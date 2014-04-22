@@ -1,0 +1,26 @@
+
+version = "0.1.7"
+// group= "net.famzangl.minecraft.minebot" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
+ sourceSets.main{
+    java{
+srcDirs 'src'
+}
+    resources{
+srcDirs 'resources'
+}
+}
+processResources
+{
+    // replace stuff in mcmod.info, nothing else
+    from(sourceSets.main.resources.srcDirs) {
+        include 'mcmod.info'
+                
+        // replace version and mcversion
+        expand 'version':project.version, 'mcversion':project.minecraft.version
+    }
+        
+    // copy everything else, thats not the mcmod.info
+    from(sourceSets.main.resources.srcDirs) {
+        exclude 'mcmod.info'
+    }
+}

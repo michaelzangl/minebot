@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="resources"/>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry combineaccessrules="false" exported="true" kind="src" path="/Minecraft"/>
+	<classpathentry kind="lib" path="/home/michael/Programme/jdk1.7.0/lib/tools.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>
