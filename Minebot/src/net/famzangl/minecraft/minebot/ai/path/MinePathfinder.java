@@ -54,19 +54,6 @@ public abstract class MinePathfinder extends MovePathFinder {
 		points = new FloatBlockCache(getPointsProvider());
 		factors = new FloatBlockCache(getFactorProvider());
 		settings = new MinebotSettings();
-		maxDistancePoints = 0;
-		maxDistanceFactor = MIN_FACTOR;
-		for (String s : settings.getKeys()) {
-			if (s.matches("mine_points_.*")) {
-				float p = settings.getFloat(s, 1, 0, MAX_POINTS);
-				maxDistancePoints = Math.max(p, maxDistancePoints);
-			} else if (s.matches("mine_factor_.*")) {
-				float p = settings.getFloat(s, 1, 0, MAX_FACTOR);
-				if (p > 0) {
-					maxDistanceFactor = Math.max(p, maxDistanceFactor);
-				}
-			}
-		}
 	}
 
 	protected abstract ISettingsProvider getFactorProvider();
