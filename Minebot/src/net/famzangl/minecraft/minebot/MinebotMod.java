@@ -8,7 +8,7 @@ import cpw.mods.fml.common.Mod.EventHandler;
 import cpw.mods.fml.common.Mod.Instance;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
 
-@Mod(modid = "minebot-mod", name = "Minebot", version = "0.1.7")
+@Mod(modid = "minebot-mod", name = "Minebot", version = "0.1.8")
 public class MinebotMod {
 	@Instance(value = "minebot-mod")
 	public static MinebotMod instance;
