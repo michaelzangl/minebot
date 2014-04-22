@@ -1,0 +1,16 @@
+[
+{
+  "modid": "minebot-mod",
+  "name": "Minebot",
+  "description": "A bot that does the dull work for you.",
+  "version": "${version}",
+  "mcversion": "${mcversion}",
+  "url": "",
+  "updateUrl": "",
+  "authors": [""],
+  "credits": "",
+  "logoFile": "",
+  "screenshots": [],
+  "dependencies": []
+}
+]
