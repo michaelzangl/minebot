@@ -2,7 +2,6 @@ package net.famzangl.minecraft.minebot.ai.task;
 
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.ItemFilter;
-import net.minecraft.util.MovementInput;
 
 public class UpwardsMoveTask extends JumpingPlaceBlockAtFloorTask {
 	public UpwardsMoveTask(int x, int y, int z, ItemFilter filter) {

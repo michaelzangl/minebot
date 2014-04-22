@@ -1,7 +1,6 @@
 package net.famzangl.minecraft.minebot;
 
 import net.famzangl.minecraft.minebot.ai.AIController;
-import net.minecraftforge.common.MinecraftForge;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.Mod.EventHandler;

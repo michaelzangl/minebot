@@ -1,6 +1,7 @@
 package net.famzangl.minecraft.minebot.ai.command;
 
 import java.util.ArrayList;
+
 import net.famzangl.minecraft.minebot.Pos;
 import net.famzangl.minecraft.minebot.ai.AIStrategy;
 import net.famzangl.minecraft.minebot.ai.animals.CommandFeed;

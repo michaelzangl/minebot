@@ -5,12 +5,8 @@ import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.ColoredBlockItemFilter;
 import net.famzangl.minecraft.minebot.ai.task.AITask;
 import net.famzangl.minecraft.minebot.ai.task.JumpingPlaceAtHalfTask;
-import net.famzangl.minecraft.minebot.ai.task.JumpingPlaceBlockAtFloorTask;
-import net.famzangl.minecraft.minebot.ai.task.JumpingPlaceBlockAtSideTask;
-import net.famzangl.minecraft.minebot.ai.task.PlaceBlockAtFloorTask;
 import net.famzangl.minecraft.minebot.build.WoodType;
 import net.minecraft.block.Block;
-import net.minecraft.world.gen.structure.StructureVillagePieces.Hall;
 import net.minecraftforge.common.util.ForgeDirection;
 
 public abstract class BuildTask {

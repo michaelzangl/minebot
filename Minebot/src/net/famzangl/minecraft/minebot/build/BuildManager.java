@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 
-
 import net.famzangl.minecraft.minebot.Pos;
 import net.famzangl.minecraft.minebot.build.blockbuild.BuildTask;
 

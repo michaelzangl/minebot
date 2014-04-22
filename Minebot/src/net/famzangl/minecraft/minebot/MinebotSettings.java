@@ -8,9 +8,10 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Properties;
-import org.apache.commons.io.IOUtils;
 
 import net.minecraft.client.Minecraft;
+
+import org.apache.commons.io.IOUtils;
 
 public class MinebotSettings {
 	private Properties settings;

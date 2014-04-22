@@ -1,10 +1,10 @@
 package net.famzangl.minecraft.minebot.ai;
 
-import org.lwjgl.opengl.GL11;
-
 import net.famzangl.minecraft.minebot.Pos;
 import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.Tessellator;
+
+import org.lwjgl.opengl.GL11;
 
 public class MarkerRenderer {
 
