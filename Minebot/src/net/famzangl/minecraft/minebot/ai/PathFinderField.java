@@ -10,11 +10,11 @@ public class PathFinderField implements Comparator<Integer> {
 	private static final long MAX_RUN_TIME = 200;
 	// Power of 2!
 	private static final int Y_LEVEL = 32;
-	private static int DELTA_X_Z = 100;
+	private static int SIZE_X_Z = 256;
 	private static int FIELD_SIZE = (1 << 16) * Y_LEVEL;
 
 	private PathFinderFieldData data = new PathFinderFieldData();
-	private final PriorityQueue<Dest> dests = new PriorityQueue<Dest>();
+	private Dest currentDest = null;
 	private final PriorityQueue<Integer> pq = new PriorityQueue<Integer>(100,
 			this);
 
@@ -43,12 +43,12 @@ public class PathFinderField implements Comparator<Integer> {
 	}
 
 	protected int getIndexForBlock(int x, int y, int z) {
-		return ((x - data.offsetX) & 0xff) | (((z - data.offsetZ) & 0xff) << 8)
+		return ((x - data.offsetX) & (SIZE_X_Z  - 1)) | (((z - data.offsetZ) & (SIZE_X_Z  - 1)) << 8)
 				| (((y - data.offsetY) & (Y_LEVEL - 1)) << 16);
 	}
 
 	protected final int getX(int blockIndex) {
-		return (blockIndex & 0xff) + data.offsetX;
+		return (blockIndex & (SIZE_X_Z  - 1)) + data.offsetX;
 	}
 
 	protected final int getY(int currentNode) {
@@ -56,7 +56,7 @@ public class PathFinderField implements Comparator<Integer> {
 	}
 
 	protected final int getZ(int currentNode) {
-		return ((currentNode >> 8) & 0xff) + data.offsetZ;
+		return ((currentNode >> 8) & (SIZE_X_Z  - 1)) + data.offsetZ;
 	}
 
 	private boolean isVisited(int blockIndex) {
@@ -155,18 +155,18 @@ public class PathFinderField implements Comparator<Integer> {
 	}
 
 	public boolean searchSomethingAround(int cx, int cy, int cz) {
-		if (data.offsetX != cx - 128 || data.offsetY != cy - Y_LEVEL / 2
-				|| data.offsetZ != cz - 128) {
+		if (data.offsetX != cx - SIZE_X_Z / 2 || data.offsetY != cy - Y_LEVEL / 2
+				|| data.offsetZ != cz - SIZE_X_Z / 2) {
 			isRunning = false;
 		}
 		if (!isRunning) {
 			System.out.println("Restart");
 			field = new int[FIELD_SIZE];
-			data.offsetX = cx - 128;
+			data.offsetX = cx - SIZE_X_Z / 2;
 			data.offsetY = cy - Y_LEVEL / 2;
-			data.offsetZ = cz - 128;
+			data.offsetZ = cz - SIZE_X_Z / 2;
 			pq.clear();
-			dests.clear();
+			currentDest = null;
 			int start = getIndexForBlock(cx, cy, cz);
 			pq.add(start);
 			setDistance(start, 1);
@@ -178,7 +178,7 @@ public class PathFinderField implements Comparator<Integer> {
 				&& ((iteration++ & 0xff) != 0 || hasTimeLeft(startTime))) {
 			int currentNode = pq.poll();
 			int currentDistance = getDistance(currentNode);
-			Dest head = dests.peek();
+			Dest head = currentDest;
 			if (head != null && currentDistance + 1 > head.destDistanceRating) {
 				planPathTo(head.destNode, cx, cy, cz);
 				terminated();
@@ -186,7 +186,10 @@ public class PathFinderField implements Comparator<Integer> {
 			}
 			float rating = rateDestination(currentNode);
 			if (rating >= 0) {
-				dests.add(new Dest(currentNode, rating));
+				Dest newDest = new Dest(currentNode, rating);
+				if (currentDest == null || newDest.compareTo(currentDest) < 0) {
+					currentDest = newDest;
+				}
 			}
 
 			int[] neighbours = getNeighbours(currentNode);
@@ -229,7 +232,7 @@ public class PathFinderField implements Comparator<Integer> {
 		isRunning = false;
 		field = null;
 		pq.clear();
-		dests.clear();
+		currentDest = null;
 	}
 
 	protected int distanceFor(int from, int to) {

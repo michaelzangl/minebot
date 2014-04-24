@@ -43,8 +43,8 @@ public abstract class BuildTask {
 	}
 
 	public static TaskDescription getTaskDescription(Block b, AIHelper h,
-			int x, int y, int z) {
-		String name = Block.blockRegistry.getNameForObject(b);
+			int x, int y, int z) throws UnknownBlockException {
+		String name = Block.blockRegistry.getNameForObject(b).replaceFirst("minecraft:", "");
 		int blockMetadata = h.getMinecraft().theWorld.getBlockMetadata(x, y, z);
 		if (AIHelper.blockIsOneOf(b, BlockBuildTask.BLOCKS)) {
 			return new TaskDescription(name, CubeBuildTask.STANDABLE);
@@ -73,7 +73,7 @@ public abstract class BuildTask {
 							+ t.toString().toLowerCase() + " " + dir, pos);
 				}
 			}
-			throw new IllegalArgumentException("Unknown wood type " + b);
+			throw new UnknownBlockException("Unknown wood type " + b);
 		} else if (AIHelper.blockIsOneOf(b, WoodBuildTask.BLOCK)) {
 			return new TaskDescription(
 					name
@@ -130,10 +130,10 @@ public abstract class BuildTask {
 							Pos.fromDir(standable));
 				}
 			}
-			throw new IllegalArgumentException("Cannot find halfslabs " + b);
+			throw new UnknownBlockException("Cannot find halfslabs " + b);
 
 		} else {
-			throw new IllegalArgumentException("Cannot reverse build task for "
+			throw new UnknownBlockException("Cannot reverse build task for "
 					+ b);
 		}
 	}

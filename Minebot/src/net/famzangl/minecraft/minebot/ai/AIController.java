@@ -148,7 +148,15 @@ public class AIController extends AIHelper implements IAIControllable {
 					desync = true;
 				} else {
 					timeout--;
-					task.runTick(this);
+					try {
+						task.runTick(this);
+					} catch (Throwable t) {
+						t.printStackTrace();
+						AIChatController
+								.addChatLine("Unexpected Error ("
+										+ t.getMessage()
+										+ "). Please report (and send the output on the console)!");
+					}
 				}
 			}
 		} else {
@@ -191,15 +199,22 @@ public class AIController extends AIHelper implements IAIControllable {
 		dead = true;
 		buildManager.reset();
 	}
-	
+
 	@SubscribeEvent
 	public void drawMarkers(RenderWorldLastEvent event) {
 		EntityLivingBase player = getMinecraft().renderViewEntity;
-		if (player.getHeldItem() != null && player.getHeldItem().getItem() instanceof MarkingAxe) {
-	        double x = player.lastTickPosX + (player.posX - player.lastTickPosX) * (double) event.partialTicks;
-	        double y = player.lastTickPosY + (player.posY - player.lastTickPosY) * (double) event.partialTicks;
-	        double z = player.lastTickPosZ + (player.posZ - player.lastTickPosZ) * (double) event.partialTicks;
-	
+		if (player.getHeldItem() != null
+				&& player.getHeldItem().getItem() instanceof MarkingAxe) {
+			double x = player.lastTickPosX
+					+ (player.posX - player.lastTickPosX)
+					* (double) event.partialTicks;
+			double y = player.lastTickPosY
+					+ (player.posY - player.lastTickPosY)
+					* (double) event.partialTicks;
+			double z = player.lastTickPosZ
+					+ (player.posZ - player.lastTickPosZ)
+					* (double) event.partialTicks;
+
 			if (markerRenderer == null) {
 				markerRenderer = new MarkerRenderer();
 			}
@@ -212,7 +227,7 @@ public class AIController extends AIHelper implements IAIControllable {
 		setPosition(pos, nextPosIsPos2);
 		nextPosIsPos2 ^= true;
 	}
-	
+
 	private AIStrategy findNewStrategy() {
 		if (requestedStrategy != null) {
 			AIStrategy r = requestedStrategy;

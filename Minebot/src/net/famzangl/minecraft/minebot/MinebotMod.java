@@ -7,7 +7,7 @@ import cpw.mods.fml.common.Mod.EventHandler;
 import cpw.mods.fml.common.Mod.Instance;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
 
-@Mod(modid = "minebot-mod", name = "Minebot", version = "0.1.8")
+@Mod(modid = "minebot-mod", name = "Minebot", version = "0.1.9")
 public class MinebotMod {
 	@Instance(value = "minebot-mod")
 	public static MinebotMod instance;
@@ -20,6 +20,10 @@ public class MinebotMod {
 		AIController controller = new AIController();
 		controller.initialize();
 		// FMLCommonHandler.instance().onPlayerPostTick(player)
+	}
+
+	public static String getVersion() {
+		return MinebotMod.class.getAnnotation(Mod.class).version();
 	}
 
 }

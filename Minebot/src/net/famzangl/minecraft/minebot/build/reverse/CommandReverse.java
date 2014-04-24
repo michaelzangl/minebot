@@ -1,10 +1,15 @@
 package net.famzangl.minecraft.minebot.build.reverse;
 
+import java.io.File;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.AIStrategy;
 import net.famzangl.minecraft.minebot.ai.command.AIChatController;
 import net.famzangl.minecraft.minebot.ai.command.AICommand;
-import net.famzangl.minecraft.minebot.ai.task.AITask;
+import net.minecraft.client.Minecraft;
 import net.minecraft.command.ICommandSender;
 
 public class CommandReverse implements AICommand {
@@ -16,55 +21,34 @@ public class CommandReverse implements AICommand {
 
 	@Override
 	public String getArgsUsage() {
-		return "";
+		return "[out-file]";
 	}
 
 	@Override
 	public String getHelpText() {
-		return "Get a build script for the selected area.";
+		return "Get a build script for the selected area.\n"
+				+ "out-file is the file to write to."
+				+ "It can be - to write to stdout."
+				+ "If no file is given, a new one is generated.";
 	}
 
 	@Override
 	public AIStrategy evaluateCommand(ICommandSender sender, String[] args,
 			AIHelper h, AIChatController aiChatController) {
-		return new AIStrategy() {
-			private boolean done = false;
+		final String outFile;
+		if (args.length == 1) {
+			File dir = new File( Minecraft.getMinecraft().mcDataDir, "minebot");
+			dir.mkdirs();
+			DateFormat df = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss");
+			String date = df.format(Calendar.getInstance().getTime());
 
-			@Override
-			public void searchTasks(AIHelper helper) {
-				if (!done) {
-					helper.addTask(new AITask() {
-						private boolean done = false;
-
-						@Override
-						public void runTick(AIHelper h) {
-							if (h.getPos1() == null || h.getPos2() == null) {
-								AIChatController.addChatLine("Set positions first.");
-							} else {
-								new BuildReverser(h).run();
-							}
-							done = true;
-						}
-
-						@Override
-						public boolean isFinished(AIHelper h) {
-							return done;
-						}
-					});
-					done = true;
-				}
-			}
-
-			@Override
-			public AITask getOverrideTask(AIHelper helper) {
-				return null;
-			}
-
-			@Override
-			public String getDescription() {
-				return "Generating build tasks.";
-			}
-		};
+			File file = new File(dir, date + ".buildscript.txt");
+			return new RunReverseBuildStrategy(file.getAbsolutePath());
+		} else if (args.length == 2) {
+			return new RunReverseBuildStrategy(args[1]);
+		} else {
+			aiChatController.usage(this);
+			return null;
+		}
 	}
-
 }
