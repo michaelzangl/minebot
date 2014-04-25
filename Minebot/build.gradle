@@ -1,5 +1,5 @@
 
-version = "0.1.9"
+version = "0.2.0"
 // group= "net.famzangl.minecraft.minebot" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
  sourceSets.main{
     java{
