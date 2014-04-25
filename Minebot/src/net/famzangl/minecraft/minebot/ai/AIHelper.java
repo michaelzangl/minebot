@@ -93,6 +93,13 @@ public abstract class AIHelper {
 			Blocks.detector_rail, Blocks.rail, Blocks.activator_rail,
 			Blocks.double_plant, Blocks.red_mushroom, Blocks.brown_mushroom,
 			Blocks.redstone_wire };
+	private static Block[] safeSideBlocks = new Block[] {
+		Blocks.fence,
+		Blocks.fence_gate,
+		Blocks.cobblestone_wall,
+		Blocks.cactus,
+		Blocks.reeds,
+	};
 
 	public final BuildManager buildManager = new BuildManager();
 	private boolean objectMouseOverInvalidated;
@@ -120,6 +127,7 @@ public abstract class AIHelper {
 	public Pos getPos2() {
 		return pos2;
 	}
+
 	public void setPosition(Pos pos, boolean isPos2) {
 		int posIndex;
 		if (isPos2) {
@@ -131,7 +139,6 @@ public abstract class AIHelper {
 		}
 		AIChatController.addChatLine("Set position" + posIndex + " to " + pos);
 	}
-	
 
 	public void face(double x, double y, double z) {
 		double d0 = x - mc.thePlayer.posX;
@@ -350,7 +357,8 @@ public abstract class AIHelper {
 	public boolean isSafeSideBlock(int x, int y, int z) {
 		Block block = mc.theWorld.getBlock(x, y, z);
 		return isSafeStandableBlock(block) || canWalkOn(block)
-				|| canWalkThrough(block) || isAirBlock(x, y, z);
+				|| canWalkThrough(block) || blockIsOneOf(block, safeSideBlocks)
+				|| isAirBlock(x, y, z);
 	}
 
 	/**
@@ -650,12 +658,12 @@ public abstract class AIHelper {
 				|| block instanceof BlockWall) {
 			maxY = 1.5;
 		} else if (block instanceof BlockSlab) {
-			int blockMetadata = getMinecraft().theWorld.getBlockMetadata(x, y, z);
+			int blockMetadata = getMinecraft().theWorld.getBlockMetadata(x, y,
+					z);
 			maxY = (blockMetadata & 0x8) == 0 ? 0.5 : 1;
 		} else {
 			maxY = block.getBlockBoundsMaxY();
 		}
-		
 
 		return y - 1 + maxY;
 	}
