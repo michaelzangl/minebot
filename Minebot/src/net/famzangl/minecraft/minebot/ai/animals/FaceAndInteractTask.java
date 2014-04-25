@@ -16,6 +16,7 @@ public class FaceAndInteractTask implements AITask {
 	private Entity preferedAnimal;
 	private IEntitySelector alsoAcceptedAnimal;
 	private boolean doRightClick;
+	private int ticksRun = 0;
 
 	public FaceAndInteractTask(Entity preferedAnimal,
 			IEntitySelector alsoAcceptedAnimal) {
@@ -31,9 +32,10 @@ public class FaceAndInteractTask implements AITask {
 
 	@Override
 	public boolean isFinished(AIHelper h) {
-		return (preferedAnimal instanceof EntityItem || preferedAnimal instanceof EntityXPOrb) ? preferedAnimal.boundingBox
-				.intersectsWith(h.getMinecraft().thePlayer.boundingBox)
-				: interacted;
+		boolean collect = preferedAnimal instanceof EntityItem
+				|| preferedAnimal instanceof EntityXPOrb;
+		return collect ? preferedAnimal.boundingBox.intersectsWith(h
+				.getMinecraft().thePlayer.boundingBox) : interacted;
 	}
 
 	@Override
@@ -47,12 +49,17 @@ public class FaceAndInteractTask implements AITask {
 				h.overrideAttack();
 			interacted = true;
 		} else {
+			double speed = h.getMinecraft().thePlayer.motionX
+					* h.getMinecraft().thePlayer.motionX
+					+ h.getMinecraft().thePlayer.motionZ
+					* h.getMinecraft().thePlayer.motionZ;
 			h.face(preferedAnimal.posX, preferedAnimal.posY,
 					preferedAnimal.posZ);
 			MovementInput i = new MovementInput();
-			i.jump = true;
+			i.jump = speed < 0.01 && ticksRun > 8;
 			i.moveForward = 1;
 			h.overrideMovement(i);
 		}
+		ticksRun++;
 	}
 }
