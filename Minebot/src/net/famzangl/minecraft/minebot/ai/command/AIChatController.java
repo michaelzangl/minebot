@@ -48,6 +48,7 @@ public class AIChatController extends CommandBase {
 		registerCommand(new CommandFeed());
 		registerCommand(new CommandKill());
 
+		registerCommand(new CommandClearArea());
 		registerCommand(new CommandScheduleBuild());
 		registerCommand(new CommandListBuild());
 		registerCommand(new CommandStepNext());

@@ -74,7 +74,6 @@ public class PlantPathFinder extends MovePathFinder {
 
 	@Override
 	protected void addTasksForTarget(Pos currentPos) {
-		int mineAbove = 0;
 		if (helper.isAirBlock(currentPos.x, currentPos.y, currentPos.z)) {
 			if (!hasFarmlandBelow(currentPos.x, currentPos.y, currentPos.z)) {
 				helper.addTask(new UseItemOnBlockAtTask(new HoeFilter(),

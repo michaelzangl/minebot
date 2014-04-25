@@ -11,6 +11,7 @@ import net.famzangl.minecraft.minebot.build.BuildManager;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockFence;
 import net.minecraft.block.BlockFenceGate;
+import net.minecraft.block.BlockSlab;
 import net.minecraft.block.BlockStairs;
 import net.minecraft.block.BlockWall;
 import net.minecraft.client.Minecraft;
@@ -648,9 +649,13 @@ public abstract class AIHelper {
 		if (block instanceof BlockFence || block instanceof BlockFenceGate
 				|| block instanceof BlockWall) {
 			maxY = 1.5;
+		} else if (block instanceof BlockSlab) {
+			int blockMetadata = getMinecraft().theWorld.getBlockMetadata(x, y, z);
+			maxY = (blockMetadata & 0x8) == 0 ? 0.5 : 1;
 		} else {
 			maxY = block.getBlockBoundsMaxY();
 		}
+		
 
 		return y - 1 + maxY;
 	}

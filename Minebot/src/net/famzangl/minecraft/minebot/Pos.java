@@ -63,4 +63,14 @@ public class Pos {
 		return res;
 	}
 
+	public static Pos minPos(Pos p1, Pos p2) {
+		return new Pos(Math.min(p1.x, p2.x), Math.min(p1.y, p2.y), Math.min(
+				p1.z, p2.z));
+	}
+
+	public static Pos maxPos(Pos p1, Pos p2) {
+		return new Pos(Math.max(p1.x, p2.x), Math.max(p1.y, p2.y), Math.max(
+				p1.z, p2.z));
+	}
+
 }
