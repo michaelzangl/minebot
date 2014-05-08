@@ -2,6 +2,7 @@ package net.famzangl.minecraft.minebot.ai.command;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Scanner;
 
 import net.famzangl.minecraft.minebot.ai.AIHelper;
@@ -44,15 +45,17 @@ public class CommandRun implements AICommand {
 						added = true;
 						File file = new File(args[1]);
 						try {
+							ArrayList<String> commands = new ArrayList<String>();
 							Scanner reader = new Scanner(file);
 							String line;
 							while (reader.hasNextLine()) {
 								line = reader.nextLine();
 								if (!line.startsWith("#") && !line.isEmpty()) {
-									helper.addTask(new SendCommandTask(line));
+									commands.add(line);
 								}
 							}
 							reader.close();
+							helper.addTask(new SendCommandTask(commands));
 						} catch (IOException e) {
 							AIChatController
 									.addChatLine("Error while reading file: "

@@ -1,16 +1,23 @@
 package net.famzangl.minecraft.minebot.ai.task;
 
+import java.util.Arrays;
+import java.util.List;
+
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.minecraft.client.gui.GuiChat;
 import net.minecraft.client.gui.GuiScreen;
 
 public class SendCommandTask implements AITask {
-	private final String command;
+	private final List<String> commands;
 	private boolean send;
 
-	public SendCommandTask(String command) {
+	public SendCommandTask(List<String> commands) {
 		super();
-		this.command = command;
+		this.commands = commands;
+	}
+
+	public SendCommandTask(String string) {
+		this(Arrays.asList(string));
 	}
 
 	@Override
@@ -22,9 +29,11 @@ public class SendCommandTask implements AITask {
 	public void runTick(AIHelper h) {
 		if (!send && h.getMinecraft().ingameGUI.getChatGUI() != null) {
 			GuiChat chat = new GuiChat();
-            h.getMinecraft().displayGuiScreen(chat);
-			chat.func_146403_a(command);
-			h.getMinecraft().displayGuiScreen((GuiScreen)null);
+			h.getMinecraft().displayGuiScreen(chat);
+			for (String command : commands) {
+				chat.func_146403_a(command);
+			}
+			h.getMinecraft().displayGuiScreen((GuiScreen) null);
 			send = true;
 		}
 	}

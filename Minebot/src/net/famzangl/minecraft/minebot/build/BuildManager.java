@@ -11,30 +11,30 @@ public class BuildManager {
 
 	private ArrayList<Pos> buildArtefactPositions = new ArrayList<Pos>();
 
-	private LinkedList<BuildTask> buildTaksk = new LinkedList<BuildTask>();
+	private LinkedList<BuildTask> buildTasks = new LinkedList<BuildTask>();
 
 	public BuildManager() {
 		reset();
 	}
 
 	public void reset() {
-		buildTaksk.clear();
+		buildTasks.clear();
 	}
 
 	public BuildTask peekNextTask() {
-		return buildTaksk.peek();
+		return buildTasks.peek();
 	}
 
 	public void addTask(BuildTask task) {
-		buildTaksk.add(task);
+		buildTasks.add(task);
 		System.out.println("Added " + task);
 	}
 
 	public BuildTask popNextTask() {
-		return buildTaksk.pop();
+		return buildTasks.pop();
 	}
 
 	public Iterable<BuildTask> getScheduled() {
-		return Collections.unmodifiableList(buildTaksk);
+		return Collections.unmodifiableList(buildTasks);
 	}
 }

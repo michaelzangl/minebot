@@ -18,12 +18,19 @@ import net.famzangl.minecraft.minebot.ai.task.AITask;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemAxe;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.crafting.CraftingManager;
+import net.minecraft.item.crafting.IRecipe;
+import net.minecraft.item.crafting.ShapedRecipes;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent.ElementType;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.entity.player.PlayerInteractEvent;
+import net.minecraftforge.event.entity.player.PlayerInteractEvent.Action;
 import net.minecraftforge.event.world.WorldEvent;
 
 import org.lwjgl.input.Keyboard;
@@ -34,6 +41,8 @@ import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.TickEvent.ClientTickEvent;
 import cpw.mods.fml.common.gameevent.TickEvent.Phase;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 
 public class AIController extends AIHelper implements IAIControllable {
 
@@ -173,10 +182,10 @@ public class AIController extends AIHelper implements IAIControllable {
 		}
 		if (doUngrab) {
 			System.out.println("Un-grabbing mouse");
-			// getMinecraft().mouseHelper.ungrabMouseCursor();
-			getMinecraft().setIngameNotInFocus();
 			// TODO: Reset this on grab
 			getMinecraft().gameSettings.pauseOnLostFocus = false;
+			// getMinecraft().mouseHelper.ungrabMouseCursor();
+			getMinecraft().setIngameNotInFocus();
 			doUngrab = false;
 		}
 
@@ -204,7 +213,7 @@ public class AIController extends AIHelper implements IAIControllable {
 	public void drawMarkers(RenderWorldLastEvent event) {
 		EntityLivingBase player = getMinecraft().renderViewEntity;
 		if (player.getHeldItem() != null
-				&& player.getHeldItem().getItem() instanceof MarkingAxe) {
+				&& player.getHeldItem().getItem() == Items.wooden_axe) {
 			double x = player.lastTickPosX
 					+ (player.posX - player.lastTickPosX)
 					* (double) event.partialTicks;
@@ -261,9 +270,28 @@ public class AIController extends AIHelper implements IAIControllable {
 		requestedStrategy = strategy;
 	}
 
+	@SubscribeEvent
+	@SideOnly(Side.CLIENT)
+	public void playerInteract(PlayerInteractEvent event) {
+		ItemStack stack = event.entityPlayer.inventory.getCurrentItem();
+		if (stack != null && stack.getItem() == Items.wooden_axe) {
+			if (event.action == Action.RIGHT_CLICK_BLOCK) {
+				Thread.dumpStack();
+				if (event.entityPlayer.worldObj.isRemote) {
+					positionMarkEvent(event.x, event.y, event.z, 0);
+				}
+			}
+		}
+	}
+
 	public void initialize() {
 		FMLCommonHandler.instance().bus().register(this);
 		MinecraftForge.EVENT_BUS.register(this);
+
+		// registerAxe();
+	}
+
+	private void registerAxe() {
 		ItemAxe old = (ItemAxe) Item.itemRegistry.getObject("wooden_axe");
 		MarkingAxe axe = (new MarkingAxe(Item.ToolMaterial.WOOD, this));
 		axe.setUnlocalizedName("hatchetWood").setTextureName("wood_axe");
@@ -291,6 +319,17 @@ public class AIController extends AIHelper implements IAIControllable {
 
 			System.out.println("Registered wooden axe: "
 					+ Item.itemRegistry.getObject("wooden_axe"));
+
+			for (Object r : CraftingManager.getInstance().getRecipeList()) {
+				if (r instanceof ShapedRecipes) {
+					ShapedRecipes recipe = (ShapedRecipes) r;
+					ItemStack out = recipe.getRecipeOutput();
+					if (out != null && out.getItem() == old) {
+						out.func_150996_a(axe);
+						System.out.println("Repalced axe...");
+					}
+				}
+			}
 		} catch (Throwable t) {
 			System.err.println("Could not register axe");
 			t.printStackTrace();

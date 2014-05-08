@@ -3,6 +3,7 @@ package net.famzangl.minecraft.minebot.build.blockbuild;
 import net.famzangl.minecraft.minebot.Pos;
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.BlockItemFilter;
+import net.famzangl.minecraft.minebot.ai.ItemFilter;
 import net.famzangl.minecraft.minebot.ai.task.AITask;
 import net.famzangl.minecraft.minebot.ai.task.SneakAndPlaceTask;
 import net.famzangl.minecraft.minebot.ai.task.UpwardsMoveTask;
@@ -55,4 +56,8 @@ public abstract class CubeBuildTask extends BuildTask {
 		}
 	}
 
+	@Override
+	public ItemFilter getRequiredItem() {
+		return blockFilter;
+	}
 }

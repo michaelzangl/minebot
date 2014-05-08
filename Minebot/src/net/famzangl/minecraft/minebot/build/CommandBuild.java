@@ -7,6 +7,7 @@ import net.famzangl.minecraft.minebot.ai.command.AIChatController;
 import net.famzangl.minecraft.minebot.ai.command.AICommand;
 import net.famzangl.minecraft.minebot.ai.task.AITask;
 import net.famzangl.minecraft.minebot.ai.task.AlignToGridTask;
+import net.famzangl.minecraft.minebot.ai.task.GetOnHotBarTask;
 import net.famzangl.minecraft.minebot.ai.task.WaitTask;
 import net.famzangl.minecraft.minebot.build.blockbuild.BuildTask;
 import net.minecraft.command.ICommandSender;
@@ -60,6 +61,7 @@ public class CommandBuild implements AICommand {
 						helper.addTask(WaitTask.instance);
 					}
 				} else {
+					helper.addTask(new GetOnHotBarTask(task.getRequiredItem()));
 					helper.addTask(task.getPlaceBlockTask(pos));
 					helper.addTask(new NextTaskTask());
 					alignSend = false;
@@ -85,7 +87,9 @@ public class CommandBuild implements AICommand {
 			int x = p.x + forPosition.x;
 			int y = p.y + forPosition.y;
 			int z = p.z + forPosition.z;
-			System.out.println("Check " + forPosition + " + " + p + " -> " + helper.isStandingOn(x, y, z) + ", " + task.couldBuildFrom(helper, x, y, z));
+			System.out.println("Check " + forPosition + " + " + p + " -> "
+					+ helper.isStandingOn(x, y, z) + ", "
+					+ task.couldBuildFrom(helper, x, y, z));
 			if (helper.isStandingOn(x, y, z)
 					&& task.couldBuildFrom(helper, x, y, z)) {
 				return p;

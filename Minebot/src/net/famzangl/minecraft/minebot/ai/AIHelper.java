@@ -19,6 +19,7 @@ import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.command.IEntitySelector;
 import net.minecraft.entity.Entity;
 import net.minecraft.init.Blocks;
+import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.MovementInput;
@@ -93,13 +94,9 @@ public abstract class AIHelper {
 			Blocks.detector_rail, Blocks.rail, Blocks.activator_rail,
 			Blocks.double_plant, Blocks.red_mushroom, Blocks.brown_mushroom,
 			Blocks.redstone_wire };
-	private static Block[] safeSideBlocks = new Block[] {
-		Blocks.fence,
-		Blocks.fence_gate,
-		Blocks.cobblestone_wall,
-		Blocks.cactus,
-		Blocks.reeds,
-	};
+	private static Block[] safeSideBlocks = new Block[] { Blocks.fence,
+			Blocks.fence_gate, Blocks.cobblestone_wall, Blocks.cactus,
+			Blocks.reeds, };
 
 	public final BuildManager buildManager = new BuildManager();
 	private boolean objectMouseOverInvalidated;
@@ -800,5 +797,14 @@ public abstract class AIHelper {
 		default:
 			return ForgeDirection.SOUTH;
 		}
+	}
+
+	public boolean hasItemInInvetory(ItemFilter itemFiler) {
+		for (ItemStack s : mc.thePlayer.inventory.mainInventory) {
+			if (itemFiler.matches(s)) {
+				return true;
+			}
+		}
+		return false;
 	}
 }

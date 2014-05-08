@@ -35,6 +35,7 @@ public class PutItemInTableTask implements AITask {
 			}
 		}
 		System.out.println("No item to put.");
+		h.desync();
 	}
 
 }
