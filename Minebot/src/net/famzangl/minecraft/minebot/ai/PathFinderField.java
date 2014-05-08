@@ -306,7 +306,7 @@ public class PathFinderField implements Comparator<Integer> {
 	}
 
 	protected int getNeighbour(int currentNode, int cx, int cy, int cz) {
-		return cy > 1 && cy < 200 && cx > data.offsetX
+		return cy > 1 && cy < 256 && cx > data.offsetX
 				&& cx < data.offsetX + 256 && cy > data.offsetY
 				&& cy < data.offsetY + Y_LEVEL && cz > data.offsetZ
 				&& cz < data.offsetZ + 256 ? getIndexForBlock(cx, cy, cz) : -1;
