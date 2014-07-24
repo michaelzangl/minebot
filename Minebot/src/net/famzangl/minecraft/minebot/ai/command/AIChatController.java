@@ -8,6 +8,7 @@ import net.famzangl.minecraft.minebot.ai.commands.CommandHelp;
 import net.famzangl.minecraft.minebot.ai.commands.CommandKill;
 import net.famzangl.minecraft.minebot.ai.commands.CommandMine;
 import net.famzangl.minecraft.minebot.ai.commands.CommandRun;
+import net.famzangl.minecraft.minebot.ai.commands.CommandSit;
 import net.famzangl.minecraft.minebot.ai.commands.CommandStop;
 import net.famzangl.minecraft.minebot.ai.commands.CommandUngrab;
 import net.famzangl.minecraft.minebot.build.commands.CommandBuild;
@@ -48,6 +49,7 @@ public class AIChatController {
 
 		registerCommand(CommandKill.class);
 		registerCommand(CommandFish.class);
+		registerCommand(CommandSit.class);
 		registerCommand(CommandFeed.class);
 
 		registerCommand(CommandBuild.class);

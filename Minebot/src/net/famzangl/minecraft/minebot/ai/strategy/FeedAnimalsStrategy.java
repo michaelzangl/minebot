@@ -3,60 +3,20 @@ package net.famzangl.minecraft.minebot.ai.strategy;
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.AIStrategy;
 import net.famzangl.minecraft.minebot.ai.selectors.AndSelector;
+import net.famzangl.minecraft.minebot.ai.selectors.ColorSelector;
+import net.famzangl.minecraft.minebot.ai.selectors.FeedableSelector;
 import net.famzangl.minecraft.minebot.ai.selectors.OrSelector;
+import net.famzangl.minecraft.minebot.ai.selectors.XPOrbSelector;
 import net.famzangl.minecraft.minebot.ai.task.AITask;
 import net.famzangl.minecraft.minebot.ai.task.FaceAndInteractTask;
 import net.minecraft.command.IEntitySelector;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.item.EntityXPOrb;
-import net.minecraft.entity.passive.EntityAnimal;
-import net.minecraft.entity.passive.EntityWolf;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemFood;
 import net.minecraft.item.ItemSeeds;
 import net.minecraft.item.ItemStack;
 
 public class FeedAnimalsStrategy implements AIStrategy {
-
-	private final class XPOrbSelector implements IEntitySelector {
-		@Override
-		public boolean isEntityApplicable(Entity e) {
-			return e instanceof EntityXPOrb;
-		}
-	}
-
-	private final class FeedableSelector implements IEntitySelector {
-		private final ItemStack currentItem;
-
-		private FeedableSelector(ItemStack currentItem) {
-			this.currentItem = currentItem;
-		}
-
-		@Override
-		public boolean isEntityApplicable(Entity e) {
-			if (!(e instanceof EntityAnimal)) {
-				return false;
-			}
-			final EntityAnimal animal = (EntityAnimal) e;
-			return animal.isBreedingItem(currentItem) && !animal.isInLove()
-					&& animal.getGrowingAge() == 0 && animal.getHealth() > 0;
-		}
-	}
-
-	private final class ColorSelector implements IEntitySelector {
-		private final int color;
-
-		public ColorSelector(int color) {
-			super();
-			this.color = color;
-		}
-
-		@Override
-		public boolean isEntityApplicable(Entity var1) {
-			return var1 instanceof EntityWolf
-					&& ((EntityWolf) var1).getCollarColor() == color;
-		}
-	}
 
 	private static final int DISTANCE = 20;
 	private final int color;

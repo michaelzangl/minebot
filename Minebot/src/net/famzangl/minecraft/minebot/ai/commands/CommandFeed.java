@@ -9,7 +9,7 @@ import net.famzangl.minecraft.minebot.ai.command.ParameterType;
 import net.famzangl.minecraft.minebot.ai.strategy.FeedAnimalsStrategy;
 
 @AICommand(helpText = "Feeds animals in range\n"
-		+ "The naimals can be restricted by color.", name = "minebot")
+		+ "The animals can be restricted by color.", name = "minebot")
 public class CommandFeed {
 
 	@AICommandInvocation()
