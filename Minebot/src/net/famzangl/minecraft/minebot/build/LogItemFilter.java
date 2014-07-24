@@ -5,11 +5,11 @@ import net.minecraft.item.ItemStack;
 
 public class LogItemFilter extends BlockItemFilter {
 
-	private WoodType logType;
+	private final WoodType logType;
 
-	public LogItemFilter(String logType) {
-		super(WoodType.valueOf(logType.toUpperCase()).block);
-		this.logType = WoodType.valueOf(logType.toUpperCase());
+	public LogItemFilter(WoodType logType) {
+		super(logType.block);
+		this.logType = logType;
 	}
 
 	@Override

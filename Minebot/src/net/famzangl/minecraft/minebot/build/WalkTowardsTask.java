@@ -9,8 +9,8 @@ import net.minecraft.util.MovementInput;
 
 public class WalkTowardsTask implements AITask {
 
-	private Pos fromPos;
-	private Pos nextPos;
+	private final Pos fromPos;
+	private final Pos nextPos;
 
 	private AITask subTask;
 
@@ -23,7 +23,7 @@ public class WalkTowardsTask implements AITask {
 	public boolean isFinished(AIHelper h) {
 		return subTask == null
 				&& h.isStandingOn(nextPos.x, nextPos.y, nextPos.z)
-			/*	&& getUpperCarpetY(h) < 0*/;
+		/* && getUpperCarpetY(h) < 0 */;
 	}
 
 	@Override
@@ -34,11 +34,11 @@ public class WalkTowardsTask implements AITask {
 		if (subTask != null) {
 			subTask.runTick(h);
 		} else {
-			int carpetY = getUpperCarpetY(h);
-			double carpetBuildHeight = h.realBlockTopY(fromPos.x,
+			final int carpetY = getUpperCarpetY(h);
+			final double carpetBuildHeight = h.realBlockTopY(fromPos.x,
 					Math.max(carpetY + 1, fromPos.y), fromPos.z);
-			double destHeight = h
-					.realBlockTopY(nextPos.x, nextPos.y, nextPos.z);
+			final double destHeight = h.realBlockTopY(nextPos.x, nextPos.y,
+					nextPos.z);
 			if (carpetBuildHeight < destHeight - 1) {
 				System.out.println("Moving upwards. Carpets are at " + carpetY);
 				h.faceBlock(fromPos.x, Math.max(carpetY, fromPos.y - 1),
@@ -48,13 +48,14 @@ public class WalkTowardsTask implements AITask {
 								Math.max(carpetY, fromPos.y - 1), fromPos.z, 1)) {
 					h.overrideUseItem();
 				}
-				MovementInput i = new MovementInput();
+				final MovementInput i = new MovementInput();
 				i.jump = true;
 				h.overrideMovement(i);
 			} else {
-				h.walkTowards(nextPos.x + 0.5, nextPos.z + 0.5, carpetBuildHeight < destHeight - 0.5);
+				h.walkTowards(nextPos.x + 0.5, nextPos.z + 0.5,
+						carpetBuildHeight < destHeight - 0.5);
 			}
-			//TODO: Clean up carpets
+			// TODO: Clean up carpets
 		}
 	}
 

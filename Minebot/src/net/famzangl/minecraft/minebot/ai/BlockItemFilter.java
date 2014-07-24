@@ -8,7 +8,7 @@ import net.minecraft.item.ItemStack;
 
 public class BlockItemFilter implements ItemFilter {
 
-	private Block[] matched;
+	private final Block[] matched;
 
 	public BlockItemFilter(Block... matched) {
 		this.matched = matched;
@@ -22,8 +22,7 @@ public class BlockItemFilter implements ItemFilter {
 	}
 
 	protected boolean matchesItem(ItemStack itemStack, ItemBlock item) {
-		return AIHelper.blockIsOneOf(
-				item.field_150939_a, matched);
+		return AIHelper.blockIsOneOf(item.field_150939_a, matched);
 	}
 
 	@Override

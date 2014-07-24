@@ -16,7 +16,7 @@ import net.minecraft.network.play.client.C16PacketClientStatus;
  * 
  */
 public class GetOnHotBarTask implements AITask {
-	private ItemFilter itemFiler;
+	private final ItemFilter itemFiler;
 	private boolean inventoryOpened;
 
 	public GetOnHotBarTask(ItemFilter itemFiler) {
@@ -33,10 +33,10 @@ public class GetOnHotBarTask implements AITask {
 	@Override
 	public void runTick(AIHelper h) {
 		if (h.getMinecraft().currentScreen instanceof GuiInventory) {
-			GuiInventory screen = (GuiInventory) h.getMinecraft().currentScreen;
+			final GuiInventory screen = (GuiInventory) h.getMinecraft().currentScreen;
 			for (int i = 9; i < 9 * 4; i++) {
-				Slot slot = screen.inventorySlots.getSlot(i);
-				ItemStack stack = slot.getStack();
+				final Slot slot = screen.inventorySlots.getSlot(i);
+				final ItemStack stack = slot.getStack();
 				if (slot == null || stack == null
 						|| !slot.canTakeStack(h.getMinecraft().thePlayer)
 						|| !itemFiler.matches(stack)) {
@@ -63,14 +63,15 @@ public class GetOnHotBarTask implements AITask {
 
 	/**
 	 * Swap a stack with Stack 5 on the hotbar.
+	 * 
 	 * @param h
 	 * @param screen
 	 * @param i
 	 */
 	private void swap(AIHelper h, GuiInventory screen, int i) {
-		PlayerControllerMP playerController = h.getMinecraft().playerController;
-		int windowId = screen.inventorySlots.windowId;
-		EntityClientPlayerMP player = h.getMinecraft().thePlayer;
+		final PlayerControllerMP playerController = h.getMinecraft().playerController;
+		final int windowId = screen.inventorySlots.windowId;
+		final EntityClientPlayerMP player = h.getMinecraft().thePlayer;
 		playerController.windowClick(windowId, i, 0, 0, player);
 		playerController.windowClick(windowId, 35 + 5, 0, 0, player);
 		playerController.windowClick(windowId, i, 0, 0, player);

@@ -35,7 +35,7 @@ public class TreePathFinder extends MovePathFinder {
 	}
 
 	private boolean isTree(int x, int y, int z) {
-		Block block = helper.getBlock(x, y, z);
+		final Block block = helper.getBlock(x, y, z);
 		return Block.isEqualTo(block, Blocks.log)
 				|| Block.isEqualTo(block, Blocks.log2);
 	}

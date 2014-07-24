@@ -6,7 +6,7 @@ import net.minecraft.util.MovingObjectPosition;
 
 public class UseItemTask implements AITask {
 	private boolean clicked;
-	private ItemFilter filter;
+	private final ItemFilter filter;
 
 	public UseItemTask() {
 		this(null);
@@ -30,7 +30,7 @@ public class UseItemTask implements AITask {
 				}
 			}
 
-			MovingObjectPosition objectMouseOver = h.getObjectMouseOver();
+			final MovingObjectPosition objectMouseOver = h.getObjectMouseOver();
 			if (objectMouseOver == null
 					|| objectMouseOver.typeOfHit != MovingObjectPosition.MovingObjectType.BLOCK) {
 				notFacingBlock(h);

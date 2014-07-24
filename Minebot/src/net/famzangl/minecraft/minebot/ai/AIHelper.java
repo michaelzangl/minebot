@@ -19,7 +19,6 @@ import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.command.IEntitySelector;
 import net.minecraft.entity.Entity;
 import net.minecraft.init.Blocks;
-import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.MovementInput;
@@ -41,7 +40,7 @@ public abstract class AIHelper {
 	private static final double WALK_PER_STEP = 4.3 / 20;
 	private static final double MIN_DISTANCE_ERROR = 0.05;
 	private static Minecraft mc = Minecraft.getMinecraft();
-	private Random rand = new Random();
+	private final Random rand = new Random();
 
 	/**
 	 * Blocks we can just walk over/next to without problems.
@@ -138,18 +137,18 @@ public abstract class AIHelper {
 	}
 
 	public void face(double x, double y, double z) {
-		double d0 = x - mc.thePlayer.posX;
-		double d1 = z - mc.thePlayer.posZ;
-		double d2 = y - mc.thePlayer.posY;
-		double d3 = d0 * d0 + d2 * d2 + d1 * d1;
+		final double d0 = x - mc.thePlayer.posX;
+		final double d1 = z - mc.thePlayer.posZ;
+		final double d2 = y - mc.thePlayer.posY;
+		final double d3 = d0 * d0 + d2 * d2 + d1 * d1;
 
 		if (d3 >= 2.500000277905201E-7D) {
-			float rotationYaw = mc.thePlayer.rotationYaw;
-			float rotationPitch = mc.thePlayer.rotationPitch;
+			final float rotationYaw = mc.thePlayer.rotationYaw;
+			final float rotationPitch = mc.thePlayer.rotationPitch;
 
-			float yaw = (float) (Math.atan2(d1, d0) * 180.0D / Math.PI) - 90.0F;
-			float pitch = (float) -(Math
-					.atan2(d2, Math.sqrt(d0 * d0 + d1 * d1)) * 180.0D / Math.PI);
+			final float yaw = (float) (Math.atan2(d1, d0) * 180.0D / Math.PI) - 90.0F;
+			final float pitch = (float) -(Math.atan2(d2,
+					Math.sqrt(d0 * d0 + d1 * d1)) * 180.0D / Math.PI);
 			mc.thePlayer.setAngles((yaw - rotationYaw) / 0.15f,
 					-(pitch - rotationPitch) / 0.15f);
 			invalidateObjectMouseOver();
@@ -186,14 +185,14 @@ public abstract class AIHelper {
 
 	// Find a block around the player
 	public Pos findBlock(Block blockType) {
-		int cx = MathHelper.floor_double(mc.thePlayer.posX);
-		int cy = MathHelper.floor_double(mc.thePlayer.posY);
-		int cz = MathHelper.floor_double(mc.thePlayer.posZ);
+		final int cx = MathHelper.floor_double(mc.thePlayer.posX);
+		final int cy = MathHelper.floor_double(mc.thePlayer.posY);
+		final int cz = MathHelper.floor_double(mc.thePlayer.posZ);
 		Pos pos = null;
 		for (int x = cx - 2; x <= cx + 2; x++) {
 			for (int z = cz - 2; z <= cz + 2; z++) {
 				for (int y = cy - 1; y <= cy + 1; y++) {
-					Block block = mc.theWorld.getBlock(x, y, z);
+					final Block block = mc.theWorld.getBlock(x, y, z);
 					if (Block.isEqualTo(block, blockType)) {
 						pos = new Pos(x, y, z);
 					}
@@ -204,7 +203,7 @@ public abstract class AIHelper {
 	}
 
 	public boolean isFacingBlock(int x, int y, int z) {
-		MovingObjectPosition o = getObjectMouseOver();
+		final MovingObjectPosition o = getObjectMouseOver();
 		return o != null && o.typeOfHit == MovingObjectType.BLOCK
 				&& o.blockX == x && o.blockY == y && o.blockZ == z;
 	}
@@ -214,7 +213,7 @@ public abstract class AIHelper {
 		if (!isFacingBlock(x, y, z, sideToDir(blockSide))) {
 			return false;
 		} else {
-			double fy = getObjectMouseOver().hitVec.yCoord - y;
+			final double fy = getObjectMouseOver().hitVec.yCoord - y;
 			return half != BlockSide.LOWER_HALF && fy > .5
 					|| half != BlockSide.UPPER_HALF && fy <= .5;
 		}
@@ -225,7 +224,7 @@ public abstract class AIHelper {
 	}
 
 	public boolean isFacingBlock(int x, int y, int z, int side) {
-		MovingObjectPosition o = getObjectMouseOver();
+		final MovingObjectPosition o = getObjectMouseOver();
 		return o != null && o.typeOfHit == MovingObjectType.BLOCK
 				&& o.blockX == x && o.blockY == y && o.blockZ == z
 				&& o.sideHit == side;
@@ -260,10 +259,10 @@ public abstract class AIHelper {
 	}
 
 	public Pos getPlayerPosition() {
-		int x = MathHelper.floor_double(getMinecraft().thePlayer.posX);
-		int y = MathHelper
+		final int x = MathHelper.floor_double(getMinecraft().thePlayer.posX);
+		final int y = MathHelper
 				.floor_double(getMinecraft().thePlayer.boundingBox.minY + 0.05);
-		int z = MathHelper.floor_double(getMinecraft().thePlayer.posZ);
+		final int z = MathHelper.floor_double(getMinecraft().thePlayer.posZ);
 		return new Pos(x, y, z);
 	}
 
@@ -312,7 +311,7 @@ public abstract class AIHelper {
 	 * @return
 	 */
 	public boolean isSafeGroundBlock(int x, int y, int z) {
-		Block block = mc.theWorld.getBlock(x, y, z);
+		final Block block = mc.theWorld.getBlock(x, y, z);
 		return isSafeStandableBlock(block);
 	}
 
@@ -325,13 +324,13 @@ public abstract class AIHelper {
 	 * @return
 	 */
 	public boolean isSafeHeadBlock(int x, int y, int z) {
-		Block block = mc.theWorld.getBlock(x, y, z);
+		final Block block = mc.theWorld.getBlock(x, y, z);
 		return blockIsOneOf(block, stairBlocks)
 				|| blockIsOneOf(block, normalBlocks) || isAirBlock(x, y, z);
 	}
 
 	public boolean isFallingBlock(int x, int y, int z) {
-		Block block = mc.theWorld.getBlock(x, y, z);
+		final Block block = mc.theWorld.getBlock(x, y, z);
 		return blockIsOneOf(block, fallingBlocks);
 	}
 
@@ -352,7 +351,7 @@ public abstract class AIHelper {
 	}
 
 	public boolean isSafeSideBlock(int x, int y, int z) {
-		Block block = mc.theWorld.getBlock(x, y, z);
+		final Block block = mc.theWorld.getBlock(x, y, z);
 		return isSafeStandableBlock(block) || canWalkOn(block)
 				|| canWalkThrough(block) || blockIsOneOf(block, safeSideBlocks)
 				|| isAirBlock(x, y, z);
@@ -435,7 +434,7 @@ public abstract class AIHelper {
 		double faceY = y + randBetween(0.1, 0.9);
 		double faceZ = z + randBetween(0.1, 0.9);
 
-		Block block = getBoundsBlock(x, y, z);
+		final Block block = getBoundsBlock(x, y, z);
 		switch (sideToFace) {
 		case UP:
 			faceY = y + block.getBlockBoundsMaxY();
@@ -466,7 +465,7 @@ public abstract class AIHelper {
 			ForgeDirection xzdir) {
 		System.out.println("x = " + x + " y=" + y + " z=" + z + " dir="
 				+ sideToFace);
-		Block block = getBoundsBlock(x, y, z);
+		final Block block = getBoundsBlock(x, y, z);
 
 		minY = Math.max(minY, block.getBlockBoundsMinY());
 		maxY = Math.max(minY, block.getBlockBoundsMaxY());
@@ -521,8 +520,8 @@ public abstract class AIHelper {
 	}
 
 	private double randBetweenNice(double minY, double maxY) {
-		return (maxY - minY) < 0.1 ? (maxY + minY) / 2 : randBetween(
-				minY + 0.03, maxY - 0.03);
+		return maxY - minY < 0.1 ? (maxY + minY) / 2 : randBetween(minY + 0.03,
+				maxY - 0.03);
 	}
 
 	private double randBetween(double a, double b) {
@@ -594,7 +593,7 @@ public abstract class AIHelper {
 	}
 
 	public static boolean blockIsOneOf(Block needle, Block... haystack) {
-		for (Block h : haystack) {
+		for (final Block h : haystack) {
 			if (Block.isEqualTo(needle, h)) {
 				return true;
 			}
@@ -611,24 +610,24 @@ public abstract class AIHelper {
 	 * @return
 	 */
 	public int getBlockId(int x, int y, int z) {
-		Chunk chunk = mc.theWorld.getChunkFromChunkCoords(x >> 4, z >> 4);
+		final Chunk chunk = mc.theWorld.getChunkFromChunkCoords(x >> 4, z >> 4);
 		chunk.getBlock(x & 15, y, z & 15);
 
 		int blockId = 0;
 
-		ExtendedBlockStorage[] sa = chunk.getBlockStorageArray();
+		final ExtendedBlockStorage[] sa = chunk.getBlockStorageArray();
 		if (y >> 4 < sa.length) {
-			ExtendedBlockStorage extendedblockstorage = sa[y >> 4];
+			final ExtendedBlockStorage extendedblockstorage = sa[y >> 4];
 
 			if (extendedblockstorage != null) {
-				int lx = x & 15;
-				int ly = y & 15;
-				int lz = z & 15;
+				final int lx = x & 15;
+				final int ly = y & 15;
+				final int lz = z & 15;
 
 				blockId = extendedblockstorage.getBlockLSBArray()[ly << 8
 						| lz << 4 | lx] & 255;
 
-				NibbleArray blockMSBArray = extendedblockstorage
+				final NibbleArray blockMSBArray = extendedblockstorage
 						.getBlockMSBArray();
 				if (blockMSBArray != null) {
 					blockId |= blockMSBArray.get(lx, ly, lz) << 8;
@@ -648,15 +647,15 @@ public abstract class AIHelper {
 	 * @return
 	 */
 	public double realBlockTopY(int x, int y, int z) {
-		Block block = getBlock(x, y - 1, z);
+		final Block block = getBlock(x, y - 1, z);
 		// Fence bounds are not exposed...
 		double maxY;
 		if (block instanceof BlockFence || block instanceof BlockFenceGate
 				|| block instanceof BlockWall) {
 			maxY = 1.5;
 		} else if (block instanceof BlockSlab) {
-			int blockMetadata = getMinecraft().theWorld.getBlockMetadata(x, y,
-					z);
+			final int blockMetadata = getMinecraft().theWorld.getBlockMetadata(
+					x, y, z);
 			maxY = (blockMetadata & 0x8) == 0 ? 0.5 : 1;
 		} else {
 			maxY = block.getBlockBoundsMaxY();
@@ -674,12 +673,12 @@ public abstract class AIHelper {
 	}
 
 	public Entity getClosestEntity(int dist, IEntitySelector selector) {
-		List<Entity> entities = getEntities(dist, selector);
+		final List<Entity> entities = getEntities(dist, selector);
 
 		double mindist = Double.MAX_VALUE;
 		Entity found = null;
-		for (Entity e : entities) {
-			double mydist = e.getDistanceSqToEntity(mc.thePlayer);
+		for (final Entity e : entities) {
+			final double mydist = e.getDistanceSqToEntity(mc.thePlayer);
 			if (mydist < mindist) {
 				found = e;
 				mindist = mydist;
@@ -704,7 +703,7 @@ public abstract class AIHelper {
 	 */
 	public boolean sneakFrom(int blockX, int blockY, int blockZ,
 			ForgeDirection inDirection) {
-		Block block = getBoundsBlock(blockX, blockY, blockZ);
+		final Block block = getBoundsBlock(blockX, blockY, blockZ);
 		double destX = blockX + .5;
 		double destZ = blockZ + .5;
 		switch (inDirection) {
@@ -737,16 +736,16 @@ public abstract class AIHelper {
 	}
 
 	public boolean walkTowards(double x, double z, boolean jump) {
-		double dx = x - mc.thePlayer.posX;
-		double dz = z - mc.thePlayer.posZ;
-		double distTo = Math.sqrt(dx * dx + dz * dz);
+		final double dx = x - mc.thePlayer.posX;
+		final double dz = z - mc.thePlayer.posZ;
+		final double distTo = Math.sqrt(dx * dx + dz * dz);
 		if (distTo > MIN_DISTANCE_ERROR) {
 			face(x, mc.thePlayer.posY, z);
 			double speed = 1;
 			if (distTo < 4 * WALK_PER_STEP) {
 				speed = Math.max(distTo / WALK_PER_STEP / 4, 0.1);
 			}
-			MovementInput movement = new MovementInput();
+			final MovementInput movement = new MovementInput();
 			movement.moveForward = (float) speed;
 			movement.jump = jump;
 			overrideMovement(movement);
@@ -800,7 +799,7 @@ public abstract class AIHelper {
 	}
 
 	public boolean hasItemInInvetory(ItemFilter itemFiler) {
-		for (ItemStack s : mc.thePlayer.inventory.mainInventory) {
+		for (final ItemStack s : mc.thePlayer.inventory.mainInventory) {
 			if (itemFiler.matches(s)) {
 				return true;
 			}

@@ -14,7 +14,7 @@ public abstract class MinePathfinder extends MovePathFinder {
 	protected static final float MAX_POINTS = 50;
 	private static final int MAX_BLOCK_IDS = 4096;
 	protected MinebotSettings settings;
-	private Random rand = new Random();
+	private final Random rand = new Random();
 	protected float maxDistancePoints = 0;
 	protected float maxDistanceFactor = 1;
 
@@ -26,9 +26,9 @@ public abstract class MinePathfinder extends MovePathFinder {
 	}
 
 	private class FloatBlockCache {
-		private float[] cached = new float[MAX_BLOCK_IDS];
-		private boolean[] isCached = new boolean[MAX_BLOCK_IDS];
-		private ISettingsProvider settingsProvider;
+		private final float[] cached = new float[MAX_BLOCK_IDS];
+		private final boolean[] isCached = new boolean[MAX_BLOCK_IDS];
+		private final ISettingsProvider settingsProvider;
 
 		public FloatBlockCache(ISettingsProvider settingsProvider) {
 			super();
@@ -36,10 +36,10 @@ public abstract class MinePathfinder extends MovePathFinder {
 		}
 
 		public float getForBlock(int x, int y, int z) {
-			int id = helper.getBlockId(x, y, z);
+			final int id = helper.getBlockId(x, y, z);
 
 			if (!isCached[id]) {
-				String name = Block.blockRegistry.getNameForObject(
+				final String name = Block.blockRegistry.getNameForObject(
 						Block.blockRegistry.getObjectById(id)).replace(
 						"minecraft:", "");
 				cached[id] = settingsProvider.getFloat(name);
@@ -62,8 +62,8 @@ public abstract class MinePathfinder extends MovePathFinder {
 
 	@Override
 	protected float rateDestination(int distance, int x, int y, int z) {
-		float r1 = rateOreBlockDistance(distance, x, y + 1, z);
-		float r2 = rateOreBlockDistance(distance, x, y, z);
+		final float r1 = rateOreBlockDistance(distance, x, y + 1, z);
+		final float r2 = rateOreBlockDistance(distance, x, y, z);
 
 		float addForDoubleMine = 0;
 
@@ -72,7 +72,7 @@ public abstract class MinePathfinder extends MovePathFinder {
 					.getFloat("mine_double_add", 1, 0.1f, 10);
 		}
 
-		float rating = Math.min(r1, r2);
+		final float rating = Math.min(r1, r2);
 
 		if (rating == Float.POSITIVE_INFINITY) {
 			return -1;
@@ -82,26 +82,26 @@ public abstract class MinePathfinder extends MovePathFinder {
 	}
 
 	private float makeRandom(float f) {
-		float r = settings.getFloat("mine_randomness", 0, 0, 1)
+		final float r = settings.getFloat("mine_randomness", 0, 0, 1)
 				* rand.nextFloat();
 		return f * (1 - r);
 	}
 
 	private float rateOreBlockDistance(int distance, int x, int y, int z) {
 		// Block block = helper.getBlock(x, y, z);
-		float point = points.getForBlock(x, y, z);
+		final float point = points.getForBlock(x, y, z);
 
-		float factor = factors.getForBlock(x, y, z);
+		final float factor = factors.getForBlock(x, y, z);
 		return factor == 0 ? Float.POSITIVE_INFINITY : distance / factor
 				* maxDistanceFactor + maxDistancePoints - point;
 	}
 
 	private float weightDouble(float f1, float f2) {
-		float maxRating = Math.max(f1, f2);
-		float smallerRating = Math.min(f1, f2);
+		final float maxRating = Math.max(f1, f2);
+		final float smallerRating = Math.min(f1, f2);
 
-		float doubleRatingFactor = settings.getFloat("mine_double_factor", 1,
-				0.1f, 10);
+		final float doubleRatingFactor = settings.getFloat(
+				"mine_double_factor", 1, 0.1f, 10);
 		return maxRating + (doubleRatingFactor - 1) * smallerRating;
 	}
 
@@ -116,7 +116,7 @@ public abstract class MinePathfinder extends MovePathFinder {
 	}
 
 	private boolean isOreBlock(int x, int y, int z) {
-		return (factors.getForBlock(x, y, z) > 0);
+		return factors.getForBlock(x, y, z) > 0;
 	}
 
 	@Override

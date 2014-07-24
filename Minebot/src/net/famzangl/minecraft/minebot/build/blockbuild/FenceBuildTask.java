@@ -13,7 +13,7 @@ public class FenceBuildTask extends CubeBuildTask {
 	public static final Block[] BLOCKS = new Block[] { Blocks.fence,
 			Blocks.cobblestone_wall, Blocks.nether_brick_fence };
 
-	protected FenceBuildTask(Pos forPosition, Block blockToPlace) {
+	public FenceBuildTask(Pos forPosition, Block blockToPlace) {
 		super(forPosition, new BlockItemFilter(blockToPlace));
 	}
 

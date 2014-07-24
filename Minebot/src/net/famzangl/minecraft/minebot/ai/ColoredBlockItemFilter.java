@@ -15,7 +15,7 @@ public class ColoredBlockItemFilter extends BlockItemFilter {
 	public static final Block[] COLORABLE_BLOCKS = new Block[] { Blocks.wool,
 			Blocks.stained_hardened_clay, Blocks.stained_glass,
 			Blocks.stained_glass_pane, Blocks.carpet };
-	private int colorMeta;
+	private final int colorMeta;
 
 	public static final String[] COLORS = new String[] { "White", "Orange",
 			"Magenta", "LightBlue", "Yellow", "Lime", "Pink", "Gray",
@@ -27,14 +27,14 @@ public class ColoredBlockItemFilter extends BlockItemFilter {
 	}
 
 	private static int colorFromString(String color) {
-		String safeColor = color.replaceAll("[-_]", "");
+		final String safeColor = color.replaceAll("[-_]", "");
 		for (int i = 0; i < COLORS.length; i++) {
 			if (COLORS[i].equalsIgnoreCase(safeColor)) {
 				return i;
 			}
 		}
 		System.out.println("Did not understand color: " + color);
-		//TODO: warn?
+		// TODO: warn?
 		return 0;
 	}
 
@@ -54,9 +54,8 @@ public class ColoredBlockItemFilter extends BlockItemFilter {
 
 	@Override
 	public String toString() {
-		return "ColoredBlockItemFilter [colorMeta=" + colorMeta
-				+ ", " + super.toString() + "]";
+		return "ColoredBlockItemFilter [colorMeta=" + colorMeta + ", "
+				+ super.toString() + "]";
 	}
-	
-	
+
 }

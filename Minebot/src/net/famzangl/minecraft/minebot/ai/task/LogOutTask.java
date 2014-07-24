@@ -17,7 +17,7 @@ public class LogOutTask implements AITask {
 	@Override
 	public void runTick(AIHelper h) {
 		if (!send) {
-			Minecraft mc = h.getMinecraft();
+			final Minecraft mc = h.getMinecraft();
 
 			mc.theWorld.sendQuittingDisconnectingPacket();
 			mc.loadWorld((WorldClient) null);

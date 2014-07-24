@@ -5,8 +5,8 @@ import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.BlockItemFilter;
 import net.famzangl.minecraft.minebot.ai.ItemFilter;
 import net.famzangl.minecraft.minebot.ai.task.AITask;
-import net.famzangl.minecraft.minebot.ai.task.SneakAndPlaceTask;
-import net.famzangl.minecraft.minebot.ai.task.UpwardsMoveTask;
+import net.famzangl.minecraft.minebot.ai.task.move.UpwardsMoveTask;
+import net.famzangl.minecraft.minebot.ai.task.place.SneakAndPlaceTask;
 
 public abstract class CubeBuildTask extends BuildTask {
 
@@ -30,14 +30,15 @@ public abstract class CubeBuildTask extends BuildTask {
 					forPosition.z, blockFilter);
 		} else {
 			return new SneakAndPlaceTask(forPosition.x, forPosition.y + 1,
-					forPosition.z, blockFilter, relativeFromPos, getMinHeightToBuild());
+					forPosition.z, blockFilter, relativeFromPos,
+					getMinHeightToBuild());
 		}
 	}
 
 	protected double getMinHeightToBuild() {
 		return forPosition.y + getBlockHeight();
 	}
-	
+
 	protected double getBlockHeight() {
 		return 1;
 	}
@@ -46,7 +47,7 @@ public abstract class CubeBuildTask extends BuildTask {
 	public Pos[] getStandablePlaces() {
 		return STANDABLE;
 	}
-	
+
 	@Override
 	public boolean couldBuildFrom(AIHelper helper, int x, int y, int z) {
 		if (!super.couldBuildFrom(helper, x, y, z)) {

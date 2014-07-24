@@ -5,7 +5,7 @@ import net.minecraft.block.Block;
 
 public class UseItemOnBlockTask extends UseItemTask {
 
-	private Block[] allowedBlocks;
+	private final Block[] allowedBlocks;
 
 	public UseItemOnBlockTask(Block... allowedBlocks) {
 		this.allowedBlocks = allowedBlocks;
@@ -14,7 +14,7 @@ public class UseItemOnBlockTask extends UseItemTask {
 	@Override
 	protected boolean isBlockAllowed(AIHelper h, int blockX, int blockY,
 			int blockZ) {
-		Block block = h.getBlock(blockX, blockY, blockZ);
+		final Block block = h.getBlock(blockX, blockY, blockZ);
 		return AIHelper.blockIsOneOf(block, allowedBlocks);
 	}
 

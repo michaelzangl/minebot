@@ -6,10 +6,10 @@ import net.famzangl.minecraft.minebot.Pos;
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.BlockItemFilter;
 import net.famzangl.minecraft.minebot.ai.PathFinderField;
-import net.famzangl.minecraft.minebot.ai.task.AlignToGridTask;
-import net.famzangl.minecraft.minebot.ai.task.DownwardsMoveTask;
-import net.famzangl.minecraft.minebot.ai.task.HorizontalMoveTask;
-import net.famzangl.minecraft.minebot.ai.task.UpwardsMoveTask;
+import net.famzangl.minecraft.minebot.ai.task.move.AlignToGridTask;
+import net.famzangl.minecraft.minebot.ai.task.move.DownwardsMoveTask;
+import net.famzangl.minecraft.minebot.ai.task.move.HorizontalMoveTask;
+import net.famzangl.minecraft.minebot.ai.task.move.UpwardsMoveTask;
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
 
@@ -24,7 +24,6 @@ public class MovePathFinder extends PathFinderField {
 			Blocks.dirt, Blocks.stone, Blocks.cobblestone };
 
 	protected AIHelper helper;
-	
 
 	/**
 	 * Blocks we should not dig through, e.g. because we cannot handle them
@@ -41,7 +40,7 @@ public class MovePathFinder extends PathFinderField {
 
 	@Override
 	protected int getNeighbour(int currentNode, int cx, int cy, int cz) {
-		int res = super.getNeighbour(currentNode, cx, cy, cz);
+		final int res = super.getNeighbour(currentNode, cx, cy, cz);
 		if (res > 0 && !isSafeToTravel(currentNode, cx, cy, cz)) {
 			return -1;
 		}
@@ -89,7 +88,7 @@ public class MovePathFinder extends PathFinderField {
 		helper.addTask(new AlignToGridTask(currentPos.x, currentPos.y,
 				currentPos.z));
 		while (!path.isEmpty()) {
-			Pos nextPos = path.removeFirst();
+			final Pos nextPos = path.removeFirst();
 			if (nextPos.y > currentPos.y) {
 				helper.addTask(new UpwardsMoveTask(nextPos.x, nextPos.y,
 						nextPos.z, new BlockItemFilter(upwardsBuildBlocks)));
@@ -128,10 +127,10 @@ public class MovePathFinder extends PathFinderField {
 	}
 
 	protected int materialDistance(int x, int y, int z, boolean asFloor) {
-		Block block = helper.getBlock(x, y, z);
-		if (Block.isEqualTo(block, Blocks.air)
-				|| (asFloor && helper.canWalkOn(block))
-				|| (!asFloor && helper.canWalkThrough(block))) {
+		final Block block = helper.getBlock(x, y, z);
+		if (Block.isEqualTo(block, Blocks.air) || asFloor
+				&& helper.canWalkOn(block) || !asFloor
+				&& helper.canWalkThrough(block)) {
 			return 0;
 		} else if (AIHelper.blockIsOneOf(block, Blocks.dirt, Blocks.gravel,
 				Blocks.sand, Blocks.sandstone)) {

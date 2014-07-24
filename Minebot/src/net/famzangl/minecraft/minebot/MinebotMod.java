@@ -17,7 +17,7 @@ public class MinebotMod {
 		// FMLCommonHandler.instance().bus().register(new KeyHandlers());
 		FMLCommonHandler.instance().bus().register(new PlayerUpdateHandler());
 		// FMLCommonHandler.instance().bus().register(new PlantKeyHandler());
-		AIController controller = new AIController();
+		final AIController controller = new AIController();
 		controller.initialize();
 		// FMLCommonHandler.instance().onPlayerPostTick(player)
 	}

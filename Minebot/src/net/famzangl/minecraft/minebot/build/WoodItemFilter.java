@@ -6,11 +6,11 @@ import net.minecraft.item.ItemStack;
 
 public class WoodItemFilter extends BlockItemFilter {
 
-	private WoodType woodType;
+	private final WoodType woodType;
 
-	public WoodItemFilter(String woodType) {
+	public WoodItemFilter(WoodType woodType) {
 		super(Blocks.planks);
-		this.woodType = WoodType.valueOf(woodType.toUpperCase());
+		this.woodType = woodType;
 	}
 
 	@Override

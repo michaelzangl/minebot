@@ -28,9 +28,9 @@ public class SendCommandTask implements AITask {
 	@Override
 	public void runTick(AIHelper h) {
 		if (!send && h.getMinecraft().ingameGUI.getChatGUI() != null) {
-			GuiChat chat = new GuiChat();
+			final GuiChat chat = new GuiChat();
 			h.getMinecraft().displayGuiScreen(chat);
-			for (String command : commands) {
+			for (final String command : commands) {
 				chat.func_146403_a(command);
 			}
 			h.getMinecraft().displayGuiScreen((GuiScreen) null);

@@ -11,7 +11,7 @@ public class TakeEnchantedItemTask implements AITask {
 		if (!(h.getMinecraft().currentScreen instanceof GuiEnchantment)) {
 			return false;
 		}
-		GuiEnchantment screen = (GuiEnchantment) h.getMinecraft().currentScreen;
+		final GuiEnchantment screen = (GuiEnchantment) h.getMinecraft().currentScreen;
 		return !screen.inventorySlots.getSlot(0).getHasStack();
 	}
 
@@ -21,12 +21,13 @@ public class TakeEnchantedItemTask implements AITask {
 			System.out.println("Screen not opened.");
 			return;
 		}
-		GuiEnchantment screen = (GuiEnchantment) h.getMinecraft().currentScreen;
+		final GuiEnchantment screen = (GuiEnchantment) h.getMinecraft().currentScreen;
 		if (screen.inventorySlots.getSlot(0).getHasStack()
 				&& screen.inventorySlots.getSlot(0).getStack()
 						.isItemEnchanted()) {
-			h.getMinecraft().playerController.windowClick(screen.inventorySlots.windowId, 0,
-					0, 1, h.getMinecraft().thePlayer);
+			h.getMinecraft().playerController.windowClick(
+					screen.inventorySlots.windowId, 0, 0, 1,
+					h.getMinecraft().thePlayer);
 			System.out.println("Taking item");
 			return;
 		} else {

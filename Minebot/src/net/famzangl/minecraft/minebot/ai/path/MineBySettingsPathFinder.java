@@ -5,10 +5,10 @@ import net.famzangl.minecraft.minebot.ai.AIHelper;
 public class MineBySettingsPathFinder extends MinePathfinder {
 
 	protected class FileSettingsProvider implements ISettingsProvider {
-		private String name_prefix;
-		private float defaultValue;
-		private float min;
-		private float max;
+		private final String name_prefix;
+		private final float defaultValue;
+		private final float min;
+		private final float max;
 
 		public FileSettingsProvider(String name_prefix, float defaultValue,
 				float min, float max) {
@@ -20,8 +20,8 @@ public class MineBySettingsPathFinder extends MinePathfinder {
 
 		@Override
 		public float getFloat(String name) {
-			float val = settings.getFloat(name_prefix + name, defaultValue,
-					min, max);
+			final float val = settings.getFloat(name_prefix + name,
+					defaultValue, min, max);
 			System.out.println(name_prefix + name + " -> " + val);
 			return val;
 		}
@@ -31,12 +31,12 @@ public class MineBySettingsPathFinder extends MinePathfinder {
 		super(helper);
 		maxDistancePoints = 0;
 		maxDistanceFactor = MIN_FACTOR;
-		for (String s : settings.getKeys()) {
+		for (final String s : settings.getKeys()) {
 			if (s.matches("mine_points_.*")) {
-				float p = settings.getFloat(s, 1, 0, MAX_POINTS);
+				final float p = settings.getFloat(s, 1, 0, MAX_POINTS);
 				maxDistancePoints = Math.max(p, maxDistancePoints);
 			} else if (s.matches("mine_factor_.*")) {
-				float p = settings.getFloat(s, 1, 0, MAX_FACTOR);
+				final float p = settings.getFloat(s, 1, 0, MAX_FACTOR);
 				if (p > 0) {
 					maxDistanceFactor = Math.max(p, maxDistanceFactor);
 				}

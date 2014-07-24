@@ -1,34 +1,26 @@
 package net.famzangl.minecraft.minebot.ai.command;
 
-import net.famzangl.minecraft.minebot.ai.AIHelper;
-import net.famzangl.minecraft.minebot.ai.AIStrategy;
-import net.minecraft.command.ICommandSender;
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
- * An AI command that does something.
+ * This represents a command of the AI system. The user can enter the name on
+ * the console to run it.
+ * <p>
+ * Classes of this type always need at least one constructor with a
+ * {@link AICommandInvocation}-Annotation.
  * 
  * @author michael
  * 
  */
-public interface AICommand {
-	public String getName();
+@Documented
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.TYPE)
+public @interface AICommand {
+	String name();
 
-	/**
-	 * args to use. [] define optional args.
-	 * 
-	 * @return
-	 */
-	public String getArgsUsage();
-	
-	public String getHelpText();
-
-	/**
-	 * 
-	 * @param sender TODO
-	 * @param args Args, where agrs[0] is the name.
-	 * @param h
-	 * @param aiChatController 
-	 * @return A Strategy or <code>null</code> if no strategy should be started.
-	 */
-	public AIStrategy evaluateCommand(ICommandSender sender, String[] args, AIHelper h, AIChatController aiChatController);
+	String helpText();
 }

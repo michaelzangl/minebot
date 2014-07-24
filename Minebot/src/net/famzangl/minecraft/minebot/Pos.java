@@ -31,19 +31,25 @@ public class Pos {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
+		if (this == obj) {
 			return true;
-		if (obj == null)
+		}
+		if (obj == null) {
 			return false;
-		if (getClass() != obj.getClass())
+		}
+		if (getClass() != obj.getClass()) {
 			return false;
-		Pos other = (Pos) obj;
-		if (x != other.x)
+		}
+		final Pos other = (Pos) obj;
+		if (x != other.x) {
 			return false;
-		if (y != other.y)
+		}
+		if (y != other.y) {
 			return false;
-		if (z != other.z)
+		}
+		if (z != other.z) {
 			return false;
+		}
 		return true;
 	}
 
@@ -56,7 +62,7 @@ public class Pos {
 	}
 
 	public static Pos[] fromDir(ForgeDirection[] standable) {
-		Pos[] res = new Pos[standable.length];
+		final Pos[] res = new Pos[standable.length];
 		for (int i = 0; i < res.length; i++) {
 			res[i] = fromDir(standable[i]);
 		}

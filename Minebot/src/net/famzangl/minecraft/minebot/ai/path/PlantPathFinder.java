@@ -3,9 +3,9 @@ package net.famzangl.minecraft.minebot.ai.path;
 import net.famzangl.minecraft.minebot.Pos;
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.ItemFilter;
-import net.famzangl.minecraft.minebot.ai.task.DestroyBlockTask;
-import net.famzangl.minecraft.minebot.ai.task.PlaceBlockAtFloorTask;
 import net.famzangl.minecraft.minebot.ai.task.UseItemOnBlockAtTask;
+import net.famzangl.minecraft.minebot.ai.task.place.DestroyBlockTask;
+import net.famzangl.minecraft.minebot.ai.task.place.PlaceBlockAtFloorTask;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockCrops;
 import net.minecraft.init.Blocks;
@@ -37,26 +37,27 @@ public class PlantPathFinder extends MovePathFinder {
 
 	@Override
 	protected float rateDestination(int distance, int x, int y, int z) {
-		if (isGrown(helper, x, y, z))
+		if (isGrown(helper, x, y, z)) {
 			return distance + 1;
-		else if (helper.isAirBlock(x, y, z) && hasFarmlandBelow(x, y, z)
-				&& helper.canSelectItem(new SeedFilter()))
+		} else if (helper.isAirBlock(x, y, z) && hasFarmlandBelow(x, y, z)
+				&& helper.canSelectItem(new SeedFilter())) {
 			return distance + 1;
-		else if (helper.isAirBlock(x, y, z)
+		} else if (helper.isAirBlock(x, y, z)
 				&& AIHelper.blockIsOneOf(helper.getBlock(x, y - 1, z),
 						Blocks.dirt, Blocks.grass)
 				&& helper.canSelectItem(new SeedFilter())
 				&& helper.canSelectItem(new HoeFilter())) {
 			return distance + 10;
-		} else
+		} else {
 			return -1;
+		}
 	}
 
 	private boolean isGrown(AIHelper helper, int x, int y, int z) {
-		Block block = helper.getBlock(x, y, z);
+		final Block block = helper.getBlock(x, y, z);
 		if (block instanceof BlockCrops) {
-			int metadata = helper.getMinecraft().theWorld.getBlockMetadata(x,
-					y, z);
+			final int metadata = helper.getMinecraft().theWorld
+					.getBlockMetadata(x, y, z);
 			return metadata >= 7;
 		}
 		return false;

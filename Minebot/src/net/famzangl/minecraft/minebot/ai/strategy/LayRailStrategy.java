@@ -11,8 +11,8 @@ public class LayRailStrategy implements AIStrategyFactory {
 
 	@Override
 	public AIStrategy produceStrategy(AIHelper helper) {
-		Pos p = helper.getPlayerPosition();
-		Vec3 lookVec = helper.getMinecraft().thePlayer.getLookVec();
+		final Pos p = helper.getPlayerPosition();
+		final Vec3 lookVec = helper.getMinecraft().thePlayer.getLookVec();
 		int dx = 0, dz = 0;
 		if (Math.abs(lookVec.xCoord) > Math.abs(lookVec.zCoord)) {
 			dx = (int) Math.signum(lookVec.xCoord);

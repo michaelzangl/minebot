@@ -19,8 +19,8 @@ import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.TickEvent.PlayerTickEvent;
 
 public class PlayerUpdateHandler {
-	private ExecutorService sendThread;
-	private Hashtable<String, Long> blockTimes = new Hashtable<String, Long>();
+	private final ExecutorService sendThread;
+	private final Hashtable<String, Long> blockTimes = new Hashtable<String, Long>();
 	private boolean toLoaded;
 	private String to;
 
@@ -33,9 +33,9 @@ public class PlayerUpdateHandler {
 		if (toLoaded && to == null) {
 			return;
 		}
-		EntityPlayer player = evt.player;
-		String name = player.getDisplayName();
-		Long blocked = blockTimes.get(name);
+		final EntityPlayer player = evt.player;
+		final String name = player.getDisplayName();
+		final Long blocked = blockTimes.get(name);
 		if (blocked != null && blocked > System.currentTimeMillis()) {
 			return;
 		}
@@ -50,7 +50,8 @@ public class PlayerUpdateHandler {
 			public void run() {
 				HttpURLConnection connection = null;
 				try {
-					String urlParameters = "players=" + URLEncoder.encode(json);
+					final String urlParameters = "players="
+							+ URLEncoder.encode(json);
 					if (!toLoaded) {
 						to = new MinebotSettings().get("report_position_to",
 								null);
@@ -59,7 +60,7 @@ public class PlayerUpdateHandler {
 					if (to == null) {
 						return;
 					}
-					URL url = new URL(to);
+					final URL url = new URL(to);
 					connection = (HttpURLConnection) url.openConnection();
 					connection.setRequestMethod("POST");
 					connection.setRequestProperty("Content-Type",
@@ -71,18 +72,18 @@ public class PlayerUpdateHandler {
 					connection.setDoInput(true);
 					connection.setDoOutput(true);
 
-					DataOutputStream wr = new DataOutputStream(connection
+					final DataOutputStream wr = new DataOutputStream(connection
 							.getOutputStream());
 					wr.writeBytes(urlParameters);
 					wr.flush();
 					wr.close();
-					InputStream is = connection.getInputStream();
-					BufferedReader rd = new BufferedReader(
+					final InputStream is = connection.getInputStream();
+					final BufferedReader rd = new BufferedReader(
 							new InputStreamReader(is));
 					while (rd.readLine() != null) {
 					}
 					rd.close();
-				} catch (Throwable t) {
+				} catch (final Throwable t) {
 					t.printStackTrace();
 				} finally {
 					if (connection != null) {

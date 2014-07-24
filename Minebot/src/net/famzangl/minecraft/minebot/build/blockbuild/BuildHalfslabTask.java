@@ -3,8 +3,8 @@ package net.famzangl.minecraft.minebot.build.blockbuild;
 import net.famzangl.minecraft.minebot.Pos;
 import net.famzangl.minecraft.minebot.ai.task.AITask;
 import net.famzangl.minecraft.minebot.ai.task.BlockSide;
-import net.famzangl.minecraft.minebot.ai.task.JumpingPlaceAtHalfTask;
-import net.famzangl.minecraft.minebot.ai.task.SneakAndPlaceAtHalfTask;
+import net.famzangl.minecraft.minebot.ai.task.place.JumpingPlaceAtHalfTask;
+import net.famzangl.minecraft.minebot.ai.task.place.SneakAndPlaceAtHalfTask;
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
 
@@ -12,13 +12,11 @@ public class BuildHalfslabTask extends CubeBuildTask {
 
 	public static final Block[] BLOCKS = new Block[] { Blocks.stone_slab,
 			Blocks.wooden_slab };
-	private BlockSide side;
+	private final BlockSide side;
 
-	protected BuildHalfslabTask(Pos forPosition, String slabType, String up) {
-		super(forPosition, new SlabFilter(SlabType.valueOf(slabType
-				.toUpperCase())));
-		this.side = "up".equalsIgnoreCase(up) ? BlockSide.UPPER_HALF
-				: BlockSide.LOWER_HALF;
+	public BuildHalfslabTask(Pos forPosition, SlabType slabType, BlockSide up) {
+		super(forPosition, new SlabFilter(slabType));
+		this.side = up;
 	}
 
 	@Override

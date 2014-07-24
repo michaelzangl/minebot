@@ -10,8 +10,9 @@ public interface AIStrategy {
 
 	/**
 	 * get an emergency override task.
+	 * 
 	 * @param aiController
 	 */
 	AITask getOverrideTask(AIHelper helper);
-	
+
 }

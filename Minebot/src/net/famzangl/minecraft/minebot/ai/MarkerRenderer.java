@@ -22,14 +22,14 @@ public class MarkerRenderer {
 		GL11.glPolygonOffset(-3.0F, -3.0F);
 		GL11.glEnable(GL11.GL_POLYGON_OFFSET_FILL);
 		GL11.glEnable(GL11.GL_ALPHA_TEST);
-		boolean hadBlend = GL11.glIsEnabled(GL11.GL_BLEND);
+		final boolean hadBlend = GL11.glIsEnabled(GL11.GL_BLEND);
 		GL11.glEnable(GL11.GL_BLEND);
-		Tessellator tessellator = Tessellator.instance;
+		final Tessellator tessellator = Tessellator.instance;
 		tessellator.startDrawingQuads();
 		tessellator.setTranslation(-x, -y, -z);
 
 		float redPart = 1.0f;
-		for (Pos m : markerPos) {
+		for (final Pos m : markerPos) {
 			tessellator.setColorRGBA_F(redPart, 0, 0, 0.5f);
 			if (m != null) {
 				renderMarker(m);
@@ -52,7 +52,7 @@ public class MarkerRenderer {
 	}
 
 	private void renderMarker(Pos m) {
-		Tessellator tessellator = Tessellator.instance;
+		final Tessellator tessellator = Tessellator.instance;
 		tessellator.addVertex(m.x + MIN, m.y + MAX, m.z + MIN);
 		tessellator.addVertex(m.x + MIN, m.y + MAX, m.z + MAX);
 		tessellator.addVertex(m.x + MAX, m.y + MAX, m.z + MAX);

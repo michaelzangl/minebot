@@ -5,7 +5,7 @@ import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.ColoredBlockItemFilter;
 import net.famzangl.minecraft.minebot.ai.ItemFilter;
 import net.famzangl.minecraft.minebot.ai.task.AITask;
-import net.famzangl.minecraft.minebot.ai.task.JumpingPlaceAtHalfTask;
+import net.famzangl.minecraft.minebot.ai.task.place.JumpingPlaceAtHalfTask;
 import net.famzangl.minecraft.minebot.build.WoodType;
 import net.minecraft.block.Block;
 import net.minecraftforge.common.util.ForgeDirection;
@@ -18,35 +18,12 @@ public abstract class BuildTask {
 		this.forPosition = forPosition;
 	}
 
-	public static BuildTask taskFor(Pos forPosition, Block blockToPlace,
-			String extra, String extra2) {
-		if (AIHelper.blockIsOneOf(blockToPlace, BlockBuildTask.BLOCKS)) {
-			return new BlockBuildTask(forPosition, blockToPlace);
-		} else if (AIHelper.blockIsOneOf(blockToPlace,
-				ColoredCubeBuildTask.BLOCKS)) {
-			return new ColoredCubeBuildTask(forPosition, blockToPlace, extra);
-		} else if (AIHelper.blockIsOneOf(blockToPlace, FenceBuildTask.BLOCKS)) {
-			return new FenceBuildTask(forPosition, blockToPlace);
-		} else if (AIHelper.blockIsOneOf(blockToPlace, LogBuildTask.BLOCKS)) {
-			return new LogBuildTask(forPosition, extra, extra2);
-		} else if (AIHelper.blockIsOneOf(blockToPlace, WoodBuildTask.BLOCK)) {
-			return new WoodBuildTask(forPosition, extra);
-		} else if (AIHelper.blockIsOneOf(blockToPlace,
-				BuildNormalStairsTask.BLOCKS)) {
-			return new BuildNormalStairsTask(forPosition, blockToPlace, extra,
-					extra2);
-		} else if (AIHelper
-				.blockIsOneOf(blockToPlace, BuildHalfslabTask.BLOCKS)) {
-			return new BuildHalfslabTask(forPosition, extra, extra2);
-		} else {
-			throw new IllegalArgumentException("Cannot build " + blockToPlace);
-		}
-	}
-
 	public static TaskDescription getTaskDescription(Block b, AIHelper h,
 			int x, int y, int z) throws UnknownBlockException {
-		String name = Block.blockRegistry.getNameForObject(b).replaceFirst("minecraft:", "");
-		int blockMetadata = h.getMinecraft().theWorld.getBlockMetadata(x, y, z);
+		final String name = Block.blockRegistry.getNameForObject(b)
+				.replaceFirst("minecraft:", "");
+		final int blockMetadata = h.getMinecraft().theWorld.getBlockMetadata(x,
+				y, z);
 		if (AIHelper.blockIsOneOf(b, BlockBuildTask.BLOCKS)) {
 			return new TaskDescription(name, CubeBuildTask.STANDABLE);
 		} else if (AIHelper.blockIsOneOf(b, ColoredCubeBuildTask.BLOCKS)) {
@@ -56,7 +33,7 @@ public abstract class BuildTask {
 		} else if (AIHelper.blockIsOneOf(b, FenceBuildTask.BLOCKS)) {
 			return new TaskDescription(name, FenceBuildTask.STANDABLE);
 		} else if (AIHelper.blockIsOneOf(b, LogBuildTask.BLOCKS)) {
-			for (WoodType t : WoodType.values()) {
+			for (final WoodType t : WoodType.values()) {
 				if (t.lowerBits == (blockMetadata & 0x3) && t.block == b) {
 					String dir;
 					Pos[] pos;
@@ -97,11 +74,11 @@ public abstract class BuildTask {
 				dir = ForgeDirection.SOUTH;
 				break;
 			}
-			Pos p1 = Pos.fromDir(dir.getOpposite()).add(0, 1, 0);
-			Pos p2 = Pos.fromDir(dir.getRotation(ForgeDirection.UP)).add(0, 1,
-					0);
-			Pos p3 = Pos.fromDir(dir.getRotation(ForgeDirection.DOWN)).add(0,
-					1, 0);
+			final Pos p1 = Pos.fromDir(dir.getOpposite()).add(0, 1, 0);
+			final Pos p2 = Pos.fromDir(dir.getRotation(ForgeDirection.UP)).add(
+					0, 1, 0);
+			final Pos p3 = Pos.fromDir(dir.getRotation(ForgeDirection.DOWN))
+					.add(0, 1, 0);
 			String up;
 			Pos[] standable;
 			if ((blockMetadata & 0x4) == 0) {
@@ -114,7 +91,7 @@ public abstract class BuildTask {
 			return new TaskDescription(name + " "
 					+ dir.toString().toLowerCase() + " " + up, standable);
 		} else if (AIHelper.blockIsOneOf(b, BuildHalfslabTask.BLOCKS)) {
-			for (SlabType t : SlabType.values()) {
+			for (final SlabType t : SlabType.values()) {
 				if (t.slabBlock == b && t.meta == (blockMetadata & 0x7)) {
 					String up;
 					ForgeDirection[] standable;
@@ -148,7 +125,7 @@ public abstract class BuildTask {
 	public abstract AITask getPlaceBlockTask(Pos relativeFromPos);
 
 	public boolean isStandablePlace(Pos relativeFromPos) {
-		for (Pos p : getStandablePlaces()) {
+		for (final Pos p : getStandablePlaces()) {
 			if (p.equals(relativeFromPos)) {
 				return true;
 			}
@@ -166,8 +143,8 @@ public abstract class BuildTask {
 	 * @return
 	 */
 	public boolean couldBuildFrom(AIHelper helper, int x, int y, int z) {
-		Pos pos = getForPosition();
-		for (Pos p : getStandablePlaces()) {
+		final Pos pos = getForPosition();
+		for (final Pos p : getStandablePlaces()) {
 			if (p.x + pos.x == x && p.y + pos.y == y && p.z + pos.z == z) {
 				return true;
 			}

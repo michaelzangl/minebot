@@ -16,7 +16,7 @@ public class SelectEnchantmentTask implements AITask {
 		if (!(h.getMinecraft().currentScreen instanceof GuiEnchantment)) {
 			return false;
 		} else {
-			GuiEnchantment screen = (GuiEnchantment) h.getMinecraft().currentScreen;
+			final GuiEnchantment screen = (GuiEnchantment) h.getMinecraft().currentScreen;
 			return screen.inventorySlots.getSlot(0).getHasStack()
 					&& screen.inventorySlots.getSlot(0).getStack()
 							.isItemEnchanted();
@@ -30,7 +30,7 @@ public class SelectEnchantmentTask implements AITask {
 			h.desync();
 			return;
 		}
-		GuiEnchantment screen = (GuiEnchantment) h.getMinecraft().currentScreen;
+		final GuiEnchantment screen = (GuiEnchantment) h.getMinecraft().currentScreen;
 		if (!screen.inventorySlots.getSlot(0).getHasStack()) {
 			System.out.println("No stack in slot.");
 			h.desync();
@@ -42,10 +42,11 @@ public class SelectEnchantmentTask implements AITask {
 		}
 
 		try {
-			Field field = GuiEnchantment.class
+			final Field field = GuiEnchantment.class
 					.getDeclaredField("field_147075_G");
 			field.setAccessible(true);
-			ContainerEnchantment c = (ContainerEnchantment) field.get(screen);
+			final ContainerEnchantment c = (ContainerEnchantment) field
+					.get(screen);
 
 			if (c.enchantLevels[E_SLOT] == 0) {
 				System.out.println("No enchantment levels computed yet.");
@@ -61,7 +62,7 @@ public class SelectEnchantmentTask implements AITask {
 			}
 			System.out.println("Sent enchant request package.");
 			return;
-		} catch (Throwable e) {
+		} catch (final Throwable e) {
 			e.printStackTrace();
 			h.desync();
 			return;

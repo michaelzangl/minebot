@@ -33,7 +33,7 @@ public class MinebotSettings {
 				System.out.println("Loading " + settingsFile.getAbsolutePath()
 						+ " ...");
 				settings.load(new FileInputStream(settingsFile));
-			} catch (IOException e) {
+			} catch (final IOException e) {
 				System.err.println("Could not read settings file.");
 			}
 		}
@@ -42,7 +42,7 @@ public class MinebotSettings {
 	}
 
 	private File getSettingsFile() {
-		File settingsFile = new File(Minecraft.getMinecraft().mcDataDir,
+		final File settingsFile = new File(Minecraft.getMinecraft().mcDataDir,
 				"minebot.properties");
 		if (!settingsFile.exists()) {
 			System.out.println("Settings file "
@@ -58,23 +58,23 @@ public class MinebotSettings {
 						"minebot.properties");
 				destination = new FileOutputStream(settingsFile);
 				IOUtils.copy(source, destination);
-			} catch (IOException e) {
+			} catch (final IOException e) {
 				System.err.println("Error copying default settings.");
 				settingsFile.delete();
-			} catch (NullPointerException e) {
+			} catch (final NullPointerException e) {
 				System.err.println("Could not find default settings.");
 				settingsFile.delete();
 			} finally {
 				if (source != null) {
 					try {
 						source.close();
-					} catch (IOException e) {
+					} catch (final IOException e) {
 					}
 				}
 				if (destination != null) {
 					try {
 						destination.close();
-					} catch (IOException e) {
+					} catch (final IOException e) {
 					}
 				}
 			}
@@ -83,24 +83,24 @@ public class MinebotSettings {
 	}
 
 	public String get(String key, String defaultValue) {
-		String property = getSettings().getProperty(key);
+		final String property = getSettings().getProperty(key);
 		return property == null ? defaultValue : property;
 	}
 
 	public int getInt(String key, int defaultValue) {
-		String property = getSettings().getProperty(key);
+		final String property = getSettings().getProperty(key);
 		try {
 			return Integer.parseInt(property);
-		} catch (Throwable t) {
+		} catch (final Throwable t) {
 			return defaultValue;
 		}
 	}
 
 	public float getFloat(String key, float defaultValue) {
-		String property = getSettings().getProperty(key);
+		final String property = getSettings().getProperty(key);
 		try {
 			return Float.parseFloat(property);
-		} catch (Throwable t) {
+		} catch (final Throwable t) {
 			return defaultValue;
 		}
 	}
@@ -113,7 +113,7 @@ public class MinebotSettings {
 	public Collection<String> getKeys() {
 		if (keys == null) {
 			keys = new ArrayList<String>();
-			for (Object k : getSettings().keySet()) {
+			for (final Object k : getSettings().keySet()) {
 				keys.add((String) k);
 			}
 		}

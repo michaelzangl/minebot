@@ -7,9 +7,18 @@ import net.minecraft.entity.passive.EntityCow;
 import net.minecraft.entity.passive.EntityPig;
 import net.minecraft.entity.passive.EntitySheep;
 
+/**
+ * A list of animal types we can filter for.
+ * 
+ * @author michael
+ * 
+ */
 public enum AnimalyType {
-	ANY(null), COW(EntityCow.class), CHICKEN(EntityChicken.class), PIG(
-			EntityPig.class), SHEEP(EntitySheep.class);
+	ANY(null),
+	COW(EntityCow.class),
+	CHICKEN(EntityChicken.class),
+	PIG(EntityPig.class),
+	SHEEP(EntitySheep.class);
 
 	private Class<?> animalClass;
 
@@ -17,7 +26,7 @@ public enum AnimalyType {
 		this.animalClass = animalClass;
 	}
 
-	boolean hasAnimalClass(Entity e) {
+	public boolean hasAnimalClass(Entity e) {
 		return animalClass == null ? e instanceof EntityAnimal
 				: e.getClass() == animalClass;
 	}

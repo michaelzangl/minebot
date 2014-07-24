@@ -1,7 +1,5 @@
 package net.famzangl.minecraft.minebot.ai;
 
-import java.lang.reflect.Field;
-import java.util.BitSet;
 import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.Map.Entry;
@@ -19,12 +17,7 @@ import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.init.Items;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemAxe;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.CraftingManager;
-import net.minecraft.item.crafting.IRecipe;
-import net.minecraft.item.crafting.ShapedRecipes;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent.ElementType;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
@@ -37,7 +30,6 @@ import org.lwjgl.input.Keyboard;
 
 import cpw.mods.fml.client.registry.ClientRegistry;
 import cpw.mods.fml.common.FMLCommonHandler;
-import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.TickEvent.ClientTickEvent;
 import cpw.mods.fml.common.gameevent.TickEvent.Phase;
@@ -52,15 +44,15 @@ public class AIController extends AIHelper implements IAIControllable {
 			Keyboard.getKeyIndex("N"), "Command Mod");
 
 	static {
-		KeyBinding mine = new KeyBinding("Farm ores",
+		final KeyBinding mine = new KeyBinding("Farm ores",
 				Keyboard.getKeyIndex("K"), "Command Mod");
-		KeyBinding lumberjack = new KeyBinding("Farm wood",
+		final KeyBinding lumberjack = new KeyBinding("Farm wood",
 				Keyboard.getKeyIndex("J"), "Command Mod");
-		KeyBinding build_rail = new KeyBinding("Build Minecart tracks",
+		final KeyBinding build_rail = new KeyBinding("Build Minecart tracks",
 				Keyboard.getKeyIndex("H"), "Command Mod");
-		KeyBinding mobfarm = new KeyBinding("Farm mobs",
+		final KeyBinding mobfarm = new KeyBinding("Farm mobs",
 				Keyboard.getKeyIndex("M"), "Command Mod");
-		KeyBinding plant = new KeyBinding("Plant seeds",
+		final KeyBinding plant = new KeyBinding("Plant seeds",
 				Keyboard.getKeyIndex("P"), "Command Mod");
 		uses.put(mine, new MineStrategy());
 		uses.put(lumberjack, new LumberjackStrategy());
@@ -135,7 +127,7 @@ public class AIController extends AIHelper implements IAIControllable {
 			synchronized (strategyDescrMutex) {
 				strategyDescr = currentStrategy.getDescription();
 			}
-			AITask overrideTask = currentStrategy.getOverrideTask(this);
+			final AITask overrideTask = currentStrategy.getOverrideTask(this);
 			if (overrideTask != null) {
 				tasks.clear();
 				tasks.push(overrideTask);
@@ -148,7 +140,7 @@ public class AIController extends AIHelper implements IAIControllable {
 			if (tasks.isEmpty()) {
 				dead = true;
 			} else {
-				AITask task = tasks.get(0);
+				final AITask task = tasks.get(0);
 				if (task.isFinished(this)) {
 					tasks.remove(0);
 					resetTimeout();
@@ -159,7 +151,7 @@ public class AIController extends AIHelper implements IAIControllable {
 					timeout--;
 					try {
 						task.runTick(this);
-					} catch (Throwable t) {
+					} catch (final Throwable t) {
 						t.printStackTrace();
 						AIChatController
 								.addChatLine("Unexpected Error ("
@@ -189,7 +181,7 @@ public class AIController extends AIHelper implements IAIControllable {
 			doUngrab = false;
 		}
 
-		ScaledResolution res = new ScaledResolution(
+		final ScaledResolution res = new ScaledResolution(
 				getMinecraft().gameSettings, getMinecraft().displayWidth,
 				getMinecraft().displayHeight);
 		String str;
@@ -211,18 +203,15 @@ public class AIController extends AIHelper implements IAIControllable {
 
 	@SubscribeEvent
 	public void drawMarkers(RenderWorldLastEvent event) {
-		EntityLivingBase player = getMinecraft().renderViewEntity;
+		final EntityLivingBase player = getMinecraft().renderViewEntity;
 		if (player.getHeldItem() != null
 				&& player.getHeldItem().getItem() == Items.wooden_axe) {
-			double x = player.lastTickPosX
-					+ (player.posX - player.lastTickPosX)
-					* (double) event.partialTicks;
-			double y = player.lastTickPosY
-					+ (player.posY - player.lastTickPosY)
-					* (double) event.partialTicks;
-			double z = player.lastTickPosZ
-					+ (player.posZ - player.lastTickPosZ)
-					* (double) event.partialTicks;
+			final double x = player.lastTickPosX
+					+ (player.posX - player.lastTickPosX) * event.partialTicks;
+			final double y = player.lastTickPosY
+					+ (player.posY - player.lastTickPosY) * event.partialTicks;
+			final double z = player.lastTickPosZ
+					+ (player.posZ - player.lastTickPosZ) * event.partialTicks;
 
 			if (markerRenderer == null) {
 				markerRenderer = new MarkerRenderer();
@@ -232,21 +221,21 @@ public class AIController extends AIHelper implements IAIControllable {
 	}
 
 	public void positionMarkEvent(int x, int y, int z, int side) {
-		Pos pos = new Pos(x, y, z);
+		final Pos pos = new Pos(x, y, z);
 		setPosition(pos, nextPosIsPos2);
 		nextPosIsPos2 ^= true;
 	}
 
 	private AIStrategy findNewStrategy() {
 		if (requestedStrategy != null) {
-			AIStrategy r = requestedStrategy;
+			final AIStrategy r = requestedStrategy;
 			requestedStrategy = null;
 			return r;
 		}
 
-		for (Entry<KeyBinding, AIStrategyFactory> e : uses.entrySet()) {
+		for (final Entry<KeyBinding, AIStrategyFactory> e : uses.entrySet()) {
 			if (e.getKey().isPressed()) {
-				AIStrategy strat = e.getValue().produceStrategy(this);
+				final AIStrategy strat = e.getValue().produceStrategy(this);
 				if (strat != null) {
 					return strat;
 				}
@@ -273,7 +262,7 @@ public class AIController extends AIHelper implements IAIControllable {
 	@SubscribeEvent
 	@SideOnly(Side.CLIENT)
 	public void playerInteract(PlayerInteractEvent event) {
-		ItemStack stack = event.entityPlayer.inventory.getCurrentItem();
+		final ItemStack stack = event.entityPlayer.inventory.getCurrentItem();
 		if (stack != null && stack.getItem() == Items.wooden_axe) {
 			if (event.action == Action.RIGHT_CLICK_BLOCK) {
 				Thread.dumpStack();
@@ -291,48 +280,4 @@ public class AIController extends AIHelper implements IAIControllable {
 		// registerAxe();
 	}
 
-	private void registerAxe() {
-		ItemAxe old = (ItemAxe) Item.itemRegistry.getObject("wooden_axe");
-		MarkingAxe axe = (new MarkingAxe(Item.ToolMaterial.WOOD, this));
-		axe.setUnlocalizedName("hatchetWood").setTextureName("wood_axe");
-		axe.setIcon(old.getIconFromDamage(0));
-
-		// call the real Item.itemRegistry.addObject(271, "wooden_axe", axe);
-		try {
-			// clear bit in availability map
-			Field availabilityMapField = Item.itemRegistry.getClass()
-					.getDeclaredField("availabilityMap");
-			availabilityMapField.setAccessible(true);
-			BitSet map = (BitSet) availabilityMapField.get(Item.itemRegistry);
-			map.clear(271);
-
-			// set namespace
-			// Loader.instance().modController = null
-			Field modControllerField = Loader.instance().getClass()
-					.getDeclaredField("modController");
-			modControllerField.setAccessible(true);
-			Object oldModController = modControllerField.get(Loader.instance());
-			modControllerField.set(Loader.instance(), null);
-
-			Item.itemRegistry.addObject(271, "minecraft:wooden_axe", axe);
-			modControllerField.set(Loader.instance(), oldModController);
-
-			System.out.println("Registered wooden axe: "
-					+ Item.itemRegistry.getObject("wooden_axe"));
-
-			for (Object r : CraftingManager.getInstance().getRecipeList()) {
-				if (r instanceof ShapedRecipes) {
-					ShapedRecipes recipe = (ShapedRecipes) r;
-					ItemStack out = recipe.getRecipeOutput();
-					if (out != null && out.getItem() == old) {
-						out.func_150996_a(axe);
-						System.out.println("Repalced axe...");
-					}
-				}
-			}
-		} catch (Throwable t) {
-			System.err.println("Could not register axe");
-			t.printStackTrace();
-		}
-	}
 }

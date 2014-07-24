@@ -12,6 +12,15 @@ import net.minecraft.entity.EntityLiving;
 import net.minecraft.util.AxisAlignedBB;
 
 public class FaceAnyMobTask implements AITask {
+	private final class LivingSelector implements
+			IEntitySelector {
+		@Override
+		public boolean isEntityApplicable(Entity var1) {
+			// TODO: better filter
+			return var1 instanceof EntityLiving;
+		}
+	}
+
 	private static final int DIST = 3;
 	int tickCount;
 
@@ -24,22 +33,17 @@ public class FaceAnyMobTask implements AITask {
 	public void runTick(AIHelper h) {
 		tickCount++;
 		if (tickCount > 10) {
-			Minecraft mc = h.getMinecraft();
-			List<Entity> entsInBBList = h.getEntities(DIST, new IEntitySelector() {
-				@Override
-				public boolean isEntityApplicable(Entity var1) {
-					// TODO: better filter
-					return var1 instanceof EntityLiving;
-				}
-			});
+			final Minecraft mc = h.getMinecraft();
+			final List<Entity> entsInBBList = h.getEntities(DIST,
+					new LivingSelector());
 			if (entsInBBList.isEmpty()) {
 				System.out.println("No entity in range");
 				return;
 			}
 			System.out.println("Face next entity in range");
-			int n = new Random().nextInt(entsInBBList.size());
-			Entity e = entsInBBList.get(n);
-			AxisAlignedBB ebb = e.boundingBox;
+			final int n = new Random().nextInt(entsInBBList.size());
+			final Entity e = entsInBBList.get(n);
+			final AxisAlignedBB ebb = e.boundingBox;
 			h.face((ebb.maxX + ebb.minX) / 2, ebb.minY + 0.2,
 					(ebb.maxZ + ebb.minZ) / 2);
 		}

@@ -1,7 +1,5 @@
 package net.famzangl.minecraft.minebot;
 
-import java.awt.AWTException;
-import java.awt.Robot;
 import java.util.List;
 
 import net.minecraft.block.BlockColored;
@@ -22,19 +20,11 @@ import cpw.mods.fml.common.gameevent.InputEvent.KeyInputEvent;
 public class FeedKeyHandler {
 	private static Minecraft mc = Minecraft.getMinecraft();
 
-	private static final int DIST = 5;
-
 	private static final int MAX_INTERACTIONS_PER_HIT = 10;
 
 	public static FeedKeyHandler instance = new FeedKeyHandler();
-	private Robot r = null;
 
 	public FeedKeyHandler() {
-		try {
-			r = new Robot();
-		} catch (AWTException e) {
-			e.printStackTrace();
-		}
 	}
 
 	public static void Pressed(KeyInputEvent event, boolean breedOrSit,
@@ -58,24 +48,24 @@ public class FeedKeyHandler {
 		int color = -1;
 		String filterClass = null;
 		if (onlyCurrent) {
-			Entity hit = mc.objectMouseOver.entityHit;
+			final Entity hit = mc.objectMouseOver.entityHit;
 			if (hit == null) {
 				return;
 			}
 			filterClass = hit.getClass().getCanonicalName();
 
 			if (hit instanceof EntityWolf) {
-				EntityWolf wolf = (EntityWolf) hit;
+				final EntityWolf wolf = (EntityWolf) hit;
 				color = wolf.getCollarColor();
 			}
 		}
 		int interactedWith = 0;
-		List<Entity> entsInBBList = findEntities();
-		for (Entity e : entsInBBList) {
+		final List<Entity> entsInBBList = null;
+		for (final Entity e : entsInBBList) {
 			if (!(e instanceof EntityAnimal)) {
 				continue;
 			}
-			EntityAnimal animal = (EntityAnimal) e;
+			final EntityAnimal animal = (EntityAnimal) e;
 
 			System.out.print(e.getClass().getName() + "," + e.posX + ", "
 					+ e.posY + ", " + e.posZ + ": ");
@@ -88,14 +78,15 @@ public class FeedKeyHandler {
 			// filter
 			if (filterClass != null
 					&& !e.getClass().getCanonicalName().equals(filterClass)
-					&& (color == -1 || (e instanceof EntityWolf && ((EntityWolf) e)
-							.getCollarColor() == color))) {
+					&& (color == -1 || e instanceof EntityWolf
+							&& ((EntityWolf) e).getCollarColor() == color)) {
 				System.out.println("skipped (filter)");
 				continue;
 			}
 
 			// do action
-			ItemStack currentItem = mc.thePlayer.inventory.getCurrentItem();
+			final ItemStack currentItem = mc.thePlayer.inventory
+					.getCurrentItem();
 			if (currentItem != null
 					&& (currentItem.getItem() instanceof ItemFood
 							|| currentItem.getItem() == Items.wheat || currentItem
@@ -118,7 +109,7 @@ public class FeedKeyHandler {
 					System.out.println("Can only color a wolf.");
 					continue;
 				}
-				int newColor = BlockColored.func_150032_b(currentItem
+				final int newColor = BlockColored.func_150032_b(currentItem
 						.getItemDamage());
 				if (((EntityWolf) e).getCollarColor() == newColor) {
 					System.out.println("Already has color.");
@@ -158,7 +149,7 @@ public class FeedKeyHandler {
 					continue;
 				}
 
-				EntityTameable tameable = (EntityTameable) e;
+				final EntityTameable tameable = (EntityTameable) e;
 				if (!tameable.isTamed()) {
 					System.out.println("Not tamed.");
 					continue;
@@ -179,19 +170,5 @@ public class FeedKeyHandler {
 			interactedWith++;
 		}
 		// mc.playerController.getBlockReachDistance()
-	}
-
-	private List<Entity> findEntities() {
-		double expandBBvalue = 1;
-		List<Entity> entsInBBList = mc.theWorld
-				.getEntitiesWithinAABBExcludingEntity(
-						mc.renderViewEntity,
-						mc.renderViewEntity.boundingBox
-								.addCoord(-DIST, -DIST, -DIST)
-								.addCoord(DIST, DIST, DIST)
-								.expand(expandBBvalue,
-										expandBBvalue,
-										expandBBvalue));
-		return entsInBBList;
 	}
 }

@@ -4,11 +4,11 @@ import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.AIStrategy;
 import net.famzangl.minecraft.minebot.ai.task.AITask;
 
-final class RunReverseBuildStrategy implements AIStrategy {
+public final class RunReverseBuildStrategy implements AIStrategy {
 	final String outFile;
 	private boolean done = false;
 
-	RunReverseBuildStrategy(String outFile) {
+	public RunReverseBuildStrategy(String outFile) {
 		this.outFile = outFile;
 	}
 

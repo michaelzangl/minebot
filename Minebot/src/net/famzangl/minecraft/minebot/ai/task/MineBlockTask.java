@@ -3,9 +3,9 @@ package net.famzangl.minecraft.minebot.ai.task;
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 
 public class MineBlockTask implements AITask {
-	private int x;
-	private int y;
-	private int z;
+	private final int x;
+	private final int y;
+	private final int z;
 
 	public MineBlockTask(int x, int y, int z) {
 		this.x = x;

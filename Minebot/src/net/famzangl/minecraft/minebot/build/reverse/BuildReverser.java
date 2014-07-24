@@ -16,16 +16,16 @@ import net.minecraft.init.Blocks;
 import net.minecraftforge.common.util.ForgeDirection;
 
 public class BuildReverser {
-	private AIHelper helper;
-	private Pos pos1;
-	private Pos pos2;
-	private ReverseBuildField field;
+	private final AIHelper helper;
+	private final Pos pos1;
+	private final Pos pos2;
+	private final ReverseBuildField field;
 	private String outFile;
 	private PrintStream out;
 
 	public BuildReverser(AIHelper helper, String outFile) {
-		this(helper, Pos.minPos(helper.getPos1(), helper.getPos2()), Pos.maxPos(
-				helper.getPos1(), helper.getPos2()), outFile);
+		this(helper, Pos.minPos(helper.getPos1(), helper.getPos2()), Pos
+				.maxPos(helper.getPos1(), helper.getPos2()), outFile);
 	}
 
 	public BuildReverser(AIHelper helper, Pos pos1, Pos pos2, String outFile) {
@@ -45,7 +45,8 @@ public class BuildReverser {
 			} else {
 				this.out = new PrintStream(outFile);
 			}
-			out.println("# Minebot reverse build script " + MinebotMod.getVersion());
+			out.println("# Minebot reverse build script "
+					+ MinebotMod.getVersion());
 			out.println("# Pos1: " + pos1);
 			out.println("# Pos2: " + pos2);
 			out.println("");
@@ -54,18 +55,19 @@ public class BuildReverser {
 			for (int y = pos1.y; y <= pos2.y; y++) {
 				out.println("# Layer " + (y - pos1.y));
 				for (int x = pos1.x; x <= pos2.x; x++) {
-					boolean row2 = ((x - pos1.x) & 1) == 1;
-					addRow(new Pos(x, y, row2 ? pos2.z : pos1.z), row2 ? ForgeDirection.NORTH
-							: ForgeDirection.SOUTH, pos2.z - pos1.z + 1);
+					final boolean row2 = (x - pos1.x & 1) == 1;
+					addRow(new Pos(x, y, row2 ? pos2.z : pos1.z),
+							row2 ? ForgeDirection.NORTH : ForgeDirection.SOUTH,
+							pos2.z - pos1.z + 1);
 				}
 				out.println("");
 			}
 			out.println("/minebot build");
 
 			AIChatController.addChatLine("Output written to: " + this.outFile);
-		} catch (FileNotFoundException e) {
+		} catch (final FileNotFoundException e) {
 			AIChatController.addChatLine("File/dir does not exist: " + outFile);
-		} catch (IOException e) {
+		} catch (final IOException e) {
 			AIChatController.addChatLine("IO-Error for: " + outFile);
 		} finally {
 			if (out != null) {
@@ -83,19 +85,19 @@ public class BuildReverser {
 	}
 
 	private void addBuildPlace(int x, int y, int z) {
-		int lx = x - pos1.x;
-		int ly = y - pos1.y;
-		int lz = z - pos1.z;
+		final int lx = x - pos1.x;
+		final int ly = y - pos1.y;
+		final int lz = z - pos1.z;
 
-		Block b = helper.getBlock(x, y, z);
+		final Block b = helper.getBlock(x, y, z);
 		if (b != Blocks.air) {
 			try {
-				TaskDescription taskString = BuildTask.getTaskDescription(b,
-						helper, x, y, z);
+				final TaskDescription taskString = BuildTask
+						.getTaskDescription(b, helper, x, y, z);
 				field.setBlockAt(lx, ly, lz, b, taskString);
 				out.println("/minebot build:schedule ~" + lx + " ~" + ly + " ~"
 						+ lz + " " + taskString.getCommandArgs());
-			} catch (UnknownBlockException e) {
+			} catch (final UnknownBlockException e) {
 				out.println("# Missing: ~" + lx + " ~" + ly + " ~" + lz + " "
 						+ b.getLocalizedName());
 				AIChatController.addChatLine("Cannot convert Block at " + x

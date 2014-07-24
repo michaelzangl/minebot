@@ -5,7 +5,7 @@ import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 
 public class SlabFilter extends BlockItemFilter {
-	private SlabType type;
+	private final SlabType type;
 
 	public SlabFilter(SlabType type) {
 		super(type.slabBlock);

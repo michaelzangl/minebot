@@ -46,7 +46,7 @@ public class EnchantStrategy implements AIStrategy, AIStrategyFactory {
 	}
 
 	private boolean enchantmentTableOpened(AIHelper helper) {
-		return ((helper.getMinecraft().currentScreen) instanceof GuiEnchantment);
+		return helper.getMinecraft().currentScreen instanceof GuiEnchantment;
 	}
 
 	@Override

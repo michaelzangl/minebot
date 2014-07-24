@@ -4,8 +4,8 @@ import net.famzangl.minecraft.minebot.Pos;
 import net.famzangl.minecraft.minebot.ai.BlockItemFilter;
 import net.famzangl.minecraft.minebot.ai.task.AITask;
 import net.famzangl.minecraft.minebot.ai.task.BlockSide;
-import net.famzangl.minecraft.minebot.ai.task.JumpingPlaceBlockAtSideTask;
-import net.famzangl.minecraft.minebot.ai.task.SneakAndPlaceAtSideTask;
+import net.famzangl.minecraft.minebot.ai.task.place.JumpingPlaceBlockAtSideTask;
+import net.famzangl.minecraft.minebot.ai.task.place.SneakAndPlaceAtSideTask;
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
 import net.minecraftforge.common.util.ForgeDirection;
@@ -18,14 +18,19 @@ public class BuildNormalStairsTask extends CubeBuildTask {
 			Blocks.oak_stairs, Blocks.sandstone_stairs, Blocks.spruce_stairs,
 			Blocks.stone_brick_stairs, Blocks.stone_stairs,
 			Blocks.quartz_stairs };
-	private ForgeDirection upwardsDirection;
-	private boolean inverted;
+	private final ForgeDirection upwardsDirection;
+	private final boolean inverted;
+	
+	public static enum Half {
+		UPPER,
+		LOWER
+	}
 
-	protected BuildNormalStairsTask(Pos forPosition, Block stairs,
-			ForgeDirection upwardsDirection, boolean inverted) {
+	public BuildNormalStairsTask(Pos forPosition, Block stairs,
+			ForgeDirection upwardsDirection, Half half) {
 		super(forPosition, new BlockItemFilter(stairs));
 		this.upwardsDirection = upwardsDirection;
-		this.inverted = inverted;
+		this.inverted = half == Half.UPPER;
 		if (upwardsDirection != ForgeDirection.EAST
 				&& upwardsDirection != ForgeDirection.WEST
 				&& upwardsDirection != ForgeDirection.NORTH
@@ -34,15 +39,10 @@ public class BuildNormalStairsTask extends CubeBuildTask {
 		}
 	}
 
-	public BuildNormalStairsTask(Pos forPosition, Block blockToPlace,
-			String extra, String extra2) {
-		this(forPosition, blockToPlace, ForgeDirection.valueOf(extra
-				.toUpperCase()), "up".equalsIgnoreCase(extra2));
-	}
-
 	@Override
 	public AITask getPlaceBlockTask(Pos relativeFromPos) {
-		BlockSide side = inverted ? BlockSide.UPPER_HALF : BlockSide.LOWER_HALF;
+		final BlockSide side = inverted ? BlockSide.UPPER_HALF
+				: BlockSide.LOWER_HALF;
 		if (!isStandablePlace(relativeFromPos)) {
 			return null;
 		} else if (relativeFromPos.equals(FROM_GROUND)) {

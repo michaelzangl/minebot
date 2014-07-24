@@ -2,6 +2,7 @@ package net.famzangl.minecraft.minebot.build.blockbuild;
 
 import net.famzangl.minecraft.minebot.Pos;
 import net.famzangl.minecraft.minebot.build.LogItemFilter;
+import net.famzangl.minecraft.minebot.build.WoodType;
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
 import net.minecraftforge.common.util.ForgeDirection;
@@ -16,9 +17,9 @@ public class LogBuildTask extends CubeBuildTask {
 			new Pos(-1, 1, 0) };
 	private final ForgeDirection dir;
 
-	public LogBuildTask(Pos forPosition, String logType, String direction) {
+	public LogBuildTask(Pos forPosition, WoodType logType, ForgeDirection direction) {
 		super(forPosition, new LogItemFilter(logType));
-		dir = ForgeDirection.valueOf(direction.toUpperCase());
+		dir = direction;
 	}
 
 	@Override

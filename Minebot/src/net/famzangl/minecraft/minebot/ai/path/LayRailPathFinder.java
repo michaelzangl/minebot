@@ -3,19 +3,19 @@ package net.famzangl.minecraft.minebot.ai.path;
 import net.famzangl.minecraft.minebot.Pos;
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.BlockItemFilter;
-import net.famzangl.minecraft.minebot.ai.task.DownwardsMoveTask;
 import net.famzangl.minecraft.minebot.ai.task.MineBlockTask;
-import net.famzangl.minecraft.minebot.ai.task.PlaceBlockAtFloorTask;
-import net.famzangl.minecraft.minebot.ai.task.UpwardsMoveTask;
+import net.famzangl.minecraft.minebot.ai.task.move.DownwardsMoveTask;
+import net.famzangl.minecraft.minebot.ai.task.move.UpwardsMoveTask;
+import net.famzangl.minecraft.minebot.ai.task.place.PlaceBlockAtFloorTask;
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
 
 public class LayRailPathFinder extends MovePathFinder {
 	int dx;
 	int dz;
-	private int cx;
-	private int cy;
-	private int cz;
+	private final int cx;
+	private final int cy;
+	private final int cz;
 
 	public LayRailPathFinder(AIHelper helper, int dx, int dz, int cx, int cy,
 			int cz) {
@@ -29,8 +29,8 @@ public class LayRailPathFinder extends MovePathFinder {
 
 	@Override
 	protected int getNeighbour(int currentNode, int cx, int cy, int cz) {
-		int res = super.getNeighbour(currentNode, cx, cy, cz);
-		if (res > 0 && (helper.isRailBlock(helper.getBlock(cx, cy + 1, cz)))) {
+		final int res = super.getNeighbour(currentNode, cx, cy, cz);
+		if (res > 0 && helper.isRailBlock(helper.getBlock(cx, cy + 1, cz))) {
 			return -1;
 		}
 		return res;
@@ -60,8 +60,8 @@ public class LayRailPathFinder extends MovePathFinder {
 	}
 
 	private boolean isOnRail(int x, int z) {
-		return (dz != 0 && x == cx && dz * (z - cz) >= 0)
-				|| (dx != 0 && (z == cz && dx * (x - cx) >= 0));
+		return dz != 0 && x == cx && dz * (z - cz) >= 0 || dx != 0 && z == cz
+				&& dx * (x - cx) >= 0;
 	}
 
 	private int railstep(int x, int z) {

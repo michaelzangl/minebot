@@ -9,7 +9,7 @@ public final class NextTaskTask implements AITask {
 	public NextTaskTask() {
 		this(1);
 	}
-	
+
 	public NextTaskTask(int tasksToSkip) {
 		this.tasksToSkip = tasksToSkip;
 	}
@@ -33,7 +33,5 @@ public final class NextTaskTask implements AITask {
 	public String toString() {
 		return "NextTaskTask [tasksToSkip=" + tasksToSkip + "]";
 	}
-
-	
 
 }

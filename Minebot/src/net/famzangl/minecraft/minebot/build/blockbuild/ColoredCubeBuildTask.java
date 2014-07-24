@@ -10,9 +10,9 @@ public class ColoredCubeBuildTask extends CubeBuildTask {
 	public static final Block[] BLOCKS = new Block[] { Blocks.wool,
 			Blocks.stained_glass, Blocks.stained_hardened_clay };
 
-	protected ColoredCubeBuildTask(Pos forPosition, Block blockType,
-			String colorArg) {
-		super(forPosition, new ColoredBlockItemFilter(blockType, colorArg));
+	public ColoredCubeBuildTask(Pos forPosition, Block blockType,
+			int extraColor) {
+		super(forPosition, new ColoredBlockItemFilter(blockType, extraColor));
 	}
 
 	@Override

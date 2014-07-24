@@ -3,15 +3,16 @@ package net.famzangl.minecraft.minebot.build;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
+import java.util.List;
 
 import net.famzangl.minecraft.minebot.Pos;
 import net.famzangl.minecraft.minebot.build.blockbuild.BuildTask;
 
 public class BuildManager {
 
-	private ArrayList<Pos> buildArtefactPositions = new ArrayList<Pos>();
+	private final ArrayList<Pos> buildArtefactPositions = new ArrayList<Pos>();
 
-	private LinkedList<BuildTask> buildTasks = new LinkedList<BuildTask>();
+	private final LinkedList<BuildTask> buildTasks = new LinkedList<BuildTask>();
 
 	public BuildManager() {
 		reset();
@@ -34,7 +35,7 @@ public class BuildManager {
 		return buildTasks.pop();
 	}
 
-	public Iterable<BuildTask> getScheduled() {
+	public List<BuildTask> getScheduled() {
 		return Collections.unmodifiableList(buildTasks);
 	}
 }

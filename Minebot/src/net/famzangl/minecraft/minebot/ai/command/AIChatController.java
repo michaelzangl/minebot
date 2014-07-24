@@ -1,24 +1,28 @@
 package net.famzangl.minecraft.minebot.ai.command;
 
-import java.util.ArrayList;
+import java.util.List;
 
-import net.famzangl.minecraft.minebot.Pos;
-import net.famzangl.minecraft.minebot.ai.AIStrategy;
-import net.famzangl.minecraft.minebot.ai.animals.CommandFeed;
-import net.famzangl.minecraft.minebot.ai.animals.CommandKill;
-import net.famzangl.minecraft.minebot.build.CommandBuild;
-import net.famzangl.minecraft.minebot.build.CommandClear;
-import net.famzangl.minecraft.minebot.build.CommandListBuild;
-import net.famzangl.minecraft.minebot.build.CommandScheduleBuild;
-import net.famzangl.minecraft.minebot.build.CommandStepNext;
-import net.famzangl.minecraft.minebot.build.CommandStepPlace;
-import net.famzangl.minecraft.minebot.build.CommandStepWalk;
-import net.famzangl.minecraft.minebot.build.reverse.CommandReverse;
-import net.minecraft.command.CommandBase;
-import net.minecraft.command.ICommandSender;
+import net.famzangl.minecraft.minebot.ai.commands.CommandFeed;
+import net.famzangl.minecraft.minebot.ai.commands.CommandFish;
+import net.famzangl.minecraft.minebot.ai.commands.CommandHelp;
+import net.famzangl.minecraft.minebot.ai.commands.CommandKill;
+import net.famzangl.minecraft.minebot.ai.commands.CommandMine;
+import net.famzangl.minecraft.minebot.ai.commands.CommandRun;
+import net.famzangl.minecraft.minebot.ai.commands.CommandStop;
+import net.famzangl.minecraft.minebot.ai.commands.CommandUngrab;
+import net.famzangl.minecraft.minebot.build.commands.CommandBuild;
+import net.famzangl.minecraft.minebot.build.commands.CommandClearArea;
+import net.famzangl.minecraft.minebot.build.commands.CommandListBuilds;
+import net.famzangl.minecraft.minebot.build.commands.CommandReset;
+import net.famzangl.minecraft.minebot.build.commands.CommandReverse;
+import net.famzangl.minecraft.minebot.build.commands.CommandScheduleBuild;
+import net.famzangl.minecraft.minebot.build.commands.CommandSetPos;
+import net.famzangl.minecraft.minebot.build.commands.CommandStepNext;
+import net.famzangl.minecraft.minebot.build.commands.CommandStepPlace;
+import net.famzangl.minecraft.minebot.build.commands.CommandStepWalk;
 import net.minecraft.util.ChatComponentText;
-import net.minecraft.util.MathHelper;
-import net.minecraftforge.client.ClientCommandHandler;
+
+import com.google.common.base.Function;
 
 /**
  * Controlls the AI from a chat line.
@@ -26,106 +30,46 @@ import net.minecraftforge.client.ClientCommandHandler;
  * @author michael
  * 
  */
-public class AIChatController extends CommandBase {
+public class AIChatController {
 	public static AIChatController runningInstance = null;
 
-	private IAIControllable controlled;
+	private final IAIControllable controlled;
 
-	private static ArrayList<AICommand> commands = new ArrayList<AICommand>();
+	private static final CommandRegistry registry = new CommandRegistry();
+
+	private static final int PER_PAGE = 8;
 
 	static {
-		registerCommand(new Usage());
-		registerCommand(new Help());
-		
-		registerCommand(new CommandUngrab());
-		registerCommand(new CommandStop());
-		registerCommand(new CommandRun());
-		registerCommand(new CommandSetPos(false));
-		registerCommand(new CommandSetPos(true));
-		
-		registerCommand(new CommandMine());
-		registerCommand(new CommandFish());
-		registerCommand(new CommandFeed());
-		registerCommand(new CommandKill());
+		registerCommand(CommandHelp.class);
+		registerCommand(CommandMine.class);
+		registerCommand(CommandStop.class);
+		registerCommand(CommandUngrab.class);
+		registerCommand(CommandRun.class);
 
-		registerCommand(new CommandClearArea());
-		registerCommand(new CommandScheduleBuild());
-		registerCommand(new CommandListBuild());
-		registerCommand(new CommandStepNext());
-		registerCommand(new CommandStepWalk());
-		registerCommand(new CommandStepPlace());
-		registerCommand(new CommandClear());
-		registerCommand(new CommandBuild());
-		registerCommand(new CommandReverse());
+		registerCommand(CommandKill.class);
+		registerCommand(CommandFish.class);
+		registerCommand(CommandFeed.class);
+
+		registerCommand(CommandBuild.class);
+		registerCommand(CommandClearArea.class);
+		registerCommand(CommandReset.class);
+		registerCommand(CommandScheduleBuild.class);
+		registerCommand(CommandSetPos.class);
+		registerCommand(CommandStepNext.class);
+		registerCommand(CommandStepPlace.class);
+		registerCommand(CommandStepWalk.class);
+		registerCommand(CommandListBuilds.class);
+		registerCommand(CommandReverse.class);
 	}
 
 	public AIChatController(IAIControllable c) {
-		this.controlled = c;
-		ClientCommandHandler.instance.registerCommand(this);
-		System.out.println("Command registered.");
+		controlled = c;
+		this.registry.setControlled(c);
 		runningInstance = this;
 	}
 
-	private static void registerCommand(AICommand aiCommand) {
-		commands.add(aiCommand);
-	}
-
-	@Override
-	public void processCommand(ICommandSender sender, String[] args) {
-		if (args.length < 1) {
-			usage();
-		} else {
-			AICommand command = getCommand(args[0]);
-			if (command == null) {
-				usage();
-			} else {
-				try {
-					AIStrategy strategy = command.evaluateCommand(sender, args,
-							controlled.getAiHelper(), this);
-					if (strategy != null) {
-						controlled.requestUseStrategy(strategy);
-					}
-				} catch (Throwable t) {
-					addChatLine("Error (please report): " + t.getMessage());
-					t.printStackTrace();
-				}
-			}
-		}
-	}
-
-	public AICommand getCommand(String name) {
-		for (AICommand c : commands) {
-			if (c.getName().equals(name)) {
-				return c;
-			}
-		}
-		return null;
-	}
-
-	public void usage() {
-		for (AICommand c : commands) {
-			usage(c);
-		}
-	}
-
-	public void usage(AICommand c) {
-		addToChat("/" + getCommandName() + " " + c.getName() + " "
-				+ c.getArgsUsage());
-	}
-
-	@Override
-	public String getCommandUsage(ICommandSender var1) {
-		return "See /minebot usage";
-	}
-
-	@Override
-	public String getCommandName() {
-		return "minebot";
-	}
-
-	@Override
-	public int getRequiredPermissionLevel() {
-		return 0;
+	private static void registerCommand(Class<?> commandClass) {
+		registry.register(commandClass);
 	}
 
 	public static void addChatLine(String message) {
@@ -134,21 +78,23 @@ public class AIChatController extends CommandBase {
 		}
 	}
 
+	public static CommandRegistry getRegistry() {
+		return registry;
+	}
+
 	private void addToChat(String string) {
 		controlled.getMinecraft().thePlayer
 				.addChatMessage(new ChatComponentText(string));
 	}
-
-	public static Pos parsePos(ICommandSender sender, String[] args, int offset) {
-		int i = sender.getPlayerCoordinates().posX;
-		int j = sender.getPlayerCoordinates().posY - 2;
-		int k = sender.getPlayerCoordinates().posZ;
-		i = MathHelper.floor_double(func_110666_a(sender, i,
-				args[offset + 0]));
-		j = MathHelper.floor_double(func_110666_a(sender, j,
-				args[offset + 1]));
-		k = MathHelper.floor_double(func_110666_a(sender, k,
-				args[offset + 2]));
-		return new Pos(i, j, k);
+	
+	public static <T> void addToChatPaged(String title, int page, List<T> data, Function<T, String> convert) {
+		AIChatController.addChatLine(title + " " + page + " / "
+				+ (int) Math.ceil((float) data.size() / PER_PAGE));
+		for (int i = Math.max(0, page - 1) * PER_PAGE; i < Math.min(page
+				* PER_PAGE, data.size()); i++) {
+			String line = convert.apply(data.get(i));
+			AIChatController.addChatLine(line);
+		}
 	}
+
 }

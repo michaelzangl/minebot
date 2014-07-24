@@ -6,7 +6,7 @@ import java.util.LinkedList;
 import net.famzangl.minecraft.minebot.Pos;
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.path.MovePathFinder;
-import net.famzangl.minecraft.minebot.ai.task.AlignToGridTask;
+import net.famzangl.minecraft.minebot.ai.task.move.AlignToGridTask;
 import net.famzangl.minecraft.minebot.build.blockbuild.BuildTask;
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
@@ -19,7 +19,7 @@ public class ForBuildPathFinder extends MovePathFinder {
 	/**
 	 * Task we want to prepare for.
 	 */
-	private BuildTask task;
+	private final BuildTask task;
 	int[] res = new int[NEIGHBOURS_PER_DIRECTION * 4];
 
 	public ForBuildPathFinder(AIHelper helper, BuildTask task) {
@@ -30,8 +30,8 @@ public class ForBuildPathFinder extends MovePathFinder {
 	@Override
 	protected int[] getNeighbours(int currentNode) {
 		Arrays.fill(res, -1);
-		int cx = getX(currentNode);
-		int cz = getZ(currentNode);
+		final int cx = getX(currentNode);
+		final int cz = getZ(currentNode);
 		getNeighbours(res, 0 * NEIGHBOURS_PER_DIRECTION, currentNode, cx + 1,
 				cz);
 		getNeighbours(res, 1 * NEIGHBOURS_PER_DIRECTION, currentNode, cx - 1,
@@ -45,7 +45,7 @@ public class ForBuildPathFinder extends MovePathFinder {
 
 	private void getNeighbours(int[] fill, int offset, int currentNode, int x,
 			int z) {
-		int cy = getY(currentNode);
+		final int cy = getY(currentNode);
 		for (int y = cy + 1; y < cy + 4; y++) {
 			if (!helper.isAirBlock(getX(currentNode), y + 1, getZ(currentNode))) {
 				break;
@@ -62,7 +62,7 @@ public class ForBuildPathFinder extends MovePathFinder {
 			}
 		}
 	}
-	
+
 	@Override
 	protected boolean isForbiddenBlock(Block block) {
 		return !(helper.canWalkOn(block) || helper.canWalkThrough(block));
@@ -71,8 +71,9 @@ public class ForBuildPathFinder extends MovePathFinder {
 	@Override
 	protected boolean checkGroundBlock(int currentNode, int cx, int cy, int cz) {
 		return helper.isSafeGroundBlock(cx, cy - 1, cz)
-				|| (helper.isAirBlock(cx, cy - 1, cz) && AIHelper.blockIsOneOf(
-						helper.getBlock(cx, cy - 2, cz), FENCES));
+				|| helper.isAirBlock(cx, cy - 1, cz)
+				&& AIHelper.blockIsOneOf(helper.getBlock(cx, cy - 2, cz),
+						FENCES);
 	}
 
 	@Override
@@ -91,14 +92,14 @@ public class ForBuildPathFinder extends MovePathFinder {
 		}
 		return -1;
 	}
-	
+
 	@Override
 	protected void foundPath(LinkedList<Pos> path) {
 		Pos currentPos = path.removeFirst();
 		helper.addTask(new AlignToGridTask(currentPos.x, currentPos.y,
 				currentPos.z));
 		while (!path.isEmpty()) {
-			Pos nextPos = path.removeFirst();
+			final Pos nextPos = path.removeFirst();
 			helper.addTask(new WalkTowardsTask(currentPos, nextPos));
 			currentPos = nextPos;
 		}

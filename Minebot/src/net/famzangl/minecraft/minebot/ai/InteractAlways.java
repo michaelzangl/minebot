@@ -18,7 +18,7 @@ public final class InteractAlways extends KeyBinding {
 
 	@Override
 	public boolean isPressed() {
-		boolean ret = isPressed;
+		final boolean ret = isPressed;
 		isPressed = false;
 		return ret;
 	}
