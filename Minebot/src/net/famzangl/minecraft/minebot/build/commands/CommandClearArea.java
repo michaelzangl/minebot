@@ -2,6 +2,7 @@ package net.famzangl.minecraft.minebot.build.commands;
 
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.AIStrategy;
+import net.famzangl.minecraft.minebot.ai.command.AIChatController;
 import net.famzangl.minecraft.minebot.ai.command.AICommand;
 import net.famzangl.minecraft.minebot.ai.command.AICommandInvocation;
 import net.famzangl.minecraft.minebot.ai.command.AICommandParameter;
@@ -16,7 +17,12 @@ public class CommandClearArea {
 	public static AIStrategy run(
 			AIHelper helper,
 			@AICommandParameter(type = ParameterType.FIXED, fixedName = "clear", description = "") String nameArg) {
-		return new PathFinderStrategy(new ClearAreaPathfinder(helper),
-				"Clear area");
+		if (helper.getPos1() == null || helper.getPos2() == null) {
+			AIChatController.addChatLine("Set positions first.");
+			return null;
+		} else {
+			return new PathFinderStrategy(new ClearAreaPathfinder(helper),
+					"Clear area");
+		}
 	}
 }

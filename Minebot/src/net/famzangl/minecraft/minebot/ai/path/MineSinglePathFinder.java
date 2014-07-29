@@ -1,22 +1,23 @@
 package net.famzangl.minecraft.minebot.ai.path;
 
 import net.famzangl.minecraft.minebot.ai.AIHelper;
+import net.minecraft.block.Block;
 
 public class MineSinglePathFinder extends MinePathfinder {
 
-	private final String blockName;
+	private final Block block;
 
-	public MineSinglePathFinder(AIHelper helper, String blockName) {
+	public MineSinglePathFinder(AIHelper helper, Block block) {
 		super(helper);
-		this.blockName = blockName;
+		this.block = block;
 	}
 
 	@Override
 	protected ISettingsProvider getFactorProvider() {
 		return new ISettingsProvider() {
 			@Override
-			public float getFloat(String name) {
-				return blockName.equalsIgnoreCase(name) ? 1 : 0;
+			public float getFloat(Block block2) {
+				return block.equals(block2) ? 1 : 0;
 			}
 		};
 	}
@@ -25,7 +26,7 @@ public class MineSinglePathFinder extends MinePathfinder {
 	protected ISettingsProvider getPointsProvider() {
 		return new ISettingsProvider() {
 			@Override
-			public float getFloat(String name) {
+			public float getFloat(Block name) {
 				return 0;
 			}
 		};

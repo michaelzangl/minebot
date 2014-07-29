@@ -15,7 +15,7 @@ import net.minecraft.network.play.client.C16PacketClientStatus;
  * @author michael
  * 
  */
-public class GetOnHotBarTask implements AITask {
+public class GetOnHotBarTask extends AITask {
 	private final ItemFilter itemFiler;
 	private boolean inventoryOpened;
 
@@ -57,6 +57,7 @@ public class GetOnHotBarTask implements AITask {
 					new GuiInventory(h.getMinecraft().thePlayer));
 			inventoryOpened = true;
 		} else {
+			h.buildManager.missingItem(itemFiler);
 			h.desync();
 		}
 	}

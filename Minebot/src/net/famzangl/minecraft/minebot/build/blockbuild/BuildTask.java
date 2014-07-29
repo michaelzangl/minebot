@@ -7,6 +7,7 @@ import net.famzangl.minecraft.minebot.ai.ItemFilter;
 import net.famzangl.minecraft.minebot.ai.task.AITask;
 import net.famzangl.minecraft.minebot.ai.task.place.JumpingPlaceAtHalfTask;
 import net.famzangl.minecraft.minebot.build.WoodType;
+import net.famzangl.minecraft.minebot.build.blockbuild.BuildNormalStairsTask.Half;
 import net.minecraft.block.Block;
 import net.minecraftforge.common.util.ForgeDirection;
 
@@ -93,18 +94,19 @@ public abstract class BuildTask {
 		} else if (AIHelper.blockIsOneOf(b, BuildHalfslabTask.BLOCKS)) {
 			for (final SlabType t : SlabType.values()) {
 				if (t.slabBlock == b && t.meta == (blockMetadata & 0x7)) {
-					String up;
+					Half up;
 					ForgeDirection[] standable;
 					if ((blockMetadata & 0x8) == 0) {
-						up = "normal";
+						up = Half.LOWER;
 						standable = JumpingPlaceAtHalfTask.TRY_FOR_LOWER;
 					} else {
-						up = "up";
+						up = Half.UPPER;
 						standable = JumpingPlaceAtHalfTask.TRY_FOR_UPPER;
 					}
 
 					return new TaskDescription(name + " "
-							+ t.toString().toLowerCase() + " " + up,
+							+ t.toString().toLowerCase() + " "
+							+ up.toString().toLowerCase(),
 							Pos.fromDir(standable));
 				}
 			}

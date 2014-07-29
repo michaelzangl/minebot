@@ -4,12 +4,16 @@ import java.util.List;
 
 import net.famzangl.minecraft.minebot.ai.commands.CommandFeed;
 import net.famzangl.minecraft.minebot.ai.commands.CommandFish;
+import net.famzangl.minecraft.minebot.ai.commands.CommandGetWood;
 import net.famzangl.minecraft.minebot.ai.commands.CommandHelp;
 import net.famzangl.minecraft.minebot.ai.commands.CommandKill;
 import net.famzangl.minecraft.minebot.ai.commands.CommandMine;
+import net.famzangl.minecraft.minebot.ai.commands.CommandPlant;
 import net.famzangl.minecraft.minebot.ai.commands.CommandRun;
 import net.famzangl.minecraft.minebot.ai.commands.CommandSit;
 import net.famzangl.minecraft.minebot.ai.commands.CommandStop;
+import net.famzangl.minecraft.minebot.ai.commands.CommandTint;
+import net.famzangl.minecraft.minebot.ai.commands.CommandTunnel;
 import net.famzangl.minecraft.minebot.ai.commands.CommandUngrab;
 import net.famzangl.minecraft.minebot.build.commands.CommandBuild;
 import net.famzangl.minecraft.minebot.build.commands.CommandClearArea;
@@ -43,9 +47,13 @@ public class AIChatController {
 	static {
 		registerCommand(CommandHelp.class);
 		registerCommand(CommandMine.class);
+		registerCommand(CommandTunnel.class);
 		registerCommand(CommandStop.class);
 		registerCommand(CommandUngrab.class);
 		registerCommand(CommandRun.class);
+		registerCommand(CommandPlant.class);
+		registerCommand(CommandGetWood.class);
+		registerCommand(CommandTint.class);
 
 		registerCommand(CommandKill.class);
 		registerCommand(CommandFish.class);

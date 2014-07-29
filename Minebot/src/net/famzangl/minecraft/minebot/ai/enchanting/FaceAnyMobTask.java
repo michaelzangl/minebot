@@ -11,7 +11,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.util.AxisAlignedBB;
 
-public class FaceAnyMobTask implements AITask {
+public class FaceAnyMobTask extends AITask {
 	private final class LivingSelector implements
 			IEntitySelector {
 		@Override

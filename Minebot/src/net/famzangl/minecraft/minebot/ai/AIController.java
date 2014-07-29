@@ -38,6 +38,8 @@ import cpw.mods.fml.relauncher.SideOnly;
 
 public class AIController extends AIHelper implements IAIControllable {
 
+	private static final int TIMEOUT = 5 * 20;
+
 	private final static Hashtable<KeyBinding, AIStrategyFactory> uses = new Hashtable<KeyBinding, AIStrategyFactory>();
 
 	protected static KeyBinding stop = new KeyBinding("Stop",
@@ -145,6 +147,9 @@ public class AIController extends AIHelper implements IAIControllable {
 					tasks.remove(0);
 					resetTimeout();
 					System.out.println("Next task: " + tasks.peekFirst());
+					if (tasks.peekFirst() != null) {
+						timeout = tasks.peekFirst().getGameTickTimeout();
+					}
 				} else if (timeout <= 0) {
 					desync = true;
 				} else {
@@ -245,7 +250,7 @@ public class AIController extends AIHelper implements IAIControllable {
 	}
 
 	private void resetTimeout() {
-		timeout = 5 * 20;
+		timeout = TIMEOUT;
 	}
 
 	@Override

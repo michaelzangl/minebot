@@ -10,10 +10,34 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockCrops;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemHoe;
 import net.minecraft.item.ItemStack;
 
 public class PlantPathFinder extends MovePathFinder {
+	public enum PlantType {
+		ANY(Items.wheat_seeds, Items.carrot, Items.potato),
+		WHEAT(Items.wheat_seeds),
+		CARROT(Items.carrot),
+		POTATO(Items.potato),
+		NETHERWART(Items.nether_wart);
+
+		private final Item[] items;
+
+		private PlantType(Item... items) {
+			this.items = items;
+		}
+
+		public boolean canPlantItem(Item item) {
+			for (Item i : items) {
+				if (item == i) {
+					return true;
+				}
+			}
+			return false;
+		}
+	}
+
 	private final class HoeFilter implements ItemFilter {
 		@Override
 		public boolean matches(ItemStack itemStack) {
@@ -22,17 +46,24 @@ public class PlantPathFinder extends MovePathFinder {
 	}
 
 	private final class SeedFilter implements ItemFilter {
+		private final PlantType type;
+
+		public SeedFilter(PlantType type) {
+			super();
+			this.type = type;
+		}
+
 		@Override
 		public boolean matches(ItemStack itemStack) {
-			return itemStack != null
-					&& (itemStack.getItem() == Items.wheat_seeds
-							|| itemStack.getItem() == Items.carrot || itemStack
-							.getItem() == Items.potato);
+			return itemStack != null && type.canPlantItem(itemStack.getItem());
 		}
 	}
 
-	public PlantPathFinder(AIHelper helper) {
+	private final PlantType type;
+
+	public PlantPathFinder(AIHelper helper, PlantType type) {
 		super(helper);
+		this.type = type;
 	}
 
 	@Override
@@ -40,12 +71,12 @@ public class PlantPathFinder extends MovePathFinder {
 		if (isGrown(helper, x, y, z)) {
 			return distance + 1;
 		} else if (helper.isAirBlock(x, y, z) && hasFarmlandBelow(x, y, z)
-				&& helper.canSelectItem(new SeedFilter())) {
+				&& helper.canSelectItem(new SeedFilter(type))) {
 			return distance + 1;
 		} else if (helper.isAirBlock(x, y, z)
 				&& AIHelper.blockIsOneOf(helper.getBlock(x, y - 1, z),
 						Blocks.dirt, Blocks.grass)
-				&& helper.canSelectItem(new SeedFilter())
+				&& helper.canSelectItem(new SeedFilter(type))
 				&& helper.canSelectItem(new HoeFilter())) {
 			return distance + 10;
 		} else {
@@ -81,7 +112,7 @@ public class PlantPathFinder extends MovePathFinder {
 						currentPos.x, currentPos.y - 1, currentPos.z));
 			}
 			helper.addTask(new PlaceBlockAtFloorTask(currentPos.x,
-					currentPos.y, currentPos.z, new SeedFilter()));
+					currentPos.y, currentPos.z, new SeedFilter(type)));
 		} else {
 			helper.addTask(new DestroyBlockTask(currentPos.x, currentPos.y,
 					currentPos.z));

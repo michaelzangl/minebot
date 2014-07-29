@@ -9,7 +9,7 @@ public class LumberjackStrategy implements AIStrategyFactory {
 
 	@Override
 	public AIStrategy produceStrategy(AIHelper helper) {
-		return new PathFinderStrategy(new TreePathFinder(helper),
+		return new PathFinderStrategy(new TreePathFinder(helper, null),
 				"Getting some wood");
 	}
 }

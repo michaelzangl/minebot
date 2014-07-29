@@ -121,8 +121,15 @@ public class CommandDefinition {
 			} else {
 				return null;
 			}
-		} catch (IllegalAccessException | IllegalArgumentException
-				| InvocationTargetException e) {
+		} catch (IllegalAccessException e) {
+			// TODO: Error...
+			e.printStackTrace();
+			throw new RuntimeException(e);
+		} catch (IllegalArgumentException e) {
+			// TODO: Error...
+			e.printStackTrace();
+			throw new RuntimeException(e);
+		} catch (InvocationTargetException e) {
 			// TODO: Error...
 			e.printStackTrace();
 			throw new RuntimeException(e);

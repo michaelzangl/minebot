@@ -1,6 +1,7 @@
 package net.famzangl.minecraft.minebot.ai.path;
 
 import net.famzangl.minecraft.minebot.ai.AIHelper;
+import net.minecraft.block.Block;
 
 public class MineBySettingsPathFinder extends MinePathfinder {
 
@@ -19,7 +20,9 @@ public class MineBySettingsPathFinder extends MinePathfinder {
 		}
 
 		@Override
-		public float getFloat(String name) {
+		public float getFloat(Block block) {
+			String name =  Block.blockRegistry.getNameForObject(block).replace(
+					"minecraft:", "");
 			final float val = settings.getFloat(name_prefix + name,
 					defaultValue, min, max);
 			System.out.println(name_prefix + name + " -> " + val);

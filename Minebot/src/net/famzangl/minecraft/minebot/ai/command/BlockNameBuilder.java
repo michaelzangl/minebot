@@ -55,7 +55,7 @@ public class BlockNameBuilder extends ParameterBuilder {
 
 	@Override
 	public Object getParameter(AIHelper helper, String[] arguments) {
-		return arguments[0];
+		return Block.blockRegistry.getObject(arguments[0]);
 	}
 
 }

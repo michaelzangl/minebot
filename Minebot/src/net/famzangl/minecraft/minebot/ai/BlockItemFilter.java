@@ -29,4 +29,27 @@ public class BlockItemFilter implements ItemFilter {
 	public String toString() {
 		return "BlockItemFilter [matched=" + Arrays.toString(matched) + "]";
 	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + Arrays.hashCode(matched);
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		BlockItemFilter other = (BlockItemFilter) obj;
+		if (!Arrays.equals(matched, other.matched))
+			return false;
+		return true;
+	}
+	
 }

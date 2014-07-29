@@ -3,12 +3,16 @@ package net.famzangl.minecraft.minebot.ai.path;
 import net.famzangl.minecraft.minebot.Pos;
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.task.MineBlockTask;
+import net.famzangl.minecraft.minebot.build.WoodType;
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
 
 public class TreePathFinder extends MovePathFinder {
-	public TreePathFinder(AIHelper helper) {
+	private final WoodType type;
+
+	public TreePathFinder(AIHelper helper, WoodType type) {
 		super(helper);
+		this.type = type;
 	}
 
 	private static final int TREE_HEIGHT = 7;
@@ -36,8 +40,14 @@ public class TreePathFinder extends MovePathFinder {
 
 	private boolean isTree(int x, int y, int z) {
 		final Block block = helper.getBlock(x, y, z);
-		return Block.isEqualTo(block, Blocks.log)
-				|| Block.isEqualTo(block, Blocks.log2);
+		if (type == null) {
+			return Block.isEqualTo(block, Blocks.log)
+					|| Block.isEqualTo(block, Blocks.log2);
+		} else {
+			return Block.isEqualTo(block, type.block)
+					&& (0x3 & helper.getMinecraft().theWorld.getBlockMetadata(
+							x, y, z)) == type.lowerBits;
+		}
 	}
 
 	@Override

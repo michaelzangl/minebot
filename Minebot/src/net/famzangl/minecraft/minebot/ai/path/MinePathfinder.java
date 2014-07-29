@@ -2,7 +2,6 @@ package net.famzangl.minecraft.minebot.ai.path;
 
 import java.util.Random;
 
-import net.famzangl.minecraft.minebot.MinebotSettings;
 import net.famzangl.minecraft.minebot.Pos;
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.task.MineBlockTask;
@@ -13,7 +12,6 @@ public abstract class MinePathfinder extends MovePathFinder {
 	protected static final int MAX_FACTOR = 10;
 	protected static final float MAX_POINTS = 50;
 	private static final int MAX_BLOCK_IDS = 4096;
-	protected MinebotSettings settings;
 	private final Random rand = new Random();
 	protected float maxDistancePoints = 0;
 	protected float maxDistanceFactor = 1;
@@ -22,7 +20,7 @@ public abstract class MinePathfinder extends MovePathFinder {
 	private final FloatBlockCache factors;
 
 	protected static interface ISettingsProvider {
-		float getFloat(String name);
+		float getFloat(Block name);
 	}
 
 	private class FloatBlockCache {
@@ -42,7 +40,7 @@ public abstract class MinePathfinder extends MovePathFinder {
 				final String name = Block.blockRegistry.getNameForObject(
 						Block.blockRegistry.getObjectById(id)).replace(
 						"minecraft:", "");
-				cached[id] = settingsProvider.getFloat(name);
+				cached[id] = settingsProvider.getFloat((Block) Block.blockRegistry.getObjectById(id));
 				isCached[id] = true;
 			}
 			return cached[id];
@@ -53,7 +51,6 @@ public abstract class MinePathfinder extends MovePathFinder {
 		super(helper);
 		points = new FloatBlockCache(getPointsProvider());
 		factors = new FloatBlockCache(getFactorProvider());
-		settings = new MinebotSettings();
 	}
 
 	protected abstract ISettingsProvider getFactorProvider();

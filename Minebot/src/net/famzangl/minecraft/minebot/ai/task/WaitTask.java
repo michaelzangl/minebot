@@ -2,7 +2,7 @@ package net.famzangl.minecraft.minebot.ai.task;
 
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 
-public class WaitTask implements AITask {
+public class WaitTask extends AITask {
 
 	public static WaitTask instance = new WaitTask();
 

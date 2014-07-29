@@ -5,7 +5,7 @@ import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.task.AITask;
 import net.minecraft.init.Blocks;
 
-public class FaceBlockOfTypeTask implements AITask {
+public class FaceBlockOfTypeTask extends AITask {
 
 	@Override
 	public boolean isFinished(AIHelper h) {

@@ -4,7 +4,7 @@ import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.task.AITask;
 import net.minecraft.util.MovingObjectPosition;
 
-public class KillAnyMobTask implements AITask {
+public class KillAnyMobTask extends AITask {
 
 	int tickCount;
 

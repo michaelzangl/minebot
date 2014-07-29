@@ -42,6 +42,10 @@ public class CommandRegistry {
 				} else {
 					AIChatController.addChatLine("ERROR: No such command.");
 				}
+			} catch (Throwable e) {
+				e.printStackTrace();
+				AIChatController
+						.addChatLine("ERROR: Could not evaluate. Please report.");
 			}
 		}
 
@@ -61,8 +65,7 @@ public class CommandRegistry {
 			if (controlled == null) {
 				return Collections.emptyList();
 			}
-			return tabCompletion(controlled.getAiHelper(), name,
-					par2ArrayOfStr);
+			return tabCompletion(controlled.getAiHelper(), name, par2ArrayOfStr);
 		}
 
 		@Override

@@ -49,7 +49,7 @@ public class EnumNameBuilder<T extends Enum<T>> extends ParameterBuilder {
 
 	@Override
 	public void addArguments(ArrayList<ArgumentDefinition> list) {
-		list.add(new EnumArgumentDefinition("Animal", annot.description(),
+		list.add(new EnumArgumentDefinition(enumClass.getSimpleName(), annot.description(),
 				enumClass.getEnumConstants()));
 	}
 

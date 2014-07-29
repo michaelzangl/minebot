@@ -3,7 +3,7 @@ package net.famzangl.minecraft.minebot.ai.task.place;
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.task.AITask;
 
-public class DestroyBlockTask implements AITask {
+public class DestroyBlockTask extends AITask {
 	private final int x;
 	private final int y;
 	private final int z;

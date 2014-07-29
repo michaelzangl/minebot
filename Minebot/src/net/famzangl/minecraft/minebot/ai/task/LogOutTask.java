@@ -5,7 +5,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiMainMenu;
 import net.minecraft.client.multiplayer.WorldClient;
 
-public class LogOutTask implements AITask {
+public class LogOutTask extends AITask {
 
 	private boolean send;
 

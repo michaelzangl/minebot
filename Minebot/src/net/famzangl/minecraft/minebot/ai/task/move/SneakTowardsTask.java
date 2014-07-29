@@ -10,7 +10,7 @@ import net.minecraftforge.common.util.ForgeDirection;
  * @author michael
  * 
  */
-public class SneakTowardsTask implements AITask {
+public class SneakTowardsTask extends AITask {
 	private final int x;
 	private final int y;
 	private final int z;

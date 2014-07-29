@@ -74,7 +74,7 @@ import net.minecraft.network.play.server.S3FPacketCustomPayload;
 import net.minecraft.network.play.server.S40PacketDisconnect;
 import net.minecraft.util.IChatComponent;
 
-public class DoFishTask implements AITask {
+public class DoFishTask extends AITask {
 
 	private boolean revoked;
 	private int rightMotion = 2;

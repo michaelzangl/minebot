@@ -2,7 +2,7 @@ package net.famzangl.minecraft.minebot.ai.task;
 
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 
-public class MineBlockTask implements AITask {
+public class MineBlockTask extends AITask {
 	private final int x;
 	private final int y;
 	private final int z;

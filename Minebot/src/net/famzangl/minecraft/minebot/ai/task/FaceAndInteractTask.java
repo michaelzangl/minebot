@@ -9,7 +9,7 @@ import net.minecraft.util.MovementInput;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.MovingObjectPosition.MovingObjectType;
 
-public class FaceAndInteractTask implements AITask {
+public class FaceAndInteractTask extends AITask {
 
 	private boolean interacted = false;
 	private final Entity preferedAnimal;

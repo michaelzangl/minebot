@@ -7,6 +7,7 @@ import net.famzangl.minecraft.minebot.ai.command.AICommandInvocation;
 import net.famzangl.minecraft.minebot.ai.command.AICommandParameter;
 import net.famzangl.minecraft.minebot.ai.command.ParameterType;
 import net.famzangl.minecraft.minebot.ai.strategy.MineStrategy;
+import net.minecraft.block.Block;
 
 @AICommand(helpText = "Mines for ores.\n"
 		+ "Uses the minebot.properties file to find ores."
@@ -24,7 +25,7 @@ public class CommandMine {
 	public static AIStrategy run(
 			AIHelper helper,
 			@AICommandParameter(type = ParameterType.FIXED, fixedName = "mine", description = "") String nameArg,
-			@AICommandParameter(type = ParameterType.BLOCK_NAME, description = "The block to mine.") String blockName) {
+			@AICommandParameter(type = ParameterType.BLOCK_NAME, description = "The block to mine.") Block blockName) {
 		return new MineStrategy().produceStrategy(helper, blockName);
 	}
 

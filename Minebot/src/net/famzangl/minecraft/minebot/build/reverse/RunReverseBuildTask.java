@@ -4,7 +4,7 @@ import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.command.AIChatController;
 import net.famzangl.minecraft.minebot.ai.task.AITask;
 
-final class RunReverseBuildTask implements AITask {
+final class RunReverseBuildTask extends AITask {
 	final String outFile;
 
 	RunReverseBuildTask(String outFile) {

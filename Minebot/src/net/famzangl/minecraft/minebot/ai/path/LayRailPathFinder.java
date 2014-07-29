@@ -10,21 +10,12 @@ import net.famzangl.minecraft.minebot.ai.task.place.PlaceBlockAtFloorTask;
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
 
-public class LayRailPathFinder extends MovePathFinder {
-	int dx;
-	int dz;
-	private final int cx;
-	private final int cy;
-	private final int cz;
+public class LayRailPathFinder extends AlongTrackPathFinder {
+
 
 	public LayRailPathFinder(AIHelper helper, int dx, int dz, int cx, int cy,
 			int cz) {
-		super(helper);
-		this.dx = dx;
-		this.dz = dz;
-		this.cx = cx;
-		this.cy = cy;
-		this.cz = cz;
+		super(helper, dx, dz, cx, cy, cz);
 	}
 
 	@Override
@@ -42,7 +33,7 @@ public class LayRailPathFinder extends MovePathFinder {
 				&& !Block.isEqualTo(helper.getBlock(x, y, z),
 						Blocks.redstone_block)) {
 			return distance + 2;
-		} else if (isOnRail(x, z) && y == cy
+		} else if (isOnTrack(x, z) && y == cy
 				&& !helper.isRailBlock(helper.getBlock(x, y, z))) {
 			return distance + 5;
 		} else {
@@ -51,21 +42,12 @@ public class LayRailPathFinder extends MovePathFinder {
 	}
 
 	private boolean isRedstoneBlockPosition(int x, int y, int z) {
-		return y == cy - 1 && isOnRail(x, z) && placeAccRail(x, z)
+		return y == cy - 1 && isOnTrack(x, z) && placeAccRail(x, z)
 				&& helper.isAirBlock(x, y + 2, z);
 	}
 
 	private boolean placeAccRail(int x, int z) {
-		return railstep(x, z) % 8 == 0;
-	}
-
-	private boolean isOnRail(int x, int z) {
-		return dz != 0 && x == cx && dz * (z - cz) >= 0 || dx != 0 && z == cz
-				&& dx * (x - cx) >= 0;
-	}
-
-	private int railstep(int x, int z) {
-		return Math.abs(x - cx + z - cz);
+		return getStepNumber(x, z) % 8 == 0;
 	}
 
 	@Override

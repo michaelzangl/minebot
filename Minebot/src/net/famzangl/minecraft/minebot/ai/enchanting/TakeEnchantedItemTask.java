@@ -4,7 +4,7 @@ import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.task.AITask;
 import net.minecraft.client.gui.GuiEnchantment;
 
-public class TakeEnchantedItemTask implements AITask {
+public class TakeEnchantedItemTask extends AITask {
 
 	@Override
 	public boolean isFinished(AIHelper h) {

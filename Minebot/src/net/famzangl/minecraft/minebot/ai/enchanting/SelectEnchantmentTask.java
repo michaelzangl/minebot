@@ -7,7 +7,7 @@ import net.famzangl.minecraft.minebot.ai.task.AITask;
 import net.minecraft.client.gui.GuiEnchantment;
 import net.minecraft.inventory.ContainerEnchantment;
 
-public class SelectEnchantmentTask implements AITask {
+public class SelectEnchantmentTask extends AITask {
 
 	private static final int E_SLOT = 2;
 

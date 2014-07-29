@@ -13,7 +13,7 @@ public class PositionNameBuilder extends ParameterBuilder {
 	private final static class PositionArgumentDefinition extends
 			ArgumentDefinition {
 		public PositionArgumentDefinition(String description, String dir) {
-			super("Position " + dir, description);
+			super("pos." + dir, description);
 		}
 
 		@Override

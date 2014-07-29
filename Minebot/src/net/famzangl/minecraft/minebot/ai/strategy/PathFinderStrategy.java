@@ -46,4 +46,11 @@ public class PathFinderStrategy implements AIStrategy {
 		return watcher.getOverrideTask(helper.getMinecraft().thePlayer
 				.getHealth());
 	}
+
+	@Override
+	public String toString() {
+		return "PathFinderStrategy [pathFinder=" + pathFinder
+				+ ", description=" + description + "]";
+	}
+
 }

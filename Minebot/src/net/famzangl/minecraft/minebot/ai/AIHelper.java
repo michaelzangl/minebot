@@ -806,4 +806,13 @@ public abstract class AIHelper {
 		}
 		return false;
 	}
+
+	public static ForgeDirection getDirectionForXZ(int x, int z) {
+		for (final ForgeDirection d : ForgeDirection.VALID_DIRECTIONS) {
+			if (d.offsetX == x && d.offsetZ == z) {
+				return d;
+			}
+		}
+		throw new IllegalArgumentException("Cannot convert to direction: " + x + " " + z);
+	}
 }

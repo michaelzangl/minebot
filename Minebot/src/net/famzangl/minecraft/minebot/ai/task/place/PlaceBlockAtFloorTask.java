@@ -5,7 +5,7 @@ import net.famzangl.minecraft.minebot.ai.ItemFilter;
 import net.famzangl.minecraft.minebot.ai.task.AITask;
 import net.minecraftforge.common.util.ForgeDirection;
 
-public class PlaceBlockAtFloorTask implements AITask {
+public class PlaceBlockAtFloorTask extends AITask {
 	protected int x;
 	protected int y;
 	protected int z;

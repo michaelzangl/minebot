@@ -22,6 +22,7 @@ public class BuildReverser {
 	private final ReverseBuildField field;
 	private String outFile;
 	private PrintStream out;
+	private int missingBlocks;
 
 	public BuildReverser(AIHelper helper, String outFile) {
 		this(helper, Pos.minPos(helper.getPos1(), helper.getPos2()), Pos
@@ -50,7 +51,7 @@ public class BuildReverser {
 			out.println("# Pos1: " + pos1);
 			out.println("# Pos2: " + pos2);
 			out.println("");
-			out.println("/minebot build:clear");
+			out.println("/minebuild clear");
 			out.println("");
 			for (int y = pos1.y; y <= pos2.y; y++) {
 				out.println("# Layer " + (y - pos1.y));
@@ -62,8 +63,11 @@ public class BuildReverser {
 				}
 				out.println("");
 			}
-			out.println("/minebot build");
+			out.println("/minebuild build");
 
+			if (missingBlocks >0) {
+				AIChatController.addChatLine("Could not convert " + missingBlocks + "blocks. They will be missing.");
+			}
 			AIChatController.addChatLine("Output written to: " + this.outFile);
 		} catch (final FileNotFoundException e) {
 			AIChatController.addChatLine("File/dir does not exist: " + outFile);
@@ -95,13 +99,12 @@ public class BuildReverser {
 				final TaskDescription taskString = BuildTask
 						.getTaskDescription(b, helper, x, y, z);
 				field.setBlockAt(lx, ly, lz, b, taskString);
-				out.println("/minebot build:schedule ~" + lx + " ~" + ly + " ~"
+				out.println("/minebuild schedule ~" + lx + " ~" + ly + " ~"
 						+ lz + " " + taskString.getCommandArgs());
 			} catch (final UnknownBlockException e) {
 				out.println("# Missing: ~" + lx + " ~" + ly + " ~" + lz + " "
 						+ b.getLocalizedName());
-				AIChatController.addChatLine("Cannot convert Block at " + x
-						+ ", " + y + ", " + z + ". It will be missing.");
+				missingBlocks++;
 			}
 		}
 	}

@@ -28,7 +28,7 @@ public class CommandScheduleBuild {
 	@AICommandInvocation()
 	public static AIStrategy run(
 			AIHelper helper,
-			@AICommandParameter(type = ParameterType.FIXED, fixedName = "build", description = "") String nameArg,
+			@AICommandParameter(type = ParameterType.FIXED, fixedName = "schedule", description = "") String nameArg,
 			@AICommandParameter(type = ParameterType.POSITION, description = "Where to place it (relative is to your current pos)") Pos forPosition,
 			@AICommandParameter(type = ParameterType.BLOCK_NAME, description = "The block") Block blockToPlace) {
 
@@ -45,7 +45,7 @@ public class CommandScheduleBuild {
 	@AICommandInvocation()
 	public static AIStrategy run(
 			AIHelper helper,
-			@AICommandParameter(type = ParameterType.FIXED, fixedName = "build", description = "") String nameArg,
+			@AICommandParameter(type = ParameterType.FIXED, fixedName = "schedule", description = "") String nameArg,
 			@AICommandParameter(type = ParameterType.POSITION, description = "Where to place it (relative is to your current pos)") Pos forPosition,
 			@AICommandParameter(type = ParameterType.BLOCK_NAME, description = "The block") Block blockToPlace,
 			@AICommandParameter(type = ParameterType.COLOR, description = "The color") int color) {
@@ -61,10 +61,10 @@ public class CommandScheduleBuild {
 	@AICommandInvocation()
 	public static AIStrategy run(
 			AIHelper helper,
-			@AICommandParameter(type = ParameterType.FIXED, fixedName = "build", description = "") String nameArg,
+			@AICommandParameter(type = ParameterType.FIXED, fixedName = "schedule", description = "") String nameArg,
 			@AICommandParameter(type = ParameterType.POSITION, description = "Where to place it (relative is to your current pos)") Pos forPosition,
-			@AICommandParameter(type = ParameterType.BLOCK_NAME, description = "The block") Block blockToPlace,
-			@AICommandParameter(type = ParameterType.ENUM, description = "The color") WoodType woodType) {
+			@AICommandParameter(type = ParameterType.BLOCK_NAME, description = "The block type to place") Block blockToPlace,
+			@AICommandParameter(type = ParameterType.ENUM, description = "The wood subtype to place") WoodType woodType) {
 		if (AIHelper.blockIsOneOf(blockToPlace, WoodBuildTask.BLOCK)) {
 			addTask(helper, new WoodBuildTask(forPosition, woodType));
 		} else {
@@ -76,11 +76,11 @@ public class CommandScheduleBuild {
 	@AICommandInvocation()
 	public static AIStrategy run(
 			AIHelper helper,
-			@AICommandParameter(type = ParameterType.FIXED, fixedName = "build", description = "") String nameArg,
+			@AICommandParameter(type = ParameterType.FIXED, fixedName = "schedule", description = "") String nameArg,
 			@AICommandParameter(type = ParameterType.POSITION, description = "Where to place it (relative is to your current pos)") Pos forPosition,
 			@AICommandParameter(type = ParameterType.BLOCK_NAME, description = "The block") Block blockToPlace,
-			@AICommandParameter(type = ParameterType.ENUM, description = "The color") WoodType woodType,
-			@AICommandParameter(type = ParameterType.ENUM, description = "The direction") ForgeDirection direction) {
+			@AICommandParameter(type = ParameterType.ENUM, description = "The type of wood logs") WoodType woodType,
+			@AICommandParameter(type = ParameterType.ENUM, description = "The direction the log is facing") ForgeDirection direction) {
 		if (AIHelper.blockIsOneOf(blockToPlace, LogBuildTask.BLOCKS)) {
 			addTask(helper, new LogBuildTask(forPosition, woodType, direction));
 		} else {
@@ -92,10 +92,10 @@ public class CommandScheduleBuild {
 	@AICommandInvocation()
 	public static AIStrategy run(
 			AIHelper helper,
-			@AICommandParameter(type = ParameterType.FIXED, fixedName = "build", description = "") String nameArg,
+			@AICommandParameter(type = ParameterType.FIXED, fixedName = "schedule", description = "") String nameArg,
 			@AICommandParameter(type = ParameterType.POSITION, description = "Where to place it (relative is to your current pos)") Pos forPosition,
 			@AICommandParameter(type = ParameterType.BLOCK_NAME, description = "The block") Block blockToPlace,
-			@AICommandParameter(type = ParameterType.ENUM, description = "The direction") ForgeDirection direction,
+			@AICommandParameter(type = ParameterType.ENUM, description = "The direction the stairs face") ForgeDirection direction,
 			@AICommandParameter(type = ParameterType.ENUM, description = "Upper for inverted stairs") Half half) {
 		if (AIHelper.blockIsOneOf(blockToPlace, BuildNormalStairsTask.BLOCKS)) {
 			addTask(helper, new BuildNormalStairsTask(forPosition,
@@ -109,11 +109,11 @@ public class CommandScheduleBuild {
 	@AICommandInvocation()
 	public static AIStrategy run(
 			AIHelper helper,
-			@AICommandParameter(type = ParameterType.FIXED, fixedName = "build", description = "") String nameArg,
+			@AICommandParameter(type = ParameterType.FIXED, fixedName = "schedule", description = "") String nameArg,
 			@AICommandParameter(type = ParameterType.POSITION, description = "Where to place it (relative is to your current pos)") Pos forPosition,
 			@AICommandParameter(type = ParameterType.BLOCK_NAME, description = "The block") Block blockToPlace,
-			@AICommandParameter(type = ParameterType.ENUM, description = "The direction") SlabType type,
-			@AICommandParameter(type = ParameterType.ENUM, description = "The side") BlockSide side) {
+			@AICommandParameter(type = ParameterType.ENUM, description = "The subtype of slabs to place") SlabType type,
+			@AICommandParameter(type = ParameterType.ENUM, description = "If a upper or lower half should be placed") BlockSide side) {
 		if (AIHelper.blockIsOneOf(blockToPlace, BuildHalfslabTask.BLOCKS)) {
 			addTask(helper, new BuildHalfslabTask(forPosition, type, side));
 		} else {

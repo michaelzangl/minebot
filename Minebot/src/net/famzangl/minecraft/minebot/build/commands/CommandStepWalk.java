@@ -19,7 +19,7 @@ public class CommandStepWalk {
 	public static AIStrategy run(
 			AIHelper helper,
 			@AICommandParameter(type = ParameterType.FIXED, fixedName = "step", description = "") String nameArg2,
-			@AICommandParameter(type = ParameterType.FIXED, fixedName = "place", description = "") String nameArg3) {
+			@AICommandParameter(type = ParameterType.FIXED, fixedName = "walk", description = "") String nameArg3) {
 
 		final BuildTask task = helper.buildManager.peekNextTask();
 		if (task == null) {

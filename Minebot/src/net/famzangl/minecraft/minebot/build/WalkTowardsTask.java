@@ -1,5 +1,7 @@
 package net.famzangl.minecraft.minebot.build;
 
+import java.util.LinkedList;
+
 import net.famzangl.minecraft.minebot.Pos;
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.BlockItemFilter;
@@ -7,12 +9,17 @@ import net.famzangl.minecraft.minebot.ai.task.AITask;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.MovementInput;
 
-public class WalkTowardsTask implements AITask {
+public class WalkTowardsTask extends AITask {
 
+	private static final BlockItemFilter CARPET = new BlockItemFilter(
+			Blocks.carpet);
 	private final Pos fromPos;
 	private final Pos nextPos;
 
 	private AITask subTask;
+
+	private final LinkedList<Pos> carpets = new LinkedList<Pos>();
+	private boolean wasStandingOnDest;
 
 	public WalkTowardsTask(Pos fromPos, Pos nextPos) {
 		this.fromPos = fromPos;
@@ -23,7 +30,8 @@ public class WalkTowardsTask implements AITask {
 	public boolean isFinished(AIHelper h) {
 		return subTask == null
 				&& h.isStandingOn(nextPos.x, nextPos.y, nextPos.z)
-		/* && getUpperCarpetY(h) < 0 */;
+				&& carpets.isEmpty();
+		/* && getUpperCarpetY(h) < 0 */
 	}
 
 	@Override
@@ -41,21 +49,45 @@ public class WalkTowardsTask implements AITask {
 					nextPos.z);
 			if (carpetBuildHeight < destHeight - 1) {
 				System.out.println("Moving upwards. Carpets are at " + carpetY);
-				h.faceBlock(fromPos.x, Math.max(carpetY, fromPos.y - 1),
-						fromPos.z);
-				if (h.selectCurrentItem(new BlockItemFilter(Blocks.carpet))
-						&& h.isFacingBlock(fromPos.x,
-								Math.max(carpetY, fromPos.y - 1), fromPos.z, 1)) {
-					h.overrideUseItem();
+				int floorY = Math.max(carpetY, fromPos.y - 1);
+				h.faceBlock(fromPos.x, floorY, fromPos.z);
+				if (h.isFacingBlock(fromPos.x, floorY, fromPos.z, 1)) {
+					if (h.selectCurrentItem(CARPET)) {
+						h.overrideUseItem();
+						carpets.add(new Pos(fromPos.x, floorY + 1, fromPos.z));
+					} else {
+						h.buildManager.missingItem(CARPET);
+					}
 				}
 				final MovementInput i = new MovementInput();
 				i.jump = true;
 				h.overrideMovement(i);
+			} else if ((h.isStandingOn(nextPos.x, nextPos.y, nextPos.z) || wasStandingOnDest)
+					&& !carpets.isEmpty()) {
+				// Destruct everything after arriving at dest. Then walk to dest
+				// again.
+
+				while (!carpets.isEmpty()) {
+					// Clean up carpets we already "lost"
+					Pos last = carpets.getLast();
+					if (h.isAirBlock(last.x, last.y, last.z)) {
+						carpets.removeLast();
+					}
+				}
+
+				int x = fromPos.x - nextPos.x;
+				int z = fromPos.x - nextPos.x;
+				if (h.sneakFrom(nextPos.x, nextPos.y, nextPos.z,
+						AIHelper.getDirectionForXZ(x, z))) {
+					Pos last = carpets.getLast();
+					h.faceAndDestroy(last.x, last.y, last.z);
+				}
+
+				wasStandingOnDest = true;
 			} else {
 				h.walkTowards(nextPos.x + 0.5, nextPos.z + 0.5,
 						carpetBuildHeight < destHeight - 0.5);
 			}
-			// TODO: Clean up carpets
 		}
 	}
 

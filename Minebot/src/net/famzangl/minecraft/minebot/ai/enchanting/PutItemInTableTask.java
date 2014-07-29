@@ -6,7 +6,7 @@ import net.minecraft.client.gui.GuiEnchantment;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 
-public class PutItemInTableTask implements AITask {
+public class PutItemInTableTask extends AITask {
 
 	@Override
 	public boolean isFinished(AIHelper h) {

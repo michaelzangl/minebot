@@ -13,7 +13,7 @@ import net.minecraftforge.common.util.ForgeDirection;
  * @author michael
  * 
  */
-public class SneakAndPlaceTask implements AITask {
+public class SneakAndPlaceTask extends AITask {
 
 	protected final int x;
 	protected final int y;
@@ -45,12 +45,7 @@ public class SneakAndPlaceTask implements AITask {
 		this.filter = filter;
 		this.relativeFrom = relativeFrom;
 		this.minBuildHeight = minBuildHeight;
-		ForgeDirection foundInDir = null;
-		for (final ForgeDirection d : ForgeDirection.VALID_DIRECTIONS) {
-			if (d.offsetX == -relativeFrom.x && d.offsetZ == -relativeFrom.z) {
-				foundInDir = d;
-			}
-		}
+		ForgeDirection foundInDir = AIHelper.getDirectionForXZ(-relativeFrom.x, -relativeFrom.z);
 		if (relativeFrom.y != 1 || foundInDir == null) {
 			throw new IllegalArgumentException();
 		}

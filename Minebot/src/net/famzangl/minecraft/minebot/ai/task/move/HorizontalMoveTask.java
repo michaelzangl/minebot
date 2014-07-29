@@ -3,7 +3,7 @@ package net.famzangl.minecraft.minebot.ai.task.move;
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.task.AITask;
 
-public class HorizontalMoveTask implements AITask {
+public class HorizontalMoveTask extends AITask {
 	private final int x;
 	private final int y;
 	private final int z;

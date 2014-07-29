@@ -1,7 +1,9 @@
 package net.famzangl.minecraft.minebot.ai.path;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 
+import net.famzangl.minecraft.minebot.MinebotSettings;
 import net.famzangl.minecraft.minebot.Pos;
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.BlockItemFilter;
@@ -20,10 +22,11 @@ import net.minecraft.init.Blocks;
  * 
  */
 public class MovePathFinder extends PathFinderField {
-	private static final Block[] upwardsBuildBlocks = new Block[] {
-			Blocks.dirt, Blocks.stone, Blocks.cobblestone };
+	protected Block[] upwardsBuildBlocks = new Block[] { Blocks.dirt,
+			Blocks.stone, Blocks.cobblestone };
 
 	protected AIHelper helper;
+	protected MinebotSettings settings;
 
 	/**
 	 * Blocks we should not dig through, e.g. because we cannot handle them
@@ -36,6 +39,20 @@ public class MovePathFinder extends PathFinderField {
 	public MovePathFinder(AIHelper helper) {
 		super();
 		this.helper = helper;
+		settings = new MinebotSettings();
+
+		ArrayList<Block> blocks = new ArrayList<Block>();
+		String upwardsBuildBlockNames = settings.get("upwards_place_block",
+				"dirt,stone,cobblestone");
+		for (String name : upwardsBuildBlockNames.split("\\s*[\\,\\s\\;]\\s*")) {
+			Block block = (Block) Block.blockRegistry.getObject(name);
+			if (block != null) {
+				blocks.add(block);
+			} else {
+				System.out.println("Invalid block name: " + name);
+			}
+		}
+		upwardsBuildBlocks = blocks.toArray(new Block[blocks.size()]);
 	}
 
 	@Override

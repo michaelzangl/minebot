@@ -4,7 +4,7 @@ import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.ItemFilter;
 import net.minecraft.util.MovingObjectPosition;
 
-public class UseItemTask implements AITask {
+public class UseItemTask extends AITask {
 	private boolean clicked;
 	private final ItemFilter filter;
 

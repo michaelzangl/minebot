@@ -6,7 +6,7 @@ import net.famzangl.minecraft.minebot.ai.task.AITask;
 import net.minecraft.item.ItemFishingRod;
 import net.minecraft.item.ItemStack;
 
-public class ThrowFishingRodTask implements AITask {
+public class ThrowFishingRodTask extends AITask {
 
 	private final static class FishingRodFilter implements ItemFilter {
 		@Override

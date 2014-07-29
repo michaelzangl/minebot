@@ -4,7 +4,7 @@ import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.task.AITask;
 import net.minecraft.client.gui.GuiScreen;
 
-public class CloseScreenTask implements AITask {
+public class CloseScreenTask extends AITask {
 
 	@Override
 	public boolean isFinished(AIHelper h) {

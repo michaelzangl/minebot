@@ -21,7 +21,7 @@ public class FileNameBuilder extends ParameterBuilder {
 	private final static class FileArgumentDefinition extends
 			ArgumentDefinition {
 		public FileArgumentDefinition(String description) {
-			super("Command", description);
+			super("File", description);
 		}
 
 		@Override

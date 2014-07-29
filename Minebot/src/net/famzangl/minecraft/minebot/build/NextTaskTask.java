@@ -3,7 +3,7 @@ package net.famzangl.minecraft.minebot.build;
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.task.AITask;
 
-public final class NextTaskTask implements AITask {
+public final class NextTaskTask extends AITask {
 	private int tasksToSkip;
 
 	public NextTaskTask() {
