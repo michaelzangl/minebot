@@ -13,6 +13,13 @@ import net.minecraft.client.Minecraft;
 
 import org.apache.commons.io.IOUtils;
 
+/**
+ * This wraps a minebot setting file and provides convenient access to the
+ * values stored in it.
+ * 
+ * @author michael
+ * 
+ */
 public class MinebotSettings {
 	private Properties settings;
 	private ArrayList<String> keys;

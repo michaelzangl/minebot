@@ -4,7 +4,7 @@ import java.util.Random;
 
 import net.famzangl.minecraft.minebot.Pos;
 import net.famzangl.minecraft.minebot.ai.AIHelper;
-import net.famzangl.minecraft.minebot.ai.task.MineBlockTask;
+import net.famzangl.minecraft.minebot.ai.task.DestroyInRangeTask;
 import net.minecraft.block.Block;
 
 public abstract class MinePathfinder extends MovePathFinder {
@@ -118,6 +118,18 @@ public abstract class MinePathfinder extends MovePathFinder {
 
 	@Override
 	protected void addTasksForTarget(Pos currentPos) {
+		Pos top, bottom;
+		if (isOreBlock(currentPos.x, currentPos.y + 1, currentPos.z)) {
+			top = currentPos.add(0, 1, 0);
+		} else {
+			top = currentPos;
+		}
+		if (isOreBlock(currentPos.x, currentPos.y, currentPos.z)) {
+			bottom = currentPos;
+		} else {
+			bottom = currentPos.add(0, 1, 0);
+		}
+		
 		for (int i = 2; i < 5; i++) {
 			if (!helper.hasSafeSides(currentPos.x, currentPos.y + i,
 					currentPos.z)
@@ -126,12 +138,12 @@ public abstract class MinePathfinder extends MovePathFinder {
 				break;
 			}
 			if (isOreBlock(currentPos.x, currentPos.y + i, currentPos.z)) {
-				helper.addTask(new MineBlockTask(currentPos.x,
-						currentPos.y + i, currentPos.z));
+				top = currentPos.add(0, i, 0);
 			} else {
 				break;
 			}
 		}
+		helper.addTask(new DestroyInRangeTask(bottom, top));
 	}
 
 	@Override

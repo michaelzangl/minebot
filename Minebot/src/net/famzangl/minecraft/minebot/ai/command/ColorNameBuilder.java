@@ -53,7 +53,7 @@ public class ColorNameBuilder extends ParameterBuilder {
 				return i;
 			}
 		}
-		throw new IllegalArgumentException("Not a color: " + arguments[0]);
+		throw new CommandEvaluationException("Not a color: " + arguments[0]);
 	}
 
 }

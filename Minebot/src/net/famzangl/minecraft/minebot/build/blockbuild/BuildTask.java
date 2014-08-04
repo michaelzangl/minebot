@@ -28,7 +28,7 @@ public abstract class BuildTask {
 		if (AIHelper.blockIsOneOf(b, BlockBuildTask.BLOCKS)) {
 			return new TaskDescription(name, CubeBuildTask.STANDABLE);
 		} else if (AIHelper.blockIsOneOf(b, ColoredCubeBuildTask.BLOCKS)) {
-			return new TaskDescription(name
+			return new TaskDescription(name + " "
 					+ ColoredBlockItemFilter.COLORS[blockMetadata],
 					CubeBuildTask.STANDABLE);
 		} else if (AIHelper.blockIsOneOf(b, FenceBuildTask.BLOCKS)) {

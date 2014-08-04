@@ -45,7 +45,7 @@ public abstract class AIHelper {
 	/**
 	 * Blocks we can just walk over/next to without problems.
 	 */
-	private static Block[] normalBlocks = new Block[] { Blocks.bedrock,
+	public static final Block[] normalBlocks = new Block[] { Blocks.bedrock,
 			Blocks.bookshelf, Blocks.brick_block, Blocks.brown_mushroom_block,
 			Blocks.cake, Blocks.coal_block, Blocks.coal_ore,
 			Blocks.cobblestone, Blocks.crafting_table, Blocks.diamond_block,
@@ -70,30 +70,31 @@ public abstract class AIHelper {
 			Blocks.stained_glass, Blocks.stained_hardened_clay, Blocks.stone,
 			Blocks.stonebrick, Blocks.web, Blocks.wool };
 
-	private static Block[] fallingBlocks = new Block[] { Blocks.gravel,
+	public static final Block[] fallingBlocks = new Block[] { Blocks.gravel,
 			Blocks.sand, };
 
 	/**
 	 * All stairs. It is no problem to walk on them.
 	 */
-	private static Block[] stairBlocks = new Block[] { Blocks.acacia_stairs,
-			Blocks.birch_stairs, Blocks.brick_stairs, Blocks.dark_oak_stairs,
-			Blocks.jungle_stairs, Blocks.nether_brick_stairs,
-			Blocks.oak_stairs, Blocks.sandstone_stairs, Blocks.spruce_stairs,
+	public static final Block[] stairBlocks = new Block[] {
+			Blocks.acacia_stairs, Blocks.birch_stairs, Blocks.brick_stairs,
+			Blocks.dark_oak_stairs, Blocks.jungle_stairs,
+			Blocks.nether_brick_stairs, Blocks.oak_stairs,
+			Blocks.sandstone_stairs, Blocks.spruce_stairs,
 			Blocks.stone_brick_stairs, Blocks.stone_stairs, Blocks.stone_slab,
 			Blocks.wooden_slab, Blocks.quartz_stairs };
 
 	/**
 	 * Flowers and stuff like that
 	 */
-	private static Block[] walkableBlocks = new Block[] { Blocks.tallgrass,
-			Blocks.yellow_flower, Blocks.red_flower, Blocks.wheat,
-			Blocks.carrots, Blocks.potatoes, Blocks.pumpkin_stem,
+	public static final Block[] walkableBlocks = new Block[] {
+			Blocks.tallgrass, Blocks.yellow_flower, Blocks.red_flower,
+			Blocks.wheat, Blocks.carrots, Blocks.potatoes, Blocks.pumpkin_stem,
 			Blocks.melon_stem, Blocks.torch, Blocks.carpet, Blocks.golden_rail,
 			Blocks.detector_rail, Blocks.rail, Blocks.activator_rail,
 			Blocks.double_plant, Blocks.red_mushroom, Blocks.brown_mushroom,
 			Blocks.redstone_wire };
-	private static Block[] safeSideBlocks = new Block[] { Blocks.fence,
+	public static final Block[] safeSideBlocks = new Block[] { Blocks.fence,
 			Blocks.fence_gate, Blocks.cobblestone_wall, Blocks.cactus,
 			Blocks.reeds, };
 
@@ -107,23 +108,67 @@ public abstract class AIHelper {
 		return mc;
 	}
 
+	/**
+	 * Gets the block at that position.
+	 * 
+	 * @param x
+	 * @param y
+	 * @param z
+	 * @return The block.
+	 */
 	public Block getBlock(int x, int y, int z) {
 		return mc.theWorld.getBlock(x, y, z);
 	}
 
+	/**
+	 * Gets the block at that position.
+	 * 
+	 * @param pos
+	 * @return
+	 */
+	public Block getBlock(Pos pos) {
+		return getBlock(pos.x, pos.y, pos.z);
+	}
+
+	/**
+	 * Adds a task that should be executed.
+	 * 
+	 * @param task
+	 *            The new task
+	 */
 	public abstract void addTask(AITask task);
 
-	// Notify that a desync happened.
+	/**
+	 * This should be called whenever the current task could not achieve it's
+	 * goal. All following tasks are unscheduled.
+	 */
 	public abstract void desync();
 
+	/**
+	 * Gets the pos1 marker.
+	 * 
+	 * @return The marker or <code>null</code> if it is unset.
+	 */
 	public Pos getPos1() {
 		return pos1;
 	}
 
+	/**
+	 * Gets the pos2 marker.
+	 * 
+	 * @return The marker or <code>null</code> if it is unset.
+	 */
 	public Pos getPos2() {
 		return pos2;
 	}
 
+	/**
+	 * Sets the pos1 or pos2 marker.
+	 * 
+	 * @param pos
+	 *            The new position.
+	 * @param isPos2
+	 */
 	public void setPosition(Pos pos, boolean isPos2) {
 		int posIndex;
 		if (isPos2) {
@@ -136,6 +181,13 @@ public abstract class AIHelper {
 		AIChatController.addChatLine("Set position" + posIndex + " to " + pos);
 	}
 
+	/**
+	 * Faces an exact position in space.
+	 * 
+	 * @param x
+	 * @param y
+	 * @param z
+	 */
 	public void face(double x, double y, double z) {
 		final double d0 = x - mc.thePlayer.posX;
 		final double d1 = z - mc.thePlayer.posZ;
@@ -161,6 +213,13 @@ public abstract class AIHelper {
 	 * overrideMovement(i); }
 	 */
 
+	/**
+	 * Checks if an item is on the hotbar.
+	 * 
+	 * @param f
+	 *            The item to search
+	 * @return <code>true</code> if it is selectable.
+	 */
 	public boolean canSelectItem(ItemFilter f) {
 		for (int i = 0; i < 9; ++i) {
 			if (f.matches(mc.thePlayer.inventory.getStackInSlot(i))) {
@@ -170,6 +229,13 @@ public abstract class AIHelper {
 		return false;
 	}
 
+	/**
+	 * Selects an item.
+	 * 
+	 * @param f
+	 *            The item to search for.
+	 * @return <code>true</code> if the player is now holding that item.
+	 */
 	public boolean selectCurrentItem(ItemFilter f) {
 		if (f.matches(mc.thePlayer.inventory.getCurrentItem())) {
 			return true;
@@ -183,7 +249,13 @@ public abstract class AIHelper {
 		return false;
 	}
 
-	// Find a block around the player
+	/**
+	 * Finds any Block of that type directly around the player.
+	 * 
+	 * @param blockType
+	 *            The block to search.
+	 * @return the position or <code>null</code> if it was not found.
+	 */
 	public Pos findBlock(Block blockType) {
 		final int cx = MathHelper.floor_double(mc.thePlayer.posX);
 		final int cy = MathHelper.floor_double(mc.thePlayer.posY);
@@ -202,12 +274,34 @@ public abstract class AIHelper {
 		return pos;
 	}
 
+	/**
+	 * Checks if the player is currently facing the block so that it can be
+	 * interacted with.
+	 * 
+	 * @param x
+	 * @param y
+	 * @param z
+	 * @return <code>true</code> if it is facing the Block.
+	 */
 	public boolean isFacingBlock(int x, int y, int z) {
 		final MovingObjectPosition o = getObjectMouseOver();
 		return o != null && o.typeOfHit == MovingObjectType.BLOCK
 				&& o.blockX == x && o.blockY == y && o.blockZ == z;
 	}
 
+	/**
+	 * Checks if the player is facing a specific side of the block.
+	 * 
+	 * @param x
+	 * @param y
+	 * @param z
+	 * @param blockSide
+	 *            The side of the block.
+	 * @param half
+	 *            Can restrict the check to the upper or lower half of the side
+	 *            (not useful for top/bottom)
+	 * @return <code>true</code> if the player faces the block.
+	 */
 	public boolean isFacingBlock(int x, int y, int z, ForgeDirection blockSide,
 			BlockSide half) {
 		if (!isFacingBlock(x, y, z, sideToDir(blockSide))) {
@@ -219,10 +313,30 @@ public abstract class AIHelper {
 		}
 	}
 
+	/**
+	 * Checks if the player is facing a specific side of the block.
+	 * 
+	 * @param x
+	 * @param y
+	 * @param z
+	 * @param blockSide
+	 *            The side of the block.
+	 * @return <code>true</code> if the player faces the block.
+	 */
 	public boolean isFacingBlock(int x, int y, int z, ForgeDirection blockSide) {
 		return isFacingBlock(x, y, z, sideToDir(blockSide));
 	}
 
+	/**
+	 * Checks if the player is facing a specific side of the block.
+	 * 
+	 * @param x
+	 * @param y
+	 * @param z
+	 * @param blockSide
+	 *            The side of the block as game integer.
+	 * @return <code>true</code> if the player faces the block.
+	 */
 	public boolean isFacingBlock(int x, int y, int z, int side) {
 		final MovingObjectPosition o = getObjectMouseOver();
 		return o != null && o.typeOfHit == MovingObjectType.BLOCK
@@ -230,10 +344,21 @@ public abstract class AIHelper {
 				&& o.sideHit == side;
 	}
 
+	/**
+	 * Needs to be called whenever the player moved and the block faced might
+	 * have changed.
+	 */
 	public void invalidateObjectMouseOver() {
 		objectMouseOverInvalidated = true;
 	}
 
+	/**
+	 * Gets the object the player is currently facing. This should always be
+	 * used instead of the Minecraft version, since it handles player movement
+	 * updates in the same game tick.
+	 * 
+	 * @return
+	 */
 	public MovingObjectPosition getObjectMouseOver() {
 		if (objectMouseOverInvalidated) {
 			objectMouseOverInvalidated = false;
@@ -258,6 +383,11 @@ public abstract class AIHelper {
 				&& Math.abs(mc.thePlayer.boundingBox.minY - y) < 0.52;
 	}
 
+	/**
+	 * Get the current position the player is at.
+	 * 
+	 * @return The position.
+	 */
 	public Pos getPlayerPosition() {
 		final int x = MathHelper.floor_double(getMinecraft().thePlayer.posX);
 		final int y = MathHelper
@@ -266,6 +396,13 @@ public abstract class AIHelper {
 		return new Pos(x, y, z);
 	}
 
+	/**
+	 * Selects a good tool for mining the given Block.
+	 * 
+	 * @param x
+	 * @param y
+	 * @param z
+	 */
 	public void selectToolFor(final int x, final int y, final int z) {
 		selectCurrentItem(new ItemFilter() {
 			@Override
@@ -273,7 +410,7 @@ public abstract class AIHelper {
 				return itemStack != null
 						&& itemStack.getItem() != null
 						&& itemStack.getItem().func_150893_a(itemStack,
-								mc.theWorld.getBlock(x, y, z)) > 1;
+								getBlock(x, y, z)) > 1;
 			}
 		});
 	}
@@ -415,6 +552,13 @@ public abstract class AIHelper {
 				|| blockIsOneOf(block, stairBlocks);
 	}
 
+	/**
+	 * Faces a block and destroys it if possible.
+	 * 
+	 * @param x
+	 * @param y
+	 * @param z
+	 */
 	public void faceAndDestroy(final int x, final int y, final int z) {
 		if (isFacingBlock(x, y, z)) {
 			selectToolFor(x, y, z);
@@ -424,11 +568,26 @@ public abstract class AIHelper {
 		}
 	}
 
+	/**
+	 * Faces a full block.
+	 * 
+	 * @param x
+	 * @param y
+	 * @param z
+	 */
 	public void faceBlock(final int x, final int y, final int z) {
 		face(x + randBetween(0.1, 0.9), y + randBetween(0.1, 0.9), z
 				+ randBetween(0.1, 0.9));
 	}
 
+	/**
+	 * Faces the side of a block.
+	 * 
+	 * @param x
+	 * @param y
+	 * @param z
+	 * @param sideToFace
+	 */
 	public void faceSideOf(int x, int y, int z, ForgeDirection sideToFace) {
 		double faceX = x + randBetween(0.1, 0.9);
 		double faceY = y + randBetween(0.1, 0.9);
@@ -460,6 +619,24 @@ public abstract class AIHelper {
 		face(faceX, faceY, faceZ);
 	}
 
+	/**
+	 * Advanced version to face a specific side of a block.
+	 * 
+	 * @param x
+	 * @param y
+	 * @param z
+	 * @param sideToFace
+	 *            To restrict facing on a given side. Can be <code>null</code>
+	 *            to disable.
+	 * @param minY
+	 *            Limits the Y coordinate that is faced.
+	 * @param maxY
+	 *            Limits the Y coordinate that is faced.
+	 * @param centerX
+	 * @param centerZ
+	 * @param xzdir
+	 *            The direction the xz restriction affects.
+	 */
 	public void faceSideOf(int x, int y, int z, ForgeDirection sideToFace,
 			double minY, double maxY, double centerX, double centerZ,
 			ForgeDirection xzdir) {
@@ -468,7 +645,7 @@ public abstract class AIHelper {
 		final Block block = getBoundsBlock(x, y, z);
 
 		minY = Math.max(minY, block.getBlockBoundsMinY());
-		maxY = Math.max(minY, block.getBlockBoundsMaxY());
+		maxY = Math.min(maxY, block.getBlockBoundsMaxY());
 		double faceY = randBetweenNice(minY, maxY);
 		double faceX, faceZ;
 
@@ -519,6 +696,13 @@ public abstract class AIHelper {
 		face(faceX + x, faceY + y, faceZ + z);
 	}
 
+	/**
+	 * A random number in a range, that does not exactly hit the sides.
+	 * 
+	 * @param minY
+	 * @param maxY
+	 * @return
+	 */
 	private double randBetweenNice(double minY, double maxY) {
 		return maxY - minY < 0.1 ? (maxY + minY) / 2 : randBetween(minY + 0.03,
 				maxY - 0.03);
@@ -537,6 +721,11 @@ public abstract class AIHelper {
 	private KeyBinding resetSneakKey;
 	private boolean sneakKeyJustPressed;
 
+	/**
+	 * overrides the keyboard input in the next game tick.
+	 * 
+	 * @param i
+	 */
 	public void overrideMovement(MovementInput i) {
 		if (resetMovementInput == null) {
 			resetMovementInput = mc.thePlayer.movementInput;
@@ -544,6 +733,9 @@ public abstract class AIHelper {
 		mc.thePlayer.movementInput = i;
 	}
 
+	/**
+	 * Presses the use item key in the next game tick.
+	 */
 	public void overrideUseItem() {
 		if (resetUseItemKey == null) {
 			resetUseItemKey = mc.gameSettings.keyBindUseItem;
@@ -554,6 +746,9 @@ public abstract class AIHelper {
 				useItemKeyJustPressed);
 	}
 
+	/**
+	 * Presses the attack key in the next game tick.
+	 */
 	public void overrideAttack() {
 		if (resetAttackKey == null) {
 			resetAttackKey = mc.gameSettings.keyBindAttack;
@@ -564,6 +759,9 @@ public abstract class AIHelper {
 				attackKeyJustPressed);
 	}
 
+	/**
+	 * Presses the sneak key in the next game step.
+	 */
 	public void overrideSneak() {
 		if (resetSneakKey == null) {
 			resetSneakKey = mc.gameSettings.keyBindSneak;
@@ -574,6 +772,9 @@ public abstract class AIHelper {
 				sneakKeyJustPressed);
 	}
 
+	/**
+	 * Restore all inputs to the default minecraft inputs.
+	 */
 	protected void resetAllInputs() {
 		if (resetMovementInput != null) {
 			mc.thePlayer.movementInput = resetMovementInput;
@@ -592,6 +793,15 @@ public abstract class AIHelper {
 		}
 	}
 
+	/**
+	 * Checks if a block is in a list of blocks.
+	 * 
+	 * @param needle
+	 *            The block to search for
+	 * @param haystack
+	 *            The blocks allowed.
+	 * @return <code>true</code> if it is the list.
+	 */
 	public static boolean blockIsOneOf(Block needle, Block... haystack) {
 		for (final Block h : haystack) {
 			if (Block.isEqualTo(needle, h)) {
@@ -602,7 +812,9 @@ public abstract class AIHelper {
 	}
 
 	/**
-	 * MC cannot do this...
+	 * A fast method that gets a block id for a given position. Use it if you
+	 * need to scan many blocks, since the default minecraft block lookup is
+	 * slow.
 	 * 
 	 * @param x
 	 * @param y
@@ -639,7 +851,8 @@ public abstract class AIHelper {
 	}
 
 	/**
-	 * The real block Y of the block we stand on.
+	 * The real top y cord of the block we stand on. Watch out: Minecraft blocks
+	 * do not always provide the right bounds with it's block objects.
 	 * 
 	 * @param x
 	 * @param y
@@ -664,6 +877,13 @@ public abstract class AIHelper {
 		return y - 1 + maxY;
 	}
 
+	/**
+	 * Gets a list of entities in a given distance filtered with a filter.
+	 * 
+	 * @param dist
+	 * @param selector
+	 * @return
+	 */
 	@SuppressWarnings("unchecked")
 	public List<Entity> getEntities(int dist, IEntitySelector selector) {
 		return mc.theWorld.getEntitiesWithinAABBExcludingEntity(
@@ -672,6 +892,14 @@ public abstract class AIHelper {
 						.addCoord(dist, dist, dist).expand(1, 1, 1), selector);
 	}
 
+	/**
+	 * Gets the closest entity limited by a given distance.
+	 * 
+	 * @param dist
+	 * @param selector
+	 * @return
+	 * @see #getEntities(int, IEntitySelector)
+	 */
 	public Entity getClosestEntity(int dist, IEntitySelector selector) {
 		final List<Entity> entities = getEntities(dist, selector);
 
@@ -688,6 +916,9 @@ public abstract class AIHelper {
 		return found;
 	}
 
+	/**
+	 * Ungrabs the mouse.
+	 */
 	public void ungrab() {
 		doUngrab = true;
 	}
@@ -735,6 +966,15 @@ public abstract class AIHelper {
 		return block;
 	}
 
+	/**
+	 * Walks towards a given point. Automatically slows down at the point
+	 * 
+	 * @param x
+	 * @param z
+	 * @param jump
+	 *            If we should jump.
+	 * @return <code>true</code> after arrival.
+	 */
 	public boolean walkTowards(double x, double z, boolean jump) {
 		final double dx = x - mc.thePlayer.posX;
 		final double dz = z - mc.thePlayer.posZ;
@@ -784,6 +1024,11 @@ public abstract class AIHelper {
 		return !mc.thePlayer.onGround;
 	}
 
+	/**
+	 * Gets the horizontal direction we look at.
+	 * 
+	 * @return
+	 */
 	public ForgeDirection getLookDirection() {
 		switch (MathHelper
 				.floor_double(getMinecraft().thePlayer.rotationYaw / 360 * 4 + .5) & 3) {
@@ -798,6 +1043,12 @@ public abstract class AIHelper {
 		}
 	}
 
+	/**
+	 * Checks if an item is in the main inventory.
+	 * 
+	 * @param itemFiler
+	 * @return
+	 */
 	public boolean hasItemInInvetory(ItemFilter itemFiler) {
 		for (final ItemStack s : mc.thePlayer.inventory.mainInventory) {
 			if (itemFiler.matches(s)) {
@@ -807,12 +1058,23 @@ public abstract class AIHelper {
 		return false;
 	}
 
+	/**
+	 * Converts an valid x/z pair to a direction if possible.
+	 * 
+	 * @param x
+	 * @param z
+	 * @return
+	 */
 	public static ForgeDirection getDirectionForXZ(int x, int z) {
-		for (final ForgeDirection d : ForgeDirection.VALID_DIRECTIONS) {
-			if (d.offsetX == x && d.offsetZ == z) {
-				return d;
+		if (x != 0 || z != 0) {
+			for (final ForgeDirection d : ForgeDirection.VALID_DIRECTIONS) {
+				if (d.offsetX == x && d.offsetZ == z) {
+					return d;
+				}
 			}
 		}
-		throw new IllegalArgumentException("Cannot convert to direction: " + x + " " + z);
+		throw new IllegalArgumentException("Cannot convert to direction: " + x
+				+ " " + z);
 	}
+
 }

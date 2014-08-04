@@ -36,6 +36,12 @@ import cpw.mods.fml.common.gameevent.TickEvent.Phase;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
+/**
+ * The main class that handles the bot.
+ * 
+ * @author michael
+ * 
+ */
 public class AIController extends AIHelper implements IAIControllable {
 
 	private static final int TIMEOUT = 5 * 20;
@@ -90,6 +96,9 @@ public class AIController extends AIHelper implements IAIControllable {
 
 	@Override
 	public void addTask(AITask task) {
+		if (task == null) {
+			throw new NullPointerException();
+		}
 		tasks.add(task);
 	}
 
@@ -100,6 +109,11 @@ public class AIController extends AIHelper implements IAIControllable {
 		desync = true;
 	}
 
+	/**
+	 * Checks if the Bot is active and what it should do.
+	 * 
+	 * @param evt
+	 */
 	@SubscribeEvent
 	public void onPlayerTick(ClientTickEvent evt) {
 		if (evt.phase != Phase.START || getMinecraft().thePlayer == null) {
@@ -206,6 +220,11 @@ public class AIController extends AIHelper implements IAIControllable {
 		buildManager.reset();
 	}
 
+	/**
+	 * Draws the position markers.
+	 * 
+	 * @param event
+	 */
 	@SubscribeEvent
 	public void drawMarkers(RenderWorldLastEvent event) {
 		final EntityLivingBase player = getMinecraft().renderViewEntity;

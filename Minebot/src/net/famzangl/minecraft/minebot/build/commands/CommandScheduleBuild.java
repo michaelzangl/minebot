@@ -6,6 +6,7 @@ import net.famzangl.minecraft.minebot.ai.AIStrategy;
 import net.famzangl.minecraft.minebot.ai.command.AICommand;
 import net.famzangl.minecraft.minebot.ai.command.AICommandInvocation;
 import net.famzangl.minecraft.minebot.ai.command.AICommandParameter;
+import net.famzangl.minecraft.minebot.ai.command.CommandEvaluationException;
 import net.famzangl.minecraft.minebot.ai.command.ParameterType;
 import net.famzangl.minecraft.minebot.ai.task.BlockSide;
 import net.famzangl.minecraft.minebot.build.WoodType;
@@ -37,7 +38,7 @@ public class CommandScheduleBuild {
 		} else if (AIHelper.blockIsOneOf(blockToPlace, FenceBuildTask.BLOCKS)) {
 			addTask(helper, new FenceBuildTask(forPosition, blockToPlace));
 		} else {
-			throw new IllegalArgumentException("Cannot build " + blockToPlace);
+			throw new CommandEvaluationException("Cannot build " + blockToPlace);
 		}
 		return null;
 	}
@@ -53,7 +54,7 @@ public class CommandScheduleBuild {
 			addTask(helper, new ColoredCubeBuildTask(forPosition, blockToPlace,
 					color));
 		} else {
-			throw new IllegalArgumentException("Cannot build " + blockToPlace);
+			throw new CommandEvaluationException("Cannot build " + blockToPlace);
 		}
 		return null;
 	}
@@ -68,7 +69,7 @@ public class CommandScheduleBuild {
 		if (AIHelper.blockIsOneOf(blockToPlace, WoodBuildTask.BLOCK)) {
 			addTask(helper, new WoodBuildTask(forPosition, woodType));
 		} else {
-			throw new IllegalArgumentException("Cannot build " + blockToPlace);
+			throw new CommandEvaluationException("Cannot build " + blockToPlace);
 		}
 		return null;
 	}
@@ -84,7 +85,7 @@ public class CommandScheduleBuild {
 		if (AIHelper.blockIsOneOf(blockToPlace, LogBuildTask.BLOCKS)) {
 			addTask(helper, new LogBuildTask(forPosition, woodType, direction));
 		} else {
-			throw new IllegalArgumentException("Cannot build " + blockToPlace);
+			throw new CommandEvaluationException("Cannot build " + blockToPlace);
 		}
 		return null;
 	}
@@ -101,7 +102,7 @@ public class CommandScheduleBuild {
 			addTask(helper, new BuildNormalStairsTask(forPosition,
 					blockToPlace, direction, half));
 		} else {
-			throw new IllegalArgumentException("Cannot build " + blockToPlace);
+			throw new CommandEvaluationException("Cannot build " + blockToPlace);
 		}
 		return null;
 	}
@@ -117,7 +118,7 @@ public class CommandScheduleBuild {
 		if (AIHelper.blockIsOneOf(blockToPlace, BuildHalfslabTask.BLOCKS)) {
 			addTask(helper, new BuildHalfslabTask(forPosition, type, side));
 		} else {
-			throw new IllegalArgumentException("Cannot build " + blockToPlace);
+			throw new CommandEvaluationException("Cannot build " + blockToPlace);
 		}
 		return null;
 	}

@@ -35,7 +35,7 @@ public class SneakAndPlaceTask extends AITask {
 	 * @param filter
 	 * @param relativeFrom
 	 *            Vector: place position -> start standing pos.
-	 * @param e
+	 * @param minBuildHeight
 	 */
 	public SneakAndPlaceTask(int x, int y, int z, BlockItemFilter filter,
 			Pos relativeFrom, double minBuildHeight) {

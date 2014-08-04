@@ -122,18 +122,19 @@ public class CommandDefinition {
 				return null;
 			}
 		} catch (IllegalAccessException e) {
-			// TODO: Error...
-			e.printStackTrace();
-			throw new RuntimeException(e);
+			doThrow(e);
 		} catch (IllegalArgumentException e) {
-			// TODO: Error...
-			e.printStackTrace();
-			throw new RuntimeException(e);
+			doThrow(e);
 		} catch (InvocationTargetException e) {
-			// TODO: Error...
-			e.printStackTrace();
-			throw new RuntimeException(e);
+			Throwable exception = e.getTargetException();
+			doThrow(exception);
 		}
+		return null;
+	}
+
+	private void doThrow(Throwable exception) {
+		exception.printStackTrace();
+		throw exception instanceof CommandEvaluationException ? (CommandEvaluationException) exception : new CommandEvaluationException("Unexpected error while evaluating.", exception);
 	}
 
 	public ArrayList<ArgumentDefinition> getArguments() {

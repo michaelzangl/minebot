@@ -2,6 +2,13 @@ package net.famzangl.minecraft.minebot;
 
 import net.minecraftforge.common.util.ForgeDirection;
 
+/**
+ * A position consisting of integer x y and z coordinates. Uses mainly for block
+ * positions.
+ * 
+ * @author michael
+ * 
+ */
 public class Pos {
 	public int x;
 	public int y;
@@ -77,6 +84,14 @@ public class Pos {
 	public static Pos maxPos(Pos p1, Pos p2) {
 		return new Pos(Math.max(p1.x, p2.x), Math.max(p1.y, p2.y), Math.max(
 				p1.z, p2.z));
+	}
+
+	public Pos add(Pos pos) {
+		return add(pos.x, pos.y, pos.z);
+	}
+
+	public Pos subtract(Pos pos) {
+		return new Pos(x - pos.x, y - pos.y, z - pos.z);
 	}
 
 }

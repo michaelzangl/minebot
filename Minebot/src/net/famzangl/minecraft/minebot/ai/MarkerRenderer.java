@@ -6,6 +6,12 @@ import net.minecraft.client.renderer.Tessellator;
 
 import org.lwjgl.opengl.GL11;
 
+/**
+ * Renders the marker boxes for indicating pos1/pos2
+ * 
+ * @author michael
+ * 
+ */
 public class MarkerRenderer {
 
 	private static final double MAX = 1.05;

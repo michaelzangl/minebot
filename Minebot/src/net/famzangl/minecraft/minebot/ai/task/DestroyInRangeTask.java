@@ -29,8 +29,9 @@ public class DestroyInRangeTask extends AITask {
 						next = new Pos(x, y, z);
 						currentMin = rating;
 					}
-					System.out.println(String.format("%d, %d, %d: %f", x, y, z,
-							(float) rating));
+					// System.out.println(String.format("%d, %d, %d: %f", x, y,
+					// z,
+					// (float) rating));
 				}
 			}
 		}
@@ -39,13 +40,28 @@ public class DestroyInRangeTask extends AITask {
 	}
 
 	private double rate(AIHelper h, int x, int y, int z) {
-		if (h.isAirBlock(x, y, z) || !h.hasSafeSides(x, y, z)
-				|| !h.isSafeHeadBlock(x, y + 1, z)
+		if (!isSafeToDestroy(h, x, y, z)
 				|| blacklist.contains(new Pos(x, y, z))) {
 			return -1;
 		} else {
-			return h.getMinecraft().thePlayer.getDistanceSq(x + .5, y + .5, z + .5);
+			return h.getMinecraft().thePlayer.getDistanceSq(x + .5, y + .5,
+					z + .5);
 		}
+	}
+
+	private boolean isSafeToDestroy(AIHelper h, int x, int y, int z) {
+		return !h.isAirBlock(x, y, z)
+				&& h.hasSafeSides(x, y, z)
+				&& (h.isSafeHeadBlock(x, y + 1, z) || isSafeFallingBlock(h, x,
+						y + 1, z));
+	}
+
+	private boolean isSafeFallingBlock(AIHelper h, int x, int y, int z) {
+		return AIHelper.blockIsOneOf(h.getBlock(x, y, z),
+				AIHelper.fallingBlocks)
+				&& isSafeToDestroy(h, x, y, z)
+				|| AIHelper.blockIsOneOf(h.getBlock(x, y, z),
+						AIHelper.walkableBlocks);
 	}
 
 	@Override
@@ -83,5 +99,9 @@ public class DestroyInRangeTask extends AITask {
 		return "DestroyInRangeTask [minPos=" + minPos + ", maxPos=" + maxPos
 				+ ", facingAttempts=" + facingAttempts + ", blacklist="
 				+ blacklist + "]";
+	}
+
+	public void blacklist(Pos pos) {
+		blacklist.add(pos);
 	}
 }

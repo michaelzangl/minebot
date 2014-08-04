@@ -15,6 +15,12 @@ import net.minecraft.item.ItemDye;
 import net.minecraft.item.ItemFood;
 import net.minecraft.item.ItemStack;
 
+/**
+ * Lets all wolves that are owned by the current player either sit or stand.
+ * 
+ * @author michael
+ * 
+ */
 public class LetAnimalsSitStrategy implements AIStrategy {
 
 	private final class NoWolfFoodFilter implements ItemFilter {
@@ -31,7 +37,16 @@ public class LetAnimalsSitStrategy implements AIStrategy {
 	private final int color;
 	private final boolean shouldSit;
 
+	/**
+	 * Creates a new strategy.
+	 * @param wolf Always needs to be wolf (for now)
+	 * @param shouldSit <code>true</code> if they all should sit, <code>false</code> otherwise
+	 * @param color A color selector or -1 for no color.
+	 */
 	public LetAnimalsSitStrategy(AnimalyType wolf, boolean shouldSit, int color) {
+		if (wolf != AnimalyType.WOLF) {
+			throw new IllegalArgumentException();
+		}
 		this.shouldSit = shouldSit;
 		this.color = color;
 	}

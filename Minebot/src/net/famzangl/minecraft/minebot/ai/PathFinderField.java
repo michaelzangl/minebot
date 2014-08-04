@@ -6,6 +6,12 @@ import java.util.PriorityQueue;
 
 import net.famzangl.minecraft.minebot.Pos;
 
+/**
+ * The basic path finding algorithm.
+ * 
+ * @author michael
+ * 
+ */
 public class PathFinderField implements Comparator<Integer> {
 	private static final long MAX_RUN_TIME = 200;
 	// Power of 2!
@@ -168,10 +174,15 @@ public class PathFinderField implements Comparator<Integer> {
 			data.offsetY = cy - Y_LEVEL / 2;
 			data.offsetZ = cz - SIZE_X_Z / 2;
 			pq.clear();
-			currentDest = null;
 			final int start = getIndexForBlock(cx, cy, cz);
 			pq.add(start);
+			float startRating = rateDestination(start);
 			setDistance(start, 1);
+			if (startRating >= 0) {
+				currentDest = new Dest(start, startRating);
+			} else {
+				currentDest = null;
+			}
 			isRunning = true;
 		}
 		startTime = System.currentTimeMillis();

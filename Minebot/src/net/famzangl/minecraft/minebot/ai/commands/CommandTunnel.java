@@ -8,6 +8,7 @@ import net.famzangl.minecraft.minebot.ai.command.AICommandInvocation;
 import net.famzangl.minecraft.minebot.ai.command.AICommandParameter;
 import net.famzangl.minecraft.minebot.ai.command.ParameterType;
 import net.famzangl.minecraft.minebot.ai.path.TunnelPathFinder;
+import net.famzangl.minecraft.minebot.ai.path.TunnelPathFinder.TorchSide;
 import net.famzangl.minecraft.minebot.ai.strategy.PathFinderStrategy;
 import net.minecraftforge.common.util.ForgeDirection;
 
@@ -37,6 +38,16 @@ public class CommandTunnel {
 		return run(helper, nameArg, helper.getLookDirection(), addToSide, addToTop);
 	}
 
+	@AICommandInvocation()
+	public static AIStrategy run(
+			AIHelper helper,
+			@AICommandParameter(type = ParameterType.FIXED, fixedName = "tunnel", description = "") String nameArg,
+			@AICommandParameter(type = ParameterType.NUMBER, description = "add to side") int addToSide,
+			@AICommandParameter(type = ParameterType.NUMBER, description = "add to top") int addToTop,
+			@AICommandParameter(type = ParameterType.ENUM, description = "torche side") TorchSide torches) {
+		return run(helper, nameArg, helper.getLookDirection(), addToSide, addToTop, torches);
+	}
+
 	
 	@AICommandInvocation()
 	public static AIStrategy run(
@@ -45,14 +56,25 @@ public class CommandTunnel {
 			@AICommandParameter(type = ParameterType.ENUM, description = "direction") ForgeDirection inDirection,
 			@AICommandParameter(type = ParameterType.NUMBER, description = "add to side") int addToSide,
 			@AICommandParameter(type = ParameterType.NUMBER, description = "add to top") int addToTop) {
-		return run(helper, inDirection.offsetX, inDirection.offsetZ, addToSide, addToTop);
+		return run(helper, inDirection.offsetX, inDirection.offsetZ, addToSide, addToTop, TorchSide.NONE);
+	}
+
+	@AICommandInvocation()
+	public static AIStrategy run(
+			AIHelper helper,
+			@AICommandParameter(type = ParameterType.FIXED, fixedName = "tunnel", description = "") String nameArg,
+			@AICommandParameter(type = ParameterType.ENUM, description = "direction") ForgeDirection inDirection,
+			@AICommandParameter(type = ParameterType.NUMBER, description = "add to side") int addToSide,
+			@AICommandParameter(type = ParameterType.NUMBER, description = "add to top") int addToTop,
+			@AICommandParameter(type = ParameterType.ENUM, description = "torche side") TorchSide torches) {
+		return run(helper, inDirection.offsetX, inDirection.offsetZ, addToSide, addToTop, torches);
 	}
 
 	public static AIStrategy run(
 			AIHelper helper,
-			int dx, int dz, int addToSide, int addToTop) {
+			int dx, int dz, int addToSide, int addToTop, TorchSide torches) {
 		Pos pos = helper.getPlayerPosition();
-		return new PathFinderStrategy(new TunnelPathFinder(helper, dx, dz, pos.x, pos.y, pos.z, addToSide, addToTop),
+		return new PathFinderStrategy(new TunnelPathFinder(helper, dx, dz, pos.x, pos.y, pos.z, addToSide, addToTop, torches),
 				"Tunneling");
 	}
 }

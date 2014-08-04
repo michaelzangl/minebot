@@ -2,6 +2,12 @@ package net.famzangl.minecraft.minebot.ai;
 
 import net.minecraft.client.settings.KeyBinding;
 
+/**
+ * A key binding that is always pressed.
+ * 
+ * @author michael
+ * 
+ */
 public final class InteractAlways extends KeyBinding {
 	private boolean isPressed;
 

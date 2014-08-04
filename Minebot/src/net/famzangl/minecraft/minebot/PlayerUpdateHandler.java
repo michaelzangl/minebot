@@ -18,6 +18,13 @@ import org.apache.commons.lang3.StringEscapeUtils;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.TickEvent.PlayerTickEvent;
 
+/**
+ * This sends a list of all visible players to a server, e.g. to display it on a
+ * map.
+ * 
+ * @author michael
+ * 
+ */
 public class PlayerUpdateHandler {
 	private final ExecutorService sendThread;
 	private final Hashtable<String, Long> blockTimes = new Hashtable<String, Long>();

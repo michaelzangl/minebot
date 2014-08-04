@@ -20,7 +20,9 @@ public enum AnimalyType {
 	COW(EntityCow.class),
 	CHICKEN(EntityChicken.class),
 	PIG(EntityPig.class),
-	SHEEP(EntitySheep.class), WOLF(EntityWolf.class), OCELOT(EntityOcelot.class);
+	SHEEP(EntitySheep.class),
+	WOLF(EntityWolf.class),
+	OCELOT(EntityOcelot.class);
 
 	private Class<?> animalClass;
 

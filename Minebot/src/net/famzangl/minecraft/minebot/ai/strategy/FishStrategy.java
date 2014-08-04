@@ -6,6 +6,7 @@ import net.famzangl.minecraft.minebot.ai.AIStrategyFactory;
 import net.famzangl.minecraft.minebot.ai.animals.ThrowFishingRodTask;
 import net.famzangl.minecraft.minebot.ai.task.AITask;
 import net.famzangl.minecraft.minebot.ai.task.DoFishTask;
+import net.famzangl.minecraft.minebot.ai.task.WaitTask;
 
 public class FishStrategy implements AIStrategy, AIStrategyFactory {
 
@@ -13,6 +14,10 @@ public class FishStrategy implements AIStrategy, AIStrategyFactory {
 	public void searchTasks(AIHelper helper) {
 		if (helper.getMinecraft().thePlayer.fishEntity == null) {
 			helper.addTask(new ThrowFishingRodTask());
+			helper.addTask(WaitTask.instance);
+			helper.addTask(WaitTask.instance);
+			helper.addTask(WaitTask.instance);
+			helper.addTask(WaitTask.instance);
 		} else {
 			helper.addTask(new DoFishTask());
 		}

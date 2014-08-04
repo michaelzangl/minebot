@@ -42,6 +42,9 @@ public class CommandRegistry {
 				} else {
 					AIChatController.addChatLine("ERROR: No such command.");
 				}
+			} catch (CommandEvaluationException e) {
+				AIChatController
+				.addChatLine("ERROR while evaluating: " + e.getMessage());
 			} catch (Throwable e) {
 				e.printStackTrace();
 				AIChatController

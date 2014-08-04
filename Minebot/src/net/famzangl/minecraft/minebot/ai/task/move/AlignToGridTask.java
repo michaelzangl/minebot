@@ -4,6 +4,11 @@ import net.famzangl.minecraft.minebot.Pos;
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.task.AITask;
 
+/**
+ * Ensures that the player is standing on a block.
+ * @author michael
+ *
+ */
 public class AlignToGridTask extends AITask {
 	private final int x;
 	private final int y;
@@ -33,5 +38,4 @@ public class AlignToGridTask extends AITask {
 	public String toString() {
 		return "AlignToGridTask [x=" + x + ", y=" + y + ", z=" + z + "]";
 	}
-
 }

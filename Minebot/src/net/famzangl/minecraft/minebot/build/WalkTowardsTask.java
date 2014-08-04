@@ -100,7 +100,7 @@ public class WalkTowardsTask extends AITask {
 	private int getUpperCarpetY(AIHelper h) {
 		int upperCarpet = -1;
 		for (int y = AIHelper.blockIsOneOf(
-				h.getBlock(fromPos.x, fromPos.y, fromPos.z), Blocks.air,
+				h.getBlock(fromPos), Blocks.air,
 				Blocks.carpet) ? fromPos.y : fromPos.y + 1; y < nextPos.y; y++) {
 			if (AIHelper.blockIsOneOf(h.getBlock(fromPos.x, y, fromPos.z),
 					Blocks.carpet)) {

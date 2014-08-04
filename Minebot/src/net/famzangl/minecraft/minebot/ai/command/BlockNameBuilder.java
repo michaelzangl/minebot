@@ -23,6 +23,7 @@ public class BlockNameBuilder extends ParameterBuilder {
 		public void getTabCompleteOptions(String currentStart,
 				Collection<String> addTo) {
 			super.getTabCompleteOptions(currentStart, addTo);
+			@SuppressWarnings("unchecked")
 			Set<String> keys = Block.blockRegistry.getKeys();
 			for (String k : keys) {
 				if (k.startsWith(MINECRAFT_PREFIX)) {
@@ -55,7 +56,11 @@ public class BlockNameBuilder extends ParameterBuilder {
 
 	@Override
 	public Object getParameter(AIHelper helper, String[] arguments) {
-		return Block.blockRegistry.getObject(arguments[0]);
+		Object block = Block.blockRegistry.getObject(arguments[0]);
+		if (block == null) {
+			throw new CommandEvaluationException("Block " + arguments[0] + " is unknown");
+		}
+		return block;
 	}
 
 }

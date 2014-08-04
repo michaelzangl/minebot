@@ -22,7 +22,8 @@ public class BuildHalfslabTask extends CubeBuildTask {
 	@Override
 	public AITask getPlaceBlockTask(Pos relativeFromPos) {
 		if (!isStandablePlace(relativeFromPos)) {
-			return null;
+			throw new IllegalArgumentException("Cannot build standing there: "
+					+ relativeFromPos);
 		} else if (relativeFromPos.equals(FROM_GROUND)) {
 			return new JumpingPlaceAtHalfTask(forPosition.x, forPosition.y + 1,
 					forPosition.z, blockFilter, side);
@@ -31,6 +32,11 @@ public class BuildHalfslabTask extends CubeBuildTask {
 					forPosition.y + 1, forPosition.z, blockFilter,
 					relativeFromPos, getMinHeightToBuild(), side);
 		}
+	}
+
+	@Override
+	protected double getBlockHeight() {
+		return side == BlockSide.LOWER_HALF ? .5 : 1;
 	}
 
 	@Override
