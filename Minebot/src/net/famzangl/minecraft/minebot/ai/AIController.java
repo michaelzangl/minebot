@@ -1,5 +1,7 @@
 package net.famzangl.minecraft.minebot.ai;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.Map.Entry;
@@ -13,6 +15,7 @@ import net.famzangl.minecraft.minebot.ai.strategy.LumberjackStrategy;
 import net.famzangl.minecraft.minebot.ai.strategy.MineStrategy;
 import net.famzangl.minecraft.minebot.ai.strategy.PlantStrategy;
 import net.famzangl.minecraft.minebot.ai.task.AITask;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.entity.EntityLivingBase;
@@ -200,18 +203,31 @@ public class AIController extends AIHelper implements IAIControllable {
 			doUngrab = false;
 		}
 
-		final ScaledResolution res = new ScaledResolution(
-				getMinecraft().gameSettings, getMinecraft().displayWidth,
-				getMinecraft().displayHeight);
-		String str;
-		synchronized (strategyDescrMutex) {
-			str = strategyDescr;
+		try {
+			// Dynamic 1.7.2 / 1.7.10 fix.
+			ScaledResolution res;
+			Constructor<?> method = ScaledResolution.class.getConstructors()[0];
+			Object arg1 = method.getParameterTypes()[0] == Minecraft.class ? getMinecraft()
+					: getMinecraft().gameSettings;
+			res = (ScaledResolution) method.newInstance(arg1,
+					getMinecraft().displayWidth, getMinecraft().displayHeight);
+
+			String str;
+			synchronized (strategyDescrMutex) {
+				str = strategyDescr;
+			}
+			getMinecraft().fontRenderer.drawStringWithShadow(
+					str,
+					res.getScaledWidth()
+							- getMinecraft().fontRenderer.getStringWidth(str)
+							- 10, 10, 16777215);
+		} catch (InstantiationException e) {
+			e.printStackTrace();
+		} catch (IllegalAccessException e) {
+			e.printStackTrace();
+		} catch (InvocationTargetException e) {
+			e.printStackTrace();
 		}
-		getMinecraft().fontRenderer.drawStringWithShadow(
-				str,
-				res.getScaledWidth()
-						- getMinecraft().fontRenderer.getStringWidth(str) - 10,
-				10, 16777215);
 	}
 
 	@SubscribeEvent

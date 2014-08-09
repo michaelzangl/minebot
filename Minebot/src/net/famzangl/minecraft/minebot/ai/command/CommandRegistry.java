@@ -40,16 +40,27 @@ public class CommandRegistry {
 					AIChatController
 							.addChatLine("ERROR: More than 1 command matches your command line.");
 				} else {
-					AIChatController.addChatLine("ERROR: No such command.");
+
+					AIChatController.addChatLine("ERROR: No command:"
+							+ combine(args) + ".");
 				}
 			} catch (CommandEvaluationException e) {
-				AIChatController
-				.addChatLine("ERROR while evaluating: " + e.getMessage());
+				AIChatController.addChatLine("ERROR while evaluating: "
+						+ e.getMessage());
 			} catch (Throwable e) {
 				e.printStackTrace();
 				AIChatController
 						.addChatLine("ERROR: Could not evaluate. Please report.");
 			}
+		}
+
+		private String combine(String[] args) {
+			StringBuilder b = new StringBuilder();
+			for (String a : args) {
+				b.append(" ");
+				b.append(a);
+			}
+			return b.toString();
 		}
 
 		@Override
