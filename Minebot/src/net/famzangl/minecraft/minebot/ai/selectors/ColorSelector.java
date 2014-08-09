@@ -15,9 +15,19 @@ public final class ColorSelector implements IEntitySelector {
 
 	@Override
 	public boolean isEntityApplicable(Entity var1) {
-		return (var1 instanceof EntityWolf && ((EntityWolf) var1)
-				.getCollarColor() == color)
-				|| (var1 instanceof EntitySheep && ((EntitySheep) var1)
-						.getFleeceColor() == 15 - color);
+		if (var1 instanceof EntityWolf) {
+			return ((EntityWolf) var1).getCollarColor() == color;
+		} else if (var1 instanceof EntitySheep) {
+			System.out.println(((EntitySheep) var1).getFleeceColor());
+			return ((EntitySheep) var1).getFleeceColor() == color;
+		} else {
+			return false;
+		}
 	}
+
+	@Override
+	public String toString() {
+		return "ColorSelector [color=" + color + "]";
+	}
+
 }

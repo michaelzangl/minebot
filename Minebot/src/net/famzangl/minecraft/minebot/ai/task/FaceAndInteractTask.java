@@ -62,4 +62,13 @@ public class FaceAndInteractTask extends AITask {
 		}
 		ticksRun++;
 	}
+
+	@Override
+	public String toString() {
+		return "FaceAndInteractTask [preferedAnimal=" + preferedAnimal
+				+ ", alsoAcceptedAnimal=" + alsoAcceptedAnimal
+				+ ", doRightClick=" + doRightClick + "]";
+	}
+	
+	
 }

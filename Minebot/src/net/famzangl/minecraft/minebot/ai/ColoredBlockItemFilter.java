@@ -17,6 +17,11 @@ public class ColoredBlockItemFilter extends BlockItemFilter {
 			Blocks.stained_glass_pane, Blocks.carpet };
 	private final int colorMeta;
 
+	/**
+	 * Right names for sheep wool and most blocks.
+	 * <p>
+	 * (15 - color) for dyes
+	 */
 	public static final String[] COLORS = new String[] { "White", "Orange",
 			"Magenta", "LightBlue", "Yellow", "Lime", "Pink", "Gray",
 			"LightGray", "Cyan", "Purple", "Blue", "Brown", "Green", "Red",

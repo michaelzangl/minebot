@@ -69,7 +69,7 @@ public class TintStrategy implements AIStrategy {
 		public boolean matches(ItemStack itemStack) {
 			return itemStack != null && itemStack.getItem() != null
 					&& itemStack.getItem() instanceof ItemDye
-					&& (color < 0 || itemStack.getItemDamage() == color);
+					&& (color < 0 || 15 - itemStack.getItemDamage() == color);
 		}
 
 	}
@@ -81,7 +81,7 @@ public class TintStrategy implements AIStrategy {
 		}
 
 		final EntityClientPlayerMP owner = helper.getMinecraft().thePlayer;
-		int holdingColor = owner.inventory.getCurrentItem().getItemDamage();
+		int holdingColor = 15 - owner.inventory.getCurrentItem().getItemDamage();
 		IEntitySelector wolfSelector = new WolfSelector(owner);
 		IEntitySelector sheepSelector = new SheepSelector();
 
@@ -118,5 +118,13 @@ public class TintStrategy implements AIStrategy {
 	public AITask getOverrideTask(AIHelper helper) {
 		return null;
 	}
+
+	@Override
+	public String toString() {
+		return "TintStrategy [color=" + color + ", current=" + current
+				+ ", type=" + type + "]";
+	}
+	
+	
 
 }
