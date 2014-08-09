@@ -1,12 +1,14 @@
 package net.famzangl.minecraft.minebot.ai.path;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 import net.famzangl.minecraft.minebot.Pos;
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.task.DestroyInRangeTask;
 import net.famzangl.minecraft.minebot.ai.task.PlaceTorchSomewhereTask;
 import net.minecraft.init.Blocks;
+import net.minecraftforge.common.util.ForgeDirection;
 
 public class TunnelPathFinder extends AlongTrackPathFinder {
 
@@ -15,18 +17,20 @@ public class TunnelPathFinder extends AlongTrackPathFinder {
 	private final TorchSide torches;
 
 	public static enum TorchSide {
-		NONE(false, false),
-		LEFT(true, false),
-		RIGHT(false, true),
-		BOTH(true, true);
+		NONE(false, false, false),
+		LEFT(true, false, false),
+		RIGHT(false, true, false),
+		BOTH(true, true, false),
+		FLOOR(false, false, true);
 
 		private final boolean left;
 		private final boolean right;
+		private final boolean floor;
 
-		private TorchSide(boolean left, boolean right) {
+		private TorchSide(boolean left, boolean right, boolean floor) {
 			this.left = left;
 			this.right = right;
-
+			this.floor = floor;
 		}
 	}
 
@@ -64,11 +68,12 @@ public class TunnelPathFinder extends AlongTrackPathFinder {
 		boolean isTorchStep = getStepNumber(currentPos.x, currentPos.z) % 8 == 0;
 		if (torches.right && isTorchStep) {
 			addTorchesTask(currentPos, -dz, dx);
-			System.out.println("Adding torches");
 		}
 		if (torches.left && isTorchStep) {
 			addTorchesTask(currentPos, dz, -dx);
-			System.out.println("Adding torches");
+		}
+		if (torches.floor && isTorchStep) {
+			helper.addTask(new PlaceTorchSomewhereTask(Collections.singletonList(currentPos), ForgeDirection.DOWN));
 		}
 	}
 
@@ -81,7 +86,7 @@ public class TunnelPathFinder extends AlongTrackPathFinder {
 			positions.add(new Pos(currentPos.x + dirX * i, currentPos.y,
 					currentPos.z + dirZ * i));
 		}
-		helper.addTask(new PlaceTorchSomewhereTask(positions, AIHelper.getDirectionForXZ(dirX, dirZ)));
+		helper.addTask(new PlaceTorchSomewhereTask(positions, AIHelper.getDirectionForXZ(dirX, dirZ), ForgeDirection.DOWN));
 	}
 
 	@Override
