@@ -2,6 +2,7 @@ package net.famzangl.minecraft.minebot.ai.path;
 
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.minecraft.block.Block;
+import net.minecraftforge.common.util.ForgeDirection;
 
 public class MineBySettingsPathFinder extends MinePathfinder {
 
@@ -30,8 +31,8 @@ public class MineBySettingsPathFinder extends MinePathfinder {
 		}
 	}
 
-	public MineBySettingsPathFinder(AIHelper helper) {
-		super(helper);
+	public MineBySettingsPathFinder(AIHelper helper, ForgeDirection preferedDirection) {
+		super(helper, preferedDirection);
 		maxDistancePoints = 0;
 		maxDistanceFactor = MIN_FACTOR;
 		for (final String s : settings.getKeys()) {

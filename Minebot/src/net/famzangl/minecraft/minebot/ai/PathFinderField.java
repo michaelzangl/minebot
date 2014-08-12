@@ -278,7 +278,7 @@ public class PathFinderField implements Comparator<Integer> {
 	protected void foundPath(LinkedList<Pos> path) {
 		System.out.println("Found a path!");
 		for (final Pos p : path) {
-			System.out.println("PAth part: " + p);
+			System.out.println("Path part: " + p);
 		}
 	}
 
@@ -299,7 +299,7 @@ public class PathFinderField implements Comparator<Integer> {
 	 * @param x
 	 * @param y
 	 * @param z
-	 * @return
+	 * @return At least the real distance to the block.
 	 */
 	protected float rateDestination(int distance, int x, int y, int z) {
 		return distance;

@@ -6,6 +6,7 @@ import net.famzangl.minecraft.minebot.Pos;
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.task.DestroyInRangeTask;
 import net.minecraft.block.Block;
+import net.minecraftforge.common.util.ForgeDirection;
 
 public abstract class MinePathfinder extends MovePathFinder {
 	protected static final float MIN_FACTOR = 0.1f;
@@ -15,6 +16,14 @@ public abstract class MinePathfinder extends MovePathFinder {
 	private final Random rand = new Random();
 	protected float maxDistancePoints = 0;
 	protected float maxDistanceFactor = 1;
+	/**
+	 * A horizontal direction that is prefered
+	 */
+	protected final ForgeDirection preferedDirection;
+	/**
+	 * 0.0 - 1.0.
+	 */
+	protected final float preferedDirectionInfluence = 0.3f;
 
 	private final FloatBlockCache points;
 	private final FloatBlockCache factors;
@@ -47,8 +56,9 @@ public abstract class MinePathfinder extends MovePathFinder {
 		}
 	}
 
-	public MinePathfinder(AIHelper helper) {
+	public MinePathfinder(AIHelper helper, ForgeDirection preferedDirection) {
 		super(helper);
+		this.preferedDirection = preferedDirection;
 		points = new FloatBlockCache(getPointsProvider());
 		factors = new FloatBlockCache(getFactorProvider());
 	}
@@ -74,7 +84,20 @@ public abstract class MinePathfinder extends MovePathFinder {
 		if (rating == Float.POSITIVE_INFINITY) {
 			return -1;
 		} else {
-			return makeRandom(rating + addForDoubleMine);
+			float badDirectionMalus = 0;
+			Pos current = helper.getPlayerPosition();
+			if (preferedDirection != null && preferedDirection.offsetX != 0) {
+				int dx = x - current.x;
+				if (Math.signum(dx) != preferedDirection.offsetX) {
+					badDirectionMalus = dx * preferedDirectionInfluence;
+				}
+			} else if (preferedDirection != null && preferedDirection.offsetZ != 0) {
+				int dz = z - current.z;
+				if (Math.signum(dz) != preferedDirection.offsetZ) {
+					badDirectionMalus = dz * preferedDirectionInfluence;
+				}
+			}
+			return makeRandom((rating + addForDoubleMine) * badDirectionMalus);
 		}
 	}
 
