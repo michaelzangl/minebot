@@ -356,7 +356,6 @@ public class AIController extends AIHelper implements IAIControllable {
 		final ItemStack stack = event.entityPlayer.inventory.getCurrentItem();
 		if (stack != null && stack.getItem() == Items.wooden_axe) {
 			if (event.action == Action.RIGHT_CLICK_BLOCK) {
-				Thread.dumpStack();
 				if (event.entityPlayer.worldObj.isRemote) {
 					positionMarkEvent(event.x, event.y, event.z, 0);
 				}
