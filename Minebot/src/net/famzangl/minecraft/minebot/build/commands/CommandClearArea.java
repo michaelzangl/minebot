@@ -13,6 +13,31 @@ import net.famzangl.minecraft.minebot.ai.strategy.PathFinderStrategy;
 @AICommand(helpText = "Clears the selected area.", name = "minebuild")
 public class CommandClearArea {
 
+	private static final class ClearAreaStrategy extends PathFinderStrategy {
+		private String progress = "?";
+		private final ClearAreaPathfinder pathFinder;
+
+		private ClearAreaStrategy(ClearAreaPathfinder pathFinder) {
+			super(pathFinder, "");
+			this.pathFinder = pathFinder;
+		}
+
+		@Override
+		public void searchTasks(AIHelper helper) {
+			int max = pathFinder.getAreaSize();
+			if (max <= 10000) {
+				progress = 100 - Math
+						.round(100f * pathFinder.getToClearCount() / max) + "%";
+			}
+			super.searchTasks(helper);
+		}
+
+		@Override
+		public String getDescription() {
+			return "Clear area:: " + progress;
+		}
+	}
+
 	@AICommandInvocation()
 	public static AIStrategy run(
 			AIHelper helper,
@@ -21,8 +46,7 @@ public class CommandClearArea {
 			AIChatController.addChatLine("Set positions first.");
 			return null;
 		} else {
-			return new PathFinderStrategy(new ClearAreaPathfinder(helper),
-					"Clear area");
+			return new ClearAreaStrategy(new ClearAreaPathfinder(helper));
 		}
 	}
 }

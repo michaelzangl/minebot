@@ -4,9 +4,9 @@ import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.task.AITask;
 
 public class HorizontalMoveTask extends AITask {
-	private final int x;
-	private final int y;
-	private final int z;
+	protected final int x;
+	protected final int y;
+	protected final int z;
 
 	public HorizontalMoveTask(int x, int y, int z) {
 		this.x = x;
@@ -26,9 +26,12 @@ public class HorizontalMoveTask extends AITask {
 		} else if (!h.isAirBlock(x, y, z) && !h.canWalkOn(h.getBlock(x, y, z))) {
 			h.faceAndDestroy(x, y, z);
 		} else {
-			h.walkTowards(x + 0.5, z + 0.5, false);
-			// mc.thePlayer.getJumpHelper().setJumping();
+			h.walkTowards(x + 0.5, z + 0.5, doJump(h));
 		}
+	}
+
+	protected boolean doJump(AIHelper h) {
+		return false;
 	}
 
 	@Override

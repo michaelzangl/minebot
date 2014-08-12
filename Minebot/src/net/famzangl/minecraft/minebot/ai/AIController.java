@@ -21,6 +21,7 @@ import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.MouseHelper;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent.ElementType;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
@@ -51,8 +52,10 @@ public class AIController extends AIHelper implements IAIControllable {
 
 	private final static Hashtable<KeyBinding, AIStrategyFactory> uses = new Hashtable<KeyBinding, AIStrategyFactory>();
 
-	protected static KeyBinding stop = new KeyBinding("Stop",
+	protected static final KeyBinding stop = new KeyBinding("Stop",
 			Keyboard.getKeyIndex("N"), "Command Mod");
+	protected static final KeyBinding ungrab = new KeyBinding("Ungrab",
+			Keyboard.getKeyIndex("U"), "Command Mod");
 
 	static {
 		final KeyBinding mine = new KeyBinding("Farm ores",
@@ -76,6 +79,7 @@ public class AIController extends AIHelper implements IAIControllable {
 		ClientRegistry.registerKeyBinding(mobfarm);
 		ClientRegistry.registerKeyBinding(plant);
 		ClientRegistry.registerKeyBinding(stop);
+		ClientRegistry.registerKeyBinding(ungrab);
 	}
 
 	private final LinkedList<AITask> tasks = new LinkedList<AITask>();
@@ -92,6 +96,12 @@ public class AIController extends AIHelper implements IAIControllable {
 	private boolean nextPosIsPos2;
 
 	private MarkerRenderer markerRenderer;
+
+	private boolean skipNextTick;
+
+	private boolean inUngrabMode;
+
+	private MouseHelper oldMouseHelper;
 
 	public AIController() {
 		new AIChatController(this);
@@ -122,8 +132,17 @@ public class AIController extends AIHelper implements IAIControllable {
 		if (evt.phase != Phase.START || getMinecraft().thePlayer == null) {
 			return;
 		}
+		if (skipNextTick) {
+			skipNextTick = false;
+			return;
+		}
+		testUngrabMode();
 		invalidateObjectMouseOver();
 		resetAllInputs();
+		
+		if (ungrab.isPressed()) {
+			doUngrab = true;
+		}
 
 		AIStrategy newStrat;
 		if (dead || stop.isPressed() || stop.getIsKeyPressed()) {
@@ -199,7 +218,9 @@ public class AIController extends AIHelper implements IAIControllable {
 			// TODO: Reset this on grab
 			getMinecraft().gameSettings.pauseOnLostFocus = false;
 			// getMinecraft().mouseHelper.ungrabMouseCursor();
-			getMinecraft().setIngameNotInFocus();
+			if (getMinecraft().inGameHasFocus) {
+				startUngrabMode();
+			}
 			doUngrab = false;
 		}
 
@@ -227,6 +248,36 @@ public class AIController extends AIHelper implements IAIControllable {
 			e.printStackTrace();
 		} catch (InvocationTargetException e) {
 			e.printStackTrace();
+		}
+	}
+
+	private synchronized void startUngrabMode() {
+		getMinecraft().mouseHelper.ungrabMouseCursor();
+		getMinecraft().inGameHasFocus = true;
+		oldMouseHelper = getMinecraft().mouseHelper;
+		getMinecraft().mouseHelper = new MouseHelper() {
+			@Override
+			public void mouseXYChange() {
+			}
+			@Override
+			public void grabMouseCursor() {
+			}
+			@Override
+			public void ungrabMouseCursor() {
+			}
+		};
+	}
+	
+	private synchronized void testUngrabMode() {
+		if (oldMouseHelper != null) {
+			if (userTookOver()) {
+				System.out.println("Preparing to re-grab the mouse.");
+				// Tell minecraft what really happened.
+				getMinecraft().mouseHelper = oldMouseHelper;
+				getMinecraft().inGameHasFocus = false;
+				getMinecraft().setIngameFocus();
+				oldMouseHelper = null;
+			}
 		}
 	}
 

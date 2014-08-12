@@ -1,0 +1,38 @@
+package net.famzangl.minecraft.minebot.ai.task.move;
+
+import net.famzangl.minecraft.minebot.ai.AIHelper;
+
+public class JumpMoveTask extends HorizontalMoveTask {
+
+	private final int oldX;
+	private final int oldZ;
+
+	public JumpMoveTask(int x, int y, int z, int oldX, int oldZ) {
+		super(x, y, z);
+		this.oldX = oldX;
+		this.oldZ = oldZ;
+	}
+
+	@Override
+	protected boolean doJump(AIHelper h) {
+//		Pos player = h.getPlayerPosition();
+//		return player.x != x && player.z != z;
+		return true;
+	}
+
+	@Override
+	public void runTick(AIHelper h) {
+		if (!h.isAirBlock(oldX, y + 1, oldZ)) {
+			h.faceAndDestroy(oldX, y + 1, oldZ);
+		} else {
+			super.runTick(h);
+		}
+	}
+
+	@Override
+	public String toString() {
+		return "JumpMoveTask [oldX=" + oldX + ", oldZ=" + oldZ + ", x=" + x
+				+ ", y=" + y + ", z=" + z + "]";
+	}
+
+}

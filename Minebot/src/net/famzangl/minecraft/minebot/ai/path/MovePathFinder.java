@@ -11,9 +11,11 @@ import net.famzangl.minecraft.minebot.ai.PathFinderField;
 import net.famzangl.minecraft.minebot.ai.task.move.AlignToGridTask;
 import net.famzangl.minecraft.minebot.ai.task.move.DownwardsMoveTask;
 import net.famzangl.minecraft.minebot.ai.task.move.HorizontalMoveTask;
+import net.famzangl.minecraft.minebot.ai.task.move.JumpMoveTask;
 import net.famzangl.minecraft.minebot.ai.task.move.UpwardsMoveTask;
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
+import net.minecraftforge.common.util.ForgeDirection;
 
 /**
  * A pathfinder that lets you move around a minecraft world.
@@ -27,6 +29,8 @@ public class MovePathFinder extends PathFinderField {
 
 	protected AIHelper helper;
 	protected MinebotSettings settings;
+
+	protected float torchLightLevel;
 
 	/**
 	 * Blocks we should not dig through, e.g. because we cannot handle them
@@ -53,6 +57,7 @@ public class MovePathFinder extends PathFinderField {
 			}
 		}
 		upwardsBuildBlocks = blocks.toArray(new Block[blocks.size()]);
+		torchLightLevel = settings.getFloat("place_torches_at", 1.0f, -1, 15);
 	}
 
 	@Override
@@ -105,8 +110,30 @@ public class MovePathFinder extends PathFinderField {
 		helper.addTask(new AlignToGridTask(currentPos.x, currentPos.y,
 				currentPos.z));
 		while (!path.isEmpty()) {
-			final Pos nextPos = path.removeFirst();
-			if (nextPos.y > currentPos.y) {
+			Pos nextPos = path.removeFirst();
+			ForgeDirection moveDirection = direction(currentPos, nextPos);
+
+			if (torchLightLevel >= 0) {
+				ForgeDirection direction;
+				if (moveDirection == ForgeDirection.UP) {
+					direction = ForgeDirection.DOWN;
+				} else {
+					direction = moveDirection;
+				}
+				helper.addTask(new PlaceTorchIfLightBelowTask(currentPos,
+						direction, torchLightLevel));
+			}
+
+			Pos peeked = path.peekFirst();
+			if (moveDirection == ForgeDirection.UP && peeked != null
+					&& direction(nextPos, peeked).offsetY == 0) {
+				// Combine upwards-sidewards.
+				System.out.println("Next direction is: " + direction(nextPos, peeked));
+				helper.addTask(new JumpMoveTask(peeked.x, peeked.y, peeked.z,
+						nextPos.x, nextPos.z));
+				nextPos = peeked;
+				path.removeFirst();
+			} else if (nextPos.y > currentPos.y) {
 				helper.addTask(new UpwardsMoveTask(nextPos.x, nextPos.y,
 						nextPos.z, new BlockItemFilter(upwardsBuildBlocks)));
 			} else if (nextPos.y < currentPos.y) {
@@ -119,6 +146,12 @@ public class MovePathFinder extends PathFinderField {
 			currentPos = nextPos;
 		}
 		addTasksForTarget(currentPos);
+	}
+
+	private ForgeDirection direction(Pos currentPos, final Pos nextPos) {
+		System.out.println(currentPos + "," + nextPos + ": "
+				+ AIHelper.getDirectionFor(nextPos.subtract(currentPos)));
+		return AIHelper.getDirectionFor(nextPos.subtract(currentPos));
 	}
 
 	protected void addTasksForTarget(Pos currentPos) {

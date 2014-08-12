@@ -463,6 +463,7 @@ public abstract class AIHelper {
 	public boolean isSafeHeadBlock(int x, int y, int z) {
 		final Block block = mc.theWorld.getBlock(x, y, z);
 		return blockIsOneOf(block, stairBlocks)
+				|| blockIsOneOf(block, walkableBlocks)
 				|| blockIsOneOf(block, normalBlocks) || isAirBlock(x, y, z);
 	}
 
@@ -739,6 +740,7 @@ public abstract class AIHelper {
 	public void overrideUseItem() {
 		if (resetUseItemKey == null) {
 			resetUseItemKey = mc.gameSettings.keyBindUseItem;
+			useItemKeyJustPressed = resetUseItemKey.getIsKeyPressed();
 		}
 		mc.gameSettings.keyBindUseItem = new InteractAlways(
 				mc.gameSettings.keyBindAttack.getKeyDescription(), 501,
@@ -752,6 +754,7 @@ public abstract class AIHelper {
 	public void overrideAttack() {
 		if (resetAttackKey == null) {
 			resetAttackKey = mc.gameSettings.keyBindAttack;
+			attackKeyJustPressed = resetAttackKey.getIsKeyPressed();
 		}
 		mc.gameSettings.keyBindAttack = new InteractAlways(
 				mc.gameSettings.keyBindAttack.getKeyDescription(), 502,
@@ -765,6 +768,7 @@ public abstract class AIHelper {
 	public void overrideSneak() {
 		if (resetSneakKey == null) {
 			resetSneakKey = mc.gameSettings.keyBindSneak;
+			sneakKeyJustPressed = resetSneakKey.getIsKeyPressed();
 		}
 		mc.gameSettings.keyBindSneak = new InteractAlways(
 				mc.gameSettings.keyBindSneak.getKeyDescription(), 503,
@@ -783,7 +787,7 @@ public abstract class AIHelper {
 		if (resetAttackKey != null) {
 			mc.gameSettings.keyBindAttack = resetAttackKey;
 		}
-		useItemKeyJustPressed = resetAttackKey != null;
+		useItemKeyJustPressed = resetUseItemKey != null;
 		if (resetUseItemKey != null) {
 			mc.gameSettings.keyBindUseItem = resetUseItemKey;
 		}
@@ -791,6 +795,21 @@ public abstract class AIHelper {
 		if (resetSneakKey != null) {
 			mc.gameSettings.keyBindSneak = resetSneakKey;
 		}
+	}
+
+	protected boolean userTookOver() {
+		MovementInput mi = resetMovementInput == null ? mc.thePlayer.movementInput
+				: resetMovementInput;
+		KeyBinding attack = resetAttackKey == null ? mc.gameSettings.keyBindAttack
+				: resetAttackKey;
+		KeyBinding use = resetUseItemKey == null ? mc.gameSettings.keyBindUseItem
+				: resetUseItemKey;
+		KeyBinding sneak = resetSneakKey == null ? mc.gameSettings.keyBindSneak
+				: resetSneakKey;
+
+		return mi.moveForward != 0 || mi.moveStrafe != 0 || mi.jump
+				|| attack.getIsKeyPressed() || use.getIsKeyPressed()
+				|| sneak.getIsKeyPressed();
 	}
 
 	/**
@@ -1075,6 +1094,21 @@ public abstract class AIHelper {
 		}
 		throw new IllegalArgumentException("Cannot convert to direction: " + x
 				+ " " + z);
+	}
+
+	public static ForgeDirection getDirectionFor(Pos pos) {
+		for (final ForgeDirection d : ForgeDirection.VALID_DIRECTIONS) {
+			if (d.offsetX == pos.x && d.offsetY == pos.y && d.offsetZ == pos.z) {
+				return d;
+			}
+		}
+		throw new IllegalArgumentException("Cannot convert to direction: "
+				+ pos);
+	}
+
+	public int getLightAt(Pos currentPos) {
+		return mc.theWorld.getBlockLightValue(currentPos.x, currentPos.y,
+				currentPos.z);
 	}
 
 }
