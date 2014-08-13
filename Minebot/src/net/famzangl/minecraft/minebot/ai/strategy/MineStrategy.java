@@ -12,12 +12,12 @@ public class MineStrategy implements AIStrategyFactory {
 	@Override
 	public AIStrategy produceStrategy(AIHelper helper) {
 		return new PathFinderStrategy(new MineBySettingsPathFinder(helper,
-				helper.getLookDirection()), "Mining ores");
+				helper.getLookDirection(), helper.getPlayerPosition().y), "Mining ores");
 	}
 
 	public AIStrategy produceStrategy(AIHelper helper, Block blockName) {
 		return new PathFinderStrategy(new MineSinglePathFinder(helper,
-				blockName, helper.getLookDirection()), "Mining "
+				blockName, helper.getLookDirection(), helper.getPlayerPosition().y), "Mining "
 				+ blockName.getLocalizedName());
 	}
 

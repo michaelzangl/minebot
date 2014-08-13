@@ -8,8 +8,8 @@ public class MineSinglePathFinder extends MinePathfinder {
 
 	private final Block block;
 
-	public MineSinglePathFinder(AIHelper helper, Block block, ForgeDirection preferedDirection) {
-		super(helper, preferedDirection);
+	public MineSinglePathFinder(AIHelper helper, Block block, ForgeDirection preferedDirection, int preferedLayer) {
+		super(helper, preferedDirection, preferedLayer);
 		this.block = block;
 	}
 

@@ -7,6 +7,7 @@ import net.famzangl.minecraft.minebot.ai.selectors.AndSelector;
 import net.famzangl.minecraft.minebot.ai.selectors.ColorSelector;
 import net.famzangl.minecraft.minebot.ai.selectors.NotSelector;
 import net.famzangl.minecraft.minebot.ai.selectors.OrSelector;
+import net.famzangl.minecraft.minebot.ai.selectors.OwnTameableSelector;
 import net.famzangl.minecraft.minebot.ai.task.AITask;
 import net.famzangl.minecraft.minebot.ai.task.FaceAndInteractTask;
 import net.minecraft.client.entity.EntityClientPlayerMP;
@@ -36,17 +37,14 @@ public class TintStrategy implements AIStrategy {
 		}
 	}
 
-	private final class WolfSelector implements IEntitySelector {
-		private final EntityClientPlayerMP owner;
-
+	private final class WolfSelector extends OwnTameableSelector {
 		private WolfSelector(EntityClientPlayerMP owner) {
-			this.owner = owner;
+			super(owner);
 		}
 
 		@Override
 		public boolean isEntityApplicable(Entity var1) {
-			return var1 instanceof EntityWolf
-					&& ((EntityWolf) var1).getOwner() == owner;
+			return var1 instanceof EntityWolf && super.isEntityApplicable(var1);
 		}
 	}
 

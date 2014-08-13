@@ -31,8 +31,8 @@ public class MineBySettingsPathFinder extends MinePathfinder {
 		}
 	}
 
-	public MineBySettingsPathFinder(AIHelper helper, ForgeDirection preferedDirection) {
-		super(helper, preferedDirection);
+	public MineBySettingsPathFinder(AIHelper helper, ForgeDirection preferedDirection, int preferedLayer) {
+		super(helper, preferedDirection, preferedLayer);
 		maxDistancePoints = 0;
 		maxDistanceFactor = MIN_FACTOR;
 		for (final String s : settings.getKeys()) {

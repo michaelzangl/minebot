@@ -24,6 +24,12 @@ public abstract class MinePathfinder extends MovePathFinder {
 	 * 0.0 - 1.0.
 	 */
 	protected final float preferedDirectionInfluence = 0.3f;
+	
+	protected final int preferedLayer;
+	/**
+	 * 0.0 - 1.0.
+	 */
+	protected final float preferedLayerInfluence = 0.3f;
 
 	private final FloatBlockCache points;
 	private final FloatBlockCache factors;
@@ -46,9 +52,9 @@ public abstract class MinePathfinder extends MovePathFinder {
 			final int id = helper.getBlockId(x, y, z);
 
 			if (!isCached[id]) {
-				final String name = Block.blockRegistry.getNameForObject(
-						Block.blockRegistry.getObjectById(id)).replace(
-						"minecraft:", "");
+//				final String name = Block.blockRegistry.getNameForObject(
+//						Block.blockRegistry.getObjectById(id)).replace(
+//						"minecraft:", "");
 				cached[id] = settingsProvider.getFloat((Block) Block.blockRegistry.getObjectById(id));
 				isCached[id] = true;
 			}
@@ -56,9 +62,10 @@ public abstract class MinePathfinder extends MovePathFinder {
 		}
 	}
 
-	public MinePathfinder(AIHelper helper, ForgeDirection preferedDirection) {
+	public MinePathfinder(AIHelper helper, ForgeDirection preferedDirection, int preferedLayer) {
 		super(helper);
 		this.preferedDirection = preferedDirection;
+		this.preferedLayer = preferedLayer;
 		points = new FloatBlockCache(getPointsProvider());
 		factors = new FloatBlockCache(getFactorProvider());
 	}
@@ -74,9 +81,9 @@ public abstract class MinePathfinder extends MovePathFinder {
 
 		float addForDoubleMine = 0;
 
-		if (r1 != Float.POSITIVE_INFINITY && r2 != Float.POSITIVE_INFINITY) {
+		if (!(r1 != Float.POSITIVE_INFINITY && r2 != Float.POSITIVE_INFINITY)) {
 			addForDoubleMine = settings
-					.getFloat("mine_double_add", 1, 0.1f, 10);
+					.getFloat("mine_double_add", 1, 0.0f, 10);
 		}
 
 		final float rating = Math.min(r1, r2);
@@ -97,7 +104,10 @@ public abstract class MinePathfinder extends MovePathFinder {
 					badDirectionMalus = dz * preferedDirectionInfluence;
 				}
 			}
-			return makeRandom((rating + addForDoubleMine) * badDirectionMalus);
+			float badY = Math.abs(y - preferedLayer) * preferedLayerInfluence;
+			
+			
+			return makeRandom(rating + addForDoubleMine + badDirectionMalus + badY);
 		}
 	}
 
@@ -114,25 +124,6 @@ public abstract class MinePathfinder extends MovePathFinder {
 		final float factor = factors.getForBlock(x, y, z);
 		return factor == 0 ? Float.POSITIVE_INFINITY : distance / factor
 				* maxDistanceFactor + maxDistancePoints - point;
-	}
-
-	private float weightDouble(float f1, float f2) {
-		final float maxRating = Math.max(f1, f2);
-		final float smallerRating = Math.min(f1, f2);
-
-		final float doubleRatingFactor = settings.getFloat(
-				"mine_double_factor", 1, 0.1f, 10);
-		return maxRating + (doubleRatingFactor - 1) * smallerRating;
-	}
-
-	private int layerMalus(int y) {
-		if (y < 5) {
-			return 1;
-		} else if (y > 15) {
-			return (y - 15) / 5;
-		} else {
-			return 0;
-		}
 	}
 
 	private boolean isOreBlock(int x, int y, int z) {

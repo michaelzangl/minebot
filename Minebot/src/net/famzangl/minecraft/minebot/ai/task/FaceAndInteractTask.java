@@ -42,12 +42,7 @@ public class FaceAndInteractTask extends AITask {
 		final MovingObjectPosition over = h.getObjectMouseOver();
 		if (over != null && over.typeOfHit == MovingObjectType.ENTITY
 				&& alsoAcceptedAnimal.isEntityApplicable(over.entityHit)) {
-			if (doRightClick) {
-				h.overrideUseItem();
-			} else {
-				h.overrideAttack();
-			}
-			interacted = true;
+			doInteractWithCurrent(h);
 		} else {
 			final double speed = h.getMinecraft().thePlayer.motionX
 					* h.getMinecraft().thePlayer.motionX
@@ -61,6 +56,15 @@ public class FaceAndInteractTask extends AITask {
 			h.overrideMovement(i);
 		}
 		ticksRun++;
+	}
+
+	protected void doInteractWithCurrent(AIHelper h) {
+		if (doRightClick) {
+			h.overrideUseItem();
+		} else {
+			h.overrideAttack();
+		}
+		interacted = true;
 	}
 
 	@Override
