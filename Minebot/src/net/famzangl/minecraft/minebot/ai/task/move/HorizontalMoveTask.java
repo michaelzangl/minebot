@@ -5,6 +5,7 @@ import java.util.List;
 
 import net.famzangl.minecraft.minebot.Pos;
 import net.famzangl.minecraft.minebot.ai.AIHelper;
+import net.famzangl.minecraft.minebot.ai.strategy.TaskOperations;
 import net.famzangl.minecraft.minebot.ai.task.AITask;
 import net.famzangl.minecraft.minebot.ai.task.CanPrefaceAndDestroy;
 
@@ -25,13 +26,13 @@ public class HorizontalMoveTask extends AITask implements CanPrefaceAndDestroy {
 	}
 
 	@Override
-	public void runTick(AIHelper h) {
+	public void runTick(AIHelper h, TaskOperations o) {
 		if (!h.isAirBlock(x, y + 1, z)) {
 			h.faceAndDestroy(x, y + 1, z);
 		} else if (!h.isAirBlock(x, y, z) && !h.canWalkOn(h.getBlock(x, y, z))) {
 			h.faceAndDestroy(x, y, z);
 		} else {
-			boolean nextIsFacing = h.faceAndDestroyForNextTask();
+			final boolean nextIsFacing = o.faceAndDestroyForNextTask();
 			h.walkTowards(x + 0.5, z + 0.5, doJump(h), !nextIsFacing);
 		}
 	}
@@ -47,7 +48,7 @@ public class HorizontalMoveTask extends AITask implements CanPrefaceAndDestroy {
 
 	@Override
 	public List<Pos> getPredestroyPositions(AIHelper helper) {
-		ArrayList<Pos> arrayList = new ArrayList<Pos>();
+		final ArrayList<Pos> arrayList = new ArrayList<Pos>();
 		arrayList.add(new Pos(x, y + 1, z));
 		if (!helper.canWalkOn(helper.getBlock(x, y, z))) {
 			arrayList.add(new Pos(x, y, z));

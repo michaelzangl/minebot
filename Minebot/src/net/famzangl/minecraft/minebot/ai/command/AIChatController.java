@@ -9,6 +9,7 @@ import net.famzangl.minecraft.minebot.ai.commands.CommandGetWood;
 import net.famzangl.minecraft.minebot.ai.commands.CommandHelp;
 import net.famzangl.minecraft.minebot.ai.commands.CommandKill;
 import net.famzangl.minecraft.minebot.ai.commands.CommandMine;
+import net.famzangl.minecraft.minebot.ai.commands.CommandPause;
 import net.famzangl.minecraft.minebot.ai.commands.CommandPlant;
 import net.famzangl.minecraft.minebot.ai.commands.CommandRun;
 import net.famzangl.minecraft.minebot.ai.commands.CommandShear;
@@ -29,6 +30,7 @@ import net.famzangl.minecraft.minebot.build.commands.CommandSetPos;
 import net.famzangl.minecraft.minebot.build.commands.CommandStepNext;
 import net.famzangl.minecraft.minebot.build.commands.CommandStepPlace;
 import net.famzangl.minecraft.minebot.build.commands.CommandStepWalk;
+import net.minecraft.client.Minecraft;
 import net.minecraft.util.ChatComponentText;
 
 import com.google.common.base.Function;
@@ -40,10 +42,6 @@ import com.google.common.base.Function;
  * 
  */
 public class AIChatController {
-	public static AIChatController runningInstance = null;
-
-	private final IAIControllable controlled;
-
 	private static final CommandRegistry registry = new CommandRegistry();
 
 	private static final int PER_PAGE = 8;
@@ -60,6 +58,7 @@ public class AIChatController {
 		registerCommand(CommandTint.class);
 		registerCommand(CommandBuildWay.class);
 		registerCommand(CommandShear.class);
+		registerCommand(CommandPause.class);
 
 		registerCommand(CommandKill.class);
 		registerCommand(CommandFish.class);
@@ -80,10 +79,7 @@ public class AIChatController {
 		registerCommand(CommandCount.class);
 	}
 
-	public AIChatController(IAIControllable c) {
-		controlled = c;
-		this.registry.setControlled(c);
-		runningInstance = this;
+	private AIChatController() {
 	}
 
 	private static void registerCommand(Class<?> commandClass) {
@@ -91,17 +87,15 @@ public class AIChatController {
 	}
 
 	public static void addChatLine(String message) {
-		if (runningInstance != null) {
-			runningInstance.addToChat("[Minebot] " + message);
-		}
+		addToChat("[Minebot] " + message);
 	}
 
 	public static CommandRegistry getRegistry() {
 		return registry;
 	}
 
-	private void addToChat(String string) {
-		controlled.getMinecraft().thePlayer
+	private static void addToChat(String string) {
+		Minecraft.getMinecraft().thePlayer
 				.addChatMessage(new ChatComponentText(string));
 	}
 
@@ -111,8 +105,8 @@ public class AIChatController {
 				+ (int) Math.ceil((float) data.size() / PER_PAGE));
 		for (int i = Math.max(0, page - 1) * PER_PAGE; i < Math.min(page
 				* PER_PAGE, data.size()); i++) {
-			String line = convert.apply(data.get(i));
-			AIChatController.addChatLine(line);
+			final String line = convert.apply(data.get(i));
+			addChatLine(line);
 		}
 	}
 

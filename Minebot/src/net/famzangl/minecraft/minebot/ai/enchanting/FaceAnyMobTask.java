@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Random;
 
 import net.famzangl.minecraft.minebot.ai.AIHelper;
+import net.famzangl.minecraft.minebot.ai.strategy.TaskOperations;
 import net.famzangl.minecraft.minebot.ai.task.AITask;
 import net.minecraft.client.Minecraft;
 import net.minecraft.command.IEntitySelector;
@@ -12,8 +13,7 @@ import net.minecraft.entity.EntityLiving;
 import net.minecraft.util.AxisAlignedBB;
 
 public class FaceAnyMobTask extends AITask {
-	private final class LivingSelector implements
-			IEntitySelector {
+	private final class LivingSelector implements IEntitySelector {
 		@Override
 		public boolean isEntityApplicable(Entity var1) {
 			// TODO: better filter
@@ -30,7 +30,7 @@ public class FaceAnyMobTask extends AITask {
 	}
 
 	@Override
-	public void runTick(AIHelper h) {
+	public void runTick(AIHelper h, TaskOperations o) {
 		tickCount++;
 		if (tickCount > 10) {
 			final Minecraft mc = h.getMinecraft();

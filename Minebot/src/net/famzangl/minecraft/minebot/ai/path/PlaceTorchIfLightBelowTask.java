@@ -28,8 +28,8 @@ public class PlaceTorchIfLightBelowTask extends PlaceTorchSomewhereTask {
 	}
 
 	private static ForgeDirection[] getDirections(ForgeDirection except) {
-		ArrayList<ForgeDirection> allowed = new ArrayList<ForgeDirection>();
-		for (ForgeDirection d : ForgeDirection.VALID_DIRECTIONS) {
+		final ArrayList<ForgeDirection> allowed = new ArrayList<ForgeDirection>();
+		for (final ForgeDirection d : ForgeDirection.VALID_DIRECTIONS) {
 			if (d != except && d != ForgeDirection.UP) {
 				allowed.add(d);
 			}

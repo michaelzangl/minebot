@@ -1,16 +1,15 @@
 package net.famzangl.minecraft.minebot.ai.selectors;
 
+import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.minecraft.command.IEntitySelector;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.passive.EntityAnimal;
-import net.minecraft.entity.passive.EntityWolf;
-import net.minecraft.item.ItemStack;
 
 public final class FeedableSelector implements IEntitySelector {
-	private final ItemStack currentItem;
+	private final AIHelper helper;
 
-	public FeedableSelector(ItemStack currentItem) {
-		this.currentItem = currentItem;
+	public FeedableSelector(AIHelper helper) {
+		this.helper = helper;
 	}
 
 	@Override
@@ -18,12 +17,6 @@ public final class FeedableSelector implements IEntitySelector {
 		if (!(e instanceof EntityAnimal)) {
 			return false;
 		}
-		final EntityAnimal animal = (EntityAnimal) e;
-		return animal.isBreedingItem(currentItem) && !animal.isInLove()
-				&& (animal.getGrowingAge() == 0 || isHungryWolf(animal)) && animal.getHealth() > 0;
-	}
-
-	private boolean isHungryWolf(EntityAnimal animal) {
-		return animal instanceof EntityWolf && animal.getHealth() < animal.getMaxHealth();
+		return helper.canSelectItem(new FilterFeedingItem((EntityAnimal) e));
 	}
 }

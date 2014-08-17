@@ -1,48 +1,38 @@
 package net.famzangl.minecraft.minebot.ai.strategy;
 
 import net.famzangl.minecraft.minebot.ai.AIHelper;
-import net.famzangl.minecraft.minebot.ai.AIStrategy;
 import net.famzangl.minecraft.minebot.ai.selectors.AndSelector;
 import net.famzangl.minecraft.minebot.ai.selectors.ColorSelector;
 import net.famzangl.minecraft.minebot.ai.selectors.FeedableSelector;
+import net.famzangl.minecraft.minebot.ai.selectors.FilterFeedingItem;
 import net.famzangl.minecraft.minebot.ai.selectors.OrSelector;
 import net.famzangl.minecraft.minebot.ai.selectors.XPOrbSelector;
-import net.famzangl.minecraft.minebot.ai.task.AITask;
 import net.famzangl.minecraft.minebot.ai.task.FaceAndInteractTask;
 import net.minecraft.command.IEntitySelector;
 import net.minecraft.entity.Entity;
-import net.minecraft.init.Items;
-import net.minecraft.item.ItemFood;
-import net.minecraft.item.ItemSeeds;
-import net.minecraft.item.ItemStack;
+import net.minecraft.entity.passive.EntityAnimal;
 
-public class FeedAnimalsStrategy implements AIStrategy {
+public class FeedAnimalsStrategy extends TaskStrategy {
 
 	private static final int DISTANCE = 20;
 	private final int color;
 
 	public FeedAnimalsStrategy() {
-		this (-1);
+		this(-1);
 	}
-	
+
 	public FeedAnimalsStrategy(int color) {
 		this.color = color;
 	}
 
 	@Override
 	public void searchTasks(AIHelper helper) {
-		final ItemStack currentItem = helper.getMinecraft().thePlayer.inventory
-				.getCurrentItem();
-		if (currentItem != null
-				&& (currentItem.getItem() instanceof ItemFood
-						|| currentItem.getItem() == Items.wheat || currentItem
-							.getItem() instanceof ItemSeeds)) {
-			feedWithFood(helper, currentItem);
-		}
+		feedWithFood(helper);
 	}
+	
 
-	private void feedWithFood(AIHelper helper, final ItemStack currentItem) {
-		IEntitySelector selector = new FeedableSelector(currentItem);
+	private void feedWithFood(AIHelper helper) {
+		IEntitySelector selector = new FeedableSelector(helper);
 		if (color >= 0) {
 			selector = new AndSelector(selector, new ColorSelector(color));
 		}
@@ -53,7 +43,19 @@ public class FeedAnimalsStrategy implements AIStrategy {
 				selector, collect));
 
 		if (found != null) {
-			helper.addTask(new FaceAndInteractTask(found, selector));
+			addTask(new FaceAndInteractTask(found, selector) {
+				@Override
+				protected void doInteractWithCurrent(AIHelper h) {
+					final Entity over = h.getObjectMouseOver().entityHit;
+					if (over instanceof EntityAnimal
+							&& h.selectCurrentItem(new FilterFeedingItem(
+									(EntityAnimal) over))) {
+						super.doInteractWithCurrent(h);
+					} else if (found == over) {
+						interacted = true;
+					}
+				}
+			});
 		}
 	}
 
@@ -61,10 +63,4 @@ public class FeedAnimalsStrategy implements AIStrategy {
 	public String getDescription() {
 		return "Feeding";
 	}
-
-	@Override
-	public AITask getOverrideTask(AIHelper helper) {
-		return null;
-	}
-
 }

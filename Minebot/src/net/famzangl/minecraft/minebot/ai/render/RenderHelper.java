@@ -24,7 +24,7 @@ public class RenderHelper {
 
 	public void renderStart(RenderWorldLastEvent event, AIHelper helper) {
 		final Tessellator tessellator = Tessellator.instance;
-		EntityLivingBase player = helper.getMinecraft().renderViewEntity;
+		final EntityLivingBase player = helper.getMinecraft().renderViewEntity;
 		final double x = player.lastTickPosX
 				+ (player.posX - player.lastTickPosX) * event.partialTicks;
 		final double y = player.lastTickPosY

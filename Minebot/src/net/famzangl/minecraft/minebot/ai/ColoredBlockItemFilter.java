@@ -73,18 +73,22 @@ public class ColoredBlockItemFilter extends BlockItemFilter {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
+		if (this == obj) {
 			return true;
-		if (!super.equals(obj))
+		}
+		if (!super.equals(obj)) {
 			return false;
-		if (getClass() != obj.getClass())
+		}
+		if (getClass() != obj.getClass()) {
 			return false;
-		ColoredBlockItemFilter other = (ColoredBlockItemFilter) obj;
-		if (colorMeta != other.colorMeta)
+		}
+		final ColoredBlockItemFilter other = (ColoredBlockItemFilter) obj;
+		if (colorMeta != other.colorMeta) {
 			return false;
+		}
 		return true;
 	}
-	
+
 	@Override
 	public String getDescriptiveString() {
 		return COLORS[colorMeta] + " " + super.getDescriptiveString();

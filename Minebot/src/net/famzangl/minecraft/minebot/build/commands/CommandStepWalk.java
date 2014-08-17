@@ -2,13 +2,14 @@ package net.famzangl.minecraft.minebot.build.commands;
 
 import net.famzangl.minecraft.minebot.Pos;
 import net.famzangl.minecraft.minebot.ai.AIHelper;
-import net.famzangl.minecraft.minebot.ai.AIStrategy;
 import net.famzangl.minecraft.minebot.ai.command.AIChatController;
 import net.famzangl.minecraft.minebot.ai.command.AICommand;
 import net.famzangl.minecraft.minebot.ai.command.AICommandInvocation;
 import net.famzangl.minecraft.minebot.ai.command.AICommandParameter;
 import net.famzangl.minecraft.minebot.ai.command.ParameterType;
+import net.famzangl.minecraft.minebot.ai.strategy.AIStrategy;
 import net.famzangl.minecraft.minebot.ai.strategy.PathFinderStrategy;
+import net.famzangl.minecraft.minebot.ai.strategy.ValueActionStrategy;
 import net.famzangl.minecraft.minebot.build.ForBuildPathFinder;
 import net.famzangl.minecraft.minebot.build.blockbuild.BuildTask;
 
@@ -26,8 +27,9 @@ public class CommandStepWalk {
 			AIChatController.addChatLine("No more build tasks.");
 			return null;
 		} else {
-			final ForBuildPathFinder pf = new ForBuildPathFinder(helper, task);
-			return new PathFinderStrategy(pf, "Going to building site.") {
+			final ForBuildPathFinder pf = new ForBuildPathFinder(task);
+			return ValueActionStrategy.makeSafe(new PathFinderStrategy(pf,
+					"Going to building site.") {
 				@Override
 				public void searchTasks(AIHelper helper) {
 					final Pos atTarget = CommandBuild
@@ -36,7 +38,7 @@ public class CommandStepWalk {
 						super.searchTasks(helper);
 					}
 				}
-			};
+			});
 		}
 	}
 }

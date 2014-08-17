@@ -1,13 +1,12 @@
 package net.famzangl.minecraft.minebot.build.commands;
 
 import net.famzangl.minecraft.minebot.ai.AIHelper;
-import net.famzangl.minecraft.minebot.ai.AIStrategy;
 import net.famzangl.minecraft.minebot.ai.command.AICommand;
 import net.famzangl.minecraft.minebot.ai.command.AICommandInvocation;
 import net.famzangl.minecraft.minebot.ai.command.AICommandParameter;
 import net.famzangl.minecraft.minebot.ai.command.ParameterType;
-import net.famzangl.minecraft.minebot.ai.task.AITask;
-import net.famzangl.minecraft.minebot.build.NextTaskTask;
+import net.famzangl.minecraft.minebot.ai.strategy.AIStrategy;
+import net.famzangl.minecraft.minebot.ai.strategy.RunOnceStrategy;
 
 @AICommand(helpText = "Select the next task as active.", name = "minebuild")
 public class CommandStepNext {
@@ -17,25 +16,12 @@ public class CommandStepNext {
 			AIHelper helper,
 			@AICommandParameter(type = ParameterType.FIXED, fixedName = "step", description = "") String nameArg2,
 			@AICommandParameter(type = ParameterType.FIXED, fixedName = "next", description = "") String nameArg3) {
-		return new AIStrategy() {
-			private boolean done;
-
+		return new RunOnceStrategy() {
 			@Override
-			public void searchTasks(AIHelper helper) {
-				if (!done) {
-					helper.addTask(new NextTaskTask());
-					done = true;
+			protected void singleRun(AIHelper helper) {
+				if (helper.buildManager.peekNextTask() != null) {
+					helper.buildManager.popNextTask();
 				}
-			}
-
-			@Override
-			public AITask getOverrideTask(AIHelper helper) {
-				return null;
-			}
-
-			@Override
-			public String getDescription() {
-				return null;
 			}
 		};
 	}

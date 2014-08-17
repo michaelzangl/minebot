@@ -2,6 +2,7 @@ package net.famzangl.minecraft.minebot.ai.task;
 
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.ItemFilter;
+import net.famzangl.minecraft.minebot.ai.strategy.TaskOperations;
 import net.minecraft.util.MovingObjectPosition;
 
 public class UseItemTask extends AITask {
@@ -22,7 +23,7 @@ public class UseItemTask extends AITask {
 	}
 
 	@Override
-	public void runTick(AIHelper h) {
+	public void runTick(AIHelper h, TaskOperations o) {
 		if (!clicked) {
 			if (filter != null) {
 				if (!h.selectCurrentItem(filter)) {

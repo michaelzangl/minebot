@@ -22,24 +22,28 @@ public class SlabFilter extends BlockItemFilter {
 	public int hashCode() {
 		final int prime = 31;
 		int result = super.hashCode();
-		result = prime * result + ((type == null) ? 0 : type.hashCode());
+		result = prime * result + (type == null ? 0 : type.hashCode());
 		return result;
 	}
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
+		if (this == obj) {
 			return true;
-		if (!super.equals(obj))
+		}
+		if (!super.equals(obj)) {
 			return false;
-		if (getClass() != obj.getClass())
+		}
+		if (getClass() != obj.getClass()) {
 			return false;
-		SlabFilter other = (SlabFilter) obj;
-		if (type != other.type)
+		}
+		final SlabFilter other = (SlabFilter) obj;
+		if (type != other.type) {
 			return false;
+		}
 		return true;
 	}
-	
+
 	@Override
 	public String getDescriptiveString() {
 		return type.toString().toLowerCase() + " slabs";

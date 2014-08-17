@@ -2,13 +2,15 @@ package net.famzangl.minecraft.minebot.ai.task.move;
 
 import net.famzangl.minecraft.minebot.Pos;
 import net.famzangl.minecraft.minebot.ai.AIHelper;
+import net.famzangl.minecraft.minebot.ai.strategy.TaskOperations;
 import net.famzangl.minecraft.minebot.ai.task.AITask;
 import net.famzangl.minecraft.minebot.ai.task.SkipWhenSearchingPrefetch;
 
 /**
  * Ensures that the player is standing on a block.
+ * 
  * @author michael
- *
+ * 
  */
 @SkipWhenSearchingPrefetch
 public class AlignToGridTask extends AITask {
@@ -32,8 +34,8 @@ public class AlignToGridTask extends AITask {
 	}
 
 	@Override
-	public void runTick(AIHelper h) {
-		h.walkTowards(x + 0.5, z + 0.5, false, !h.faceAndDestroyForNextTask());
+	public void runTick(AIHelper h, TaskOperations o) {
+		h.walkTowards(x + 0.5, z + 0.5, false, !o.faceAndDestroyForNextTask());
 	}
 
 	@Override

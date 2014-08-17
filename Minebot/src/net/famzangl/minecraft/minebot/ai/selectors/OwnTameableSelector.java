@@ -32,9 +32,9 @@ public class OwnTameableSelector implements IEntitySelector {
 				return var1.getOwner() == owner;
 			}
 
-		} catch (NoSuchMethodException e1) {
+		} catch (final NoSuchMethodException e1) {
 			e1.printStackTrace();
-		} catch (SecurityException e1) {
+		} catch (final SecurityException e1) {
 			e1.printStackTrace();
 		}
 		return true;

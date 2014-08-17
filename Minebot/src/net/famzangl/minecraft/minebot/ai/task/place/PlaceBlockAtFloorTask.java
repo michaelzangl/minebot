@@ -2,7 +2,9 @@ package net.famzangl.minecraft.minebot.ai.task.place;
 
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.ItemFilter;
+import net.famzangl.minecraft.minebot.ai.strategy.TaskOperations;
 import net.famzangl.minecraft.minebot.ai.task.AITask;
+import net.famzangl.minecraft.minebot.ai.task.error.SelectTaskError;
 import net.minecraftforge.common.util.ForgeDirection;
 
 public class PlaceBlockAtFloorTask extends AITask {
@@ -29,17 +31,16 @@ public class PlaceBlockAtFloorTask extends AITask {
 	}
 
 	@Override
-	public void runTick(AIHelper h) {
+	public void runTick(AIHelper h, TaskOperations o) {
 		if (faceTimer > 0) {
 			faceTimer--;
 		}
 		if (h.isAirBlock(x, getPlaceAtY(), z)) {
 			if (!h.selectCurrentItem(filter)) {
-				System.out.println("Cannot select " + filter);
-				h.desync();
+				o.desync(new SelectTaskError(filter));
 			} else {
 				if (faceTimer == 0) {
-					faceBlock(h);
+					faceBlock(h, o);
 					faceTimer = 2;
 				} else {
 					tryPlaceBlock(h);
@@ -48,7 +49,7 @@ public class PlaceBlockAtFloorTask extends AITask {
 		}
 	}
 
-	protected void faceBlock(AIHelper h) {
+	protected void faceBlock(AIHelper h, TaskOperations o) {
 		h.faceSideOf(x, getPlaceAtY() - 1, z, ForgeDirection.UP);
 	}
 

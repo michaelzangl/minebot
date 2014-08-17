@@ -7,6 +7,7 @@ import java.util.List;
 
 import net.famzangl.minecraft.minebot.Pos;
 import net.famzangl.minecraft.minebot.ai.AIHelper;
+import net.famzangl.minecraft.minebot.ai.strategy.TaskOperations;
 
 public class DestroyInRangeTask extends AITask implements CanPrefaceAndDestroy {
 
@@ -27,7 +28,7 @@ public class DestroyInRangeTask extends AITask implements CanPrefaceAndDestroy {
 		for (int x = minPos.x; x <= maxPos.x; x++) {
 			for (int y = minPos.y; y <= maxPos.y; y++) {
 				for (int z = minPos.z; z <= maxPos.z; z++) {
-					double rating = rate(h, x, y, z);
+					final double rating = rate(h, x, y, z);
 					if (rating >= 0 && rating < currentMin) {
 						next = new Pos(x, y, z);
 						currentMin = rating;
@@ -73,7 +74,7 @@ public class DestroyInRangeTask extends AITask implements CanPrefaceAndDestroy {
 	}
 
 	@Override
-	public void runTick(AIHelper h) {
+	public void runTick(AIHelper h, TaskOperations o) {
 		Pos n = getNextToDestruct(h);
 		if (facingAttempts > 20) {
 			blacklist.add(n);
@@ -110,7 +111,8 @@ public class DestroyInRangeTask extends AITask implements CanPrefaceAndDestroy {
 
 	@Override
 	public List<Pos> getPredestroyPositions(AIHelper helper) {
-		Pos next = getNextToDestruct(helper);
-		return next != null ? Arrays.asList(next) : Collections.<Pos>emptyList();
+		final Pos next = getNextToDestruct(helper);
+		return next != null ? Arrays.asList(next) : Collections
+				.<Pos> emptyList();
 	}
 }

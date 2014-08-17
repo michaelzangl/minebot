@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.famzangl.minecraft.minebot.ai.AIHelper;
-import net.famzangl.minecraft.minebot.ai.AIStrategy;
 import net.famzangl.minecraft.minebot.ai.ItemFilter;
 import net.famzangl.minecraft.minebot.ai.animals.AnimalyType;
 import net.famzangl.minecraft.minebot.ai.selectors.AndSelector;
@@ -12,7 +11,6 @@ import net.famzangl.minecraft.minebot.ai.selectors.ColorSelector;
 import net.famzangl.minecraft.minebot.ai.selectors.IsSittingSelector;
 import net.famzangl.minecraft.minebot.ai.selectors.NotSelector;
 import net.famzangl.minecraft.minebot.ai.selectors.OneOfListSelector;
-import net.famzangl.minecraft.minebot.ai.task.AITask;
 import net.famzangl.minecraft.minebot.ai.task.FaceAndInteractTask;
 import net.minecraft.command.IEntitySelector;
 import net.minecraft.entity.Entity;
@@ -27,7 +25,7 @@ import net.minecraft.item.ItemStack;
  * @author michael
  * 
  */
-public class LetAnimalsSitStrategy implements AIStrategy {
+public class LetAnimalsSitStrategy extends TaskStrategy {
 
 	private final class NoWolfFoodFilter implements ItemFilter {
 		@Override
@@ -36,7 +34,7 @@ public class LetAnimalsSitStrategy implements AIStrategy {
 		}
 
 		private boolean interactsWithWolf(Item item) {
-			return (item instanceof ItemFood)
+			return item instanceof ItemFood
 					&& ((ItemFood) item).isWolfsFavoriteMeat()
 					|| item instanceof ItemDye;
 		}
@@ -82,7 +80,7 @@ public class LetAnimalsSitStrategy implements AIStrategy {
 		final Entity found = helper.getClosestEntity(DISTANCE, selector);
 
 		if (found != null) {
-			helper.addTask(new FaceAndInteractTask(found, selector) {
+			addTask(new FaceAndInteractTask(found, selector) {
 				@Override
 				protected void doInteractWithCurrent(AIHelper h) {
 					super.doInteractWithCurrent(h);
@@ -96,10 +94,4 @@ public class LetAnimalsSitStrategy implements AIStrategy {
 	public String getDescription() {
 		return shouldSit ? "Let them sit" : "Let them go";
 	}
-
-	@Override
-	public AITask getOverrideTask(AIHelper helper) {
-		return null;
-	}
-
 }

@@ -6,9 +6,9 @@ import net.minecraft.command.IEntitySelector;
 import net.minecraft.entity.Entity;
 
 public class OneOfListSelector implements IEntitySelector {
-	
+
 	private final List<Entity> list;
-	
+
 	public OneOfListSelector(List<Entity> list) {
 		this.list = list;
 	}

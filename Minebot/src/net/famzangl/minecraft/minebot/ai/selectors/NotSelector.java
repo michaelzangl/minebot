@@ -4,12 +4,12 @@ import net.minecraft.command.IEntitySelector;
 import net.minecraft.entity.Entity;
 
 public class NotSelector implements IEntitySelector {
-	
+
 	private final IEntitySelector selector;
 
 	public NotSelector(IEntitySelector selector) {
 		this.selector = selector;
-		
+
 	}
 
 	@Override
@@ -17,5 +17,4 @@ public class NotSelector implements IEntitySelector {
 		return !selector.isEntityApplicable(var1);
 	}
 
-	
 }

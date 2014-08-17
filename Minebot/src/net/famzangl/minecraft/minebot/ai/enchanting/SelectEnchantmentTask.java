@@ -3,7 +3,9 @@ package net.famzangl.minecraft.minebot.ai.enchanting;
 import java.lang.reflect.Field;
 
 import net.famzangl.minecraft.minebot.ai.AIHelper;
+import net.famzangl.minecraft.minebot.ai.strategy.TaskOperations;
 import net.famzangl.minecraft.minebot.ai.task.AITask;
+import net.famzangl.minecraft.minebot.ai.task.error.StringTaskError;
 import net.minecraft.client.gui.GuiEnchantment;
 import net.minecraft.inventory.ContainerEnchantment;
 
@@ -24,16 +26,16 @@ public class SelectEnchantmentTask extends AITask {
 	}
 
 	@Override
-	public void runTick(AIHelper h) {
+	public void runTick(AIHelper h, TaskOperations o) {
 		if (!(h.getMinecraft().currentScreen instanceof GuiEnchantment)) {
 			System.out.println("Screen not opened.");
-			h.desync();
+			o.desync(new StringTaskError("Enchantment screen is not open."));
 			return;
 		}
 		final GuiEnchantment screen = (GuiEnchantment) h.getMinecraft().currentScreen;
 		if (!screen.inventorySlots.getSlot(0).getHasStack()) {
 			System.out.println("No stack in slot.");
-			h.desync();
+			o.desync(new StringTaskError("No stack in enchantment table."));
 			return;
 		}
 		if (screen.inventorySlots.getSlot(0).getStack().isItemEnchanted()) {
@@ -64,7 +66,7 @@ public class SelectEnchantmentTask extends AITask {
 			return;
 		} catch (final Throwable e) {
 			e.printStackTrace();
-			h.desync();
+			o.desync(new StringTaskError("Some error... :-("));
 			return;
 		}
 	}

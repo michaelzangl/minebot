@@ -6,7 +6,6 @@ import java.util.Comparator;
 import java.util.List;
 
 import net.famzangl.minecraft.minebot.ai.AIHelper;
-import net.famzangl.minecraft.minebot.ai.AIStrategy;
 import net.famzangl.minecraft.minebot.ai.command.AIChatController;
 import net.famzangl.minecraft.minebot.ai.command.AICommand;
 import net.famzangl.minecraft.minebot.ai.command.AICommandInvocation;
@@ -15,6 +14,7 @@ import net.famzangl.minecraft.minebot.ai.command.ArgumentDefinition;
 import net.famzangl.minecraft.minebot.ai.command.CommandDefinition;
 import net.famzangl.minecraft.minebot.ai.command.FixedNameBuilder.FixedArgumentDefinition;
 import net.famzangl.minecraft.minebot.ai.command.ParameterType;
+import net.famzangl.minecraft.minebot.ai.strategy.AIStrategy;
 import net.minecraft.client.entity.EntityClientPlayerMP;
 import net.minecraft.util.ChatComponentText;
 
@@ -28,10 +28,10 @@ final public class CommandHelp {
 			Function<CommandDefinition, String> {
 		@Override
 		public String apply(CommandDefinition command) {
-			StringBuilder stringBuilder = new StringBuilder();
+			final StringBuilder stringBuilder = new StringBuilder();
 			stringBuilder.append("/");
 			stringBuilder.append(command.getCommandName());
-			for (ArgumentDefinition arg : command.getArguments()) {
+			for (final ArgumentDefinition arg : command.getArguments()) {
 				stringBuilder.append(" ");
 				stringBuilder.append(arg.getDescriptionType());
 			}
@@ -43,16 +43,18 @@ final public class CommandHelp {
 			Comparator<CommandDefinition> {
 		@Override
 		public int compare(CommandDefinition o1, CommandDefinition o2) {
-			int res = o1.getCommandName().compareTo(o2.getCommandName());
+			final int res = o1.getCommandName().compareTo(o2.getCommandName());
 			if (res != 0) {
 				return res;
 			} else {
-				ArgumentDefinition a1 = o1.getArguments().get(0);
-				ArgumentDefinition a2 = o2.getArguments().get(0);
+				final ArgumentDefinition a1 = o1.getArguments().get(0);
+				final ArgumentDefinition a2 = o2.getArguments().get(0);
 				if (a1 instanceof FixedArgumentDefinition
 						&& a2 instanceof FixedArgumentDefinition) {
-					String n1 = ((FixedArgumentDefinition) a1).getFixedName();
-					String n2 = ((FixedArgumentDefinition) a2).getFixedName();
+					final String n1 = ((FixedArgumentDefinition) a1)
+							.getFixedName();
+					final String n2 = ((FixedArgumentDefinition) a2)
+							.getFixedName();
 					return n1.compareTo(n2);
 				} else {
 					return 0;
@@ -73,7 +75,7 @@ final public class CommandHelp {
 			AIHelper helper,
 			@AICommandParameter(type = ParameterType.FIXED, fixedName = "help", description = "") String nameArg,
 			@AICommandParameter(type = ParameterType.NUMBER, description = "help page") int page) {
-		List<CommandDefinition> commands = new ArrayList<CommandDefinition>(
+		final List<CommandDefinition> commands = new ArrayList<CommandDefinition>(
 				AIChatController.getRegistry().getAllCommands());
 		Collections.sort(commands, new CommandComperator());
 		AIChatController.addToChatPaged("Help", page, commands,
@@ -88,10 +90,10 @@ final public class CommandHelp {
 			@AICommandParameter(type = ParameterType.FIXED, fixedName = "help", description = "") String nameArg,
 			@AICommandParameter(type = ParameterType.COMMAND, description = "command help") String commandName) {
 		boolean found = false;
-		EntityClientPlayerMP player = helper.getMinecraft().thePlayer;
-		for (CommandDefinition command : AIChatController.getRegistry()
+		final EntityClientPlayerMP player = helper.getMinecraft().thePlayer;
+		for (final CommandDefinition command : AIChatController.getRegistry()
 				.getAllCommands()) {
-			ArrayList<ArgumentDefinition> args = command.getArguments();
+			final ArrayList<ArgumentDefinition> args = command.getArguments();
 			if (args.get(0).couldEvaluateAgainst(commandName)) {
 				if (found) {
 					player.addChatMessage(new ChatComponentText(""));
@@ -109,19 +111,20 @@ final public class CommandHelp {
 
 	private static void printHelp(EntityClientPlayerMP player,
 			CommandDefinition command) {
-		CommandToTextConverter conv = new CommandToTextConverter();
+		final CommandToTextConverter conv = new CommandToTextConverter();
 
-		ChatComponentText headline = new ChatComponentText(conv.apply(command));
+		final ChatComponentText headline = new ChatComponentText(
+				conv.apply(command));
 		headline.getChatStyle().setBold(true);
 		player.addChatMessage(headline);
-		for (String line : command.getHelpText().split("\n")) {
-			ChatComponentText text = new ChatComponentText(line);
+		for (final String line : command.getHelpText().split("\n")) {
+			final ChatComponentText text = new ChatComponentText(line);
 			text.getChatStyle().setItalic(true);
 			player.addChatMessage(text);
 		}
 
-		for (ArgumentDefinition arg : command.getArguments()) {
-			String[] help = arg.getDescriptionString().split("\n");
+		for (final ArgumentDefinition arg : command.getArguments()) {
+			final String[] help = arg.getDescriptionString().split("\n");
 			for (final String text : help) {
 				player.addChatMessage(new ChatComponentText("   " + text));
 			}

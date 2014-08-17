@@ -26,7 +26,7 @@ public class FixedNameBuilder extends ParameterBuilder {
 		public boolean couldEvaluateAgainst(String string) {
 			return string.equals(fixedName);
 		}
-		
+
 		public String getFixedName() {
 			return fixedName;
 		}
@@ -41,7 +41,8 @@ public class FixedNameBuilder extends ParameterBuilder {
 
 	@Override
 	public void addArguments(ArrayList<ArgumentDefinition> list) {
-		list.add(new FixedArgumentDefinition("'" + fixedName + "'", "fixed String"));
+		list.add(new FixedArgumentDefinition("'" + fixedName + "'",
+				"fixed String"));
 	}
 
 	@Override

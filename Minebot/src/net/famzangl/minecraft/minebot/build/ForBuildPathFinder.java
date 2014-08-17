@@ -25,8 +25,7 @@ public class ForBuildPathFinder extends MovePathFinder {
 	private final boolean canBuildUp;
 	private boolean noPathFound;
 
-	public ForBuildPathFinder(AIHelper helper, BuildTask task) {
-		super(helper);
+	public ForBuildPathFinder(BuildTask task) {
 		canBuildUp = helper.canSelectItem(new BlockItemFilter(Blocks.carpet));
 		this.task = task;
 	}
@@ -50,7 +49,7 @@ public class ForBuildPathFinder extends MovePathFinder {
 	private void getNeighbours(int[] fill, int offset, int currentNode, int x,
 			int z) {
 		final int cy = getY(currentNode);
-		int  max = canBuildUp ? 3 : 1;
+		final int max = canBuildUp ? 3 : 1;
 		for (int y = cy + 1; y <= cy + max; y++) {
 			if (!helper.isAirBlock(getX(currentNode), y + 1, getZ(currentNode))) {
 				break;
@@ -101,16 +100,15 @@ public class ForBuildPathFinder extends MovePathFinder {
 	@Override
 	protected void foundPath(LinkedList<Pos> path) {
 		Pos currentPos = path.removeFirst();
-		helper.addTask(new AlignToGridTask(currentPos.x, currentPos.y,
-				currentPos.z));
+		addTask(new AlignToGridTask(currentPos.x, currentPos.y, currentPos.z));
 		while (!path.isEmpty()) {
 			final Pos nextPos = path.removeFirst();
-			helper.addTask(new WalkTowardsTask(currentPos, nextPos));
+			addTask(new WalkTowardsTask(currentPos, nextPos));
 			currentPos = nextPos;
 		}
 		noPathFound = true;
 	}
-	
+
 	@Override
 	protected void noPathFound() {
 		noPathFound = true;

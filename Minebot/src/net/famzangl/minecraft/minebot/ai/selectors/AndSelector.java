@@ -13,7 +13,7 @@ public class AndSelector implements IEntitySelector {
 
 	@Override
 	public boolean isEntityApplicable(Entity var1) {
-		for (IEntitySelector s : selectors) {
+		for (final IEntitySelector s : selectors) {
 			if (!s.isEntityApplicable(var1)) {
 				return false;
 			}

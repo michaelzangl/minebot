@@ -7,9 +7,7 @@ import java.util.List;
 
 import net.famzangl.minecraft.minebot.Pos;
 import net.famzangl.minecraft.minebot.ai.ItemFilter;
-import net.famzangl.minecraft.minebot.ai.command.AIChatController;
 import net.famzangl.minecraft.minebot.build.blockbuild.BuildTask;
-import net.famzangl.minecraft.minebot.build.commands.CommandCount;
 
 public class BuildManager {
 
@@ -44,10 +42,11 @@ public class BuildManager {
 		return Collections.unmodifiableList(buildTasks);
 	}
 
-	public void missingItem(ItemFilter itemFiler) {
-		if (itemFiler != lastMissing) {
-			AIChatController.addChatLine("Cannot handle missing item: " + CommandCount.niceFilterName(itemFiler));
-		}
-		lastMissing = itemFiler;
-	}
+	// public void missingItem(ItemFilter itemFiler) {
+	// if (itemFiler != lastMissing) {
+	// AIChatController.addChatLine("Cannot handle missing item: " +
+	// CommandCount.niceFilterName(itemFiler));
+	// }
+	// lastMissing = itemFiler;
+	// }
 }

@@ -3,6 +3,7 @@ package net.famzangl.minecraft.minebot.ai.task;
 import java.lang.reflect.Field;
 
 import net.famzangl.minecraft.minebot.ai.AIHelper;
+import net.famzangl.minecraft.minebot.ai.strategy.TaskOperations;
 import net.minecraft.client.multiplayer.PlayerControllerMP;
 import net.minecraft.client.network.NetHandlerPlayClient;
 import net.minecraft.entity.projectile.EntityFishHook;
@@ -86,7 +87,7 @@ public class DoFishTask extends AITask {
 	}
 
 	@Override
-	public void runTick(AIHelper h) {
+	public void runTick(AIHelper h, TaskOperations o) {
 		if (fishIsCaptured(h)) {
 			h.overrideUseItem();
 			revoked = true;

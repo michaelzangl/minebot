@@ -1,6 +1,7 @@
 package net.famzangl.minecraft.minebot.ai.task;
 
 import net.famzangl.minecraft.minebot.ai.AIHelper;
+import net.famzangl.minecraft.minebot.ai.strategy.TaskOperations;
 
 public class MineBlockTask extends AITask {
 	private final int x;
@@ -19,7 +20,7 @@ public class MineBlockTask extends AITask {
 	}
 
 	@Override
-	public void runTick(AIHelper h) {
+	public void runTick(AIHelper h, TaskOperations o) {
 		h.faceAndDestroy(x, y, z);
 	}
 

@@ -8,6 +8,7 @@ import net.famzangl.minecraft.minebot.Pos;
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.BlockItemFilter;
 import net.famzangl.minecraft.minebot.ai.PathFinderField;
+import net.famzangl.minecraft.minebot.ai.task.AITask;
 import net.famzangl.minecraft.minebot.ai.task.move.AlignToGridTask;
 import net.famzangl.minecraft.minebot.ai.task.move.DownwardsMoveTask;
 import net.famzangl.minecraft.minebot.ai.task.move.HorizontalMoveTask;
@@ -40,16 +41,18 @@ public class MovePathFinder extends PathFinderField {
 			Blocks.cactus, Blocks.obsidian, Blocks.piston_extension,
 			Blocks.piston_head };
 
-	public MovePathFinder(AIHelper helper) {
+	private TaskReceiver receiver;
+
+	public MovePathFinder() {
 		super();
-		this.helper = helper;
 		settings = new MinebotSettings();
 
-		ArrayList<Block> blocks = new ArrayList<Block>();
-		String upwardsBuildBlockNames = settings.get("upwards_place_block",
-				"dirt,stone,cobblestone");
-		for (String name : upwardsBuildBlockNames.split("\\s*[\\,\\s\\;]\\s*")) {
-			Block block = (Block) Block.blockRegistry.getObject(name);
+		final ArrayList<Block> blocks = new ArrayList<Block>();
+		final String upwardsBuildBlockNames = settings.get(
+				"upwards_place_block", "dirt,stone,cobblestone");
+		for (final String name : upwardsBuildBlockNames
+				.split("\\s*[\\,\\s\\;]\\s*")) {
+			final Block block = (Block) Block.blockRegistry.getObject(name);
 			if (block != null) {
 				blocks.add(block);
 			} else {
@@ -58,6 +61,27 @@ public class MovePathFinder extends PathFinderField {
 		}
 		upwardsBuildBlocks = blocks.toArray(new Block[blocks.size()]);
 		torchLightLevel = settings.getFloat("place_torches_at", 1.0f, -1, 15);
+	}
+
+	@Override
+	protected final boolean searchSomethingAround(int cx, int cy, int cz) {
+		throw new UnsupportedOperationException("Direct call not supported.");
+	}
+
+	protected void addTask(AITask task) {
+		receiver.addTask(task);
+	}
+
+	public final boolean searchSomethingAround(Pos playerPosition,
+			AIHelper helper, TaskReceiver receiver) {
+		this.helper = helper;
+		this.receiver = receiver;
+		return runSearch(playerPosition);
+	}
+
+	protected boolean runSearch(Pos playerPosition) {
+		return super.searchSomethingAround(playerPosition.x, playerPosition.y,
+				playerPosition.z);
 	}
 
 	@Override
@@ -107,11 +131,10 @@ public class MovePathFinder extends PathFinderField {
 	protected void foundPath(LinkedList<Pos> path) {
 		super.foundPath(path);
 		Pos currentPos = path.removeFirst();
-		helper.addTask(new AlignToGridTask(currentPos.x, currentPos.y,
-				currentPos.z));
+		addTask(new AlignToGridTask(currentPos.x, currentPos.y, currentPos.z));
 		while (!path.isEmpty()) {
 			Pos nextPos = path.removeFirst();
-			ForgeDirection moveDirection = direction(currentPos, nextPos);
+			final ForgeDirection moveDirection = direction(currentPos, nextPos);
 
 			if (torchLightLevel >= 0) {
 				ForgeDirection direction;
@@ -120,28 +143,27 @@ public class MovePathFinder extends PathFinderField {
 				} else {
 					direction = moveDirection;
 				}
-				helper.addTask(new PlaceTorchIfLightBelowTask(currentPos,
-						direction, torchLightLevel));
+				addTask(new PlaceTorchIfLightBelowTask(currentPos, direction,
+						torchLightLevel));
 			}
 
-			Pos peeked = path.peekFirst();
+			final Pos peeked = path.peekFirst();
 			if (moveDirection == ForgeDirection.UP && peeked != null
 					&& direction(nextPos, peeked).offsetY == 0) {
 				// Combine upwards-sidewards.
-				System.out.println("Next direction is: " + direction(nextPos, peeked));
-				helper.addTask(new JumpMoveTask(peeked.x, peeked.y, peeked.z,
+				System.out.println("Next direction is: "
+						+ direction(nextPos, peeked));
+				addTask(new JumpMoveTask(peeked.x, peeked.y, peeked.z,
 						nextPos.x, nextPos.z));
 				nextPos = peeked;
 				path.removeFirst();
 			} else if (nextPos.y > currentPos.y) {
-				helper.addTask(new UpwardsMoveTask(nextPos.x, nextPos.y,
-						nextPos.z, new BlockItemFilter(upwardsBuildBlocks)));
+				addTask(new UpwardsMoveTask(nextPos.x, nextPos.y, nextPos.z,
+						new BlockItemFilter(upwardsBuildBlocks)));
 			} else if (nextPos.y < currentPos.y) {
-				helper.addTask(new DownwardsMoveTask(nextPos.x, nextPos.y,
-						nextPos.z));
+				addTask(new DownwardsMoveTask(nextPos.x, nextPos.y, nextPos.z));
 			} else {
-				helper.addTask(new HorizontalMoveTask(nextPos.x, nextPos.y,
-						nextPos.z));
+				addTask(new HorizontalMoveTask(nextPos.x, nextPos.y, nextPos.z));
 			}
 			currentPos = nextPos;
 		}

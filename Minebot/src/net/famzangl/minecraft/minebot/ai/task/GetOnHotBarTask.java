@@ -2,6 +2,8 @@ package net.famzangl.minecraft.minebot.ai.task;
 
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.ItemFilter;
+import net.famzangl.minecraft.minebot.ai.strategy.TaskOperations;
+import net.famzangl.minecraft.minebot.ai.task.error.SelectTaskError;
 import net.minecraft.client.entity.EntityClientPlayerMP;
 import net.minecraft.client.gui.inventory.GuiInventory;
 import net.minecraft.client.multiplayer.PlayerControllerMP;
@@ -32,7 +34,7 @@ public class GetOnHotBarTask extends AITask {
 	}
 
 	@Override
-	public void runTick(AIHelper h) {
+	public void runTick(AIHelper h, TaskOperations o) {
 		if (h.getMinecraft().currentScreen instanceof GuiInventory) {
 			final GuiInventory screen = (GuiInventory) h.getMinecraft().currentScreen;
 			for (int i = 9; i < 9 * 4; i++) {
@@ -58,8 +60,7 @@ public class GetOnHotBarTask extends AITask {
 					new GuiInventory(h.getMinecraft().thePlayer));
 			inventoryOpened = true;
 		} else {
-			h.buildManager.missingItem(itemFiler);
-			h.desync();
+			o.desync(new SelectTaskError(itemFiler));
 		}
 	}
 

@@ -20,8 +20,7 @@ public class ArgumentDefinition {
 		this(descriptionType, "");
 	}
 
-	public ArgumentDefinition(String descriptionType,
-			String descriptionInfo) {
+	public ArgumentDefinition(String descriptionType, String descriptionInfo) {
 		super();
 		this.descriptionType = descriptionType;
 		this.descriptionInfo = descriptionInfo;
@@ -43,7 +42,7 @@ public class ArgumentDefinition {
 	}
 
 	public final String getDescriptionString() {
-		String info = getDescriptionInfo();
+		final String info = getDescriptionInfo();
 		return getDescriptionType()
 				+ (info == null || info.isEmpty() ? "" : ": " + info);
 	}

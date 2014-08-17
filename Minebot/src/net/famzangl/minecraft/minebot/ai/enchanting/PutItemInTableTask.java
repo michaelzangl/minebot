@@ -1,7 +1,9 @@
 package net.famzangl.minecraft.minebot.ai.enchanting;
 
 import net.famzangl.minecraft.minebot.ai.AIHelper;
+import net.famzangl.minecraft.minebot.ai.strategy.TaskOperations;
 import net.famzangl.minecraft.minebot.ai.task.AITask;
+import net.famzangl.minecraft.minebot.ai.task.error.StringTaskError;
 import net.minecraft.client.gui.GuiEnchantment;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
@@ -15,7 +17,7 @@ public class PutItemInTableTask extends AITask {
 	}
 
 	@Override
-	public void runTick(AIHelper h) {
+	public void runTick(AIHelper h, TaskOperations o) {
 		final GuiEnchantment screen = (GuiEnchantment) h.getMinecraft().currentScreen;
 		for (int i = 1; i < 9 * 4 + 1; i++) {
 			final Slot slot = screen.inventorySlots.getSlot(i);
@@ -36,7 +38,7 @@ public class PutItemInTableTask extends AITask {
 			}
 		}
 		System.out.println("No item to put.");
-		h.desync();
+		o.desync(new StringTaskError("No item for table."));
 	}
 
 }

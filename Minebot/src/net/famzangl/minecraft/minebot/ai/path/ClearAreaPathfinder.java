@@ -16,20 +16,18 @@ public class ClearAreaPathfinder extends MovePathFinder {
 	private final HashSet<Pos> foundPositions = new HashSet<Pos>();
 	private Pos pathEndPosition;
 
-	public ClearAreaPathfinder(AIHelper helper) {
-		super(helper);
-		minPos = Pos.minPos(helper.getPos1(), helper.getPos2());
-		maxPos = Pos.maxPos(helper.getPos1(), helper.getPos2());
+	public ClearAreaPathfinder(Pos pos1, Pos pos2) {
+		minPos = Pos.minPos(pos1, pos2);
+		maxPos = Pos.maxPos(pos1, pos2);
 		topY = maxPos.y;
 	}
 
 	@Override
-	public boolean searchSomethingAround(int cx, int cy, int cz) {
+	protected boolean runSearch(Pos playerPosition) {
 		foundPositions.clear();
-		pathEndPosition = new Pos(cx, cy, cz);
+		pathEndPosition = playerPosition;
 		do {
-			boolean finished = super.searchSomethingAround(pathEndPosition.x,
-					pathEndPosition.y, pathEndPosition.z);
+			final boolean finished = super.runSearch(pathEndPosition);
 			if (!finished) {
 				return false;
 			}
@@ -39,7 +37,7 @@ public class ClearAreaPathfinder extends MovePathFinder {
 
 	@Override
 	protected void foundPath(LinkedList<Pos> path) {
-		for (Pos p : path) {
+		for (final Pos p : path) {
 			foundPositions.add(p);
 			foundPositions.add(p.add(0, 1, 0));
 			pathEndPosition = p;
@@ -57,18 +55,22 @@ public class ClearAreaPathfinder extends MovePathFinder {
 	@Override
 	protected float rateDestination(int distance, int x, int y, int z) {
 		if (isInArea(x, y, z)
-				&& (!isTemporaryCleared(x, y, z) || (!isTemporaryCleared(x,
-						y + 1, z) && y < maxPos.y))) {
-			float bonus = 0.0001f * (x - minPos.x) + 0.001f * (y - minPos.y);
+				&& (!isTemporaryCleared(x, y, z) || !isTemporaryCleared(x,
+						y + 1, z) && y < maxPos.y)) {
+			final float bonus = 0.0001f * (x - minPos.x) + 0.001f
+					* (y - minPos.y);
 			int layerMalus;
-			if (topY <= y)
+			if (topY <= y) {
 				layerMalus = 5;
-			else if (!isInArea(x, y+1, z) || isTemporaryCleared(x, y + 1, z))
+			} else if (!isInArea(x, y + 1, z)
+					|| isTemporaryCleared(x, y + 1, z)) {
 				layerMalus = 2;
-			else if (isInArea(x, y+1, z) && !isTemporaryCleared(x, y + 2, z))
+			} else if (isInArea(x, y + 1, z)
+					&& !isTemporaryCleared(x, y + 2, z)) {
 				layerMalus = 2;
-			else
+			} else {
 				layerMalus = 0;
+			}
 			return distance + bonus + layerMalus + (maxPos.y - y) * 2;
 		} else {
 			return -1;
@@ -76,7 +78,7 @@ public class ClearAreaPathfinder extends MovePathFinder {
 	}
 
 	private boolean isTemporaryCleared(int x, int y, int z) {
-		return isClearedBlock(x, y, z)
+		return isClearedBlock(helper, x, y, z)
 				|| foundPositions.contains(new Pos(x, y, z));
 	}
 
@@ -85,7 +87,7 @@ public class ClearAreaPathfinder extends MovePathFinder {
 				&& minPos.z <= z && z <= maxPos.z;
 	}
 
-	private boolean isClearedBlock(int x, int y, int z) {
+	private static boolean isClearedBlock(AIHelper helper, int x, int y, int z) {
 		return AIHelper.blockIsOneOf(helper.getBlock(x, y, z), Blocks.air,
 				Blocks.torch);
 	}
@@ -95,12 +97,12 @@ public class ClearAreaPathfinder extends MovePathFinder {
 		super.addTasksForTarget(currentPos);
 		Pos top = currentPos;
 		for (int i = 1; i < 6; i++) {
-			Pos pos = currentPos.add(0, i, 0);
+			final Pos pos = currentPos.add(0, i, 0);
 			if (pos.y <= maxPos.y) {
 				top = pos;
 			}
 		}
-		helper.addTask(new DestroyInRangeTask(currentPos, top));
+		addTask(new DestroyInRangeTask(currentPos, top));
 	}
 
 	@Override
@@ -113,13 +115,13 @@ public class ClearAreaPathfinder extends MovePathFinder {
 				* (maxPos.z - minPos.z + 1);
 	}
 
-	public float getToClearCount() {
+	public float getToClearCount(AIHelper helper) {
 		int count = 0;
 		int newTopY = minPos.y;
 		for (int y = minPos.y; y <= maxPos.y; y++) {
 			for (int z = minPos.z; z <= maxPos.z; z++) {
 				for (int x = minPos.x; x <= maxPos.x; x++) {
-					if (!isClearedBlock(x, y, z)) {
+					if (!isClearedBlock(helper, x, y, z)) {
 						count++;
 						newTopY = Math.max(y, newTopY);
 					}

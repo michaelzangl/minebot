@@ -1,14 +1,14 @@
 package net.famzangl.minecraft.minebot.ai.strategy;
 
+import java.util.HashSet;
+
 import net.famzangl.minecraft.minebot.ai.AIHelper;
-import net.famzangl.minecraft.minebot.ai.AIStrategy;
 import net.famzangl.minecraft.minebot.ai.animals.AnimalyType;
 import net.famzangl.minecraft.minebot.ai.selectors.AndSelector;
 import net.famzangl.minecraft.minebot.ai.selectors.ItemSelector;
 import net.famzangl.minecraft.minebot.ai.selectors.NotSelector;
 import net.famzangl.minecraft.minebot.ai.selectors.OrSelector;
 import net.famzangl.minecraft.minebot.ai.selectors.OwnTameableSelector;
-import net.famzangl.minecraft.minebot.ai.task.AITask;
 import net.famzangl.minecraft.minebot.ai.task.FaceAndInteractTask;
 import net.minecraft.command.IEntitySelector;
 import net.minecraft.entity.Entity;
@@ -20,7 +20,7 @@ import net.minecraft.entity.passive.EntityAnimal;
  * @author michael
  * 
  */
-public class KillAnimalsStrategy implements AIStrategy {
+public class KillAnimalsStrategy extends TaskStrategy {
 
 	private final class KillableSelector implements IEntitySelector {
 		@Override
@@ -37,6 +37,7 @@ public class KillAnimalsStrategy implements AIStrategy {
 	private static final int DISTANCE = 20;
 	private final int maxKills;
 	private final AnimalyType type;
+	private final HashSet<Entity> hitEntities = new HashSet<Entity>();
 
 	public KillAnimalsStrategy() {
 		this(-1, AnimalyType.ANY);
@@ -49,6 +50,12 @@ public class KillAnimalsStrategy implements AIStrategy {
 
 	@Override
 	public void searchTasks(final AIHelper helper) {
+		if (maxKills >= 0) {
+			int kills = countKills();
+			if (kills >= maxKills) {
+				return;
+			}
+		}
 
 		final IEntitySelector selector = new AndSelector(
 				new KillableSelector(),
@@ -61,18 +68,30 @@ public class KillAnimalsStrategy implements AIStrategy {
 				collect, selector));
 
 		if (found != null) {
-			helper.addTask(new FaceAndInteractTask(found, selector, false));
+			addTask(new FaceAndInteractTask(found, selector, false) {
+				@Override
+				protected void doInteractWithCurrent(AIHelper h) {
+					hitEntities.add(h.getObjectMouseOver().entityHit);
+					super.doInteractWithCurrent(h);
+				}
+			});
 		}
+	}
+
+	private int countKills() {
+		int kills = 0;
+		for (Entity e : hitEntities) {
+			if (e instanceof EntityAnimal
+					&& ((EntityAnimal) e).getHealth() <= 0) {
+				kills++;
+			}
+		}
+		return kills;
 	}
 
 	@Override
 	public String getDescription() {
 		return "Killing";
-	}
-
-	@Override
-	public AITask getOverrideTask(AIHelper helper) {
-		return null;
 	}
 
 }

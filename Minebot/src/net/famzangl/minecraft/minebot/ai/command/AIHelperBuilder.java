@@ -14,7 +14,7 @@ public class AIHelperBuilder extends ParameterBuilder {
 	public void addArguments(ArrayList<ArgumentDefinition> list) {
 		// ignored.
 	}
-	
+
 	@Override
 	public Object getParameter(AIHelper helper, String[] arguments) {
 		return helper;

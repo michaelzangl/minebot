@@ -4,6 +4,7 @@ import java.util.List;
 
 import net.famzangl.minecraft.minebot.Pos;
 import net.famzangl.minecraft.minebot.ai.AIHelper;
+import net.famzangl.minecraft.minebot.ai.strategy.TaskOperations;
 
 public class JumpMoveTask extends HorizontalMoveTask {
 
@@ -18,17 +19,17 @@ public class JumpMoveTask extends HorizontalMoveTask {
 
 	@Override
 	protected boolean doJump(AIHelper h) {
-//		Pos player = h.getPlayerPosition();
-//		return player.x != x && player.z != z;
+		// Pos player = h.getPlayerPosition();
+		// return player.x != x && player.z != z;
 		return true;
 	}
 
 	@Override
-	public void runTick(AIHelper h) {
+	public void runTick(AIHelper h, TaskOperations o) {
 		if (!h.isAirBlock(oldX, y + 1, oldZ)) {
 			h.faceAndDestroy(oldX, y + 1, oldZ);
 		} else {
-			super.runTick(h);
+			super.runTick(h, o);
 		}
 	}
 
@@ -40,7 +41,7 @@ public class JumpMoveTask extends HorizontalMoveTask {
 
 	@Override
 	public List<Pos> getPredestroyPositions(AIHelper helper) {
-		List<Pos> list = super.getPredestroyPositions(helper);
+		final List<Pos> list = super.getPredestroyPositions(helper);
 		list.add(0, new Pos(oldX, y + 1, oldZ));
 		return list;
 	}

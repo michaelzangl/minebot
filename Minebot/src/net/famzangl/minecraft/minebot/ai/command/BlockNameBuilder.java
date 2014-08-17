@@ -9,7 +9,8 @@ import net.minecraft.block.Block;
 
 public class BlockNameBuilder extends ParameterBuilder {
 
-	private final static class BlockArgumentDefinition extends ArgumentDefinition {
+	private final static class BlockArgumentDefinition extends
+			ArgumentDefinition {
 		public BlockArgumentDefinition(String description) {
 			super("Block", description);
 		}
@@ -24,19 +25,20 @@ public class BlockNameBuilder extends ParameterBuilder {
 				Collection<String> addTo) {
 			super.getTabCompleteOptions(currentStart, addTo);
 			@SuppressWarnings("unchecked")
-			Set<String> keys = Block.blockRegistry.getKeys();
-			for (String k : keys) {
+			final Set<String> keys = Block.blockRegistry.getKeys();
+			for (final String k : keys) {
 				if (k.startsWith(MINECRAFT_PREFIX)) {
-					String subKey = k.substring(MINECRAFT_PREFIX.length());
+					final String subKey = k
+							.substring(MINECRAFT_PREFIX.length());
 					addKey(currentStart, addTo, subKey);
 				} else {
 					addKey(currentStart, addTo, k);
-				} 
+				}
 			}
 		}
 
-		private void addKey(String currentStart,
-				Collection<String> addTo, String subKey) {
+		private void addKey(String currentStart, Collection<String> addTo,
+				String subKey) {
 			if (subKey.startsWith(currentStart)) {
 				addTo.add(subKey);
 			}
@@ -56,9 +58,10 @@ public class BlockNameBuilder extends ParameterBuilder {
 
 	@Override
 	public Object getParameter(AIHelper helper, String[] arguments) {
-		Object block = Block.blockRegistry.getObject(arguments[0]);
+		final Object block = Block.blockRegistry.getObject(arguments[0]);
 		if (block == null) {
-			throw new CommandEvaluationException("Block " + arguments[0] + " is unknown");
+			throw new CommandEvaluationException("Block " + arguments[0]
+					+ " is unknown");
 		}
 		return block;
 	}

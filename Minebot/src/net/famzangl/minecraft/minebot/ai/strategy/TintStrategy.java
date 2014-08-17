@@ -1,14 +1,12 @@
 package net.famzangl.minecraft.minebot.ai.strategy;
 
 import net.famzangl.minecraft.minebot.ai.AIHelper;
-import net.famzangl.minecraft.minebot.ai.AIStrategy;
 import net.famzangl.minecraft.minebot.ai.ItemFilter;
 import net.famzangl.minecraft.minebot.ai.selectors.AndSelector;
 import net.famzangl.minecraft.minebot.ai.selectors.ColorSelector;
 import net.famzangl.minecraft.minebot.ai.selectors.NotSelector;
 import net.famzangl.minecraft.minebot.ai.selectors.OrSelector;
 import net.famzangl.minecraft.minebot.ai.selectors.OwnTameableSelector;
-import net.famzangl.minecraft.minebot.ai.task.AITask;
 import net.famzangl.minecraft.minebot.ai.task.FaceAndInteractTask;
 import net.minecraft.client.entity.EntityClientPlayerMP;
 import net.minecraft.command.IEntitySelector;
@@ -18,7 +16,7 @@ import net.minecraft.entity.passive.EntityWolf;
 import net.minecraft.item.ItemDye;
 import net.minecraft.item.ItemStack;
 
-public class TintStrategy implements AIStrategy {
+public class TintStrategy extends TaskStrategy {
 	private static final int DISTANCE = 20;
 	private final int color;
 	private final int current;
@@ -79,9 +77,10 @@ public class TintStrategy implements AIStrategy {
 		}
 
 		final EntityClientPlayerMP owner = helper.getMinecraft().thePlayer;
-		int holdingColor = 15 - owner.inventory.getCurrentItem().getItemDamage();
-		IEntitySelector wolfSelector = new WolfSelector(owner);
-		IEntitySelector sheepSelector = new SheepSelector();
+		final int holdingColor = 15 - owner.inventory.getCurrentItem()
+				.getItemDamage();
+		final IEntitySelector wolfSelector = new WolfSelector(owner);
+		final IEntitySelector sheepSelector = new SheepSelector();
 
 		IEntitySelector selector;
 		switch (type) {
@@ -103,7 +102,7 @@ public class TintStrategy implements AIStrategy {
 		final Entity found = helper.getClosestEntity(DISTANCE, selector);
 
 		if (found != null) {
-			helper.addTask(new FaceAndInteractTask(found, selector));
+			addTask(new FaceAndInteractTask(found, selector));
 		}
 	}
 
@@ -113,16 +112,9 @@ public class TintStrategy implements AIStrategy {
 	}
 
 	@Override
-	public AITask getOverrideTask(AIHelper helper) {
-		return null;
-	}
-
-	@Override
 	public String toString() {
 		return "TintStrategy [color=" + color + ", current=" + current
 				+ ", type=" + type + "]";
 	}
-	
-	
 
 }

@@ -1,6 +1,7 @@
 package net.famzangl.minecraft.minebot.ai.task;
 
 import net.famzangl.minecraft.minebot.ai.AIHelper;
+import net.famzangl.minecraft.minebot.ai.strategy.TaskOperations;
 import net.minecraft.command.IEntitySelector;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityItem;
@@ -11,7 +12,7 @@ import net.minecraft.util.MovingObjectPosition.MovingObjectType;
 
 public class FaceAndInteractTask extends AITask {
 
-	private boolean interacted = false;
+	protected boolean interacted = false;
 	private final Entity preferedAnimal;
 	private final IEntitySelector alsoAcceptedAnimal;
 	private final boolean doRightClick;
@@ -38,7 +39,7 @@ public class FaceAndInteractTask extends AITask {
 	}
 
 	@Override
-	public void runTick(AIHelper h) {
+	public void runTick(AIHelper h, TaskOperations o) {
 		final MovingObjectPosition over = h.getObjectMouseOver();
 		if (over != null && over.typeOfHit == MovingObjectType.ENTITY
 				&& alsoAcceptedAnimal.isEntityApplicable(over.entityHit)) {
@@ -73,6 +74,5 @@ public class FaceAndInteractTask extends AITask {
 				+ ", alsoAcceptedAnimal=" + alsoAcceptedAnimal
 				+ ", doRightClick=" + doRightClick + "]";
 	}
-	
-	
+
 }

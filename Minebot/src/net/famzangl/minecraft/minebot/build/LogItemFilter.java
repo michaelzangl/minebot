@@ -22,21 +22,25 @@ public class LogItemFilter extends BlockItemFilter {
 	public int hashCode() {
 		final int prime = 31;
 		int result = super.hashCode();
-		result = prime * result + ((logType == null) ? 0 : logType.hashCode());
+		result = prime * result + (logType == null ? 0 : logType.hashCode());
 		return result;
 	}
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
+		if (this == obj) {
 			return true;
-		if (!super.equals(obj))
+		}
+		if (!super.equals(obj)) {
 			return false;
-		if (getClass() != obj.getClass())
+		}
+		if (getClass() != obj.getClass()) {
 			return false;
-		LogItemFilter other = (LogItemFilter) obj;
-		if (logType != other.logType)
+		}
+		final LogItemFilter other = (LogItemFilter) obj;
+		if (logType != other.logType) {
 			return false;
+		}
 		return true;
 	}
 

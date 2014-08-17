@@ -1,7 +1,6 @@
 package net.famzangl.minecraft.minebot.ai.path;
 
 import net.famzangl.minecraft.minebot.Pos;
-import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.BlockItemFilter;
 import net.famzangl.minecraft.minebot.ai.task.MineBlockTask;
 import net.famzangl.minecraft.minebot.ai.task.move.DownwardsMoveTask;
@@ -12,10 +11,8 @@ import net.minecraft.init.Blocks;
 
 public class LayRailPathFinder extends AlongTrackPathFinder {
 
-
-	public LayRailPathFinder(AIHelper helper, int dx, int dz, int cx, int cy,
-			int cz) {
-		super(helper, dx, dz, cx, cy, cz);
+	public LayRailPathFinder(int dx, int dz, int cx, int cy, int cz) {
+		super(dx, dz, cx, cy, cz);
 	}
 
 	@Override
@@ -54,7 +51,7 @@ public class LayRailPathFinder extends AlongTrackPathFinder {
 	protected void addTasksForTarget(Pos currentPos) {
 		if (isRedstoneBlockPosition(currentPos.x, currentPos.y, currentPos.z)) {
 			// For those server lags
-			helper.addTask(new UpwardsMoveTask(currentPos.x, currentPos.y + 1,
+			addTask(new UpwardsMoveTask(currentPos.x, currentPos.y + 1,
 					currentPos.z, new BlockItemFilter(Blocks.redstone_block)));
 		} else if (placeAccRail(currentPos.x, currentPos.z)) {
 			if (!Block.isEqualTo(helper.getBlock(currentPos.x,
@@ -63,9 +60,9 @@ public class LayRailPathFinder extends AlongTrackPathFinder {
 							currentPos.z)
 					&& helper.isSafeGroundBlock(currentPos.x, currentPos.y - 2,
 							currentPos.z)) {
-				helper.addTask(new DownwardsMoveTask(currentPos.x,
-						currentPos.y - 1, currentPos.z));
-				helper.addTask(new UpwardsMoveTask(currentPos.x, currentPos.y,
+				addTask(new DownwardsMoveTask(currentPos.x, currentPos.y - 1,
+						currentPos.z));
+				addTask(new UpwardsMoveTask(currentPos.x, currentPos.y,
 						currentPos.z,
 						new BlockItemFilter(Blocks.redstone_block)));
 			}
@@ -77,10 +74,9 @@ public class LayRailPathFinder extends AlongTrackPathFinder {
 
 	private void placeRail(Pos currentPos, Block rail) {
 		if (!helper.isAirBlock(currentPos.x, currentPos.y, currentPos.z)) {
-			helper.addTask(new MineBlockTask(currentPos.x, currentPos.y,
-					currentPos.z));
+			addTask(new MineBlockTask(currentPos.x, currentPos.y, currentPos.z));
 		}
-		helper.addTask(new PlaceBlockAtFloorTask(currentPos.x, currentPos.y,
+		addTask(new PlaceBlockAtFloorTask(currentPos.x, currentPos.y,
 				currentPos.z, new BlockItemFilter(rail)));
 	}
 

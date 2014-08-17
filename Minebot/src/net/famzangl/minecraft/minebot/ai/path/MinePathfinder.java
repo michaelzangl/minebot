@@ -3,7 +3,6 @@ package net.famzangl.minecraft.minebot.ai.path;
 import java.util.Random;
 
 import net.famzangl.minecraft.minebot.Pos;
-import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.task.DestroyInRangeTask;
 import net.minecraft.block.Block;
 import net.minecraftforge.common.util.ForgeDirection;
@@ -24,7 +23,7 @@ public abstract class MinePathfinder extends MovePathFinder {
 	 * 0.0 - 1.0.
 	 */
 	protected final float preferedDirectionInfluence = 0.3f;
-	
+
 	protected final int preferedLayer;
 	/**
 	 * 0.0 - 1.0.
@@ -52,18 +51,18 @@ public abstract class MinePathfinder extends MovePathFinder {
 			final int id = helper.getBlockId(x, y, z);
 
 			if (!isCached[id]) {
-//				final String name = Block.blockRegistry.getNameForObject(
-//						Block.blockRegistry.getObjectById(id)).replace(
-//						"minecraft:", "");
-				cached[id] = settingsProvider.getFloat((Block) Block.blockRegistry.getObjectById(id));
+				// final String name = Block.blockRegistry.getNameForObject(
+				// Block.blockRegistry.getObjectById(id)).replace(
+				// "minecraft:", "");
+				cached[id] = settingsProvider
+						.getFloat((Block) Block.blockRegistry.getObjectById(id));
 				isCached[id] = true;
 			}
 			return cached[id];
 		}
 	}
 
-	public MinePathfinder(AIHelper helper, ForgeDirection preferedDirection, int preferedLayer) {
-		super(helper);
+	public MinePathfinder(ForgeDirection preferedDirection, int preferedLayer) {
 		this.preferedDirection = preferedDirection;
 		this.preferedLayer = preferedLayer;
 		points = new FloatBlockCache(getPointsProvider());
@@ -92,22 +91,24 @@ public abstract class MinePathfinder extends MovePathFinder {
 			return -1;
 		} else {
 			float badDirectionMalus = 0;
-			Pos current = helper.getPlayerPosition();
+			final Pos current = helper.getPlayerPosition();
 			if (preferedDirection != null && preferedDirection.offsetX != 0) {
-				int dx = x - current.x;
+				final int dx = x - current.x;
 				if (Math.signum(dx) != preferedDirection.offsetX) {
 					badDirectionMalus = dx * preferedDirectionInfluence;
 				}
-			} else if (preferedDirection != null && preferedDirection.offsetZ != 0) {
-				int dz = z - current.z;
+			} else if (preferedDirection != null
+					&& preferedDirection.offsetZ != 0) {
+				final int dz = z - current.z;
 				if (Math.signum(dz) != preferedDirection.offsetZ) {
 					badDirectionMalus = dz * preferedDirectionInfluence;
 				}
 			}
-			float badY = Math.abs(y - preferedLayer) * preferedLayerInfluence;
-			
-			
-			return makeRandom(rating + addForDoubleMine + badDirectionMalus + badY);
+			final float badY = Math.abs(y - preferedLayer)
+					* preferedLayerInfluence;
+
+			return makeRandom(rating + addForDoubleMine + badDirectionMalus
+					+ badY);
 		}
 	}
 
@@ -143,7 +144,7 @@ public abstract class MinePathfinder extends MovePathFinder {
 		} else {
 			bottom = currentPos.add(0, 1, 0);
 		}
-		
+
 		for (int i = 2; i < 5; i++) {
 			if (!helper.hasSafeSides(currentPos.x, currentPos.y + i,
 					currentPos.z)
@@ -157,7 +158,7 @@ public abstract class MinePathfinder extends MovePathFinder {
 				break;
 			}
 		}
-		helper.addTask(new DestroyInRangeTask(bottom, top));
+		addTask(new DestroyInRangeTask(bottom, top));
 	}
 
 	@Override

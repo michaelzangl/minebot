@@ -4,7 +4,6 @@ import java.util.List;
 
 import net.famzangl.minecraft.minebot.Pos;
 import net.famzangl.minecraft.minebot.ai.AIHelper;
-import net.famzangl.minecraft.minebot.ai.AIStrategy;
 import net.famzangl.minecraft.minebot.ai.command.AIChatController;
 import net.famzangl.minecraft.minebot.ai.command.AICommand;
 import net.famzangl.minecraft.minebot.ai.command.AICommandInvocation;
@@ -12,7 +11,9 @@ import net.famzangl.minecraft.minebot.ai.command.AICommandParameter;
 import net.famzangl.minecraft.minebot.ai.command.ParameterType;
 import net.famzangl.minecraft.minebot.ai.render.MarkingStrategy;
 import net.famzangl.minecraft.minebot.ai.render.PosMarkerRenderer;
-import net.famzangl.minecraft.minebot.ai.task.AITask;
+import net.famzangl.minecraft.minebot.ai.strategy.AIStrategy;
+import net.famzangl.minecraft.minebot.ai.strategy.TaskStrategy;
+import net.famzangl.minecraft.minebot.ai.strategy.ValueActionStrategy;
 import net.famzangl.minecraft.minebot.ai.task.GetOnHotBarTask;
 import net.famzangl.minecraft.minebot.ai.task.WaitTask;
 import net.famzangl.minecraft.minebot.ai.task.move.AlignToGridTask;
@@ -24,7 +25,7 @@ import net.minecraftforge.client.event.RenderWorldLastEvent;
 @AICommand(helpText = "Runs all tasks that are scheduled for building.", name = "minebuild")
 public class CommandBuild {
 
-	private static final class BuildStrategy implements AIStrategy,
+	private static final class BuildStrategy extends TaskStrategy implements
 			MarkingStrategy {
 		private boolean alignSend;
 		private ForBuildPathFinder pathFinder;
@@ -40,23 +41,23 @@ public class CommandBuild {
 			if (task == null) {
 				AIChatController.addChatLine("No more build tasks.");
 			} else if (!alignSend) {
-				helper.addTask(new AlignToGridTask(helper.getPlayerPosition()));
+				addTask(new AlignToGridTask(helper.getPlayerPosition()));
 				alignSend = true;
 			} else if ((pos = isAroundSite(helper, task)) == null) {
 				if (pathFinder == null) {
-					pathFinder = new ForBuildPathFinder(helper, task);
+					pathFinder = new ForBuildPathFinder(task);
 				}
-				if (!pathFinder.searchSomethingAround(helper
-						.getPlayerPosition())) {
-					helper.addTask(WaitTask.instance);
+				if (!pathFinder.searchSomethingAround(
+						helper.getPlayerPosition(), helper, this)) {
+					addTask(new WaitTask());
 				} else if (pathFinder.isNoPathFound()) {
 					AIChatController
 							.addChatLine("Cannot navigate to next build task.");
 				}
 			} else {
-				helper.addTask(new GetOnHotBarTask(task.getRequiredItem()));
-				helper.addTask(task.getPlaceBlockTask(pos));
-				helper.addTask(new NextTaskTask());
+				addTask(new GetOnHotBarTask(task.getRequiredItem()));
+				addTask(task.getPlaceBlockTask(pos));
+				addTask(new NextTaskTask());
 				alignSend = false;
 				pathFinder = null;
 			}
@@ -68,11 +69,6 @@ public class CommandBuild {
 				positions[i] = i < list.size() ? list.get(i).getForPosition()
 						: null;
 			}
-		}
-
-		@Override
-		public AITask getOverrideTask(AIHelper helper) {
-			return null;
 		}
 
 		@Override
@@ -90,7 +86,7 @@ public class CommandBuild {
 	public static AIStrategy run(
 			AIHelper helper,
 			@AICommandParameter(type = ParameterType.FIXED, fixedName = "build", description = "") String nameArg2) {
-		return new BuildStrategy();
+		return ValueActionStrategy.makeSafe(new BuildStrategy());
 
 	}
 

@@ -2,6 +2,7 @@ package net.famzangl.minecraft.minebot.ai.enchanting;
 
 import net.famzangl.minecraft.minebot.Pos;
 import net.famzangl.minecraft.minebot.ai.AIHelper;
+import net.famzangl.minecraft.minebot.ai.strategy.TaskOperations;
 import net.famzangl.minecraft.minebot.ai.task.AITask;
 import net.minecraft.init.Blocks;
 
@@ -14,7 +15,7 @@ public class FaceBlockOfTypeTask extends AITask {
 	}
 
 	@Override
-	public void runTick(AIHelper h) {
+	public void runTick(AIHelper h, TaskOperations o) {
 		final Pos pos = h.findBlock(Blocks.enchanting_table);
 		if (pos == null) {
 			System.out.println("Could not find block around player.");

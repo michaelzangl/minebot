@@ -3,24 +3,16 @@ package net.famzangl.minecraft.minebot.ai;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Hashtable;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map.Entry;
 
 import net.famzangl.minecraft.minebot.Pos;
 import net.famzangl.minecraft.minebot.ai.command.AIChatController;
 import net.famzangl.minecraft.minebot.ai.command.IAIControllable;
-import net.famzangl.minecraft.minebot.ai.enchanting.EnchantStrategy;
 import net.famzangl.minecraft.minebot.ai.render.BuildMarkerRenderer;
 import net.famzangl.minecraft.minebot.ai.render.MarkingStrategy;
 import net.famzangl.minecraft.minebot.ai.render.PosMarkerRenderer;
-import net.famzangl.minecraft.minebot.ai.strategy.LayRailStrategy;
-import net.famzangl.minecraft.minebot.ai.strategy.LumberjackStrategy;
-import net.famzangl.minecraft.minebot.ai.strategy.MineStrategy;
-import net.famzangl.minecraft.minebot.ai.strategy.PlantStrategy;
-import net.famzangl.minecraft.minebot.ai.task.AITask;
-import net.famzangl.minecraft.minebot.ai.task.CanPrefaceAndDestroy;
-import net.famzangl.minecraft.minebot.ai.task.SkipWhenSearchingPrefetch;
+import net.famzangl.minecraft.minebot.ai.strategy.AIStrategy;
+import net.famzangl.minecraft.minebot.ai.strategy.AIStrategy.TickResult;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.settings.KeyBinding;
@@ -53,9 +45,6 @@ import cpw.mods.fml.relauncher.SideOnly;
  * 
  */
 public class AIController extends AIHelper implements IAIControllable {
-
-	private static final int TIMEOUT = 5 * 20;
-
 	private final static Hashtable<KeyBinding, AIStrategyFactory> uses = new Hashtable<KeyBinding, AIStrategyFactory>();
 
 	protected static final KeyBinding stop = new KeyBinding("Stop",
@@ -63,36 +52,31 @@ public class AIController extends AIHelper implements IAIControllable {
 	protected static final KeyBinding ungrab = new KeyBinding("Ungrab",
 			Keyboard.getKeyIndex("U"), "Command Mod");
 
-	private static final int MAX_LOOKAHEAD = 5;
-
 	static {
-		final KeyBinding mine = new KeyBinding("Farm ores",
-				Keyboard.getKeyIndex("K"), "Command Mod");
-		final KeyBinding lumberjack = new KeyBinding("Farm wood",
-				Keyboard.getKeyIndex("J"), "Command Mod");
-		final KeyBinding build_rail = new KeyBinding("Build Minecart tracks",
-				Keyboard.getKeyIndex("H"), "Command Mod");
-		final KeyBinding mobfarm = new KeyBinding("Farm mobs",
-				Keyboard.getKeyIndex("M"), "Command Mod");
-		final KeyBinding plant = new KeyBinding("Plant seeds",
-				Keyboard.getKeyIndex("P"), "Command Mod");
-		uses.put(mine, new MineStrategy());
-		uses.put(lumberjack, new LumberjackStrategy());
-		uses.put(build_rail, new LayRailStrategy());
-		uses.put(mobfarm, new EnchantStrategy());
-		uses.put(plant, new PlantStrategy());
-		ClientRegistry.registerKeyBinding(mine);
-		ClientRegistry.registerKeyBinding(lumberjack);
-		ClientRegistry.registerKeyBinding(build_rail);
-		ClientRegistry.registerKeyBinding(mobfarm);
-		ClientRegistry.registerKeyBinding(plant);
+		// final KeyBinding mine = new KeyBinding("Farm ores",
+		// Keyboard.getKeyIndex("K"), "Command Mod");
+		// final KeyBinding lumberjack = new KeyBinding("Farm wood",
+		// Keyboard.getKeyIndex("J"), "Command Mod");
+		// final KeyBinding build_rail = new KeyBinding("Build Minecart tracks",
+		// Keyboard.getKeyIndex("H"), "Command Mod");
+		// final KeyBinding mobfarm = new KeyBinding("Farm mobs",
+		// Keyboard.getKeyIndex("M"), "Command Mod");
+		// final KeyBinding plant = new KeyBinding("Plant seeds",
+		// Keyboard.getKeyIndex("P"), "Command Mod");
+		// uses.put(mine, new MineStrategy());
+		// uses.put(lumberjack, new LumberjackStrategy());
+		// uses.put(build_rail, new LayRailStrategy());
+		// uses.put(mobfarm, new EnchantStrategy());
+		// uses.put(plant, new PlantStrategy());
+		// ClientRegistry.registerKeyBinding(mine);
+		// ClientRegistry.registerKeyBinding(lumberjack);
+		// ClientRegistry.registerKeyBinding(build_rail);
+		// ClientRegistry.registerKeyBinding(mobfarm);
+		// ClientRegistry.registerKeyBinding(plant);
 		ClientRegistry.registerKeyBinding(stop);
 		ClientRegistry.registerKeyBinding(ungrab);
 	}
 
-	private final LinkedList<AITask> tasks = new LinkedList<AITask>();
-	private boolean desync;
-	private int timeout = 10 * 20;
 	private boolean dead;
 	private AIStrategy currentStrategy;
 
@@ -107,29 +91,12 @@ public class AIController extends AIHelper implements IAIControllable {
 
 	private boolean skipNextTick;
 
-	private boolean inUngrabMode;
-
 	private MouseHelper oldMouseHelper;
 
 	private BuildMarkerRenderer buildMarkerRenderer;
 
 	public AIController() {
-		new AIChatController(this);
-	}
-
-	@Override
-	public void addTask(AITask task) {
-		if (task == null) {
-			throw new NullPointerException();
-		}
-		tasks.add(task);
-	}
-
-	@Override
-	public void desync() {
-		System.out.println("Desync. This is an error. Did the server lag?");
-		Thread.dumpStack();
-		desync = true;
+		AIChatController.getRegistry().setControlled(this);
 	}
 
 	/**
@@ -156,67 +123,21 @@ public class AIController extends AIHelper implements IAIControllable {
 
 		AIStrategy newStrat;
 		if (dead || stop.isPressed() || stop.getIsKeyPressed()) {
+			deactivateCurrentStrategy();
 			dead = false;
-			currentStrategy = null;
-			tasks.clear();
-			System.out.println("New Strategy: None");
-			resetTimeout();
 		} else if ((newStrat = findNewStrategy()) != null) {
-			tasks.clear();
+			deactivateCurrentStrategy();
 			currentStrategy = newStrat;
-			System.out.println("New Strategy: " + newStrat);
-			resetTimeout();
-		} else if (desync) {
-			tasks.clear();
+			currentStrategy.setActive(true, this);
 		}
-		desync = false;
 
 		if (currentStrategy != null) {
 			synchronized (strategyDescrMutex) {
 				strategyDescr = currentStrategy.getDescription();
 			}
-			final AITask overrideTask = currentStrategy.getOverrideTask(this);
-			if (overrideTask != null) {
-				tasks.clear();
-				tasks.push(overrideTask);
-			} else if (tasks.isEmpty()) {
-				currentStrategy.searchTasks(this);
-				resetTimeout();
-				System.out.println("Found new task: " + tasks.peekFirst());
-			}
-
-			if (tasks.isEmpty()) {
+			final TickResult result = currentStrategy.gameTick(this);
+			if (result == TickResult.NO_MORE_WORK) {
 				dead = true;
-			} else {
-				AITask task = tasks.get(0);
-				while (task.isFinished(this)) {
-					tasks.remove(0);
-					resetTimeout();
-					System.out.println("Next task: " + tasks.peekFirst());
-					if (tasks.peekFirst() != null) {
-						timeout = tasks.peekFirst().getGameTickTimeout();
-						task = tasks.peekFirst();
-					} else {
-						task = null;
-						break;
-					}
-				}
-				if (task == null) {
-					// pass
-				} else if (timeout <= 0) {
-					desync = true;
-				} else {
-					timeout--;
-					try {
-						task.runTick(this);
-					} catch (final Throwable t) {
-						t.printStackTrace();
-						AIChatController
-								.addChatLine("Unexpected Error ("
-										+ t.getMessage()
-										+ "). Please report (and send the output on the console)!");
-					}
-				}
 			}
 		} else {
 			synchronized (strategyDescrMutex) {
@@ -225,35 +146,11 @@ public class AIController extends AIHelper implements IAIControllable {
 		}
 	}
 
-	@Override
-	public boolean faceAndDestroyForNextTask() {
-		boolean found = false;
-		for (int i = 1; i < MAX_LOOKAHEAD && i < tasks.size() && !found; i++) {
-			AITask task = tasks.get(i);
-			System.out.println("Prefetching with: " + task);
-			if (tasks.get(i).getClass()
-					.isAnnotationPresent(SkipWhenSearchingPrefetch.class)) {
-				continue;
-			} else if (task instanceof CanPrefaceAndDestroy) {
-				CanPrefaceAndDestroy dTask = (CanPrefaceAndDestroy) task;
-				List<Pos> positions = dTask.getPredestroyPositions(this);
-				for (Pos pos : positions) {
-					if (!isAirBlock(pos.x, pos.y, pos.z)) {
-						faceAndDestroy(pos.x, pos.y, pos.z);
-						found = true;
-						break;
-					}
-				}
-				System.out.println("Prefacing: " + found + " for " + positions);
-			} else {
-				System.out.println("Prefetching showstopper: " + task);
-				break;
-			}
+	private void deactivateCurrentStrategy() {
+		if (currentStrategy != null) {
+			currentStrategy.setActive(false, this);
 		}
-		if (!found) {
-			System.out.println("Could not prefetch anything. " + tasks.size());
-		}
-		return found;
+		currentStrategy = null;
 	}
 
 	@SubscribeEvent
@@ -275,8 +172,9 @@ public class AIController extends AIHelper implements IAIControllable {
 		try {
 			// Dynamic 1.7.2 / 1.7.10 fix.
 			ScaledResolution res;
-			Constructor<?> method = ScaledResolution.class.getConstructors()[0];
-			Object arg1 = method.getParameterTypes()[0] == Minecraft.class ? getMinecraft()
+			final Constructor<?> method = ScaledResolution.class
+					.getConstructors()[0];
+			final Object arg1 = method.getParameterTypes()[0] == Minecraft.class ? getMinecraft()
 					: getMinecraft().gameSettings;
 			res = (ScaledResolution) method.newInstance(arg1,
 					getMinecraft().displayWidth, getMinecraft().displayHeight);
@@ -290,11 +188,11 @@ public class AIController extends AIHelper implements IAIControllable {
 					res.getScaledWidth()
 							- getMinecraft().fontRenderer.getStringWidth(str)
 							- 10, 10, 16777215);
-		} catch (InstantiationException e) {
+		} catch (final InstantiationException e) {
 			e.printStackTrace();
-		} catch (IllegalAccessException e) {
+		} catch (final IllegalAccessException e) {
 			e.printStackTrace();
-		} catch (InvocationTargetException e) {
+		} catch (final InvocationTargetException e) {
 			e.printStackTrace();
 		}
 	}
@@ -385,10 +283,6 @@ public class AIController extends AIHelper implements IAIControllable {
 			}
 		}
 		return null;
-	}
-
-	private void resetTimeout() {
-		timeout = TIMEOUT;
 	}
 
 	@Override

@@ -37,7 +37,7 @@ public class PositionNameBuilder extends ParameterBuilder {
 	@Override
 	public Object getParameter(AIHelper helper, String[] arguments) {
 		try {
-			ChunkCoordinates ppos = helper.getMinecraft().thePlayer
+			final ChunkCoordinates ppos = helper.getMinecraft().thePlayer
 					.getPlayerCoordinates();
 			int i = ppos.posX;
 			int j = ppos.posY - 2;
@@ -49,7 +49,7 @@ public class PositionNameBuilder extends ParameterBuilder {
 			k = MathHelper.floor_double(CommandBase.func_110666_a(
 					helper.getMinecraft().thePlayer, k, arguments[2]));
 			return new Pos(i, j, k);
-		} catch (NumberInvalidException e) {
+		} catch (final NumberInvalidException e) {
 			throw new CommandEvaluationException("Number format not supported.");
 		}
 	}

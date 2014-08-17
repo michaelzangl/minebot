@@ -1,7 +1,6 @@
 package net.famzangl.minecraft.minebot.ai.path;
 
 import net.famzangl.minecraft.minebot.Pos;
-import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.task.MineBlockTask;
 import net.famzangl.minecraft.minebot.build.WoodType;
 import net.minecraft.block.Block;
@@ -10,8 +9,7 @@ import net.minecraft.init.Blocks;
 public class TreePathFinder extends MovePathFinder {
 	private final WoodType type;
 
-	public TreePathFinder(AIHelper helper, WoodType type) {
-		super(helper);
+	public TreePathFinder(WoodType type) {
 		this.type = type;
 	}
 
@@ -68,8 +66,8 @@ public class TreePathFinder extends MovePathFinder {
 			}
 			if (!helper
 					.isAirBlock(currentPos.x, currentPos.y + i, currentPos.z)) {
-				helper.addTask(new MineBlockTask(currentPos.x,
-						currentPos.y + i, currentPos.z));
+				addTask(new MineBlockTask(currentPos.x, currentPos.y + i,
+						currentPos.z));
 			}
 		}
 	}

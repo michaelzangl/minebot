@@ -2,12 +2,12 @@ package net.famzangl.minecraft.minebot.build.commands;
 
 import net.famzangl.minecraft.minebot.Pos;
 import net.famzangl.minecraft.minebot.ai.AIHelper;
-import net.famzangl.minecraft.minebot.ai.AIStrategy;
 import net.famzangl.minecraft.minebot.ai.command.AICommand;
 import net.famzangl.minecraft.minebot.ai.command.AICommandInvocation;
 import net.famzangl.minecraft.minebot.ai.command.AICommandParameter;
 import net.famzangl.minecraft.minebot.ai.command.CommandEvaluationException;
 import net.famzangl.minecraft.minebot.ai.command.ParameterType;
+import net.famzangl.minecraft.minebot.ai.strategy.AIStrategy;
 import net.famzangl.minecraft.minebot.ai.task.BlockSide;
 import net.famzangl.minecraft.minebot.build.WoodType;
 import net.famzangl.minecraft.minebot.build.blockbuild.BlockBuildTask;

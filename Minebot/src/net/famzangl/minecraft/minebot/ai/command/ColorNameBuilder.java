@@ -16,7 +16,7 @@ public class ColorNameBuilder extends ParameterBuilder {
 
 		@Override
 		public boolean couldEvaluateAgainst(String string) {
-			for (String color : ColoredBlockItemFilter.COLORS) {
+			for (final String color : ColoredBlockItemFilter.COLORS) {
 				if (color.equalsIgnoreCase(string)) {
 					return true;
 				}
@@ -27,7 +27,7 @@ public class ColorNameBuilder extends ParameterBuilder {
 		@Override
 		public void getTabCompleteOptions(String currentStart,
 				Collection<String> addTo) {
-			for (String color : ColoredBlockItemFilter.COLORS) {
+			for (final String color : ColoredBlockItemFilter.COLORS) {
 				if (color.toLowerCase().startsWith(currentStart.toLowerCase())) {
 					addTo.add(color);
 				}
@@ -46,9 +46,9 @@ public class ColorNameBuilder extends ParameterBuilder {
 
 	@Override
 	public Object getParameter(AIHelper helper, String[] arguments) {
-		String[] colors = ColoredBlockItemFilter.COLORS;
+		final String[] colors = ColoredBlockItemFilter.COLORS;
 		for (int i = 0; i < colors.length; i++) {
-			String color = colors[i];
+			final String color = colors[i];
 			if (color.equalsIgnoreCase(arguments[0])) {
 				return i;
 			}

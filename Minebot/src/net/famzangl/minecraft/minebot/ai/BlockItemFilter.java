@@ -40,21 +40,25 @@ public class BlockItemFilter implements ItemFilter {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
+		if (this == obj) {
 			return true;
-		if (obj == null)
+		}
+		if (obj == null) {
 			return false;
-		if (getClass() != obj.getClass())
+		}
+		if (getClass() != obj.getClass()) {
 			return false;
-		BlockItemFilter other = (BlockItemFilter) obj;
-		if (!Arrays.equals(matched, other.matched))
+		}
+		final BlockItemFilter other = (BlockItemFilter) obj;
+		if (!Arrays.equals(matched, other.matched)) {
 			return false;
+		}
 		return true;
 	}
 
 	public String getDescriptiveString() {
-		StringBuilder str = new StringBuilder();
-		for (Block m : matched) {
+		final StringBuilder str = new StringBuilder();
+		for (final Block m : matched) {
 			if (str.length() > 0) {
 				str.append(", ");
 			}

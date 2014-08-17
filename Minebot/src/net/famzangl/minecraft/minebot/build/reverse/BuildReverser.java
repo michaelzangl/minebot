@@ -65,8 +65,9 @@ public class BuildReverser {
 			}
 			out.println("#/minebuild build");
 
-			if (missingBlocks >0) {
-				AIChatController.addChatLine("Could not convert " + missingBlocks + "blocks. They will be missing.");
+			if (missingBlocks > 0) {
+				AIChatController.addChatLine("Could not convert "
+						+ missingBlocks + "blocks. They will be missing.");
 			}
 			AIChatController.addChatLine("Output written to: " + this.outFile);
 		} catch (final FileNotFoundException e) {

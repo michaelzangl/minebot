@@ -1,7 +1,5 @@
 package net.famzangl.minecraft.minebot.ai.path;
 
-import net.famzangl.minecraft.minebot.ai.AIHelper;
-
 public class AlongTrackPathFinder extends MovePathFinder {
 	protected final int dx;
 	protected final int dz;
@@ -9,9 +7,7 @@ public class AlongTrackPathFinder extends MovePathFinder {
 	protected final int cy;
 	protected final int cz;
 
-	public AlongTrackPathFinder(AIHelper helper, int dx, int dz, int cx,
-			int cy, int cz) {
-		super(helper);
+	public AlongTrackPathFinder(int dx, int dz, int cx, int cy, int cz) {
 		this.dx = dx;
 		this.dz = dz;
 		this.cx = cx;

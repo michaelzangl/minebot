@@ -10,7 +10,9 @@ public interface CanPrefaceAndDestroy {
 	/**
 	 * Return a list that this task faces and destroys that could already be
 	 * mined before arriving at the target location.
-	 * @param helper TODO
+	 * 
+	 * @param helper
+	 *            TODO
 	 * 
 	 * @return
 	 */

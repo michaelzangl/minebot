@@ -5,7 +5,9 @@ import java.util.LinkedList;
 import net.famzangl.minecraft.minebot.Pos;
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.BlockItemFilter;
+import net.famzangl.minecraft.minebot.ai.strategy.TaskOperations;
 import net.famzangl.minecraft.minebot.ai.task.AITask;
+import net.famzangl.minecraft.minebot.ai.task.error.SelectTaskError;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.MovementInput;
 
@@ -35,12 +37,12 @@ public class WalkTowardsTask extends AITask {
 	}
 
 	@Override
-	public void runTick(AIHelper h) {
+	public void runTick(AIHelper h, TaskOperations o) {
 		if (subTask != null && subTask.isFinished(h)) {
 			subTask = null;
 		}
 		if (subTask != null) {
-			subTask.runTick(h);
+			subTask.runTick(h, o);
 		} else {
 			final int carpetY = getUpperCarpetY(h);
 			final double carpetBuildHeight = h.realBlockTopY(fromPos.x,
@@ -49,14 +51,14 @@ public class WalkTowardsTask extends AITask {
 					nextPos.z);
 			if (carpetBuildHeight < destHeight - 1) {
 				System.out.println("Moving upwards. Carpets are at " + carpetY);
-				int floorY = Math.max(carpetY, fromPos.y - 1);
+				final int floorY = Math.max(carpetY, fromPos.y - 1);
 				h.faceBlock(fromPos.x, floorY, fromPos.z);
 				if (h.isFacingBlock(fromPos.x, floorY, fromPos.z, 1)) {
 					if (h.selectCurrentItem(CARPET)) {
 						h.overrideUseItem();
 						carpets.add(new Pos(fromPos.x, floorY + 1, fromPos.z));
 					} else {
-						h.buildManager.missingItem(CARPET);
+						o.desync(new SelectTaskError(CARPET));
 					}
 				}
 				final MovementInput i = new MovementInput();
@@ -69,17 +71,17 @@ public class WalkTowardsTask extends AITask {
 
 				while (!carpets.isEmpty()) {
 					// Clean up carpets we already "lost"
-					Pos last = carpets.getLast();
+					final Pos last = carpets.getLast();
 					if (h.isAirBlock(last.x, last.y, last.z)) {
 						carpets.removeLast();
 					}
 				}
 
-				int x = fromPos.x - nextPos.x;
-				int z = fromPos.x - nextPos.x;
+				final int x = fromPos.x - nextPos.x;
+				final int z = fromPos.x - nextPos.x;
 				if (h.sneakFrom(nextPos.x, nextPos.y, nextPos.z,
 						AIHelper.getDirectionForXZ(x, z))) {
-					Pos last = carpets.getLast();
+					final Pos last = carpets.getLast();
 					h.faceAndDestroy(last.x, last.y, last.z);
 				}
 
@@ -99,8 +101,7 @@ public class WalkTowardsTask extends AITask {
 	 */
 	private int getUpperCarpetY(AIHelper h) {
 		int upperCarpet = -1;
-		for (int y = AIHelper.blockIsOneOf(
-				h.getBlock(fromPos), Blocks.air,
+		for (int y = AIHelper.blockIsOneOf(h.getBlock(fromPos), Blocks.air,
 				Blocks.carpet) ? fromPos.y : fromPos.y + 1; y < nextPos.y; y++) {
 			if (AIHelper.blockIsOneOf(h.getBlock(fromPos.x, y, fromPos.z),
 					Blocks.carpet)) {

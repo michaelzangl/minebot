@@ -156,12 +156,7 @@ public class PathFinderField implements Comparator<Integer> {
 
 	}
 
-	public final boolean searchSomethingAround(Pos playerPosition) {
-		return searchSomethingAround(playerPosition.x, playerPosition.y,
-				playerPosition.z);
-	}
-
-	public boolean searchSomethingAround(int cx, int cy, int cz) {
+	protected boolean searchSomethingAround(int cx, int cy, int cz) {
 		if (data.offsetX != cx - SIZE_X_Z / 2
 				|| data.offsetY != cy - Y_LEVEL / 2
 				|| data.offsetZ != cz - SIZE_X_Z / 2) {
@@ -176,7 +171,7 @@ public class PathFinderField implements Comparator<Integer> {
 			pq.clear();
 			final int start = getIndexForBlock(cx, cy, cz);
 			pq.add(start);
-			float startRating = rateDestination(start);
+			final float startRating = rateDestination(start);
 			setDistance(start, 1);
 			if (startRating >= 0) {
 				currentDest = new Dest(start, startRating);

@@ -15,9 +15,10 @@ public class CommandNameBuilder extends ParameterBuilder {
 
 		@Override
 		public boolean couldEvaluateAgainst(String string) {
-			for (CommandDefinition command : AIChatController.getRegistry()
-					.getAllCommands()) {
-				ArrayList<ArgumentDefinition> args = command.getArguments();
+			for (final CommandDefinition command : AIChatController
+					.getRegistry().getAllCommands()) {
+				final ArrayList<ArgumentDefinition> args = command
+						.getArguments();
 				if (args.get(0).couldEvaluateAgainst(string)) {
 					return true;
 				}
@@ -28,9 +29,10 @@ public class CommandNameBuilder extends ParameterBuilder {
 		@Override
 		public void getTabCompleteOptions(String currentStart,
 				Collection<String> addTo) {
-			for (CommandDefinition command : AIChatController.getRegistry()
-					.getAllCommands()) {
-				ArrayList<ArgumentDefinition> args = command.getArguments();
+			for (final CommandDefinition command : AIChatController
+					.getRegistry().getAllCommands()) {
+				final ArrayList<ArgumentDefinition> args = command
+						.getArguments();
 				args.get(0).getTabCompleteOptions(currentStart, addTo);
 			}
 		}

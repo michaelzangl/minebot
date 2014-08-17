@@ -6,11 +6,11 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
 import net.famzangl.minecraft.minebot.ai.AIHelper;
-import net.famzangl.minecraft.minebot.ai.AIStrategy;
 import net.famzangl.minecraft.minebot.ai.command.AICommand;
 import net.famzangl.minecraft.minebot.ai.command.AICommandInvocation;
 import net.famzangl.minecraft.minebot.ai.command.AICommandParameter;
 import net.famzangl.minecraft.minebot.ai.command.ParameterType;
+import net.famzangl.minecraft.minebot.ai.strategy.AIStrategy;
 import net.famzangl.minecraft.minebot.build.reverse.RunReverseBuildStrategy;
 import net.minecraft.client.Minecraft;
 

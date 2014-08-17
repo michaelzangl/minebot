@@ -2,6 +2,7 @@ package net.famzangl.minecraft.minebot.ai.animals;
 
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.ItemFilter;
+import net.famzangl.minecraft.minebot.ai.strategy.TaskOperations;
 import net.famzangl.minecraft.minebot.ai.task.AITask;
 import net.minecraft.item.ItemFishingRod;
 import net.minecraft.item.ItemStack;
@@ -22,7 +23,7 @@ public class ThrowFishingRodTask extends AITask {
 	}
 
 	@Override
-	public void runTick(AIHelper h) {
+	public void runTick(AIHelper h, TaskOperations o) {
 		if (h.selectCurrentItem(new FishingRodFilter())) {
 			h.overrideUseItem();
 		}

@@ -29,7 +29,7 @@ public class PlantPathFinder extends MovePathFinder {
 		}
 
 		public boolean canPlantItem(Item item) {
-			for (Item i : items) {
+			for (final Item i : items) {
 				if (item == i) {
 					return true;
 				}
@@ -61,8 +61,7 @@ public class PlantPathFinder extends MovePathFinder {
 
 	private final PlantType type;
 
-	public PlantPathFinder(AIHelper helper, PlantType type) {
-		super(helper);
+	public PlantPathFinder(PlantType type) {
 		this.type = type;
 	}
 
@@ -108,13 +107,13 @@ public class PlantPathFinder extends MovePathFinder {
 	protected void addTasksForTarget(Pos currentPos) {
 		if (helper.isAirBlock(currentPos.x, currentPos.y, currentPos.z)) {
 			if (!hasFarmlandBelow(currentPos.x, currentPos.y, currentPos.z)) {
-				helper.addTask(new UseItemOnBlockAtTask(new HoeFilter(),
-						currentPos.x, currentPos.y - 1, currentPos.z));
+				addTask(new UseItemOnBlockAtTask(new HoeFilter(), currentPos.x,
+						currentPos.y - 1, currentPos.z));
 			}
-			helper.addTask(new PlaceBlockAtFloorTask(currentPos.x,
-					currentPos.y, currentPos.z, new SeedFilter(type)));
+			addTask(new PlaceBlockAtFloorTask(currentPos.x, currentPos.y,
+					currentPos.z, new SeedFilter(type)));
 		} else {
-			helper.addTask(new DestroyBlockTask(currentPos.x, currentPos.y,
+			addTask(new DestroyBlockTask(currentPos.x, currentPos.y,
 					currentPos.z));
 		}
 	}

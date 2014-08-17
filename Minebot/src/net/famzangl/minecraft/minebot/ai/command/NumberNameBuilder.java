@@ -6,8 +6,9 @@ import net.famzangl.minecraft.minebot.ai.AIHelper;
 
 /**
  * A number.
+ * 
  * @author michael
- *
+ * 
  */
 public class NumberNameBuilder extends ParameterBuilder {
 

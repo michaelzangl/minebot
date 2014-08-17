@@ -1,13 +1,11 @@
 package net.famzangl.minecraft.minebot.ai.strategy;
 
 import net.famzangl.minecraft.minebot.ai.AIHelper;
-import net.famzangl.minecraft.minebot.ai.AIStrategy;
 import net.famzangl.minecraft.minebot.ai.ItemFilter;
 import net.famzangl.minecraft.minebot.ai.selectors.AndSelector;
 import net.famzangl.minecraft.minebot.ai.selectors.ColorSelector;
 import net.famzangl.minecraft.minebot.ai.selectors.ItemSelector;
 import net.famzangl.minecraft.minebot.ai.selectors.OrSelector;
-import net.famzangl.minecraft.minebot.ai.task.AITask;
 import net.famzangl.minecraft.minebot.ai.task.FaceAndInteractTask;
 import net.minecraft.command.IEntitySelector;
 import net.minecraft.entity.Entity;
@@ -15,7 +13,7 @@ import net.minecraft.entity.passive.EntitySheep;
 import net.minecraft.item.ItemShears;
 import net.minecraft.item.ItemStack;
 
-public class ShearStrategy implements AIStrategy {
+public class ShearStrategy extends TaskStrategy {
 	private static final int DISTANCE = 20;
 	private final int color;
 
@@ -26,7 +24,8 @@ public class ShearStrategy implements AIStrategy {
 	private final class ShearsFilter implements ItemFilter {
 		@Override
 		public boolean matches(ItemStack itemStack) {
-			return itemStack != null && itemStack.getItem() instanceof ItemShears;
+			return itemStack != null
+					&& itemStack.getItem() instanceof ItemShears;
 		}
 	}
 
@@ -36,12 +35,6 @@ public class ShearStrategy implements AIStrategy {
 			return var1 instanceof EntitySheep
 					&& ((EntitySheep) var1).isShearable(null, null, 0, 0, 0);
 		}
-	}
-
-	public static enum TintType {
-		WOLF,
-		SHEEP,
-		ANY;
 	}
 
 	@Override
@@ -60,18 +53,13 @@ public class ShearStrategy implements AIStrategy {
 				selector, new ItemSelector()));
 
 		if (found != null) {
-			helper.addTask(new FaceAndInteractTask(found, selector));
+			addTask(new FaceAndInteractTask(found, selector));
 		}
 	}
 
 	@Override
 	public String getDescription() {
-		return "Tinting...";
-	}
-
-	@Override
-	public AITask getOverrideTask(AIHelper helper) {
-		return null;
+		return "Shearing...";
 	}
 
 }

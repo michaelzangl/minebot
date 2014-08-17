@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 import net.famzangl.minecraft.minebot.ai.AIHelper;
-import net.famzangl.minecraft.minebot.ai.AIStrategy;
+import net.famzangl.minecraft.minebot.ai.strategy.AIStrategy;
 
 /**
  * This is the basic definition of a command.
@@ -32,7 +32,7 @@ public class CommandDefinition {
 			if (types[parameter] == AIHelper.class) {
 				b = new AIHelperBuilder(null);
 			} else {
-				AICommandParameter annot = findParameterAnnotation(parameterAnnotations[parameter]);
+				final AICommandParameter annot = findParameterAnnotation(parameterAnnotations[parameter]);
 				switch (annot.type()) {
 				case BLOCK_NAME:
 					b = new BlockNameBuilder(annot);
@@ -71,7 +71,7 @@ public class CommandDefinition {
 	}
 
 	private AICommandParameter findParameterAnnotation(Annotation[] annotations) {
-		for (Annotation a : annotations) {
+		for (final Annotation a : annotations) {
 			if (a instanceof AICommandParameter) {
 				// TODO: Type check of parameter.
 				return (AICommandParameter) a;
@@ -107,26 +107,26 @@ public class CommandDefinition {
 	}
 
 	public AIStrategy evaluate(AIHelper helper, String[] args) {
-		Object[] params = new Object[builders.length];
+		final Object[] params = new Object[builders.length];
 		for (int parameter = 0; parameter < builders.length; parameter++) {
-			String[] argsPart = Arrays.copyOfRange(args,
+			final String[] argsPart = Arrays.copyOfRange(args,
 					parameterStarts[parameter], parameterStarts[parameter + 1]);
 			params[parameter] = builders[parameter].getParameter(helper,
 					argsPart);
 		}
 		try {
-			Object result = method.invoke(null, params);
+			final Object result = method.invoke(null, params);
 			if (result instanceof AIStrategy) {
 				return (AIStrategy) result;
 			} else {
 				return null;
 			}
-		} catch (IllegalAccessException e) {
+		} catch (final IllegalAccessException e) {
 			doThrow(e);
-		} catch (IllegalArgumentException e) {
+		} catch (final IllegalArgumentException e) {
 			doThrow(e);
-		} catch (InvocationTargetException e) {
-			Throwable exception = e.getTargetException();
+		} catch (final InvocationTargetException e) {
+			final Throwable exception = e.getTargetException();
 			doThrow(exception);
 		}
 		return null;
@@ -134,7 +134,9 @@ public class CommandDefinition {
 
 	private void doThrow(Throwable exception) {
 		exception.printStackTrace();
-		throw exception instanceof CommandEvaluationException ? (CommandEvaluationException) exception : new CommandEvaluationException("Unexpected error while evaluating.", exception);
+		throw exception instanceof CommandEvaluationException ? (CommandEvaluationException) exception
+				: new CommandEvaluationException(
+						"Unexpected error while evaluating.", exception);
 	}
 
 	public ArrayList<ArgumentDefinition> getArguments() {

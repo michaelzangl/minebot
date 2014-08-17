@@ -54,9 +54,12 @@ public class BuildWayPathfinder extends AlongTrackPathFinder {
 	private static final Block BRIDGE_WALL = Blocks.cobblestone_wall;
 	private final int width = 2;
 
-	public BuildWayPathfinder(AIHelper helper, int dx, int dz, int cx, int cy,
-			int cz) {
-		super(helper, dx, dz, cx, cy, cz);
+	public BuildWayPathfinder(int dx, int dz, int cx, int cy, int cz) {
+		super(dx, dz, cx, cy, cz);
+	}
+
+	public BuildWayPathfinder(ForgeDirection dir, Pos pos) {
+		this(dir.offsetX, dir.offsetZ, pos.x, pos.y, pos.z);
 	}
 
 	/**
@@ -92,44 +95,42 @@ public class BuildWayPathfinder extends AlongTrackPathFinder {
 		 * @param currentPos
 		 */
 		public void addConstructionTasks(Pos currentPos) {
-			helper.addTask(new GetOnHotBarTask(new SlabFilter(FLOOR)));
+			addTask(new GetOnHotBarTask(new SlabFilter(FLOOR)));
 			if (placeTorch) {
-				helper.addTask(new GetOnHotBarTask(new BlockItemFilter(Blocks.torch)));
+				addTask(new GetOnHotBarTask(new BlockItemFilter(Blocks.torch)));
 			}
-			
-			Pos first = getPos(0, -1);
-			AITask placeTask = new BuildHalfslabTask(first, FLOOR,
+
+			final Pos first = getPos(0, -1);
+			final AITask placeTask = new BuildHalfslabTask(first, FLOOR,
 					BlockSide.LOWER_HALF).getPlaceBlockTask(currentPos
 					.subtract(first));
-			helper.addTask(placeTask);
+			addTask(placeTask);
 
-			DestroyInRangeTask clearTask = getClearAreaTask();
+			final DestroyInRangeTask clearTask = getClearAreaTask();
 			clearTask.blacklist(first);
-			helper.addTask(clearTask);
+			addTask(clearTask);
 
 			for (int i = 1; i < width; i++) {
-				Pos current = getPos(i, -1);
-				helper.addTask(new BuildHalfslabTask(current, FLOOR,
+				final Pos current = getPos(i, -1);
+				addTask(new BuildHalfslabTask(current, FLOOR,
 						BlockSide.LOWER_HALF)
 						.getPlaceBlockTask(getPos(i - 1, 0).subtract(current)));
 			}
 
 			addFarSideBuildTasks();
 
-			helper.addTask(new WalkTowardsTask(getPos(width - 1, 0), getPos(0,
-					0)));
+			addTask(new WalkTowardsTask(getPos(width - 1, 0), getPos(0, 0)));
 			addNearSideBuildTasks();
 
 			done = true;
 		}
 
 		protected void addFarSideBuildTasks() {
-			helper.addTask(new WalkTowardsTask(getPos(width, 1), getPos(
-					width - 1, 0)));
+			addTask(new WalkTowardsTask(getPos(width, 1), getPos(width - 1, 0)));
 		}
 
 		protected void addNearSideBuildTasks() {
-			helper.addTask(new WalkTowardsTask(getPos(-1, 1), getPos(0, 0)));
+			addTask(new WalkTowardsTask(getPos(-1, 1), getPos(0, 0)));
 		}
 
 		protected DestroyInRangeTask getClearAreaTask() {
@@ -137,15 +138,15 @@ public class BuildWayPathfinder extends AlongTrackPathFinder {
 		}
 
 		public void addConstructionTasksFromInner() {
-			helper.addTask(new DestroyInRangeTask(getPos(0, -1), getPos(0, 1)));
+			addTask(new DestroyInRangeTask(getPos(0, -1), getPos(0, 1)));
 
 			addConstructionTasks(getPos(0, -1));
 		}
 
 		public void addConstructionTasksFromPrevoius(Pos current) {
-			Pos floorPos = getPos(0, -1);
-			Block floor = helper.getBlock(floorPos);
-			helper.addTask(new DestroyInRangeTask(floorPos, getPos(0, 1)));
+			final Pos floorPos = getPos(0, -1);
+			final Block floor = helper.getBlock(floorPos);
+			addTask(new DestroyInRangeTask(floorPos, getPos(0, 1)));
 			// helper.addTask(new SneakAndPlaceAtHalfTask(floorPos.x,
 			// floorPos.y,
 			// floorPos.z, FLOOR, current, floorPos.y + .5,
@@ -155,16 +156,16 @@ public class BuildWayPathfinder extends AlongTrackPathFinder {
 		}
 
 		protected final void addNearSide() {
-			CubeBuildTask task = new BlockBuildTask(getPos(-1, -1), BRIDGE_SIDE);
-			helper.addTask(task.getPlaceBlockTask(getPos(1, 1).subtract(
-					getPos(0, 0))));
+			final CubeBuildTask task = new BlockBuildTask(getPos(-1, -1),
+					BRIDGE_SIDE);
+			addTask(task.getPlaceBlockTask(getPos(1, 1).subtract(getPos(0, 0))));
 		}
 
 		protected final void addFarSide() {
-			CubeBuildTask task = new BlockBuildTask(getPos(width, -1),
+			final CubeBuildTask task = new BlockBuildTask(getPos(width, -1),
 					BRIDGE_SIDE);
-			helper.addTask(task.getPlaceBlockTask(getPos(-1, 1).subtract(
-					getPos(0, 0))));
+			addTask(task
+					.getPlaceBlockTask(getPos(-1, 1).subtract(getPos(0, 0))));
 		}
 	}
 
@@ -177,7 +178,7 @@ public class BuildWayPathfinder extends AlongTrackPathFinder {
 			int covered = 0;
 			for (int y = 2; y <= 3; y++) {
 				for (int u = -1; u <= width + 1; u++) {
-					Block block = helper.getBlock(getPos(u, y));
+					final Block block = helper.getBlock(getPos(u, y));
 					if (AIHelper.blockIsOneOf(block, AIHelper.normalBlocks)
 							|| AIHelper.blockIsOneOf(block,
 									AIHelper.fallingBlocks)) {
@@ -190,13 +191,13 @@ public class BuildWayPathfinder extends AlongTrackPathFinder {
 		}
 
 		public boolean needsBridge() {
-			return (isAirlike(-1, 0) && isAirlike(-1, -1) && isAirlike(-1, -2))
-					|| (isAirlike(width, 0) && isAirlike(width, -1) && isAirlike(
-							width, -2));
+			return isAirlike(-1, 0) && isAirlike(-1, -1) && isAirlike(-1, -2)
+					|| isAirlike(width, 0) && isAirlike(width, -1)
+					&& isAirlike(width, -2);
 		}
 
 		private boolean isAirlike(int u, int dy) {
-			Block block = helper.getBlock(getPos(u, dy));
+			final Block block = helper.getBlock(getPos(u, dy));
 			return AIHelper.blockIsOneOf(block, Blocks.air)
 					|| AIHelper.blockIsOneOf(block, AIHelper.walkableBlocks);
 		}
@@ -207,11 +208,11 @@ public class BuildWayPathfinder extends AlongTrackPathFinder {
 		public BridgeWayType(int stepIndex) {
 			super(stepIndex);
 		}
-		
+
 		@Override
 		public void addConstructionTasks(Pos currentPos) {
-			helper.addTask(new GetOnHotBarTask(new BlockItemFilter(BRIDGE_WALL)));
-			helper.addTask(new GetOnHotBarTask(new BlockItemFilter(BRIDGE_SIDE)));
+			addTask(new GetOnHotBarTask(new BlockItemFilter(BRIDGE_WALL)));
+			addTask(new GetOnHotBarTask(new BlockItemFilter(BRIDGE_SIDE)));
 			super.addConstructionTasks(currentPos);
 		}
 
@@ -219,11 +220,12 @@ public class BuildWayPathfinder extends AlongTrackPathFinder {
 		protected void addFarSideBuildTasks() {
 			addFarSide();
 			super.addFarSideBuildTasks();
-			helper.addTask(new PlaceBlockTask(getPos(width, -1),
-					ForgeDirection.UP, BRIDGE_WALL));
+			addTask(new PlaceBlockTask(getPos(width, -1), ForgeDirection.UP,
+					BRIDGE_WALL));
 			if (placeTorch) {
-				helper.addTask(new PlaceTorchSomewhereTask(Collections
-						.singletonList(getPos(width, 1)), ForgeDirection.DOWN));
+				addTask(new PlaceTorchSomewhereTask(
+						Collections.singletonList(getPos(width, 1)),
+						ForgeDirection.DOWN));
 			}
 		}
 
@@ -231,11 +233,12 @@ public class BuildWayPathfinder extends AlongTrackPathFinder {
 		protected void addNearSideBuildTasks() {
 			addNearSide();
 			super.addNearSideBuildTasks();
-			helper.addTask(new PlaceBlockTask(getPos(-1, -1),
-					ForgeDirection.UP, BRIDGE_WALL));
+			addTask(new PlaceBlockTask(getPos(-1, -1), ForgeDirection.UP,
+					BRIDGE_WALL));
 			if (placeTorch) {
-				helper.addTask(new PlaceTorchSomewhereTask(Collections
-						.singletonList(getPos(-1, 1)), ForgeDirection.DOWN));
+				addTask(new PlaceTorchSomewhereTask(
+						Collections.singletonList(getPos(-1, 1)),
+						ForgeDirection.DOWN));
 			}
 		}
 
@@ -256,10 +259,9 @@ public class BuildWayPathfinder extends AlongTrackPathFinder {
 		protected void addNearSideBuildTasks() {
 			super.addNearSideBuildTasks();
 			if (placeTorch) {
-				helper.addTask(new PlaceTorchSomewhereTask(Arrays.asList(
-						getPos(0, 1), getPos(0, 0), getPos(-1, 1)),
-						getForwardDirection().getRotation(ForgeDirection.UP),
-						ForgeDirection.DOWN));
+				addTask(new PlaceTorchSomewhereTask(Arrays.asList(getPos(0, 1),
+						getPos(0, 0), getPos(-1, 1)), getForwardDirection()
+						.getRotation(ForgeDirection.UP), ForgeDirection.DOWN));
 			}
 		}
 
@@ -267,7 +269,7 @@ public class BuildWayPathfinder extends AlongTrackPathFinder {
 		protected void addFarSideBuildTasks() {
 			super.addFarSideBuildTasks();
 			if (placeTorch) {
-				helper.addTask(new PlaceTorchSomewhereTask(Arrays.asList(
+				addTask(new PlaceTorchSomewhereTask(Arrays.asList(
 						getPos(width - 1, 1), getPos(width - 1, 0),
 						getPos(width, 1)), getForwardDirection().getRotation(
 						ForgeDirection.DOWN), ForgeDirection.DOWN));
@@ -280,11 +282,11 @@ public class BuildWayPathfinder extends AlongTrackPathFinder {
 		public FlatlandWayType(int stepIndex) {
 			super(stepIndex);
 		}
-		
+
 		@Override
 		public void addConstructionTasks(Pos currentPos) {
 			if (placeTorch) {
-				helper.addTask(new GetOnHotBarTask(new BlockItemFilter(BRIDGE_SIDE)));
+				addTask(new GetOnHotBarTask(new BlockItemFilter(BRIDGE_SIDE)));
 			}
 			super.addConstructionTasks(currentPos);
 		}
@@ -305,8 +307,9 @@ public class BuildWayPathfinder extends AlongTrackPathFinder {
 			}
 			super.addFarSideBuildTasks();
 			if (placeTorch) {
-				helper.addTask(new PlaceTorchSomewhereTask(Collections
-						.singletonList(getPos(width, 0)), ForgeDirection.DOWN));
+				addTask(new PlaceTorchSomewhereTask(
+						Collections.singletonList(getPos(width, 0)),
+						ForgeDirection.DOWN));
 			}
 		}
 
@@ -317,8 +320,9 @@ public class BuildWayPathfinder extends AlongTrackPathFinder {
 			}
 			super.addNearSideBuildTasks();
 			if (placeTorch) {
-				helper.addTask(new PlaceTorchSomewhereTask(Collections
-						.singletonList(getPos(-1, 0)), ForgeDirection.DOWN));
+				addTask(new PlaceTorchSomewhereTask(
+						Collections.singletonList(getPos(-1, 0)),
+						ForgeDirection.DOWN));
 			}
 		}
 	}
@@ -337,8 +341,8 @@ public class BuildWayPathfinder extends AlongTrackPathFinder {
 	}
 
 	private void computeNextWayType() {
-		int i = wayTypes.size();
-		NormalWayType base = new NormalWayType(i);
+		final int i = wayTypes.size();
+		final NormalWayType base = new NormalWayType(i);
 		WayPiece type = base;
 		if (base.needsBridge()) {
 			type = new BridgeWayType(i);
@@ -354,7 +358,7 @@ public class BuildWayPathfinder extends AlongTrackPathFinder {
 
 	@Override
 	protected void addTasksForTarget(Pos currentPos) {
-		int currentStep = getStepNumber(currentPos.x, currentPos.z);
+		final int currentStep = getStepNumber(currentPos.x, currentPos.z);
 		if (currentPos.y == cy - 1
 				&& !getSuggestedWayType(currentStep).isDone()) {
 			getSuggestedWayType(currentStep).addConstructionTasksFromInner();
@@ -375,8 +379,9 @@ public class BuildWayPathfinder extends AlongTrackPathFinder {
 				&& playerPosition.y == cy - 1
 				&& AIHelper.blockIsOneOf(helper.getBlock(playerPosition),
 						FLOOR.slabBlock)) {
-			int currentStep = getStepNumber(playerPosition.x, playerPosition.z);
-			WayPiece next = getSuggestedWayType(currentStep + 1);
+			final int currentStep = getStepNumber(playerPosition.x,
+					playerPosition.z);
+			final WayPiece next = getSuggestedWayType(currentStep + 1);
 			if (!next.isDone()) {
 				next.addConstructionTasksFromPrevoius(playerPosition.add(0, 1,
 						0));
@@ -391,8 +396,8 @@ public class BuildWayPathfinder extends AlongTrackPathFinder {
 		if (!isOnTrack(x, z)) {
 			return -1;
 		}
-		int currentStep = getStepNumber(x, z);
-		if ((y == cy - 1 && !getSuggestedWayType(currentStep).isDone())) {
+		final int currentStep = getStepNumber(x, z);
+		if (y == cy - 1 && !getSuggestedWayType(currentStep).isDone()) {
 			return distance;
 		} else {
 			return -1;

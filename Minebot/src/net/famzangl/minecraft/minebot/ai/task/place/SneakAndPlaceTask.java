@@ -3,7 +3,9 @@ package net.famzangl.minecraft.minebot.ai.task.place;
 import net.famzangl.minecraft.minebot.Pos;
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.BlockItemFilter;
+import net.famzangl.minecraft.minebot.ai.strategy.TaskOperations;
 import net.famzangl.minecraft.minebot.ai.task.AITask;
+import net.famzangl.minecraft.minebot.ai.task.error.SelectTaskError;
 import net.minecraft.util.MovementInput;
 import net.minecraftforge.common.util.ForgeDirection;
 
@@ -45,7 +47,8 @@ public class SneakAndPlaceTask extends AITask {
 		this.filter = filter;
 		this.relativeFrom = relativeFrom;
 		this.minBuildHeight = minBuildHeight;
-		ForgeDirection foundInDir = AIHelper.getDirectionForXZ(-relativeFrom.x, -relativeFrom.z);
+		final ForgeDirection foundInDir = AIHelper.getDirectionForXZ(
+				-relativeFrom.x, -relativeFrom.z);
 		if (relativeFrom.y != 1 || foundInDir == null) {
 			throw new IllegalArgumentException();
 		}
@@ -58,7 +61,7 @@ public class SneakAndPlaceTask extends AITask {
 	}
 
 	@Override
-	public void runTick(AIHelper h) {
+	public void runTick(AIHelper h, TaskOperations o) {
 		if (faceTimer > 0) {
 			faceTimer--;
 		}
@@ -67,14 +70,13 @@ public class SneakAndPlaceTask extends AITask {
 			final boolean hasRequiredHeight = h.getMinecraft().thePlayer.boundingBox.minY > minBuildHeight - 0.05;
 			if (hasRequiredHeight) {
 				if (faceTimer == 0) {
-					faceBlock(h);
+					faceBlock(h, o);
 					faceTimer = 3;
 				} else if (isFacingRightBlock(h)) {
 					if (h.selectCurrentItem(filter)) {
 						h.overrideUseItem();
 					} else {
-						System.out.println("Cannot select " + filter);
-						h.desync();
+						o.desync(new SelectTaskError(filter));
 					}
 				}
 			} else {
@@ -90,7 +92,7 @@ public class SneakAndPlaceTask extends AITask {
 				inDirection);
 	}
 
-	protected void faceBlock(AIHelper h) {
+	protected void faceBlock(AIHelper h, TaskOperations o) {
 		h.faceSideOf(x + relativeFrom.x, y - 1, z + relativeFrom.z, inDirection);
 	}
 

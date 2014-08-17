@@ -22,7 +22,7 @@ public class EnumNameBuilder<T extends Enum<T>> extends ParameterBuilder {
 
 		@Override
 		public boolean couldEvaluateAgainst(String string) {
-			for (Enum<?> type : options) {
+			for (final Enum<?> type : options) {
 				if (type.name().equalsIgnoreCase(string)) {
 					return true;
 				}
@@ -33,7 +33,7 @@ public class EnumNameBuilder<T extends Enum<T>> extends ParameterBuilder {
 		@Override
 		public void getTabCompleteOptions(String currentStart,
 				Collection<String> addTo) {
-			for (Enum<?> type : options) {
+			for (final Enum<?> type : options) {
 				if (type.name().toLowerCase()
 						.startsWith(currentStart.toLowerCase())) {
 					addTo.add(type.name().toLowerCase());
@@ -49,8 +49,8 @@ public class EnumNameBuilder<T extends Enum<T>> extends ParameterBuilder {
 
 	@Override
 	public void addArguments(ArrayList<ArgumentDefinition> list) {
-		list.add(new EnumArgumentDefinition(enumClass.getSimpleName(), annot.description(),
-				enumClass.getEnumConstants()));
+		list.add(new EnumArgumentDefinition(enumClass.getSimpleName(), annot
+				.description(), enumClass.getEnumConstants()));
 	}
 
 	@Override

@@ -1,6 +1,7 @@
 package net.famzangl.minecraft.minebot.build;
 
 import net.famzangl.minecraft.minebot.ai.AIHelper;
+import net.famzangl.minecraft.minebot.ai.strategy.TaskOperations;
 import net.famzangl.minecraft.minebot.ai.task.AITask;
 
 public final class NextTaskTask extends AITask {
@@ -15,7 +16,7 @@ public final class NextTaskTask extends AITask {
 	}
 
 	@Override
-	public void runTick(AIHelper h) {
+	public void runTick(AIHelper h, TaskOperations o) {
 		while (tasksToSkip > 0) {
 			if (h.buildManager.peekNextTask() != null) {
 				h.buildManager.popNextTask();

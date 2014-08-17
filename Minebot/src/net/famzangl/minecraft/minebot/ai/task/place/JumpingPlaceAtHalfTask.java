@@ -2,7 +2,9 @@ package net.famzangl.minecraft.minebot.ai.task.place;
 
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.ItemFilter;
+import net.famzangl.minecraft.minebot.ai.strategy.TaskOperations;
 import net.famzangl.minecraft.minebot.ai.task.BlockSide;
+import net.famzangl.minecraft.minebot.ai.task.error.StringTaskError;
 import net.minecraftforge.common.util.ForgeDirection;
 
 public class JumpingPlaceAtHalfTask extends JumpingPlaceBlockAtFloorTask {
@@ -27,14 +29,14 @@ public class JumpingPlaceAtHalfTask extends JumpingPlaceBlockAtFloorTask {
 	}
 
 	@Override
-	protected void faceBlock(AIHelper h) {
+	protected void faceBlock(AIHelper h, TaskOperations o) {
 		final ForgeDirection[] dirs = getBuildDirs();
 		for (int i = 0; i < dirs.length; i++) {
 			if (faceSideBlock(h, dirs[attempts++ % dirs.length])) {
 				return;
 			}
 		}
-		h.desync();
+		o.desync(new StringTaskError("Could not face anywhere to place."));
 	}
 
 	protected ForgeDirection[] getBuildDirs() {

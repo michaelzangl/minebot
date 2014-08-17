@@ -3,7 +3,9 @@ package net.famzangl.minecraft.minebot.ai.task.place;
 import net.famzangl.minecraft.minebot.Pos;
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.BlockItemFilter;
+import net.famzangl.minecraft.minebot.ai.strategy.TaskOperations;
 import net.famzangl.minecraft.minebot.ai.task.BlockSide;
+import net.famzangl.minecraft.minebot.ai.task.error.StringTaskError;
 import net.minecraftforge.common.util.ForgeDirection;
 
 public class SneakAndPlaceAtHalfTask extends SneakAndPlaceTask {
@@ -29,7 +31,7 @@ public class SneakAndPlaceAtHalfTask extends SneakAndPlaceTask {
 	}
 
 	@Override
-	protected void faceBlock(AIHelper h) {
+	protected void faceBlock(AIHelper h, TaskOperations o) {
 		final ForgeDirection[] dirs = getBuildDirs();
 		attempts++;
 		for (int i = 0; i < dirs.length; i++) {
@@ -41,7 +43,7 @@ public class SneakAndPlaceAtHalfTask extends SneakAndPlaceTask {
 				attempts += 10;
 			}
 		}
-		h.desync();
+		o.desync(new StringTaskError("Could not face anywhere to place."));
 	}
 
 	private void faceSideBlock(AIHelper h, ForgeDirection useSide) {

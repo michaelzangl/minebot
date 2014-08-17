@@ -9,11 +9,11 @@ import net.famzangl.minecraft.minebot.ai.AIHelper;
 
 public class FileNameBuilder extends ParameterBuilder {
 	public static boolean isFilenameValid(String file) {
-		File f = new File(file);
+		final File f = new File(file);
 		try {
 			f.getCanonicalPath();
 			return true;
-		} catch (IOException e) {
+		} catch (final IOException e) {
 			return false;
 		}
 	}
@@ -32,7 +32,7 @@ public class FileNameBuilder extends ParameterBuilder {
 		@Override
 		public void getTabCompleteOptions(String currentStart,
 				Collection<String> addTo) {
-			for (File r : File.listRoots()) {
+			for (final File r : File.listRoots()) {
 				if (r.getAbsolutePath().startsWith(currentStart)) {
 					addTo.add(r.getAbsolutePath());
 				}
@@ -47,9 +47,10 @@ public class FileNameBuilder extends ParameterBuilder {
 				dir = dir.getParentFile();
 			}
 			if (dir != null && dir.isDirectory()) {
-				for (File f : dir.listFiles()) {
+				for (final File f : dir.listFiles()) {
 					if (f.getName().startsWith(namePrefix)) {
-						addTo.add(f.getPath() + (f.isDirectory() ? File.separator : ""));
+						addTo.add(f.getPath()
+								+ (f.isDirectory() ? File.separator : ""));
 					}
 				}
 			}

@@ -10,7 +10,7 @@ import java.util.Hashtable;
 import java.util.List;
 
 import net.famzangl.minecraft.minebot.ai.AIHelper;
-import net.famzangl.minecraft.minebot.ai.AIStrategy;
+import net.famzangl.minecraft.minebot.ai.strategy.AIStrategy;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.ICommandSender;
 import net.minecraftforge.client.ClientCommandHandler;
@@ -35,7 +35,7 @@ public class CommandRegistry {
 				if (strategy != null) {
 					controlled.requestUseStrategy(strategy);
 				}
-			} catch (UnknownCommandException e) {
+			} catch (final UnknownCommandException e) {
 				if (e.getEvaluateable().size() > 0) {
 					AIChatController
 							.addChatLine("ERROR: More than 1 command matches your command line.");
@@ -44,10 +44,10 @@ public class CommandRegistry {
 					AIChatController.addChatLine("ERROR: No command:"
 							+ combine(args) + ".");
 				}
-			} catch (CommandEvaluationException e) {
+			} catch (final CommandEvaluationException e) {
 				AIChatController.addChatLine("ERROR while evaluating: "
 						+ e.getMessage());
-			} catch (Throwable e) {
+			} catch (final Throwable e) {
 				e.printStackTrace();
 				AIChatController
 						.addChatLine("ERROR: Could not evaluate. Please report.");
@@ -55,8 +55,8 @@ public class CommandRegistry {
 		}
 
 		private String combine(String[] args) {
-			StringBuilder b = new StringBuilder();
-			for (String a : args) {
+			final StringBuilder b = new StringBuilder();
+			for (final String a : args) {
 				b.append(" ");
 				b.append(a);
 			}
@@ -94,7 +94,7 @@ public class CommandRegistry {
 
 	public void register(Class<?> commandClass) {
 		checkCommandCLass(commandClass);
-		String name = commandClass.getAnnotation(AICommand.class).name();
+		final String name = commandClass.getAnnotation(AICommand.class).name();
 		List<CommandDefinition> list = commandTable.get(name);
 		if (list == null) {
 			list = new ArrayList<CommandDefinition>();
@@ -118,9 +118,9 @@ public class CommandRegistry {
 
 	public AIStrategy evaluateCommand(AIHelper helper, String commandID,
 			String[] arguments) throws UnknownCommandException {
-		List<CommandDefinition> commands = getCommands(commandID);
-		ArrayList<CommandDefinition> evaluateable = new ArrayList<CommandDefinition>();
-		for (CommandDefinition c : commands) {
+		final List<CommandDefinition> commands = getCommands(commandID);
+		final ArrayList<CommandDefinition> evaluateable = new ArrayList<CommandDefinition>();
+		for (final CommandDefinition c : commands) {
 			if (c.couldEvaluateAgainst(arguments)) {
 				evaluateable.add(c);
 			}
@@ -134,20 +134,21 @@ public class CommandRegistry {
 
 	public List<String> tabCompletion(AIHelper helper, String commandID,
 			String[] currentArgs) {
-		List<CommandDefinition> commands = getCommands(commandID);
-		HashSet<String> suggestions = new HashSet<String>();
-		String[] fixedArgs = Arrays.copyOf(currentArgs, currentArgs.length - 1);
-		for (CommandDefinition c : commands) {
-			ArrayList<ArgumentDefinition> args = c.getArguments();
+		final List<CommandDefinition> commands = getCommands(commandID);
+		final HashSet<String> suggestions = new HashSet<String>();
+		final String[] fixedArgs = Arrays.copyOf(currentArgs,
+				currentArgs.length - 1);
+		for (final CommandDefinition c : commands) {
+			final ArrayList<ArgumentDefinition> args = c.getArguments();
 			if (c.couldEvaluateStartingWith(fixedArgs)
 					&& args.size() > fixedArgs.length) {
-				ArgumentDefinition lastArg = c.getArguments().get(
+				final ArgumentDefinition lastArg = c.getArguments().get(
 						currentArgs.length - 1);
 				lastArg.getTabCompleteOptions(
 						currentArgs[currentArgs.length - 1], suggestions);
 			}
 		}
-		ArrayList<String> asList = new ArrayList<String>(suggestions);
+		final ArrayList<String> asList = new ArrayList<String>(suggestions);
 		Collections.sort(asList);
 		return asList;
 	}
@@ -162,7 +163,7 @@ public class CommandRegistry {
 
 	private void getCommandsForClass(Class<?> commandClass,
 			List<CommandDefinition> commands) {
-		for (Method m : commandClass.getMethods()) {
+		for (final Method m : commandClass.getMethods()) {
 			if (Modifier.isStatic(m.getModifiers())
 					&& m.isAnnotationPresent(AICommandInvocation.class)) {
 				commands.add(getCommandForMethod(m));
@@ -175,11 +176,15 @@ public class CommandRegistry {
 	}
 
 	public List<CommandDefinition> getAllCommands() {
-		ArrayList<CommandDefinition> defs = new ArrayList<CommandDefinition>();
-		for (List<CommandDefinition> list : commandTable.values()) {
+		final ArrayList<CommandDefinition> defs = new ArrayList<CommandDefinition>();
+		for (final List<CommandDefinition> list : commandTable.values()) {
 			defs.addAll(list);
 		}
 		return defs;
+	}
+
+	public IAIControllable getControlled() {
+		return controlled;
 	}
 
 	public void setControlled(IAIControllable controlled) {

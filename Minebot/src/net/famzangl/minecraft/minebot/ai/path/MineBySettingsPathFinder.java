@@ -1,6 +1,5 @@
 package net.famzangl.minecraft.minebot.ai.path;
 
-import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.minecraft.block.Block;
 import net.minecraftforge.common.util.ForgeDirection;
 
@@ -22,8 +21,8 @@ public class MineBySettingsPathFinder extends MinePathfinder {
 
 		@Override
 		public float getFloat(Block block) {
-			String name =  Block.blockRegistry.getNameForObject(block).replace(
-					"minecraft:", "");
+			final String name = Block.blockRegistry.getNameForObject(block)
+					.replace("minecraft:", "");
 			final float val = settings.getFloat(name_prefix + name,
 					defaultValue, min, max);
 			System.out.println(name_prefix + name + " -> " + val);
@@ -31,8 +30,9 @@ public class MineBySettingsPathFinder extends MinePathfinder {
 		}
 	}
 
-	public MineBySettingsPathFinder(AIHelper helper, ForgeDirection preferedDirection, int preferedLayer) {
-		super(helper, preferedDirection, preferedLayer);
+	public MineBySettingsPathFinder(ForgeDirection preferedDirection,
+			int preferedLayer) {
+		super(preferedDirection, preferedLayer);
 		maxDistancePoints = 0;
 		maxDistanceFactor = MIN_FACTOR;
 		for (final String s : settings.getKeys()) {

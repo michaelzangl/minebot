@@ -158,10 +158,13 @@ public abstract class BuildTask {
 
 	/**
 	 * @param add
-	 * @param rotateSteps 0..3 Steps of ForgeDirection.rotate(UP).
-	 * @param mirror Applied after rotate (if possible);
+	 * @param rotateSteps
+	 *            0..3 Steps of ForgeDirection.rotate(UP).
+	 * @param mirror
+	 *            Applied after rotate (if possible);
 	 * @return
 	 */
-	public abstract BuildTask withPositionAndRotation(Pos add, int rotateSteps, MirrorDirection mirror);
+	public abstract BuildTask withPositionAndRotation(Pos add, int rotateSteps,
+			MirrorDirection mirror);
 
 }

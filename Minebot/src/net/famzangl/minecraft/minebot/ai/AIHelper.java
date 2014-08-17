@@ -5,7 +5,6 @@ import java.util.Random;
 
 import net.famzangl.minecraft.minebot.Pos;
 import net.famzangl.minecraft.minebot.ai.command.AIChatController;
-import net.famzangl.minecraft.minebot.ai.task.AITask;
 import net.famzangl.minecraft.minebot.ai.task.BlockSide;
 import net.famzangl.minecraft.minebot.build.BuildManager;
 import net.minecraft.block.Block;
@@ -131,20 +130,6 @@ public abstract class AIHelper {
 	}
 
 	/**
-	 * Adds a task that should be executed.
-	 * 
-	 * @param task
-	 *            The new task
-	 */
-	public abstract void addTask(AITask task);
-
-	/**
-	 * This should be called whenever the current task could not achieve it's
-	 * goal. All following tasks are unscheduled.
-	 */
-	public abstract void desync();
-
-	/**
 	 * Gets the pos1 marker.
 	 * 
 	 * @return The marker or <code>null</code> if it is unset.
@@ -257,7 +242,7 @@ public abstract class AIHelper {
 	 * @return the position or <code>null</code> if it was not found.
 	 */
 	public Pos findBlock(Block blockType) {
-		Pos current = getPlayerPosition();
+		final Pos current = getPlayerPosition();
 		Pos pos = null;
 		for (int x = current.x - 2; x <= current.x + 2; x++) {
 			for (int z = current.z - 2; z <= current.z + 2; z++) {
@@ -388,7 +373,8 @@ public abstract class AIHelper {
 	 */
 	public Pos getPlayerPosition() {
 		final int x = (int) Math.floor(getMinecraft().thePlayer.posX);
-		final int y = (int) Math.floor(getMinecraft().thePlayer.boundingBox.minY + 0.05);
+		final int y = (int) Math
+				.floor(getMinecraft().thePlayer.boundingBox.minY + 0.05);
 		final int z = (int) Math.floor(getMinecraft().thePlayer.posZ);
 		return new Pos(x, y, z);
 	}
@@ -795,13 +781,13 @@ public abstract class AIHelper {
 	}
 
 	protected boolean userTookOver() {
-		MovementInput mi = resetMovementInput == null ? mc.thePlayer.movementInput
+		final MovementInput mi = resetMovementInput == null ? mc.thePlayer.movementInput
 				: resetMovementInput;
-		KeyBinding attack = resetAttackKey == null ? mc.gameSettings.keyBindAttack
+		final KeyBinding attack = resetAttackKey == null ? mc.gameSettings.keyBindAttack
 				: resetAttackKey;
-		KeyBinding use = resetUseItemKey == null ? mc.gameSettings.keyBindUseItem
+		final KeyBinding use = resetUseItemKey == null ? mc.gameSettings.keyBindUseItem
 				: resetUseItemKey;
-		KeyBinding sneak = resetSneakKey == null ? mc.gameSettings.keyBindSneak
+		final KeyBinding sneak = resetSneakKey == null ? mc.gameSettings.keyBindSneak
 				: resetSneakKey;
 
 		return mi.moveForward != 0 || mi.moveStrafe != 0 || mi.jump
@@ -1007,12 +993,12 @@ public abstract class AIHelper {
 			if (distTo < 4 * WALK_PER_STEP) {
 				speed = Math.max(distTo / WALK_PER_STEP / 4, 0.1);
 			}
-			double yaw = mc.thePlayer.rotationYaw / 180 * Math.PI;
-			double lookX = -Math.sin(yaw);
-			double lookZ = Math.cos(yaw);
-			double dlength = Math.sqrt(dx * dx + dz * dz);
-			double same = (lookX * dx + lookZ * dz) / dlength;
-			double strafe = (lookZ * dx - lookX * dz) / dlength;
+			final double yaw = mc.thePlayer.rotationYaw / 180 * Math.PI;
+			final double lookX = -Math.sin(yaw);
+			final double lookZ = Math.cos(yaw);
+			final double dlength = Math.sqrt(dx * dx + dz * dz);
+			final double same = (lookX * dx + lookZ * dz) / dlength;
+			final double strafe = (lookZ * dx - lookX * dz) / dlength;
 			System.out.println("look: " + lookX + "," + lookZ + "; d = " + dx
 					+ "," + dz + "; walk: " + same + "," + strafe);
 			final MovementInput movement = new MovementInput();
@@ -1119,22 +1105,15 @@ public abstract class AIHelper {
 	}
 
 	public int getLightAt(Pos pos) {
-        Chunk chunk = mc.theWorld.getChunkFromChunkCoords(pos.x >> 4, pos.z >> 4);
-        ExtendedBlockStorage storage = chunk.getBlockStorageArray()[pos.y >> 4];
-        if (storage == null) {
-        	return 0;
-        } else {
-        	return storage.getExtBlocklightValue(pos.x & 15, pos.y & 15, pos.z & 15);
-        }
+		final Chunk chunk = mc.theWorld.getChunkFromChunkCoords(pos.x >> 4,
+				pos.z >> 4);
+		final ExtendedBlockStorage storage = chunk.getBlockStorageArray()[pos.y >> 4];
+		if (storage == null) {
+			return 0;
+		} else {
+			return storage.getExtBlocklightValue(pos.x & 15, pos.y & 15,
+					pos.z & 15);
+		}
 	}
 
-	/**
-	 * This can be called by the current task to do a look ahead and already let
-	 * the next task to it's face and destroy. Use with care.
-	 * 
-	 * @return
-	 */
-	public boolean faceAndDestroyForNextTask() {
-		return false;
-	}
 }

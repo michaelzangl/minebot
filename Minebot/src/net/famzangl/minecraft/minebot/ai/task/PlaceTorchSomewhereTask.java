@@ -1,11 +1,14 @@
 package net.famzangl.minecraft.minebot.ai.task;
 
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
 import net.famzangl.minecraft.minebot.Pos;
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.BlockItemFilter;
+import net.famzangl.minecraft.minebot.ai.strategy.TaskOperations;
+import net.famzangl.minecraft.minebot.ai.task.error.SelectTaskError;
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
 import net.minecraftforge.common.util.ForgeDirection;
@@ -47,8 +50,11 @@ public class PlaceTorchSomewhereTask extends AITask {
 
 	/**
 	 * Create a new task-
-	 * @param positions The positions on which the torch should be placed.
-	 * @param preferedDirectionThe direction in which the stick of the torch should be mounted.
+	 * 
+	 * @param positions
+	 *            The positions on which the torch should be placed.
+	 * @param preferedDirectionThe
+	 *            direction in which the stick of the torch should be mounted.
 	 */
 	public PlaceTorchSomewhereTask(List<Pos> positions,
 			ForgeDirection... preferedDirection) {
@@ -59,25 +65,25 @@ public class PlaceTorchSomewhereTask extends AITask {
 
 	@Override
 	public boolean isFinished(AIHelper h) {
-		PosAndDir place = getNextPlace(h);
-		return place == null || (lastAttempt != null && Block
-						.isEqualTo(h.getBlock(lastAttempt), Blocks.torch));
+		final PosAndDir place = getNextPlace(h);
+		return place == null || lastAttempt != null
+				&& Block.isEqualTo(h.getBlock(lastAttempt), Blocks.torch);
 	}
 
 	private PosAndDir getNextPlace(AIHelper h) {
 		if (attemptOnPositions == null) {
 			attemptOnPositions = new LinkedList<PlaceTorchSomewhereTask.PosAndDir>();
-			for (Pos p : places) {
-				for (ForgeDirection d : 
-						preferedDirection) {
-					PosAndDir current = new PosAndDir(p, d);
-					Pos placeOn = current.getPlaceOn();
+			for (final Pos p : places) {
+				for (final ForgeDirection d : preferedDirection) {
+					final PosAndDir current = new PosAndDir(p, d);
+					final Pos placeOn = current.getPlaceOn();
 					if (!h.isAirBlock(placeOn.x, placeOn.y, placeOn.z)) {
 						attemptOnPositions.add(current);
 					}
 				}
 			}
-			System.out.println("Placing torch somewhere there: " + attemptOnPositions);
+			System.out.println("Placing torch somewhere there: "
+					+ attemptOnPositions);
 		}
 
 		while (!attemptOnPositions.isEmpty()
@@ -89,13 +95,14 @@ public class PlaceTorchSomewhereTask extends AITask {
 	}
 
 	@Override
-	public void runTick(AIHelper h) {
-		if (!h.selectCurrentItem(new BlockItemFilter(Blocks.torch))) {
-			h.desync();
+	public void runTick(AIHelper h, TaskOperations o) {
+		final BlockItemFilter f = new BlockItemFilter(Blocks.torch);
+		if (!h.selectCurrentItem(f)) {
+			o.desync(new SelectTaskError(f));
 		}
 
-		PosAndDir next = getNextPlace(h);
-		Pos placeOn = next.getPlaceOn();
+		final PosAndDir next = getNextPlace(h);
+		final Pos placeOn = next.getPlaceOn();
 		h.faceSideOf(placeOn.x, placeOn.y, placeOn.z, next.dir.getOpposite());
 		if (h.isFacingBlock(placeOn.x, placeOn.y, placeOn.z,
 				next.dir.getOpposite())) {
@@ -113,9 +120,8 @@ public class PlaceTorchSomewhereTask extends AITask {
 	@Override
 	public String toString() {
 		return "PlaceTorchSomewhereTask [places=" + places
-				+ ", preferedDirection=" + preferedDirection + ", lastAttempt="
-				+ lastAttempt + "]";
+				+ ", preferedDirection=" + Arrays.toString(preferedDirection)
+				+ "]";
 	}
-	
-	
+
 }

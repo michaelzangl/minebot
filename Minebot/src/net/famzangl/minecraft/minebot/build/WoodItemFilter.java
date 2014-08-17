@@ -23,22 +23,25 @@ public class WoodItemFilter extends BlockItemFilter {
 	public int hashCode() {
 		final int prime = 31;
 		int result = super.hashCode();
-		result = prime * result
-				+ ((woodType == null) ? 0 : woodType.hashCode());
+		result = prime * result + (woodType == null ? 0 : woodType.hashCode());
 		return result;
 	}
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
+		if (this == obj) {
 			return true;
-		if (!super.equals(obj))
+		}
+		if (!super.equals(obj)) {
 			return false;
-		if (getClass() != obj.getClass())
+		}
+		if (getClass() != obj.getClass()) {
 			return false;
-		WoodItemFilter other = (WoodItemFilter) obj;
-		if (woodType != other.woodType)
+		}
+		final WoodItemFilter other = (WoodItemFilter) obj;
+		if (woodType != other.woodType) {
 			return false;
+		}
 		return true;
 	}
 

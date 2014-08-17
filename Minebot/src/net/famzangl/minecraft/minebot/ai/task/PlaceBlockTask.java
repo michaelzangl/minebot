@@ -3,6 +3,8 @@ package net.famzangl.minecraft.minebot.ai.task;
 import net.famzangl.minecraft.minebot.Pos;
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.BlockItemFilter;
+import net.famzangl.minecraft.minebot.ai.strategy.TaskOperations;
+import net.famzangl.minecraft.minebot.ai.task.error.SelectTaskError;
 import net.minecraft.block.Block;
 import net.minecraftforge.common.util.ForgeDirection;
 
@@ -33,9 +35,10 @@ public class PlaceBlockTask extends AITask {
 	}
 
 	@Override
-	public void runTick(AIHelper h) {
-		if (!h.selectCurrentItem(new BlockItemFilter(block))) {
-			h.desync();
+	public void runTick(AIHelper h, TaskOperations o) {
+		final BlockItemFilter f = new BlockItemFilter(block);
+		if (!h.selectCurrentItem(f)) {
+			o.desync(new SelectTaskError(f));
 		}
 
 		h.faceSideOf(placeOn.x, placeOn.y, placeOn.z, onSide);
