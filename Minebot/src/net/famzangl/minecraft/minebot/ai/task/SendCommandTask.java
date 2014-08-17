@@ -7,6 +7,7 @@ import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.minecraft.client.gui.GuiChat;
 import net.minecraft.client.gui.GuiScreen;
 
+@SkipWhenSearchingPrefetch
 public class SendCommandTask extends AITask {
 	private final List<String> commands;
 	private boolean send;

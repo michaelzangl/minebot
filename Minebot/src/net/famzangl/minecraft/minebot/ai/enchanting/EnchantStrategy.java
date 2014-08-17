@@ -15,7 +15,16 @@ import net.minecraft.client.gui.GuiEnchantment;
 
 public class EnchantStrategy implements AIStrategy, AIStrategyFactory {
 
-	private static final int LEVEL = 30;
+
+	private final int level;
+
+	public EnchantStrategy() {
+		this(30);
+	}
+	
+	public EnchantStrategy(int level) {
+		this.level = level;
+	}
 
 	@Override
 	public AIStrategy produceStrategy(AIHelper helper) {
@@ -42,7 +51,7 @@ public class EnchantStrategy implements AIStrategy, AIStrategyFactory {
 	}
 
 	private boolean hasLevelsToEnchant(AIHelper helper) {
-		return helper.getMinecraft().thePlayer.experienceLevel >= LEVEL;
+		return helper.getMinecraft().thePlayer.experienceLevel >= level;
 	}
 
 	private boolean enchantmentTableOpened(AIHelper helper) {
@@ -51,7 +60,7 @@ public class EnchantStrategy implements AIStrategy, AIStrategyFactory {
 
 	@Override
 	public String getDescription() {
-		return "Enchanting for level " + LEVEL;
+		return "Enchanting for level " + level;
 	}
 
 	@Override

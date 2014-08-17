@@ -25,7 +25,7 @@ public class CommandClearArea {
 		@Override
 		public void searchTasks(AIHelper helper) {
 			int max = pathFinder.getAreaSize();
-			if (max <= 10000) {
+			if (max <= 100000) {
 				progress = 100 - Math
 						.round(100f * pathFinder.getToClearCount() / max) + "%";
 			}
@@ -34,7 +34,7 @@ public class CommandClearArea {
 
 		@Override
 		public String getDescription() {
-			return "Clear area:: " + progress;
+			return "Clear area: " + progress;
 		}
 	}
 

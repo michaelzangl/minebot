@@ -4,17 +4,23 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Hashtable;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map.Entry;
 
 import net.famzangl.minecraft.minebot.Pos;
 import net.famzangl.minecraft.minebot.ai.command.AIChatController;
 import net.famzangl.minecraft.minebot.ai.command.IAIControllable;
 import net.famzangl.minecraft.minebot.ai.enchanting.EnchantStrategy;
+import net.famzangl.minecraft.minebot.ai.render.BuildMarkerRenderer;
+import net.famzangl.minecraft.minebot.ai.render.MarkingStrategy;
+import net.famzangl.minecraft.minebot.ai.render.PosMarkerRenderer;
 import net.famzangl.minecraft.minebot.ai.strategy.LayRailStrategy;
 import net.famzangl.minecraft.minebot.ai.strategy.LumberjackStrategy;
 import net.famzangl.minecraft.minebot.ai.strategy.MineStrategy;
 import net.famzangl.minecraft.minebot.ai.strategy.PlantStrategy;
 import net.famzangl.minecraft.minebot.ai.task.AITask;
+import net.famzangl.minecraft.minebot.ai.task.CanPrefaceAndDestroy;
+import net.famzangl.minecraft.minebot.ai.task.SkipWhenSearchingPrefetch;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.settings.KeyBinding;
@@ -57,6 +63,8 @@ public class AIController extends AIHelper implements IAIControllable {
 	protected static final KeyBinding ungrab = new KeyBinding("Ungrab",
 			Keyboard.getKeyIndex("U"), "Command Mod");
 
+	private static final int MAX_LOOKAHEAD = 5;
+
 	static {
 		final KeyBinding mine = new KeyBinding("Farm ores",
 				Keyboard.getKeyIndex("K"), "Command Mod");
@@ -95,13 +103,15 @@ public class AIController extends AIHelper implements IAIControllable {
 
 	private boolean nextPosIsPos2;
 
-	private MarkerRenderer markerRenderer;
+	private PosMarkerRenderer markerRenderer;
 
 	private boolean skipNextTick;
 
 	private boolean inUngrabMode;
 
 	private MouseHelper oldMouseHelper;
+
+	private BuildMarkerRenderer buildMarkerRenderer;
 
 	public AIController() {
 		new AIChatController(this);
@@ -139,7 +149,7 @@ public class AIController extends AIHelper implements IAIControllable {
 		testUngrabMode();
 		invalidateObjectMouseOver();
 		resetAllInputs();
-		
+
 		if (ungrab.isPressed()) {
 			doUngrab = true;
 		}
@@ -178,14 +188,21 @@ public class AIController extends AIHelper implements IAIControllable {
 			if (tasks.isEmpty()) {
 				dead = true;
 			} else {
-				final AITask task = tasks.get(0);
-				if (task.isFinished(this)) {
+				AITask task = tasks.get(0);
+				while (task.isFinished(this)) {
 					tasks.remove(0);
 					resetTimeout();
 					System.out.println("Next task: " + tasks.peekFirst());
 					if (tasks.peekFirst() != null) {
 						timeout = tasks.peekFirst().getGameTickTimeout();
+						task = tasks.peekFirst();
+					} else {
+						task = null;
+						break;
 					}
+				}
+				if (task == null) {
+					// pass
 				} else if (timeout <= 0) {
 					desync = true;
 				} else {
@@ -206,6 +223,37 @@ public class AIController extends AIHelper implements IAIControllable {
 				strategyDescr = "";
 			}
 		}
+	}
+
+	@Override
+	public boolean faceAndDestroyForNextTask() {
+		boolean found = false;
+		for (int i = 1; i < MAX_LOOKAHEAD && i < tasks.size() && !found; i++) {
+			AITask task = tasks.get(i);
+			System.out.println("Prefetching with: " + task);
+			if (tasks.get(i).getClass()
+					.isAnnotationPresent(SkipWhenSearchingPrefetch.class)) {
+				continue;
+			} else if (task instanceof CanPrefaceAndDestroy) {
+				CanPrefaceAndDestroy dTask = (CanPrefaceAndDestroy) task;
+				List<Pos> positions = dTask.getPredestroyPositions(this);
+				for (Pos pos : positions) {
+					if (!isAirBlock(pos.x, pos.y, pos.z)) {
+						faceAndDestroy(pos.x, pos.y, pos.z);
+						found = true;
+						break;
+					}
+				}
+				System.out.println("Prefacing: " + found + " for " + positions);
+			} else {
+				System.out.println("Prefetching showstopper: " + task);
+				break;
+			}
+		}
+		if (!found) {
+			System.out.println("Could not prefetch anything. " + tasks.size());
+		}
+		return found;
 	}
 
 	@SubscribeEvent
@@ -259,15 +307,17 @@ public class AIController extends AIHelper implements IAIControllable {
 			@Override
 			public void mouseXYChange() {
 			}
+
 			@Override
 			public void grabMouseCursor() {
 			}
+
 			@Override
 			public void ungrabMouseCursor() {
 			}
 		};
 	}
-	
+
 	private synchronized void testUngrabMode() {
 		if (oldMouseHelper != null) {
 			if (userTookOver()) {
@@ -297,17 +347,19 @@ public class AIController extends AIHelper implements IAIControllable {
 		final EntityLivingBase player = getMinecraft().renderViewEntity;
 		if (player.getHeldItem() != null
 				&& player.getHeldItem().getItem() == Items.wooden_axe) {
-			final double x = player.lastTickPosX
-					+ (player.posX - player.lastTickPosX) * event.partialTicks;
-			final double y = player.lastTickPosY
-					+ (player.posY - player.lastTickPosY) * event.partialTicks;
-			final double z = player.lastTickPosZ
-					+ (player.posZ - player.lastTickPosZ) * event.partialTicks;
-
 			if (markerRenderer == null) {
-				markerRenderer = new MarkerRenderer();
+				markerRenderer = new PosMarkerRenderer(1, 0, 0);
 			}
-			markerRenderer.render(x, y, z, pos1, pos2);
+			markerRenderer.render(event, this, pos1, pos2);
+		} else if (player.getHeldItem() != null
+				&& player.getHeldItem().getItem() == Items.stick) {
+			if (buildMarkerRenderer == null) {
+				buildMarkerRenderer = new BuildMarkerRenderer();
+			}
+			buildMarkerRenderer.render(event, this);
+		}
+		if (currentStrategy instanceof MarkingStrategy) {
+			((MarkingStrategy) currentStrategy).drawMarkers(event, this);
 		}
 	}
 

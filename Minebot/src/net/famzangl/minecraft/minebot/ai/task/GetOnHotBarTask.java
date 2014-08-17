@@ -15,6 +15,7 @@ import net.minecraft.network.play.client.C16PacketClientStatus;
  * @author michael
  * 
  */
+@SkipWhenSearchingPrefetch
 public class GetOnHotBarTask extends AITask {
 	private final ItemFilter itemFiler;
 	private boolean inventoryOpened;

@@ -39,4 +39,9 @@ public class SlabFilter extends BlockItemFilter {
 			return false;
 		return true;
 	}
+	
+	@Override
+	public String getDescriptiveString() {
+		return type.toString().toLowerCase() + " slabs";
+	}
 }

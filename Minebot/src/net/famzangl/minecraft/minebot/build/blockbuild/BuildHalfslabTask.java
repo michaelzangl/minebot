@@ -13,9 +13,11 @@ public class BuildHalfslabTask extends CubeBuildTask {
 	public static final Block[] BLOCKS = new Block[] { Blocks.stone_slab,
 			Blocks.wooden_slab };
 	private final BlockSide side;
+	private final SlabType slabType;
 
 	public BuildHalfslabTask(Pos forPosition, SlabType slabType, BlockSide up) {
 		super(forPosition, new SlabFilter(slabType));
+		this.slabType = slabType;
 		this.side = up;
 	}
 
@@ -43,5 +45,11 @@ public class BuildHalfslabTask extends CubeBuildTask {
 	public String toString() {
 		return "BuildHalfslabTask [side=" + side + ", blockFilter="
 				+ blockFilter + ", forPosition=" + forPosition + "]";
+	}
+
+	@Override
+	public BuildTask withPositionAndRotation(Pos add, int rotateSteps,
+			MirrorDirection mirror) {
+		return new BuildHalfslabTask(add, slabType, side);
 	}
 }

@@ -51,5 +51,16 @@ public class BlockItemFilter implements ItemFilter {
 			return false;
 		return true;
 	}
-	
+
+	public String getDescriptiveString() {
+		StringBuilder str = new StringBuilder();
+		for (Block m : matched) {
+			if (str.length() > 0) {
+				str.append(", ");
+			}
+			str.append(m.getLocalizedName());
+		}
+		return str.toString();
+	}
+
 }

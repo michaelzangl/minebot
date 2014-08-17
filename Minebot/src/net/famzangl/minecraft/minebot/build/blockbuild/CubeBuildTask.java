@@ -61,4 +61,5 @@ public abstract class CubeBuildTask extends BuildTask {
 	public ItemFilter getRequiredItem() {
 		return blockFilter;
 	}
+	
 }

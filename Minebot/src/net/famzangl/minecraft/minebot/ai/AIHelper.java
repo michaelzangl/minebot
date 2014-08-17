@@ -257,13 +257,11 @@ public abstract class AIHelper {
 	 * @return the position or <code>null</code> if it was not found.
 	 */
 	public Pos findBlock(Block blockType) {
-		final int cx = MathHelper.floor_double(mc.thePlayer.posX);
-		final int cy = MathHelper.floor_double(mc.thePlayer.posY);
-		final int cz = MathHelper.floor_double(mc.thePlayer.posZ);
+		Pos current = getPlayerPosition();
 		Pos pos = null;
-		for (int x = cx - 2; x <= cx + 2; x++) {
-			for (int z = cz - 2; z <= cz + 2; z++) {
-				for (int y = cy - 1; y <= cy + 1; y++) {
+		for (int x = current.x - 2; x <= current.x + 2; x++) {
+			for (int z = current.z - 2; z <= current.z + 2; z++) {
+				for (int y = current.y - 1; y <= current.y + 2; y++) {
 					final Block block = mc.theWorld.getBlock(x, y, z);
 					if (Block.isEqualTo(block, blockType)) {
 						pos = new Pos(x, y, z);
@@ -389,10 +387,9 @@ public abstract class AIHelper {
 	 * @return The position.
 	 */
 	public Pos getPlayerPosition() {
-		final int x = MathHelper.floor_double(getMinecraft().thePlayer.posX);
-		final int y = MathHelper
-				.floor_double(getMinecraft().thePlayer.boundingBox.minY + 0.05);
-		final int z = MathHelper.floor_double(getMinecraft().thePlayer.posZ);
+		final int x = (int) Math.floor(getMinecraft().thePlayer.posX);
+		final int y = (int) Math.floor(getMinecraft().thePlayer.boundingBox.minY + 0.05);
+		final int z = (int) Math.floor(getMinecraft().thePlayer.posZ);
 		return new Pos(x, y, z);
 	}
 
@@ -995,17 +992,32 @@ public abstract class AIHelper {
 	 * @return <code>true</code> after arrival.
 	 */
 	public boolean walkTowards(double x, double z, boolean jump) {
+		return walkTowards(x, z, jump, true);
+	}
+
+	public boolean walkTowards(double x, double z, boolean jump, boolean face) {
 		final double dx = x - mc.thePlayer.posX;
 		final double dz = z - mc.thePlayer.posZ;
 		final double distTo = Math.sqrt(dx * dx + dz * dz);
 		if (distTo > MIN_DISTANCE_ERROR) {
-			face(x, mc.thePlayer.posY, z);
+			if (face) {
+				face(x, mc.thePlayer.posY, z);
+			}
 			double speed = 1;
 			if (distTo < 4 * WALK_PER_STEP) {
 				speed = Math.max(distTo / WALK_PER_STEP / 4, 0.1);
 			}
+			double yaw = mc.thePlayer.rotationYaw / 180 * Math.PI;
+			double lookX = -Math.sin(yaw);
+			double lookZ = Math.cos(yaw);
+			double dlength = Math.sqrt(dx * dx + dz * dz);
+			double same = (lookX * dx + lookZ * dz) / dlength;
+			double strafe = (lookZ * dx - lookX * dz) / dlength;
+			System.out.println("look: " + lookX + "," + lookZ + "; d = " + dx
+					+ "," + dz + "; walk: " + same + "," + strafe);
 			final MovementInput movement = new MovementInput();
-			movement.moveForward = (float) speed;
+			movement.moveForward = (float) (speed * same);
+			movement.moveStrafe = (float) (speed * strafe);
 			movement.jump = jump;
 			overrideMovement(movement);
 			if (distTo < 0.5) {
@@ -1106,9 +1118,23 @@ public abstract class AIHelper {
 				+ pos);
 	}
 
-	public int getLightAt(Pos currentPos) {
-		return mc.theWorld.getBlockLightValue(currentPos.x, currentPos.y,
-				currentPos.z);
+	public int getLightAt(Pos pos) {
+        Chunk chunk = mc.theWorld.getChunkFromChunkCoords(pos.x >> 4, pos.z >> 4);
+        ExtendedBlockStorage storage = chunk.getBlockStorageArray()[pos.y >> 4];
+        if (storage == null) {
+        	return 0;
+        } else {
+        	return storage.getExtBlocklightValue(pos.x & 15, pos.y & 15, pos.z & 15);
+        }
 	}
 
+	/**
+	 * This can be called by the current task to do a look ahead and already let
+	 * the next task to it's face and destroy. Use with care.
+	 * 
+	 * @return
+	 */
+	public boolean faceAndDestroyForNextTask() {
+		return false;
+	}
 }

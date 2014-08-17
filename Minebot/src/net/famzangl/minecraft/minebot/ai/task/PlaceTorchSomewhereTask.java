@@ -16,6 +16,7 @@ import net.minecraftforge.common.util.ForgeDirection;
  * @author michael
  * 
  */
+@SkipWhenSearchingPrefetch
 public class PlaceTorchSomewhereTask extends AITask {
 	private LinkedList<PosAndDir> attemptOnPositions;
 	private final List<Pos> places;

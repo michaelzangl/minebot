@@ -19,7 +19,9 @@ import net.famzangl.minecraft.minebot.ai.commands.CommandTunnel;
 import net.famzangl.minecraft.minebot.ai.commands.CommandUngrab;
 import net.famzangl.minecraft.minebot.build.commands.CommandBuild;
 import net.famzangl.minecraft.minebot.build.commands.CommandClearArea;
+import net.famzangl.minecraft.minebot.build.commands.CommandCount;
 import net.famzangl.minecraft.minebot.build.commands.CommandListBuilds;
+import net.famzangl.minecraft.minebot.build.commands.CommandMove;
 import net.famzangl.minecraft.minebot.build.commands.CommandReset;
 import net.famzangl.minecraft.minebot.build.commands.CommandReverse;
 import net.famzangl.minecraft.minebot.build.commands.CommandScheduleBuild;
@@ -74,6 +76,8 @@ public class AIChatController {
 		registerCommand(CommandStepWalk.class);
 		registerCommand(CommandListBuilds.class);
 		registerCommand(CommandReverse.class);
+		registerCommand(CommandMove.class);
+		registerCommand(CommandCount.class);
 	}
 
 	public AIChatController(IAIControllable c) {
@@ -100,8 +104,9 @@ public class AIChatController {
 		controlled.getMinecraft().thePlayer
 				.addChatMessage(new ChatComponentText(string));
 	}
-	
-	public static <T> void addToChatPaged(String title, int page, List<T> data, Function<T, String> convert) {
+
+	public static <T> void addToChatPaged(String title, int page, List<T> data,
+			Function<T, String> convert) {
 		AIChatController.addChatLine(title + " " + page + " / "
 				+ (int) Math.ceil((float) data.size() / PER_PAGE));
 		for (int i = Math.max(0, page - 1) * PER_PAGE; i < Math.min(page

@@ -84,5 +84,10 @@ public class ColoredBlockItemFilter extends BlockItemFilter {
 			return false;
 		return true;
 	}
+	
+	@Override
+	public String getDescriptiveString() {
+		return COLORS[colorMeta] + " " + super.getDescriptiveString();
+	}
 
 }

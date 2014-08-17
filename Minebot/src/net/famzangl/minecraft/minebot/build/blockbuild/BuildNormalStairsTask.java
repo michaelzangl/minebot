@@ -20,7 +20,8 @@ public class BuildNormalStairsTask extends CubeBuildTask {
 			Blocks.quartz_stairs };
 	private final ForgeDirection upwardsDirection;
 	private final boolean inverted;
-	
+	private final Block stairs;
+
 	public static enum Half {
 		UPPER,
 		LOWER
@@ -29,6 +30,7 @@ public class BuildNormalStairsTask extends CubeBuildTask {
 	public BuildNormalStairsTask(Pos forPosition, Block stairs,
 			ForgeDirection upwardsDirection, Half half) {
 		super(forPosition, new BlockItemFilter(stairs));
+		this.stairs = stairs;
 		this.upwardsDirection = upwardsDirection;
 		this.inverted = half == Half.UPPER;
 		if (upwardsDirection != ForgeDirection.EAST
@@ -62,6 +64,31 @@ public class BuildNormalStairsTask extends CubeBuildTask {
 		return "BuildNormalStairsTask [upwardsDirection=" + upwardsDirection
 				+ ", inverted=" + inverted + ", blockFilter=" + blockFilter
 				+ ", forPosition=" + forPosition + "]";
+	}
+
+	@Override
+	public BuildTask withPositionAndRotation(Pos add, int rotateSteps,
+			MirrorDirection mirror) {
+		ForgeDirection dir = upwardsDirection;
+		for (int i = 0; i < rotateSteps; i++) {
+			dir = dir.getRotation(ForgeDirection.UP);
+		}
+
+		if (mirror == MirrorDirection.EAST_WEST && dir == ForgeDirection.EAST) {
+			dir = ForgeDirection.WEST;
+		} else if (mirror == MirrorDirection.EAST_WEST
+				&& dir == ForgeDirection.WEST) {
+			dir = ForgeDirection.EAST;
+		} else if (mirror == MirrorDirection.NORTH_SOUTH
+				&& dir == ForgeDirection.NORTH) {
+			dir = ForgeDirection.SOUTH;
+		} else if (mirror == MirrorDirection.NORTH_SOUTH
+				&& dir == ForgeDirection.SOUTH) {
+			dir = ForgeDirection.NORTH;
+		}
+
+		return new BuildNormalStairsTask(add, stairs, dir,
+				inverted ? Half.UPPER : Half.LOWER);
 	}
 
 }

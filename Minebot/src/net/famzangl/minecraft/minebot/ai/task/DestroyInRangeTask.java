@@ -1,11 +1,14 @@
 package net.famzangl.minecraft.minebot.ai.task;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 import net.famzangl.minecraft.minebot.Pos;
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 
-public class DestroyInRangeTask extends AITask {
+public class DestroyInRangeTask extends AITask implements CanPrefaceAndDestroy {
 
 	private final Pos minPos;
 	private final Pos maxPos;
@@ -103,5 +106,11 @@ public class DestroyInRangeTask extends AITask {
 
 	public void blacklist(Pos pos) {
 		blacklist.add(pos);
+	}
+
+	@Override
+	public List<Pos> getPredestroyPositions(AIHelper helper) {
+		Pos next = getNextToDestruct(helper);
+		return next != null ? Arrays.asList(next) : Collections.<Pos>emptyList();
 	}
 }

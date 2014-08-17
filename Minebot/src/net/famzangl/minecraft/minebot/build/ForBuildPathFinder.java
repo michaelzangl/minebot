@@ -5,6 +5,7 @@ import java.util.LinkedList;
 
 import net.famzangl.minecraft.minebot.Pos;
 import net.famzangl.minecraft.minebot.ai.AIHelper;
+import net.famzangl.minecraft.minebot.ai.BlockItemFilter;
 import net.famzangl.minecraft.minebot.ai.path.MovePathFinder;
 import net.famzangl.minecraft.minebot.ai.task.move.AlignToGridTask;
 import net.famzangl.minecraft.minebot.build.blockbuild.BuildTask;
@@ -21,9 +22,12 @@ public class ForBuildPathFinder extends MovePathFinder {
 	 */
 	private final BuildTask task;
 	int[] res = new int[NEIGHBOURS_PER_DIRECTION * 4];
+	private final boolean canBuildUp;
+	private boolean noPathFound;
 
 	public ForBuildPathFinder(AIHelper helper, BuildTask task) {
 		super(helper);
+		canBuildUp = helper.canSelectItem(new BlockItemFilter(Blocks.carpet));
 		this.task = task;
 	}
 
@@ -46,7 +50,8 @@ public class ForBuildPathFinder extends MovePathFinder {
 	private void getNeighbours(int[] fill, int offset, int currentNode, int x,
 			int z) {
 		final int cy = getY(currentNode);
-		for (int y = cy + 1; y < cy + 4; y++) {
+		int  max = canBuildUp ? 3 : 1;
+		for (int y = cy + 1; y <= cy + max; y++) {
 			if (!helper.isAirBlock(getX(currentNode), y + 1, getZ(currentNode))) {
 				break;
 			}
@@ -103,6 +108,16 @@ public class ForBuildPathFinder extends MovePathFinder {
 			helper.addTask(new WalkTowardsTask(currentPos, nextPos));
 			currentPos = nextPos;
 		}
+		noPathFound = true;
+	}
+	
+	@Override
+	protected void noPathFound() {
+		noPathFound = true;
+		super.noPathFound();
 	}
 
+	public boolean isNoPathFound() {
+		return noPathFound;
+	}
 }

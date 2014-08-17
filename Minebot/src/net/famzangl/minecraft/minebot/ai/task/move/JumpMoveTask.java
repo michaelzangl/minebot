@@ -1,5 +1,8 @@
 package net.famzangl.minecraft.minebot.ai.task.move;
 
+import java.util.List;
+
+import net.famzangl.minecraft.minebot.Pos;
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 
 public class JumpMoveTask extends HorizontalMoveTask {
@@ -35,4 +38,10 @@ public class JumpMoveTask extends HorizontalMoveTask {
 				+ ", y=" + y + ", z=" + z + "]";
 	}
 
+	@Override
+	public List<Pos> getPredestroyPositions(AIHelper helper) {
+		List<Pos> list = super.getPredestroyPositions(helper);
+		list.add(0, new Pos(oldX, y + 1, oldZ));
+		return list;
+	}
 }

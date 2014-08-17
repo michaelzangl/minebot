@@ -7,9 +7,11 @@ import net.famzangl.minecraft.minebot.Pos;
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.BlockItemFilter;
 import net.famzangl.minecraft.minebot.ai.task.PlaceTorchSomewhereTask;
+import net.famzangl.minecraft.minebot.ai.task.SkipWhenSearchingPrefetch;
 import net.minecraft.init.Blocks;
 import net.minecraftforge.common.util.ForgeDirection;
 
+@SkipWhenSearchingPrefetch
 public class PlaceTorchIfLightBelowTask extends PlaceTorchSomewhereTask {
 
 	private static final BlockItemFilter TORCH_FILTER = new BlockItemFilter(

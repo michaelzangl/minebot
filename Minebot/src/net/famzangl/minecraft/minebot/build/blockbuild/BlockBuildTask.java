@@ -10,9 +10,10 @@ public class BlockBuildTask extends CubeBuildTask {
 	public static final Block[] BLOCKS = new Block[] { Blocks.dirt,
 			Blocks.stone, Blocks.cobblestone, Blocks.beacon, Blocks.bookshelf,
 			Blocks.brick_block, Blocks.cake, Blocks.coal_block,
-			Blocks.crafting_table, Blocks.diamond_block, Blocks.emerald_block,
-			Blocks.end_stone, Blocks.glass, Blocks.gold_block, Blocks.grass,
-			Blocks.gravel, Blocks.hay_block, Blocks.iron_block,
+			Blocks.coal_ore, Blocks.crafting_table, Blocks.diamond_block,
+			Blocks.diamond_ore, Blocks.emerald_block, Blocks.emerald_ore,
+			Blocks.end_stone, Blocks.glass, Blocks.gold_block, Blocks.gold_ore,
+			Blocks.grass, Blocks.gravel, Blocks.hay_block, Blocks.iron_block,
 			Blocks.iron_ore, Blocks.lapis_block, Blocks.lapis_ore,
 			Blocks.melon_block, Blocks.mossy_cobblestone, Blocks.nether_brick,
 			Blocks.netherrack, Blocks.obsidian, Blocks.pumpkin,
@@ -21,12 +22,22 @@ public class BlockBuildTask extends CubeBuildTask {
 			Blocks.sand, Blocks.stonebrick, Blocks.tnt };
 
 	public BlockBuildTask(Pos forPosition, Block blockToPlace) {
-		super(forPosition, new BlockItemFilter(blockToPlace));
+		this(forPosition, new BlockItemFilter(blockToPlace));
+	}
+
+	private BlockBuildTask(Pos forPosition, BlockItemFilter blockFilter) {
+		super(forPosition, blockFilter);
 	}
 
 	@Override
 	public String toString() {
 		return "BlockBuildTask [blockFilter=" + blockFilter + ", forPosition="
 				+ forPosition + "]";
+	}
+
+	@Override
+	public BuildTask withPositionAndRotation(Pos add, int rotateSteps,
+			MirrorDirection mirror) {
+		return new BlockBuildTask(add, this.blockFilter);
 	}
 }

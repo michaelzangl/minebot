@@ -31,13 +31,15 @@ public class SneakAndPlaceAtHalfTask extends SneakAndPlaceTask {
 	@Override
 	protected void faceBlock(AIHelper h) {
 		final ForgeDirection[] dirs = getBuildDirs();
+		attempts++;
 		for (int i = 0; i < dirs.length; i++) {
-			final ForgeDirection useSide = dirs[attempts % dirs.length];
+			final ForgeDirection useSide = dirs[attempts / 10 % dirs.length];
 			if (!h.isAirBlock(x + useSide.offsetX, y - 1, z + useSide.offsetZ)) {
 				faceSideBlock(h, useSide);
 				return;
+			} else {
+				attempts += 10;
 			}
-			attempts++;
 		}
 		h.desync();
 	}

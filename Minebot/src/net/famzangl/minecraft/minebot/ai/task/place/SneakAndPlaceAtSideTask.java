@@ -18,9 +18,9 @@ public class SneakAndPlaceAtSideTask extends SneakAndPlaceAtHalfTask {
 	@Override
 	protected ForgeDirection[] getBuildDirs() {
 		return new ForgeDirection[] {
+				lookingDirection,
 				lookingDirection.getRotation(ForgeDirection.UP),
-				lookingDirection.getRotation(ForgeDirection.DOWN),
-				lookingDirection };
+				lookingDirection.getRotation(ForgeDirection.DOWN)};
 	}
 
 	@Override

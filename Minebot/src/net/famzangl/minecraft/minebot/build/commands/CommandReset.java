@@ -16,7 +16,7 @@ public class CommandReset {
 		@Override
 		public void searchTasks(AIHelper helper) {
 			if (helper.buildManager.peekNextTask() != null) {
-				helper.addTask(new NextTaskTask(10));
+				helper.addTask(new NextTaskTask(10000));
 			}
 		}
 

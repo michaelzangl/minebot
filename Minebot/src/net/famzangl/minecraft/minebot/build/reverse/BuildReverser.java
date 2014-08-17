@@ -51,7 +51,7 @@ public class BuildReverser {
 			out.println("# Pos1: " + pos1);
 			out.println("# Pos2: " + pos2);
 			out.println("");
-			out.println("/minebuild clear");
+			out.println("/minebuild reset");
 			out.println("");
 			for (int y = pos1.y; y <= pos2.y; y++) {
 				out.println("# Layer " + (y - pos1.y));
@@ -63,7 +63,7 @@ public class BuildReverser {
 				}
 				out.println("");
 			}
-			out.println("/minebuild build");
+			out.println("#/minebuild build");
 
 			if (missingBlocks >0) {
 				AIChatController.addChatLine("Could not convert " + missingBlocks + "blocks. They will be missing.");

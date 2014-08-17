@@ -2,6 +2,7 @@ package net.famzangl.minecraft.minebot.ai.task;
 
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 
+@SkipWhenSearchingPrefetch
 public class WaitTask extends AITask {
 
 	public static WaitTask instance = new WaitTask();

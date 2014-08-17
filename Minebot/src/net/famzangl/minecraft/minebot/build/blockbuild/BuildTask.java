@@ -83,10 +83,10 @@ public abstract class BuildTask {
 			String up;
 			Pos[] standable;
 			if ((blockMetadata & 0x4) == 0) {
-				up = "normal";
+				up = "lower";
 				standable = new Pos[] { new Pos(0, 0, 0), p1, p2, p3 };
 			} else {
-				up = "up";
+				up = "upper";
 				standable = new Pos[] { p1, p2, p3 };
 			}
 			return new TaskDescription(name + " "
@@ -155,4 +155,13 @@ public abstract class BuildTask {
 	}
 
 	public abstract ItemFilter getRequiredItem();
+
+	/**
+	 * @param add
+	 * @param rotateSteps 0..3 Steps of ForgeDirection.rotate(UP).
+	 * @param mirror Applied after rotate (if possible);
+	 * @return
+	 */
+	public abstract BuildTask withPositionAndRotation(Pos add, int rotateSteps, MirrorDirection mirror);
+
 }

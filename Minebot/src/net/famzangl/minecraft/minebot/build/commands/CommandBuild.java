@@ -1,5 +1,7 @@
 package net.famzangl.minecraft.minebot.build.commands;
 
+import java.util.List;
+
 import net.famzangl.minecraft.minebot.Pos;
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.AIStrategy;
@@ -8,6 +10,8 @@ import net.famzangl.minecraft.minebot.ai.command.AICommand;
 import net.famzangl.minecraft.minebot.ai.command.AICommandInvocation;
 import net.famzangl.minecraft.minebot.ai.command.AICommandParameter;
 import net.famzangl.minecraft.minebot.ai.command.ParameterType;
+import net.famzangl.minecraft.minebot.ai.render.MarkingStrategy;
+import net.famzangl.minecraft.minebot.ai.render.PosMarkerRenderer;
 import net.famzangl.minecraft.minebot.ai.task.AITask;
 import net.famzangl.minecraft.minebot.ai.task.GetOnHotBarTask;
 import net.famzangl.minecraft.minebot.ai.task.WaitTask;
@@ -15,13 +19,19 @@ import net.famzangl.minecraft.minebot.ai.task.move.AlignToGridTask;
 import net.famzangl.minecraft.minebot.build.ForBuildPathFinder;
 import net.famzangl.minecraft.minebot.build.NextTaskTask;
 import net.famzangl.minecraft.minebot.build.blockbuild.BuildTask;
+import net.minecraftforge.client.event.RenderWorldLastEvent;
 
 @AICommand(helpText = "Runs all tasks that are scheduled for building.", name = "minebuild")
 public class CommandBuild {
 
-	private static final class BuildStrategy implements AIStrategy {
+	private static final class BuildStrategy implements AIStrategy,
+			MarkingStrategy {
 		private boolean alignSend;
 		private ForBuildPathFinder pathFinder;
+
+		private final PosMarkerRenderer renderer = new PosMarkerRenderer(1, 1,
+				0);
+		private final Pos[] positions = new Pos[5];
 
 		@Override
 		public void searchTasks(AIHelper helper) {
@@ -39,6 +49,9 @@ public class CommandBuild {
 				if (!pathFinder.searchSomethingAround(helper
 						.getPlayerPosition())) {
 					helper.addTask(WaitTask.instance);
+				} else if (pathFinder.isNoPathFound()) {
+					AIChatController
+							.addChatLine("Cannot navigate to next build task.");
 				}
 			} else {
 				helper.addTask(new GetOnHotBarTask(task.getRequiredItem()));
@@ -46,6 +59,14 @@ public class CommandBuild {
 				helper.addTask(new NextTaskTask());
 				alignSend = false;
 				pathFinder = null;
+			}
+			reloadPositions(helper.buildManager.getScheduled());
+		}
+
+		private void reloadPositions(List<BuildTask> list) {
+			for (int i = 0; i < positions.length; i++) {
+				positions[i] = i < list.size() ? list.get(i).getForPosition()
+						: null;
 			}
 		}
 
@@ -57,6 +78,11 @@ public class CommandBuild {
 		@Override
 		public String getDescription() {
 			return "Building.";
+		}
+
+		@Override
+		public void drawMarkers(RenderWorldLastEvent event, AIHelper helper) {
+			renderer.render(event, helper, positions);
 		}
 	}
 

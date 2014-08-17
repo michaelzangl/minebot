@@ -9,6 +9,7 @@ import net.famzangl.minecraft.minebot.Pos;
 import net.famzangl.minecraft.minebot.ai.ItemFilter;
 import net.famzangl.minecraft.minebot.ai.command.AIChatController;
 import net.famzangl.minecraft.minebot.build.blockbuild.BuildTask;
+import net.famzangl.minecraft.minebot.build.commands.CommandCount;
 
 public class BuildManager {
 
@@ -45,7 +46,7 @@ public class BuildManager {
 
 	public void missingItem(ItemFilter itemFiler) {
 		if (itemFiler != lastMissing) {
-			AIChatController.addChatLine("Cannot handle missing item: " + itemFiler);
+			AIChatController.addChatLine("Cannot handle missing item: " + CommandCount.niceFilterName(itemFiler));
 		}
 		lastMissing = itemFiler;
 	}

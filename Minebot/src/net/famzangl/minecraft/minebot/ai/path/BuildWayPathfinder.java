@@ -6,15 +6,18 @@ import java.util.Collections;
 
 import net.famzangl.minecraft.minebot.Pos;
 import net.famzangl.minecraft.minebot.ai.AIHelper;
+import net.famzangl.minecraft.minebot.ai.BlockItemFilter;
 import net.famzangl.minecraft.minebot.ai.task.AITask;
 import net.famzangl.minecraft.minebot.ai.task.BlockSide;
 import net.famzangl.minecraft.minebot.ai.task.DestroyInRangeTask;
+import net.famzangl.minecraft.minebot.ai.task.GetOnHotBarTask;
 import net.famzangl.minecraft.minebot.ai.task.PlaceBlockTask;
 import net.famzangl.minecraft.minebot.ai.task.PlaceTorchSomewhereTask;
 import net.famzangl.minecraft.minebot.build.WalkTowardsTask;
 import net.famzangl.minecraft.minebot.build.blockbuild.BlockBuildTask;
 import net.famzangl.minecraft.minebot.build.blockbuild.BuildHalfslabTask;
 import net.famzangl.minecraft.minebot.build.blockbuild.CubeBuildTask;
+import net.famzangl.minecraft.minebot.build.blockbuild.SlabFilter;
 import net.famzangl.minecraft.minebot.build.blockbuild.SlabType;
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
@@ -89,6 +92,11 @@ public class BuildWayPathfinder extends AlongTrackPathFinder {
 		 * @param currentPos
 		 */
 		public void addConstructionTasks(Pos currentPos) {
+			helper.addTask(new GetOnHotBarTask(new SlabFilter(FLOOR)));
+			if (placeTorch) {
+				helper.addTask(new GetOnHotBarTask(new BlockItemFilter(Blocks.torch)));
+			}
+			
 			Pos first = getPos(0, -1);
 			AITask placeTask = new BuildHalfslabTask(first, FLOOR,
 					BlockSide.LOWER_HALF).getPlaceBlockTask(currentPos
@@ -199,6 +207,13 @@ public class BuildWayPathfinder extends AlongTrackPathFinder {
 		public BridgeWayType(int stepIndex) {
 			super(stepIndex);
 		}
+		
+		@Override
+		public void addConstructionTasks(Pos currentPos) {
+			helper.addTask(new GetOnHotBarTask(new BlockItemFilter(BRIDGE_WALL)));
+			helper.addTask(new GetOnHotBarTask(new BlockItemFilter(BRIDGE_SIDE)));
+			super.addConstructionTasks(currentPos);
+		}
 
 		@Override
 		protected void addFarSideBuildTasks() {
@@ -264,6 +279,14 @@ public class BuildWayPathfinder extends AlongTrackPathFinder {
 
 		public FlatlandWayType(int stepIndex) {
 			super(stepIndex);
+		}
+		
+		@Override
+		public void addConstructionTasks(Pos currentPos) {
+			if (placeTorch) {
+				helper.addTask(new GetOnHotBarTask(new BlockItemFilter(BRIDGE_SIDE)));
+			}
+			super.addConstructionTasks(currentPos);
 		}
 
 		@Override

@@ -156,7 +156,7 @@ public class PathFinderField implements Comparator<Integer> {
 
 	}
 
-	public boolean searchSomethingAround(Pos playerPosition) {
+	public final boolean searchSomethingAround(Pos playerPosition) {
 		return searchSomethingAround(playerPosition.x, playerPosition.y,
 				playerPosition.z);
 	}

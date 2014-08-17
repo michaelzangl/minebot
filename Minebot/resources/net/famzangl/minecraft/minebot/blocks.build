@@ -1,0 +1,26 @@
+# Simple test case.
+# Layer 0
+/minebuild schedule ~0 ~0 ~0 stonebrick
+/minebuild schedule ~0 ~0 ~1 crafting_table
+# Missing: ~0 ~0 ~2 Sandstone
+# Missing: ~0 ~0 ~3 Sandstone
+/minebuild schedule ~0 ~0 ~4 cobblestone
+/minebuild schedule ~0 ~0 ~5 dirt
+/minebuild schedule ~1 ~0 ~5 dirt
+/minebuild schedule ~1 ~0 ~4 sand
+/minebuild schedule ~1 ~0 ~3 coal_ore
+# Missing: ~1 ~0 ~2 Sandstone
+/minebuild schedule ~1 ~0 ~1 diamond_block
+/minebuild schedule ~1 ~0 ~0 melon_block
+/minebuild schedule ~2 ~0 ~0 nether_brick
+/minebuild schedule ~2 ~0 ~1 diamond_ore
+/minebuild schedule ~2 ~0 ~2 gold_block
+/minebuild schedule ~2 ~0 ~3 iron_ore
+/minebuild schedule ~2 ~0 ~4 sand
+/minebuild schedule ~2 ~0 ~5 grass
+/minebuild schedule ~3 ~0 ~5 stone
+/minebuild schedule ~3 ~0 ~4 gravel
+/minebuild schedule ~3 ~0 ~3 gold_ore
+/minebuild schedule ~3 ~0 ~2 brick_block
+/minebuild schedule ~3 ~0 ~1 bookshelf
+/minebuild schedule ~3 ~0 ~0 emerald_ore

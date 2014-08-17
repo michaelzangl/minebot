@@ -1,0 +1,21 @@
+
+/minebuild schedule ~0 ~0 ~1 oak_stairs south lower
+/minebuild schedule ~0 ~0 ~0 oak_stairs west upper
+/minebuild schedule ~0 ~0 ~3 oak_stairs north lower
+/minebuild schedule ~0 ~0 ~4 stone_stairs south lower
+/minebuild schedule ~1 ~0 ~4 brick_stairs south lower
+/minebuild schedule ~1 ~0 ~3 dark_oak_stairs north lower
+/minebuild schedule ~2 ~0 ~0 oak_stairs west lower
+/minebuild schedule ~2 ~0 ~1 oak_stairs south lower
+/minebuild schedule ~2 ~0 ~3 acacia_stairs north lower
+/minebuild schedule ~2 ~0 ~4 stone_brick_stairs south lower
+/minebuild schedule ~3 ~0 ~4 nether_brick_stairs south lower
+/minebuild schedule ~3 ~0 ~3 quartz_stairs north lower
+/minebuild schedule ~3 ~0 ~1 oak_stairs east lower
+/minebuild schedule ~3 ~0 ~0 oak_stairs north lower
+/minebuild schedule ~4 ~0 ~3 jungle_stairs north lower
+/minebuild schedule ~4 ~0 ~4 sandstone_stairs south lower
+/minebuild schedule ~5 ~0 ~4 spruce_stairs south lower
+/minebuild schedule ~5 ~0 ~3 birch_stairs north lower
+/minebuild schedule ~5 ~0 ~1 oak_stairs south lower
+/minebuild schedule ~5 ~0 ~0 oak_stairs north upper

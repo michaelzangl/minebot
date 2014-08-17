@@ -42,4 +42,8 @@ public class WoodItemFilter extends BlockItemFilter {
 		return true;
 	}
 
+	@Override
+	public String getDescriptiveString() {
+		return woodType.toString().toLowerCase() + " planks";
+	}
 }

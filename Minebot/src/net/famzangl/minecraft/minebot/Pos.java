@@ -94,4 +94,8 @@ public class Pos {
 		return new Pos(x - pos.x, y - pos.y, z - pos.z);
 	}
 
+	public Pos multiply(int howMuch) {
+		return new Pos(x * howMuch, y * howMuch, z * howMuch);
+	}
+
 }

@@ -1,5 +1,8 @@
 package net.famzangl.minecraft.minebot.ai.path;
 
+import java.util.HashSet;
+import java.util.LinkedList;
+
 import net.famzangl.minecraft.minebot.Pos;
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.task.DestroyInRangeTask;
@@ -10,6 +13,8 @@ public class ClearAreaPathfinder extends MovePathFinder {
 	private final Pos minPos;
 	private final Pos maxPos;
 	private int topY;
+	private final HashSet<Pos> foundPositions = new HashSet<Pos>();
+	private Pos pathEndPosition;
 
 	public ClearAreaPathfinder(AIHelper helper) {
 		super(helper);
@@ -19,28 +24,70 @@ public class ClearAreaPathfinder extends MovePathFinder {
 	}
 
 	@Override
+	public boolean searchSomethingAround(int cx, int cy, int cz) {
+		foundPositions.clear();
+		pathEndPosition = new Pos(cx, cy, cz);
+		do {
+			boolean finished = super.searchSomethingAround(pathEndPosition.x,
+					pathEndPosition.y, pathEndPosition.z);
+			if (!finished) {
+				return false;
+			}
+		} while (foundPositions.size() < 20 && pathEndPosition != null);
+		return true;
+	}
+
+	@Override
+	protected void foundPath(LinkedList<Pos> path) {
+		for (Pos p : path) {
+			foundPositions.add(p);
+			foundPositions.add(p.add(0, 1, 0));
+			pathEndPosition = p;
+		}
+
+		super.foundPath(path);
+	}
+
+	@Override
+	protected void noPathFound() {
+		pathEndPosition = null;
+		super.noPathFound();
+	}
+
+	@Override
 	protected float rateDestination(int distance, int x, int y, int z) {
 		if (isInArea(x, y, z)
-				&& (!isClearedBlock(x, y, z) || (!isClearedBlock(x,
+				&& (!isTemporaryCleared(x, y, z) || (!isTemporaryCleared(x,
 						y + 1, z) && y < maxPos.y))) {
 			float bonus = 0.0001f * (x - minPos.x) + 0.001f * (y - minPos.y);
-			return distance + bonus + (topY <= y ? 5 : (maxPos.y - y) * 3);
+			int layerMalus;
+			if (topY <= y)
+				layerMalus = 5;
+			else if (!isInArea(x, y+1, z) || isTemporaryCleared(x, y + 1, z))
+				layerMalus = 2;
+			else if (isInArea(x, y+1, z) && !isTemporaryCleared(x, y + 2, z))
+				layerMalus = 2;
+			else
+				layerMalus = 0;
+			return distance + bonus + layerMalus + (maxPos.y - y) * 2;
 		} else {
 			return -1;
 		}
 	}
 
+	private boolean isTemporaryCleared(int x, int y, int z) {
+		return isClearedBlock(x, y, z)
+				|| foundPositions.contains(new Pos(x, y, z));
+	}
+
 	private boolean isInArea(int x, int y, int z) {
-		return minPos.x <= x
-				&& x <= maxPos.x
-				&& minPos.y <= y
-				&& y <= maxPos.y
-				&& minPos.z <= z
-				&& z <= maxPos.z;
+		return minPos.x <= x && x <= maxPos.x && minPos.y <= y && y <= maxPos.y
+				&& minPos.z <= z && z <= maxPos.z;
 	}
 
 	private boolean isClearedBlock(int x, int y, int z) {
-		return AIHelper.blockIsOneOf(helper.getBlock(x, y, z), Blocks.air, Blocks.torch);
+		return AIHelper.blockIsOneOf(helper.getBlock(x, y, z), Blocks.air,
+				Blocks.torch);
 	}
 
 	@Override
@@ -55,7 +102,7 @@ public class ClearAreaPathfinder extends MovePathFinder {
 		}
 		helper.addTask(new DestroyInRangeTask(currentPos, top));
 	}
-	
+
 	@Override
 	protected int materialDistance(int x, int y, int z, boolean asFloor) {
 		return isInArea(x, y, z) ? 0 : super.materialDistance(x, y, z, asFloor);
@@ -80,6 +127,7 @@ public class ClearAreaPathfinder extends MovePathFinder {
 			}
 		}
 		topY = newTopY;
+		System.out.println("top Y:  " + newTopY);
 		return count;
 	}
 }

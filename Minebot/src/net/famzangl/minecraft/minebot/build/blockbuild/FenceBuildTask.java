@@ -14,7 +14,11 @@ public class FenceBuildTask extends CubeBuildTask {
 			Blocks.cobblestone_wall, Blocks.nether_brick_fence };
 
 	public FenceBuildTask(Pos forPosition, Block blockToPlace) {
-		super(forPosition, new BlockItemFilter(blockToPlace));
+		this(forPosition, new BlockItemFilter(blockToPlace));
+	}
+
+	public FenceBuildTask(Pos forPosition, BlockItemFilter blockItemFilter) {
+		super(forPosition, blockItemFilter);
 	}
 
 	@Override
@@ -27,4 +31,14 @@ public class FenceBuildTask extends CubeBuildTask {
 		return 1.5;
 	}
 
+	@Override
+	protected double getMinHeightToBuild() {
+		return super.getMinHeightToBuild();
+	}
+
+	@Override
+	public BuildTask withPositionAndRotation(Pos add, int rotateSteps,
+			MirrorDirection mirror) {
+		return new FenceBuildTask(add, blockFilter);
+	}
 }

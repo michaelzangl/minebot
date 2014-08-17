@@ -39,5 +39,10 @@ public class LogItemFilter extends BlockItemFilter {
 			return false;
 		return true;
 	}
-	
+
+	@Override
+	public String getDescriptiveString() {
+		return logType.toString().toLowerCase() + " logs";
+	}
+
 }
