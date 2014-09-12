@@ -24,7 +24,7 @@ public abstract class AIStrategy {
 		 * This stategy did not do anything and has nothing more to do
 		 * currently. Deactivate it.
 		 */
-		NO_MORE_WORK
+		NO_MORE_WORK, ABORT
 	};
 
 	private boolean active;
@@ -100,9 +100,10 @@ public abstract class AIStrategy {
 
 	/**
 	 * 
+	 * @param helper TODO
 	 * @return A String to display in the top right hand corner of the screen.
 	 */
-	public String getDescription() {
+	public String getDescription(AIHelper helper) {
 		return "No description so far... " + getClass().getSimpleName();
 	}
 

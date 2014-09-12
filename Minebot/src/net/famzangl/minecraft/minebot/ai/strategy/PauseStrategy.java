@@ -5,6 +5,7 @@ import net.famzangl.minecraft.minebot.ai.AIHelper;
 public class PauseStrategy extends AIStrategy {
 
 	private int leftTicks;
+	private boolean shouldTickAgain;
 
 	public PauseStrategy(int seconds) {
 		super();
@@ -18,11 +19,20 @@ public class PauseStrategy extends AIStrategy {
 
 	@Override
 	protected TickResult onGameTick(AIHelper helper) {
-		if (leftTicks > 0) {
+		if (shouldTickAgain) {
+			shouldTickAgain = false;
+			return TickResult.TICK_AGAIN;
+		} else if (leftTicks > 0) {
 			leftTicks--;
+			shouldTickAgain = true;
 			return TickResult.TICK_HANDLED;
 		}
 		return TickResult.NO_MORE_WORK;
+	}
+	
+	@Override
+	public String getDescription(AIHelper helper) {
+		return "Pausing for " + (leftTicks / 20) + "s";
 	}
 
 }

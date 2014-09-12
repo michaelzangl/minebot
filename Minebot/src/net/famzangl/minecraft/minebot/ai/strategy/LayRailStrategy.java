@@ -16,6 +16,6 @@ public class LayRailStrategy implements AIStrategyFactory {
 		return ValueActionStrategy.makeSafe(new PathFinderStrategy(
 				new LayRailPathFinder(horizontalLook.offsetX,
 						horizontalLook.offsetZ, p.x, p.y, p.z),
-				"Building a railway"));
+				"Building a railway"), true);
 	}
 }

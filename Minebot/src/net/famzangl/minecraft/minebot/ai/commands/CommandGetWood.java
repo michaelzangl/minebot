@@ -18,7 +18,7 @@ public class CommandGetWood {
 			AIHelper helper,
 			@AICommandParameter(type = ParameterType.FIXED, fixedName = "lumberjack", description = "") String nameArg) {
 		return ValueActionStrategy.makeSafe(new PathFinderStrategy(
-				new TreePathFinder(null), "Getting some wood"));
+				new TreePathFinder(null), "Getting some wood"), true);
 	}
 
 	@AICommandInvocation()
@@ -27,7 +27,7 @@ public class CommandGetWood {
 			@AICommandParameter(type = ParameterType.FIXED, fixedName = "lumberjack", description = "") String nameArg,
 			@AICommandParameter(type = ParameterType.ENUM, description = "wood type") WoodType type) {
 		return ValueActionStrategy.makeSafe(new PathFinderStrategy(
-				new TreePathFinder(type), "Getting some wood"));
+				new TreePathFinder(type), "Getting some wood"), true);
 	}
 
 }

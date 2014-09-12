@@ -17,7 +17,7 @@ public class CommandFeed {
 	public static AIStrategy run(
 			AIHelper helper,
 			@AICommandParameter(type = ParameterType.FIXED, fixedName = "feed", description = "") String nameArg) {
-		return ValueActionStrategy.makeSafe(new FeedAnimalsStrategy());
+		return ValueActionStrategy.makeSafe(new FeedAnimalsStrategy(), false);
 	}
 
 	@AICommandInvocation()
@@ -25,6 +25,6 @@ public class CommandFeed {
 			AIHelper helper,
 			@AICommandParameter(type = ParameterType.FIXED, fixedName = "feed", description = "") String nameArg,
 			@AICommandParameter(type = ParameterType.COLOR, description = "The color of wolfes to feed.") int color) {
-		return ValueActionStrategy.makeSafe(new FeedAnimalsStrategy(color));
+		return ValueActionStrategy.makeSafe(new FeedAnimalsStrategy(color), false);
 	}
 }

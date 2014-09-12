@@ -1,11 +1,14 @@
 package net.famzangl.minecraft.minebot.ai.task;
 
 import java.lang.reflect.Field;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
+import net.famzangl.minecraft.minebot.Pos;
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.strategy.TaskOperations;
 import net.minecraft.client.multiplayer.PlayerControllerMP;
 import net.minecraft.client.network.NetHandlerPlayClient;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.projectile.EntityFishHook;
 import net.minecraft.network.EnumConnectionState;
 import net.minecraft.network.INetHandler;
@@ -80,6 +83,7 @@ public class DoFishTask extends AITask {
 	private boolean revoked;
 	private int rightMotion = 2;
 	private boolean inThrowingPhase = true;
+	private boolean sendReset = true;
 
 	@Override
 	public boolean isFinished(AIHelper h) {
@@ -96,7 +100,7 @@ public class DoFishTask extends AITask {
 
 	private class MyNetHandler implements INetHandlerPlayClient {
 		INetHandlerPlayClient root;
-		private boolean foundFish;
+		private final ConcurrentLinkedQueue<Pos> foundFishPositions = new ConcurrentLinkedQueue<Pos>();
 
 		public MyNetHandler(INetHandlerPlayClient root) {
 			super();
@@ -312,10 +316,12 @@ public class DoFishTask extends AITask {
 		@Override
 		public void handleParticles(S2APacketParticles var1) {
 			if ("wake".equals(var1.func_149228_c())) {
-				System.out.println("Got the particles! i= "
-						+ var1.func_149222_k());
 				if (var1.func_149222_k() > 0) {
-					foundFish = true;
+					double x = var1.func_149220_d();
+					double y = var1.func_149226_e();
+					double z = var1.func_149225_f();
+					foundFishPositions.add(new Pos((int) Math.floor(x),
+							(int) Math.floor(y), (int) Math.floor(z)));
 				}
 			}
 			root.handleParticles(var1);
@@ -436,10 +442,19 @@ public class DoFishTask extends AITask {
 			root.handleEntityEffect(var1);
 		}
 
-		public boolean fishIsCaptured() {
-			final boolean foundFish2 = foundFish;
-			foundFish = false;
-			return foundFish2;
+		public boolean fishIsCaptured(Entity expectedPos) {
+			while (true) {
+				Pos next = foundFishPositions.poll();
+				if (next == null) {
+					return false;
+				} else if (expectedPos.getDistance(next.x + 0.5, next.y + 0.5, next.z + 0.5) < 4) {
+					return true;
+				}
+			}
+		}
+
+		public void reset() {
+			foundFishPositions.clear();
 		}
 	}
 
@@ -467,9 +482,14 @@ public class DoFishTask extends AITask {
 				final INetHandlerPlayClient newHandler = new MyNetHandler(
 						oldHandler);
 				field.set(manager, newHandler);
+				sendReset = false;
 			} else {
 				final MyNetHandler myHandler = (MyNetHandler) oldHandler;
-				return myHandler.fishIsCaptured();
+				if (sendReset) {
+					myHandler.reset();
+					sendReset = false;
+				}
+				return myHandler.fishIsCaptured(helper.getMinecraft().thePlayer.fishEntity);
 			}
 		} catch (final Throwable e) {
 			for (final Field f : manager.getClass().getDeclaredFields()) {

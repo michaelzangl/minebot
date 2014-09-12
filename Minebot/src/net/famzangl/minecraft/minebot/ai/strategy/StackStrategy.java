@@ -11,6 +11,7 @@ import net.famzangl.minecraft.minebot.ai.AIHelper;
 public class StackStrategy extends AIStrategy {
 
 	private final StrategyStack stack;
+	private boolean aborted = false;
 
 	public StackStrategy(StrategyStack stack) {
 		super();
@@ -19,11 +20,17 @@ public class StackStrategy extends AIStrategy {
 
 	@Override
 	protected TickResult onGameTick(AIHelper helper) {
-		if (stack.gameTick(helper)) {
-			return TickResult.TICK_HANDLED;
-		} else {
+		TickResult tickResult = stack.gameTick(helper);
+		if (tickResult == TickResult.ABORT) {
+			aborted = true;
 			return TickResult.NO_MORE_WORK;
 		}
+		return tickResult;
+	}
+
+	@Override
+	public boolean checkShouldTakeOver(AIHelper helper) {
+		return !aborted && stack.couldTakeOver(helper);
 	}
 
 	@Override
@@ -37,10 +44,20 @@ public class StackStrategy extends AIStrategy {
 		stack.pause(helper);
 		super.onDeactivate(helper);
 	}
-	
+
 	@Override
-	public String getDescription() {
+	public String getDescription(AIHelper helper) {
+		StringBuilder str = new StringBuilder("");
 		AIStrategy current = stack.getCurrentStrategy();
-		return current != null ? current.getDescription() : "Multiple tasks.";
+		for (AIStrategy s : stack.getStrategies()) {
+			if (str.length() != 0) {
+				str.append("\n");
+			}
+			if (s == current && !(s instanceof StackStrategy)) {
+				str.append("-> ");
+			}
+			str.append(s.getDescription(helper));
+		}
+		return str.toString();
 	}
 }

@@ -72,7 +72,7 @@ public class CommandBuild {
 		}
 
 		@Override
-		public String getDescription() {
+		public String getDescription(AIHelper helper) {
 			return "Building.";
 		}
 
@@ -86,7 +86,7 @@ public class CommandBuild {
 	public static AIStrategy run(
 			AIHelper helper,
 			@AICommandParameter(type = ParameterType.FIXED, fixedName = "build", description = "") String nameArg2) {
-		return ValueActionStrategy.makeSafe(new BuildStrategy());
+		return ValueActionStrategy.makeSafe(new BuildStrategy(), false);
 
 	}
 

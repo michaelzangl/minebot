@@ -5,7 +5,7 @@ import net.famzangl.minecraft.minebot.ai.AIHelper;
 public final class StopStrategy extends AIStrategy {
 
 	@Override
-	public String getDescription() {
+	public String getDescription(AIHelper helper) {
 		return "Stopping";
 	}
 

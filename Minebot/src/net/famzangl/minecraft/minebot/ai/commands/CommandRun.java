@@ -14,6 +14,8 @@ import net.famzangl.minecraft.minebot.ai.command.AICommandParameter;
 import net.famzangl.minecraft.minebot.ai.command.IAIControllable;
 import net.famzangl.minecraft.minebot.ai.command.ParameterType;
 import net.famzangl.minecraft.minebot.ai.strategy.AIStrategy;
+import net.famzangl.minecraft.minebot.ai.strategy.StackStrategy;
+import net.famzangl.minecraft.minebot.ai.strategy.StrategyStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiChat;
 import net.minecraft.client.gui.GuiScreen;
@@ -57,6 +59,8 @@ public class CommandRun {
 		private boolean exceptionReported;
 		private AIStrategy activeStrategy;
 		private boolean repeatMode = false;
+		private int stackMaxLeft = -1;
+		private StrategyStack stack;
 
 		public RunFileStrategy(String fileName) {
 			super();
@@ -119,45 +123,86 @@ public class CommandRun {
 				} else {
 					return result;
 				}
+			} else if (stack != null) {
+				if (stackMaxLeft == 0 || commands.isEmpty()) {
+					AIChatController.addChatLine("Stack has no end.");
+					return TickResult.NO_MORE_WORK;
+				} else {
+					String command = getNextCommand();
+					if (command.equals("stack end")) {
+						setActiveStrategy(helper, new StackStrategy(stack));
+						stack = null;
+						stackMaxLeft = -1;
+						return TickResult.TICK_AGAIN;
+					} else {
+						final AIStrategy receivedStrategy = runAndGetStrategy(
+								helper, command);
+						if (receivedStrategy != null) {
+							stack.addStrategy(receivedStrategy);
+						} else {
+							AIChatController.addChatLine("Command is not a strategy: " + command);
+							return TickResult.ABORT;
+						}
+						return TickResult.TICK_AGAIN;
+					}
+				}
 			} else if (commands.isEmpty()) {
-
 				AIChatController.addChatLine("Done");
 				return TickResult.NO_MORE_WORK;
 			} else {
-				final IAIControllable controlled = AIChatController
-						.getRegistry().getControlled();
-				final StrategyReceiver tempController = new StrategyReceiver(
-						controlled);
-				try {
-					AIChatController.getRegistry()
-							.setControlled(tempController);
-					final String command = commands.removeFirst();
-					runCommand(helper, command);
-					if (repeatMode) {
-						commands.add(command);
+				final String command = getNextCommand();
+				if (command.equals("repeat:")) {
+					repeatMode = true;
+				} else if (command.equals("stack:")) {
+					stackMaxLeft = commands.size();
+					stack = new StrategyStack();
+				} else {
+					final AIStrategy receivedStrategy = runAndGetStrategy(
+							helper, command);
+					if (receivedStrategy != null) {
+						setActiveStrategy(helper, receivedStrategy);
 					}
-				} finally {
-					AIChatController.getRegistry().setControlled(controlled);
-				}
-				if (tempController.receivedStrategy != null) {
-					activeStrategy = tempController.getReceivedStrategy();
-					activeStrategy.setActive(true, helper);
 				}
 				return TickResult.TICK_AGAIN;
 			}
 		}
 
-		private void runCommand(AIHelper helper, String command) {
-			if (command.equals("repeat:")) {
-				repeatMode = true;
-			} else {
-				CommandRun.runCommand(helper, command);
+		private String getNextCommand() {
+			String command = commands.removeFirst();
+			if (repeatMode) {
+				commands.add(command);
 			}
+			return command;
+		}
+
+		private void setActiveStrategy(AIHelper helper,
+				final AIStrategy receivedStrategy) {
+			activeStrategy = receivedStrategy;
+			activeStrategy.setActive(true, helper);
+		}
+
+		private AIStrategy runAndGetStrategy(AIHelper helper,
+				final String command) {
+			final IAIControllable controlled = AIChatController.getRegistry()
+					.getControlled();
+			final StrategyReceiver tempController = new StrategyReceiver(
+					controlled);
+			try {
+				AIChatController.getRegistry().setControlled(tempController);
+				runCommand(helper, command);
+			} finally {
+				AIChatController.getRegistry().setControlled(controlled);
+			}
+			return tempController.getReceivedStrategy();
+		}
+
+		private void runCommand(AIHelper helper, String command) {
+			CommandRun.runCommand(helper, command);
 		}
 
 		@Override
-		public String getDescription() {
-			return "Running from file.";
+		public String getDescription(AIHelper helper) {
+			return "Running from file..." + (activeStrategy != null ? "\n" + activeStrategy.getDescription(helper): "");
 		}
 
 	}

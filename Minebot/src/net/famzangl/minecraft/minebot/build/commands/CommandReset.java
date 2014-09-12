@@ -25,7 +25,7 @@ public class CommandReset {
 		}
 
 		@Override
-		public String getDescription() {
+		public String getDescription(AIHelper helper) {
 			return "Clearing build list.";
 		}
 	}

@@ -18,7 +18,7 @@ public class CommandPlant {
 			AIHelper helper,
 			@AICommandParameter(type = ParameterType.FIXED, fixedName = "plant", description = "") String nameArg) {
 		return ValueActionStrategy.makeSafe(new PathFinderStrategy(
-				new PlantPathFinder(PlantType.ANY), "Planting"));
+				new PlantPathFinder(PlantType.ANY), "Planting"), false);
 	}
 
 	@AICommandInvocation()
@@ -27,6 +27,6 @@ public class CommandPlant {
 			@AICommandParameter(type = ParameterType.FIXED, fixedName = "plant", description = "") String nameArg,
 			@AICommandParameter(type = ParameterType.ENUM, description = "plant type") PlantType type) {
 		return ValueActionStrategy.makeSafe(new PathFinderStrategy(
-				new PlantPathFinder(type), "Planting"));
+				new PlantPathFinder(type), "Planting"), false);
 	}
 }

@@ -26,7 +26,7 @@ public class CommandSit {
 			@AICommandParameter(type = ParameterType.FIXED, fixedName = "sit", description = "") String nameArg,
 			@AICommandParameter(type = ParameterType.COLOR, description = "The color of wolfes to feed.") int color) {
 		return ValueActionStrategy.makeSafe(new LetAnimalsSitStrategy(
-				AnimalyType.WOLF, true, color));
+				AnimalyType.WOLF, true, color), false);
 	}
 
 	@AICommandInvocation()
@@ -42,6 +42,6 @@ public class CommandSit {
 			@AICommandParameter(type = ParameterType.FIXED, fixedName = "unsit", description = "") String nameArg,
 			@AICommandParameter(type = ParameterType.COLOR, description = "The color of wolfes to feed.") int color) {
 		return ValueActionStrategy.makeSafe(new LetAnimalsSitStrategy(
-				AnimalyType.WOLF, false, color));
+				AnimalyType.WOLF, false, color), false);
 	}
 }

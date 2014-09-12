@@ -45,6 +45,6 @@ public class CommandTint {
 			@AICommandParameter(type = ParameterType.ENUM, description = "Animals to apply the tint to") TintType type,
 			@AICommandParameter(type = ParameterType.COLOR, description = "The color the wolf should currently have") int current) {
 		return ValueActionStrategy.makeSafe(new TintStrategy(color, type,
-				current));
+				current), false);
 	}
 }

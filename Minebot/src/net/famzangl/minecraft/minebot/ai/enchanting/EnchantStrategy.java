@@ -51,7 +51,7 @@ public class EnchantStrategy extends TaskStrategy {
 	}
 
 	@Override
-	public String getDescription() {
+	public String getDescription(AIHelper helper) {
 		return "Enchanting for level " + level;
 	}
 }

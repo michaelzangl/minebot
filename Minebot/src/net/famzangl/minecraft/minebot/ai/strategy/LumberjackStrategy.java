@@ -9,6 +9,6 @@ public class LumberjackStrategy implements AIStrategyFactory {
 	@Override
 	public AIStrategy produceStrategy(AIHelper helper) {
 		return ValueActionStrategy.makeSafe(new PathFinderStrategy(
-				new TreePathFinder(null), "Getting some wood"));
+				new TreePathFinder(null), "Getting some wood"), true);
 	}
 }

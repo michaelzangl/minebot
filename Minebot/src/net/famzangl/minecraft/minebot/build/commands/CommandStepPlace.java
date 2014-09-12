@@ -51,10 +51,10 @@ public class CommandStepPlace {
 			}
 
 			@Override
-			public String getDescription() {
+			public String getDescription(AIHelper helper) {
 				return "Place the block.";
 			}
-		});
+		}, false);
 	}
 
 	private static Pos getFromPos(AIHelper helper, final BuildTask task,

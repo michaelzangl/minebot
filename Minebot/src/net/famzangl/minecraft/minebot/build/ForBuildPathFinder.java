@@ -22,12 +22,17 @@ public class ForBuildPathFinder extends MovePathFinder {
 	 */
 	private final BuildTask task;
 	int[] res = new int[NEIGHBOURS_PER_DIRECTION * 4];
-	private final boolean canBuildUp;
+	private boolean canBuildUp;
 	private boolean noPathFound;
 
 	public ForBuildPathFinder(BuildTask task) {
-		canBuildUp = helper.canSelectItem(new BlockItemFilter(Blocks.carpet));
 		this.task = task;
+	}
+	
+	@Override
+	protected boolean runSearch(Pos playerPosition) {
+		canBuildUp = helper.canSelectItem(new BlockItemFilter(Blocks.carpet));
+		return super.runSearch(playerPosition);
 	}
 
 	@Override

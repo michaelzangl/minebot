@@ -91,7 +91,7 @@ public class LetAnimalsSitStrategy extends TaskStrategy {
 	}
 
 	@Override
-	public String getDescription() {
+	public String getDescription(AIHelper helper) {
 		return shouldSit ? "Let them sit" : "Let them go";
 	}
 }

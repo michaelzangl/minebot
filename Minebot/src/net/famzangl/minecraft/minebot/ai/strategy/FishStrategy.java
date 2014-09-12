@@ -9,16 +9,17 @@ public class FishStrategy extends TaskStrategy {
 
 	@Override
 	public void searchTasks(AIHelper helper) {
+		System.out.println("Fish entity: " + helper.getMinecraft().thePlayer.fishEntity);
 		if (helper.getMinecraft().thePlayer.fishEntity == null) {
 			addTask(new ThrowFishingRodTask());
-			addTask(new WaitTask(10));
+			addTask(new WaitTask(20));
 		} else {
 			addTask(new DoFishTask());
 		}
 	}
 
 	@Override
-	public String getDescription() {
+	public String getDescription(AIHelper helper) {
 		return "Fishing";
 	}
 

@@ -60,7 +60,7 @@ public class FeedAnimalsStrategy extends TaskStrategy {
 	}
 
 	@Override
-	public String getDescription() {
+	public String getDescription(AIHelper helper) {
 		return "Feeding";
 	}
 }

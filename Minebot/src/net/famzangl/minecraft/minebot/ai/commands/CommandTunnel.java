@@ -79,6 +79,6 @@ public class CommandTunnel {
 		final Pos pos = helper.getPlayerPosition();
 		return ValueActionStrategy.makeSafe(new PathFinderStrategy(
 				new TunnelPathFinder(dx, dz, pos.x, pos.y, pos.z, addToSide,
-						addToTop, torches), "Tunneling"));
+						addToTop, torches), "Tunneling"), true);
 	}
 }

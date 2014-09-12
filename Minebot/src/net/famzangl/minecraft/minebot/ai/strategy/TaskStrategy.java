@@ -61,7 +61,7 @@ public abstract class TaskStrategy extends AIStrategy implements
 		boolean found = false;
 		for (int i = 1; i < MAX_LOOKAHEAD && i < tasks.size() && !found; i++) {
 			final AITask task = tasks.get(i);
-			System.out.println("Prefetching with: " + task);
+//			System.out.println("Prefetching with: " + task);
 			if (tasks.get(i).getClass()
 					.isAnnotationPresent(SkipWhenSearchingPrefetch.class)) {
 				continue;
@@ -76,16 +76,22 @@ public abstract class TaskStrategy extends AIStrategy implements
 						break;
 					}
 				}
-				System.out.println("Prefacing: " + found + " for " + positions);
+//				System.out.println("Prefacing: " + found + " for " + positions);
 			} else {
-				System.out.println("Prefetching showstopper: " + task);
+//				System.out.println("Prefetching showstopper: " + task);
 				break;
 			}
 		}
-		if (!found) {
-			System.out.println("Could not prefetch anything. " + tasks.size());
-		}
+//		if (!found) {
+//			System.out.println("Could not prefetch anything. " + tasks.size());
+//		}
 		return found;
+	}
+	
+	@Override
+	public boolean checkShouldTakeOver(AIHelper helper) {
+		searchTasks(helper);
+		return !tasks.isEmpty();
 	}
 
 	@Override
@@ -111,7 +117,7 @@ public abstract class TaskStrategy extends AIStrategy implements
 
 		final AITask task = tasks.peekFirst();
 		if (task.isFinished(helper)) {
-			System.out.println("Task done.");
+			System.out.println("Task done: " + task);
 			tasks.removeFirst();
 			taskTimeout = 0;
 			return TickResult.TICK_AGAIN;

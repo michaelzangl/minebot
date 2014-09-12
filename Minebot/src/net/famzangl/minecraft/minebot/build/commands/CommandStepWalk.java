@@ -38,7 +38,7 @@ public class CommandStepWalk {
 						super.searchTasks(helper);
 					}
 				}
-			});
+			}, false);
 		}
 	}
 }

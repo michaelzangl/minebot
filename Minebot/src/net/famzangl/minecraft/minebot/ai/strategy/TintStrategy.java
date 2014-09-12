@@ -107,7 +107,7 @@ public class TintStrategy extends TaskStrategy {
 	}
 
 	@Override
-	public String getDescription() {
+	public String getDescription(AIHelper helper) {
 		return "Tinting...";
 	}
 

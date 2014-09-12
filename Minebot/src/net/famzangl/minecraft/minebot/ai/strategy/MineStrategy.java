@@ -12,14 +12,14 @@ public class MineStrategy implements AIStrategyFactory {
 	public AIStrategy produceStrategy(AIHelper helper) {
 		return ValueActionStrategy.makeSafe(new PathFinderStrategy(
 				new MineBySettingsPathFinder(helper.getLookDirection(), helper
-						.getPlayerPosition().y), "Mining ores"));
+						.getPlayerPosition().y), "Mining ores"), true);
 	}
 
 	public AIStrategy produceStrategy(AIHelper helper, Block blockName) {
 		return ValueActionStrategy.makeSafe(new PathFinderStrategy(
 				new MineSinglePathFinder(blockName, helper.getLookDirection(),
 						helper.getPlayerPosition().y), "Mining "
-						+ blockName.getLocalizedName()));
+						+ blockName.getLocalizedName()), true);
 	}
 
 }

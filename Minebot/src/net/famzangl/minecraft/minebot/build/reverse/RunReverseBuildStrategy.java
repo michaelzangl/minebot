@@ -31,7 +31,7 @@ public final class RunReverseBuildStrategy extends AIStrategy {
 	}
 
 	@Override
-	public String getDescription() {
+	public String getDescription(AIHelper helper) {
 		return "Generating build tasks.";
 	}
 

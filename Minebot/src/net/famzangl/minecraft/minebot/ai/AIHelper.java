@@ -46,7 +46,7 @@ public abstract class AIHelper {
 	 */
 	public static final Block[] normalBlocks = new Block[] { Blocks.bedrock,
 			Blocks.bookshelf, Blocks.brick_block, Blocks.brown_mushroom_block,
-			Blocks.cake, Blocks.coal_block, Blocks.coal_ore,
+			Blocks.cake, Blocks.clay, Blocks.coal_block, Blocks.coal_ore,
 			Blocks.cobblestone, Blocks.crafting_table, Blocks.diamond_block,
 			Blocks.diamond_ore, Blocks.dirt, Blocks.double_stone_slab,
 			Blocks.double_wooden_slab, Blocks.emerald_block,
@@ -67,7 +67,7 @@ public abstract class AIHelper {
 			Blocks.redstone_block, Blocks.redstone_lamp, Blocks.redstone_ore,
 			Blocks.sandstone, Blocks.snow, Blocks.soul_sand,
 			Blocks.stained_glass, Blocks.stained_hardened_clay, Blocks.stone,
-			Blocks.stonebrick, Blocks.web, Blocks.wool };
+			Blocks.stonebrick, Blocks.wool };
 
 	public static final Block[] fallingBlocks = new Block[] { Blocks.gravel,
 			Blocks.sand, };
@@ -95,7 +95,7 @@ public abstract class AIHelper {
 			Blocks.redstone_wire };
 	public static final Block[] safeSideBlocks = new Block[] { Blocks.fence,
 			Blocks.fence_gate, Blocks.cobblestone_wall, Blocks.cactus,
-			Blocks.reeds, };
+			Blocks.reeds, Blocks.web};
 
 	public final BuildManager buildManager = new BuildManager();
 	private boolean objectMouseOverInvalidated;
@@ -409,19 +409,7 @@ public abstract class AIHelper {
 	public boolean isAirBlock(int x, int y, int z) {
 		return Block.isEqualTo(mc.theWorld.getBlock(x, y, z), Blocks.air);
 	}
-
-	/**
-	 * Check if this block is safe to build upwards on a path.
-	 * 
-	 * @param x
-	 * @param y
-	 * @param z
-	 * @return
-	 */
-	public boolean isSafeUpwardsGround(int x, int y, int z) {
-		return isSafeGroundBlock(x, y, z) || isAirBlock(x, y, z);
-	}
-
+	
 	/**
 	 * Check if this block is safe to stand on it on a path.
 	 * 
@@ -431,7 +419,7 @@ public abstract class AIHelper {
 	 * @return
 	 */
 	public boolean isSafeGroundBlock(int x, int y, int z) {
-		final Block block = mc.theWorld.getBlock(x, y, z);
+		final Block block = getBlock(x, y, z);
 		return isSafeStandableBlock(block);
 	}
 
@@ -624,8 +612,8 @@ public abstract class AIHelper {
 	public void faceSideOf(int x, int y, int z, ForgeDirection sideToFace,
 			double minY, double maxY, double centerX, double centerZ,
 			ForgeDirection xzdir) {
-		System.out.println("x = " + x + " y=" + y + " z=" + z + " dir="
-				+ sideToFace);
+//		System.out.println("x = " + x + " y=" + y + " z=" + z + " dir="
+//				+ sideToFace);
 		final Block block = getBoundsBlock(x, y, z);
 
 		minY = Math.max(minY, block.getBlockBoundsMinY());
@@ -999,8 +987,8 @@ public abstract class AIHelper {
 			final double dlength = Math.sqrt(dx * dx + dz * dz);
 			final double same = (lookX * dx + lookZ * dz) / dlength;
 			final double strafe = (lookZ * dx - lookX * dz) / dlength;
-			System.out.println("look: " + lookX + "," + lookZ + "; d = " + dx
-					+ "," + dz + "; walk: " + same + "," + strafe);
+//			System.out.println("look: " + lookX + "," + lookZ + "; d = " + dx
+//					+ "," + dz + "; walk: " + same + "," + strafe);
 			final MovementInput movement = new MovementInput();
 			movement.moveForward = (float) (speed * same);
 			movement.moveStrafe = (float) (speed * strafe);

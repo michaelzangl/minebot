@@ -79,6 +79,11 @@ public class MovePathFinder extends PathFinderField {
 		return runSearch(playerPosition);
 	}
 
+	/**
+	 * 
+	 * @param playerPosition
+	 * @return <code>false</code> When pathfinding should be given more time.
+	 */
 	protected boolean runSearch(Pos playerPosition) {
 		return super.searchSomethingAround(playerPosition.x, playerPosition.y,
 				playerPosition.z);
@@ -108,7 +113,8 @@ public class MovePathFinder extends PathFinderField {
 
 	protected boolean checkGroundBlock(int currentNode, int cx, int cy, int cz) {
 		if (getY(currentNode) < cy) {
-			return helper.isSafeUpwardsGround(cx, cy - 1, cz);
+			return helper.isSafeGroundBlock(cx, cy - 1, cz)
+					|| helper.canWalkOn(helper.getBlock(cx, cy - 1, cz));
 		} else {
 			return helper.isSafeGroundBlock(cx, cy - 1, cz);
 		}
@@ -136,7 +142,7 @@ public class MovePathFinder extends PathFinderField {
 			Pos nextPos = path.removeFirst();
 			final ForgeDirection moveDirection = direction(currentPos, nextPos);
 
-			if (torchLightLevel >= 0) {
+			if (torchLightLevel >= 0 && moveDirection != ForgeDirection.UP) {
 				ForgeDirection direction;
 				if (moveDirection == ForgeDirection.UP) {
 					direction = ForgeDirection.DOWN;
@@ -151,8 +157,8 @@ public class MovePathFinder extends PathFinderField {
 			if (moveDirection == ForgeDirection.UP && peeked != null
 					&& direction(nextPos, peeked).offsetY == 0) {
 				// Combine upwards-sidewards.
-				System.out.println("Next direction is: "
-						+ direction(nextPos, peeked));
+				// System.out.println("Next direction is: "
+				// + direction(nextPos, peeked));
 				addTask(new JumpMoveTask(peeked.x, peeked.y, peeked.z,
 						nextPos.x, nextPos.z));
 				nextPos = peeked;
@@ -171,8 +177,6 @@ public class MovePathFinder extends PathFinderField {
 	}
 
 	private ForgeDirection direction(Pos currentPos, final Pos nextPos) {
-		System.out.println(currentPos + "," + nextPos + ": "
-				+ AIHelper.getDirectionFor(nextPos.subtract(currentPos)));
 		return AIHelper.getDirectionFor(nextPos.subtract(currentPos));
 	}
 

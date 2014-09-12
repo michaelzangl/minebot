@@ -1,6 +1,8 @@
 package net.famzangl.minecraft.minebot.ai.strategy;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.strategy.AIStrategy.TickResult;
@@ -12,6 +14,7 @@ public class StrategyStack {
 	private final ArrayList<AIStrategy> strategies = new ArrayList<AIStrategy>();
 	private AIStrategy currentStrategy = null;
 	private boolean paused;
+	private boolean goodPause;
 
 	/**
 	 * Does a game tick. Selects the next best strategy to activate.
@@ -19,22 +22,18 @@ public class StrategyStack {
 	 * @param helper
 	 * @return <code>true</code> on success.
 	 */
-	public boolean gameTick(AIHelper helper) {
-		int i = 0;
-		do {
-			final TickResult result = strategyTick(helper, currentStrategy == null || i != 0);
-			i++;
+	public TickResult gameTick(AIHelper helper) {
+			final TickResult result = strategyTick(helper, currentStrategy == null || goodPause);
+			goodPause = false;
 			if (result == null) {
-				return false;
-			} else if (result == TickResult.TICK_HANDLED) {
-				return true;
+				return TickResult.NO_MORE_WORK;
 			} else if (result == TickResult.NO_MORE_WORK) {
 				setCurrentStrategy(helper, null);
+				return TickResult.TICK_AGAIN;
 			} else if (result == TickResult.TICK_AGAIN) {
+				goodPause = true;
 			}
-		} while (i < 100);
-		System.err.println("Help. Infinite loop in strategies.");
-		return false;
+			return result;
 	}
 
 	private TickResult strategyTick(AIHelper helper, boolean goodTimeToPause) {
@@ -84,5 +83,18 @@ public class StrategyStack {
 	
 	public AIStrategy getCurrentStrategy() {
 		return currentStrategy;
+	}
+
+	public boolean couldTakeOver(AIHelper helper) {
+		for (AIStrategy s : strategies) {
+			if (s.checkShouldTakeOver(helper)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public List<AIStrategy> getStrategies() {
+		return Collections.unmodifiableList(strategies);
 	}
 }

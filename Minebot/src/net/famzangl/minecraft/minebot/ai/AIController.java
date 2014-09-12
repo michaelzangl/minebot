@@ -128,16 +128,23 @@ public class AIController extends AIHelper implements IAIControllable {
 		} else if ((newStrat = findNewStrategy()) != null) {
 			deactivateCurrentStrategy();
 			currentStrategy = newStrat;
+			System.out.println("Using new root strategy: " + newStrat);
 			currentStrategy.setActive(true, this);
 		}
 
 		if (currentStrategy != null) {
-			synchronized (strategyDescrMutex) {
-				strategyDescr = currentStrategy.getDescription();
+			TickResult result = null;
+			for (int i = 0; i < 100; i++) {
+				result = currentStrategy.gameTick(this);
+				if (result != TickResult.TICK_AGAIN) {
+					break;
+				}
 			}
-			final TickResult result = currentStrategy.gameTick(this);
-			if (result == TickResult.NO_MORE_WORK) {
+			if (result == TickResult.ABORT || result == TickResult.NO_MORE_WORK) {
 				dead = true;
+			}
+			synchronized (strategyDescrMutex) {
+				strategyDescr = currentStrategy.getDescription(this);
 			}
 		} else {
 			synchronized (strategyDescrMutex) {
@@ -179,15 +186,19 @@ public class AIController extends AIHelper implements IAIControllable {
 			res = (ScaledResolution) method.newInstance(arg1,
 					getMinecraft().displayWidth, getMinecraft().displayHeight);
 
-			String str;
+			String[] str;
 			synchronized (strategyDescrMutex) {
-				str = strategyDescr;
+				str = (strategyDescr == null ? "?" : strategyDescr).split("\n");
 			}
-			getMinecraft().fontRenderer.drawStringWithShadow(
-					str,
-					res.getScaledWidth()
-							- getMinecraft().fontRenderer.getStringWidth(str)
-							- 10, 10, 16777215);
+			int y = 10;
+			for (String s : str) {
+				getMinecraft().fontRenderer.drawStringWithShadow(
+						s,
+						res.getScaledWidth()
+								- getMinecraft().fontRenderer.getStringWidth(s)
+								- 10, y, 16777215);
+				y += 15;
+			}
 		} catch (final InstantiationException e) {
 			e.printStackTrace();
 		} catch (final IllegalAccessException e) {

@@ -9,7 +9,7 @@ import net.famzangl.minecraft.minebot.ai.selectors.ItemSelector;
 import net.famzangl.minecraft.minebot.ai.selectors.NotSelector;
 import net.famzangl.minecraft.minebot.ai.selectors.OrSelector;
 import net.famzangl.minecraft.minebot.ai.selectors.OwnTameableSelector;
-import net.famzangl.minecraft.minebot.ai.task.FaceAndInteractTask;
+import net.famzangl.minecraft.minebot.ai.selectors.XPOrbSelector;
 import net.minecraft.command.IEntitySelector;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.passive.EntityAnimal;
@@ -20,7 +20,7 @@ import net.minecraft.entity.passive.EntityAnimal;
  * @author michael
  * 
  */
-public class KillAnimalsStrategy extends TaskStrategy {
+public class KillAnimalsStrategy extends FaceInteractStrategy {
 
 	private final class KillableSelector implements IEntitySelector {
 		@Override
@@ -34,7 +34,6 @@ public class KillAnimalsStrategy extends TaskStrategy {
 		}
 	}
 
-	private static final int DISTANCE = 20;
 	private final int maxKills;
 	private final AnimalyType type;
 	private final HashSet<Entity> hitEntities = new HashSet<Entity>();
@@ -49,33 +48,49 @@ public class KillAnimalsStrategy extends TaskStrategy {
 	}
 
 	@Override
-	public void searchTasks(final AIHelper helper) {
+	public boolean checkShouldTakeOver(AIHelper helper) {
+		return super.checkShouldTakeOver(helper);
+	}
+
+	@Override
+	protected TickResult onGameTick(AIHelper helper) {
+		return super.onGameTick(helper);
+	}
+
+	@Override
+	protected IEntitySelector entitiesToInteract(AIHelper helper) {
+		if (maxKillsReached(helper)) {
+			return new IEntitySelector() {
+				@Override
+				public boolean isEntityApplicable(Entity var1) {
+					return false;
+				}
+			};
+		} else {
+			return new AndSelector(new KillableSelector(), new NotSelector(
+					new OwnTameableSelector(helper.getMinecraft().thePlayer)));
+		}
+	}
+
+	@Override
+	protected IEntitySelector entitiesToFace(AIHelper helper) {
+		return new OrSelector(super.entitiesToFace(helper), new ItemSelector(), new XPOrbSelector());
+	}
+
+	@Override
+	protected void doInteract(Entity entityHit, AIHelper helper) {
+		hitEntities.add(entityHit);
+		helper.overrideAttack();
+	}
+
+	public boolean maxKillsReached(final AIHelper helper) {
 		if (maxKills >= 0) {
 			int kills = countKills();
 			if (kills >= maxKills) {
-				return;
+				return true;
 			}
 		}
-
-		final IEntitySelector selector = new AndSelector(
-				new KillableSelector(),
-				new NotSelector(new OwnTameableSelector(
-						helper.getMinecraft().thePlayer)));
-
-		final IEntitySelector collect = new ItemSelector();
-
-		final Entity found = helper.getClosestEntity(DISTANCE, new OrSelector(
-				collect, selector));
-
-		if (found != null) {
-			addTask(new FaceAndInteractTask(found, selector, false) {
-				@Override
-				protected void doInteractWithCurrent(AIHelper h) {
-					hitEntities.add(h.getObjectMouseOver().entityHit);
-					super.doInteractWithCurrent(h);
-				}
-			});
-		}
+		return false;
 	}
 
 	private int countKills() {
@@ -90,7 +105,7 @@ public class KillAnimalsStrategy extends TaskStrategy {
 	}
 
 	@Override
-	public String getDescription() {
+	public String getDescription(AIHelper helper) {
 		return "Killing";
 	}
 

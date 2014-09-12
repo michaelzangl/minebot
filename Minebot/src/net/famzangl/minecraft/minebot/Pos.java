@@ -98,4 +98,8 @@ public class Pos {
 		return new Pos(x * howMuch, y * howMuch, z * howMuch);
 	}
 
+	public double distance(Pos other) {
+		return Math.hypot(Math.hypot(other.x - x, other.y - y), other.z - z);
+	}
+
 }

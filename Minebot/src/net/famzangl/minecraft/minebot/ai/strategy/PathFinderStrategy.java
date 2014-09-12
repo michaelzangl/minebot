@@ -24,7 +24,7 @@ public class PathFinderStrategy extends TaskStrategy {
 	}
 
 	@Override
-	public String getDescription() {
+	public String getDescription(AIHelper helper) {
 		return description;
 	}
 

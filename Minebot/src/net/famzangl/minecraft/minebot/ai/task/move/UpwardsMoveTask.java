@@ -18,6 +18,9 @@ public class UpwardsMoveTask extends JumpingPlaceBlockAtFloorTask {
 				o.desync(new PositionTaskError(x, y - 1, z));
 			}
 			h.faceAndDestroy(x, y + 1, z);
+		} else if (h.canWalkOn(h.getBlock(x, y - 1, z))
+				&& !h.isAirBlock(x, y - 1, z)) {
+			h.faceAndDestroy(x, y - 1, z);
 		} else {
 			super.runTick(h, o);
 		}

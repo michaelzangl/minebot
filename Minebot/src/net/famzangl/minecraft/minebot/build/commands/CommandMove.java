@@ -86,7 +86,7 @@ public class CommandMove {
 		}
 
 		@Override
-		public String getDescription() {
+		public String getDescription(AIHelper helper) {
 			return null;
 		}
 	}

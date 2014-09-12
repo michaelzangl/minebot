@@ -23,6 +23,6 @@ public class CommandBuildWay {
 		final Pos pos = helper.getPlayerPosition();
 
 		return ValueActionStrategy.makeSafe(new BuildWayStrategy(
-				new BuildWayPathfinder(dir, pos)));
+				new BuildWayPathfinder(dir, pos)), false);
 	}
 }

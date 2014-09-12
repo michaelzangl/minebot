@@ -1,23 +1,15 @@
 package net.famzangl.minecraft.minebot.ai.enchanting;
 
 import net.famzangl.minecraft.minebot.ai.AIHelper;
-import net.famzangl.minecraft.minebot.ai.strategy.TaskOperations;
-import net.famzangl.minecraft.minebot.ai.task.AITask;
-import net.famzangl.minecraft.minebot.ai.task.error.StringTaskError;
+import net.famzangl.minecraft.minebot.ai.task.PutItemInContainerTask;
 import net.minecraft.client.gui.GuiEnchantment;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 
-public class PutItemInTableTask extends AITask {
+public class PutItemInTableTask extends PutItemInContainerTask {
 
 	@Override
-	public boolean isFinished(AIHelper h) {
-		final GuiEnchantment screen = (GuiEnchantment) h.getMinecraft().currentScreen;
-		return screen.inventorySlots.getSlot(0).getHasStack();
-	}
-
-	@Override
-	public void runTick(AIHelper h, TaskOperations o) {
+	protected int getStackToPut(AIHelper h) {
 		final GuiEnchantment screen = (GuiEnchantment) h.getMinecraft().currentScreen;
 		for (int i = 1; i < 9 * 4 + 1; i++) {
 			final Slot slot = screen.inventorySlots.getSlot(i);
@@ -26,19 +18,10 @@ public class PutItemInTableTask extends AITask {
 			}
 			final ItemStack stack = slot.getStack();
 			if (stack != null && stack.isItemEnchantable()) {
-				h.getMinecraft().playerController.windowClick(
-						screen.inventorySlots.windowId, i, 0, 1,
-						h.getMinecraft().thePlayer);
-				// ItemStack itemstack3 =
-				// screen.inventorySlots.transferStackInSlot(mc.thePlayer,
-				// i);
-				// System.out.println("Selected slot " + i + ". Got stack "
-				// + itemstack3 + " (should be null)");
-				return;
+				return i;
 			}
 		}
-		System.out.println("No item to put.");
-		o.desync(new StringTaskError("No item for table."));
+		return -1;
 	}
 
 }

@@ -36,7 +36,7 @@ public class CommandClearArea {
 		}
 
 		@Override
-		public String getDescription() {
+		public String getDescription(AIHelper helper) {
 			return "Clear area: " + progress;
 		}
 	}
@@ -52,7 +52,7 @@ public class CommandClearArea {
 			return null;
 		} else {
 			return ValueActionStrategy.makeSafe(new ClearAreaStrategy(
-					new ClearAreaPathfinder(pos1, pos2)));
+					new ClearAreaPathfinder(pos1, pos2)), true);
 		}
 	}
 }

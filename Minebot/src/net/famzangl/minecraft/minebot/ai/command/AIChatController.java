@@ -3,6 +3,8 @@ package net.famzangl.minecraft.minebot.ai.command;
 import java.util.List;
 
 import net.famzangl.minecraft.minebot.ai.commands.CommandBuildWay;
+import net.famzangl.minecraft.minebot.ai.commands.CommandEat;
+import net.famzangl.minecraft.minebot.ai.commands.CommandEnchant;
 import net.famzangl.minecraft.minebot.ai.commands.CommandFeed;
 import net.famzangl.minecraft.minebot.ai.commands.CommandFish;
 import net.famzangl.minecraft.minebot.ai.commands.CommandGetWood;
@@ -15,6 +17,7 @@ import net.famzangl.minecraft.minebot.ai.commands.CommandRun;
 import net.famzangl.minecraft.minebot.ai.commands.CommandShear;
 import net.famzangl.minecraft.minebot.ai.commands.CommandSit;
 import net.famzangl.minecraft.minebot.ai.commands.CommandStop;
+import net.famzangl.minecraft.minebot.ai.commands.CommandStore;
 import net.famzangl.minecraft.minebot.ai.commands.CommandTint;
 import net.famzangl.minecraft.minebot.ai.commands.CommandTunnel;
 import net.famzangl.minecraft.minebot.ai.commands.CommandUngrab;
@@ -59,6 +62,9 @@ public class AIChatController {
 		registerCommand(CommandBuildWay.class);
 		registerCommand(CommandShear.class);
 		registerCommand(CommandPause.class);
+		registerCommand(CommandStore.class);
+		registerCommand(CommandEnchant.class);
+		registerCommand(CommandEat.class);
 
 		registerCommand(CommandKill.class);
 		registerCommand(CommandFish.class);

@@ -16,7 +16,7 @@ public class CommandEnchant {
 	public static AIStrategy run(
 			AIHelper helper,
 			@AICommandParameter(type = ParameterType.FIXED, fixedName = "enchant", description = "") String nameArg) {
-		return ValueActionStrategy.makeSafe(new EnchantStrategy());
+		return ValueActionStrategy.makeSafe(new EnchantStrategy(), false);
 	}
 
 	@AICommandInvocation()
@@ -24,7 +24,7 @@ public class CommandEnchant {
 			AIHelper helper,
 			@AICommandParameter(type = ParameterType.FIXED, fixedName = "enchant", description = "") String nameArg,
 			@AICommandParameter(type = ParameterType.NUMBER, description = "") int level) {
-		return ValueActionStrategy.makeSafe(new EnchantStrategy(level));
+		return ValueActionStrategy.makeSafe(new EnchantStrategy(level), false);
 	}
 
 }

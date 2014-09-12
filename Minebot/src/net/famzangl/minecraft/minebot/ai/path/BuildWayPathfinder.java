@@ -54,12 +54,12 @@ public class BuildWayPathfinder extends AlongTrackPathFinder {
 	private static final Block BRIDGE_WALL = Blocks.cobblestone_wall;
 	private final int width = 2;
 
-	public BuildWayPathfinder(int dx, int dz, int cx, int cy, int cz) {
+	private BuildWayPathfinder(int dx, int dz, int cx, int cy, int cz) {
 		super(dx, dz, cx, cy, cz);
 	}
 
 	public BuildWayPathfinder(ForgeDirection dir, Pos pos) {
-		this(dir.offsetX, dir.offsetZ, pos.x, pos.y, pos.z);
+		this(dir.offsetX, dir.offsetZ, pos.x, pos.y + 1, pos.z);
 	}
 
 	/**
@@ -338,6 +338,15 @@ public class BuildWayPathfinder extends AlongTrackPathFinder {
 
 	public ForgeDirection getForwardDirection() {
 		return AIHelper.getDirectionForXZ(dx, dz);
+	}
+	
+	@Override
+	protected boolean runSearch(Pos playerPosition) {
+		if (!addContinuingTask(playerPosition)) {
+			return super.runSearch(playerPosition);
+		} else {
+			return true;
+		}
 	}
 
 	private void computeNextWayType() {

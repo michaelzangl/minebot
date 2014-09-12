@@ -24,7 +24,16 @@ public class CommandKill {
 	public static AIStrategy run(
 			AIHelper helper,
 			@AICommandParameter(type = ParameterType.FIXED, fixedName = "kill", description = "") String nameArg,
-			@AICommandParameter(type = ParameterType.ENUM, description = "") AnimalyType type) {
-		return ValueActionStrategy.makeSafe(new KillAnimalsStrategy(0, type));
+			@AICommandParameter(type = ParameterType.ENUM, description = "Animal type") AnimalyType type) {
+		return run(helper, nameArg, type, -1);
+	}
+	
+	@AICommandInvocation()
+	public static AIStrategy run(
+			AIHelper helper,
+			@AICommandParameter(type = ParameterType.FIXED, fixedName = "kill", description = "") String nameArg,
+			@AICommandParameter(type = ParameterType.ENUM, description = "Animal type") AnimalyType type,
+			@AICommandParameter(type = ParameterType.NUMBER, description = "How many") int count) {
+		return ValueActionStrategy.makeSafe(new KillAnimalsStrategy(count, type), false);
 	}
 }

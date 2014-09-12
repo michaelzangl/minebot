@@ -24,7 +24,7 @@ public class CommandShear {
 			AIHelper helper,
 			@AICommandParameter(type = ParameterType.FIXED, fixedName = "shear", description = "") String nameArg,
 			@AICommandParameter(type = ParameterType.COLOR, description = "The color to get") int color) {
-		return ValueActionStrategy.makeSafe(new ShearStrategy(color));
+		return ValueActionStrategy.makeSafe(new ShearStrategy(color), false);
 	}
 
 }
