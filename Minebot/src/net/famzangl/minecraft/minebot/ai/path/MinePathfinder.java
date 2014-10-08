@@ -1,8 +1,10 @@
 package net.famzangl.minecraft.minebot.ai.path;
 
 import java.util.Random;
+import java.util.Set;
 
 import net.famzangl.minecraft.minebot.Pos;
+import net.famzangl.minecraft.minebot.ai.BlockWhitelist;
 import net.famzangl.minecraft.minebot.ai.task.DestroyInRangeTask;
 import net.minecraft.block.Block;
 import net.minecraftforge.common.util.ForgeDirection;
@@ -47,8 +49,7 @@ public abstract class MinePathfinder extends MovePathFinder {
 			this.settingsProvider = settingsProvider;
 		}
 
-		public float getForBlock(int x, int y, int z) {
-			final int id = helper.getBlockId(x, y, z);
+		public float getForBlock(int id) {
 
 			if (!isCached[id]) {
 				// final String name = Block.blockRegistry.getNameForObject(
@@ -62,11 +63,21 @@ public abstract class MinePathfinder extends MovePathFinder {
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	public MinePathfinder(ForgeDirection preferedDirection, int preferedLayer) {
 		this.preferedDirection = preferedDirection;
 		this.preferedLayer = preferedLayer;
 		points = new FloatBlockCache(getPointsProvider());
 		factors = new FloatBlockCache(getFactorProvider());
+		
+		for (String k : (Set<String>)Block.blockRegistry.getKeys()) {
+			int id = Block.getIdFromBlock((Block) Block.blockRegistry.getObject(k));
+			float f = factors.getForBlock(id);
+			if (f > 0) {
+				headAllowedBlocks.intersectWith(new BlockWhitelist(id));
+				footAllowedBlocks.intersectWith(new BlockWhitelist(id));
+			}
+		}
 	}
 
 	protected abstract ISettingsProvider getFactorProvider();
@@ -117,18 +128,18 @@ public abstract class MinePathfinder extends MovePathFinder {
 				* rand.nextFloat();
 		return f * (1 - r);
 	}
-
+	
 	private float rateOreBlockDistance(int distance, int x, int y, int z) {
-		// Block block = helper.getBlock(x, y, z);
-		final float point = points.getForBlock(x, y, z);
+		final int id = helper.getBlockId(x, y, z);
+		final float point = points.getForBlock(id);
 
-		final float factor = factors.getForBlock(x, y, z);
+		final float factor = factors.getForBlock(id);
 		return factor == 0 ? Float.POSITIVE_INFINITY : distance / factor
 				* maxDistanceFactor + maxDistancePoints - point;
 	}
 
 	private boolean isOreBlock(int x, int y, int z) {
-		return factors.getForBlock(x, y, z) > 0;
+		return factors.getForBlock(helper.getBlockId(x, y, z)) > 0;
 	}
 
 	@Override

@@ -18,7 +18,7 @@ public class MineSinglePathFinder extends MinePathfinder {
 		return new ISettingsProvider() {
 			@Override
 			public float getFloat(Block block2) {
-				return block.equals(block2) ? 1 : 0;
+				return block == block2 ? 1 : 0;
 			}
 		};
 	}

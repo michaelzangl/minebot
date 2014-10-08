@@ -39,4 +39,8 @@ public class StringTaskError extends TaskError {
 		return true;
 	}
 
+	@Override
+	public String toString() {
+		return "StringTaskError [message=" + message + "]";
+	}
 }

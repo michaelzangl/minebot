@@ -1,13 +1,22 @@
 package net.famzangl.minecraft.minebot.ai.task.error;
 
+import net.famzangl.minecraft.minebot.ai.HumanReadableItemFilter;
 import net.famzangl.minecraft.minebot.ai.ItemFilter;
 
 public final class SelectTaskError extends TaskError {
 	private final ItemFilter filter;
 
 	public SelectTaskError(ItemFilter filter) {
-		super("Cannot select: " + filter);
+		super("Cannot select: " + getMessage(filter));
 		this.filter = filter;
+	}
+
+	private static String getMessage(ItemFilter filter) {
+		if (filter instanceof HumanReadableItemFilter) {
+			return ((HumanReadableItemFilter) filter).getDescription();
+		} else {
+			return filter.toString();
+		}
 	}
 
 	@Override

@@ -6,21 +6,21 @@ import net.famzangl.minecraft.minebot.ai.command.AICommand;
 import net.famzangl.minecraft.minebot.ai.command.AICommandInvocation;
 import net.famzangl.minecraft.minebot.ai.command.AICommandParameter;
 import net.famzangl.minecraft.minebot.ai.command.ParameterType;
+import net.famzangl.minecraft.minebot.ai.command.SafeStrategyRule;
 import net.famzangl.minecraft.minebot.ai.strategy.AIStrategy;
 import net.famzangl.minecraft.minebot.ai.strategy.KillAnimalsStrategy;
-import net.famzangl.minecraft.minebot.ai.strategy.ValueActionStrategy;
 
 @AICommand(helpText = "Starts hitting animals.\nA filter can be given.\nAvoids animals of your team.", name = "minebot")
 public class CommandKill {
 
-	@AICommandInvocation()
+	@AICommandInvocation(safeRule = SafeStrategyRule.DEFEND)
 	public static AIStrategy run(
 			AIHelper helper,
 			@AICommandParameter(type = ParameterType.FIXED, fixedName = "kill", description = "") String nameArg) {
 		return run(helper, nameArg, AnimalyType.ANY);
 	}
 
-	@AICommandInvocation()
+	@AICommandInvocation(safeRule = SafeStrategyRule.DEFEND)
 	public static AIStrategy run(
 			AIHelper helper,
 			@AICommandParameter(type = ParameterType.FIXED, fixedName = "kill", description = "") String nameArg,
@@ -28,12 +28,12 @@ public class CommandKill {
 		return run(helper, nameArg, type, -1);
 	}
 	
-	@AICommandInvocation()
+	@AICommandInvocation(safeRule = SafeStrategyRule.DEFEND)
 	public static AIStrategy run(
 			AIHelper helper,
 			@AICommandParameter(type = ParameterType.FIXED, fixedName = "kill", description = "") String nameArg,
 			@AICommandParameter(type = ParameterType.ENUM, description = "Animal type") AnimalyType type,
 			@AICommandParameter(type = ParameterType.NUMBER, description = "How many") int count) {
-		return ValueActionStrategy.makeSafe(new KillAnimalsStrategy(count, type), false);
+		return new KillAnimalsStrategy(count, type);
 	}
 }

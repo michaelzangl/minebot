@@ -6,7 +6,7 @@ import net.minecraft.block.Block;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 
-public class BlockItemFilter implements ItemFilter {
+public class BlockItemFilter implements HumanReadableItemFilter {
 
 	private final Block[] matched;
 
@@ -56,7 +56,8 @@ public class BlockItemFilter implements ItemFilter {
 		return true;
 	}
 
-	public String getDescriptiveString() {
+	@Override
+	public String getDescription() {
 		final StringBuilder str = new StringBuilder();
 		for (final Block m : matched) {
 			if (str.length() > 0) {

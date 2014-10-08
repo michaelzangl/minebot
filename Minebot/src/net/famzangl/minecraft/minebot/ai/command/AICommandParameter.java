@@ -13,4 +13,6 @@ public @interface AICommandParameter {
 	String description();
 
 	String fixedName() default "";
+	
+	boolean optional() default false;
 }

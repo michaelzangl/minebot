@@ -90,7 +90,10 @@ public abstract class TaskStrategy extends AIStrategy implements
 	
 	@Override
 	public boolean checkShouldTakeOver(AIHelper helper) {
-		searchTasks(helper);
+		if (tasks.isEmpty()) {
+			searchTasks(helper);
+			searchNewTasks = false;
+		}
 		return !tasks.isEmpty();
 	}
 
@@ -99,7 +102,8 @@ public abstract class TaskStrategy extends AIStrategy implements
 		if (desync) {
 			tasks.clear();
 			desync = false;
-			return TickResult.TICK_AGAIN;
+			// pause for a tick, to reset all buttons, jump, ...
+			return TickResult.TICK_HANDLED;
 		}
 
 		if (searchNewTasks) {
@@ -131,6 +135,10 @@ public abstract class TaskStrategy extends AIStrategy implements
 			taskTimeout++;
 			return TickResult.TICK_HANDLED;
 		}
+	}
+	
+	protected boolean hasMoreTasks() {
+		return !tasks.isEmpty();
 	}
 
 	/**

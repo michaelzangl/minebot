@@ -301,16 +301,20 @@ public class PathFinderField implements Comparator<Integer> {
 	}
 
 	protected int[] getNeighbours(int currentNode) {
-		final int[] res = new int[6];
+		final int[] res = new int[10];
 		final int cx = getX(currentNode);
 		final int cz = getZ(currentNode);
 		final int cy = getY(currentNode);
-		res[0] = getNeighbour(currentNode, cx + 1, cy, cz);
-		res[1] = getNeighbour(currentNode, cx - 1, cy, cz);
-		res[2] = getNeighbour(currentNode, cx, cy + 1, cz);
-		res[3] = getNeighbour(currentNode, cx, cy - 1, cz);
+		res[0] = getNeighbour(currentNode, cx, cy + 1, cz);
+		res[1] = getNeighbour(currentNode, cx, cy - 1, cz);
+		res[2] = getNeighbour(currentNode, cx + 1, cy, cz);
+		res[3] = getNeighbour(currentNode, cx - 1, cy, cz);
 		res[4] = getNeighbour(currentNode, cx, cy, cz + 1);
 		res[5] = getNeighbour(currentNode, cx, cy, cz - 1);
+		res[6] = getNeighbour(currentNode, cx + 1, cy - 1, cz);
+		res[7] = getNeighbour(currentNode, cx - 1, cy - 1, cz);
+		res[8] = getNeighbour(currentNode, cx, cy - 1, cz + 1);
+		res[9] = getNeighbour(currentNode, cx, cy - 1, cz - 1);
 		return res;
 	}
 

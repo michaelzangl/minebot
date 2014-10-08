@@ -2,6 +2,7 @@ package net.famzangl.minecraft.minebot.ai.path;
 
 import net.famzangl.minecraft.minebot.Pos;
 import net.famzangl.minecraft.minebot.ai.AIHelper;
+import net.famzangl.minecraft.minebot.ai.BlockWhitelist;
 import net.famzangl.minecraft.minebot.ai.ItemFilter;
 import net.famzangl.minecraft.minebot.ai.task.UseItemOnBlockAtTask;
 import net.famzangl.minecraft.minebot.ai.task.place.DestroyBlockTask;
@@ -16,15 +17,18 @@ import net.minecraft.item.ItemStack;
 
 public class PlantPathFinder extends MovePathFinder {
 	public enum PlantType {
-		ANY(Items.wheat_seeds, Items.carrot, Items.potato),
-		WHEAT(Items.wheat_seeds),
-		CARROT(Items.carrot),
-		POTATO(Items.potato),
-		NETHERWART(Items.nether_wart);
+		ANY(Blocks.farmland, Items.wheat_seeds, Items.carrot, Items.potato),
+		WHEAT(Blocks.farmland, Items.wheat_seeds),
+		CARROT(Blocks.farmland, Items.carrot),
+		POTATO(Blocks.farmland, Items.potato),
+		NETHERWART(Blocks.soul_sand, Items.nether_wart);
+
+		public final Block farmland;
 
 		private final Item[] items;
 
-		private PlantType(Item... items) {
+		private PlantType(Block farmland, Item... items) {
+			this.farmland = farmland;
 			this.items = items;
 		}
 
@@ -61,8 +65,14 @@ public class PlantPathFinder extends MovePathFinder {
 
 	private final PlantType type;
 
+	private static final BlockWhitelist farmlandable = new BlockWhitelist(
+			Blocks.dirt, Blocks.grass);
+
 	public PlantPathFinder(PlantType type) {
 		this.type = type;
+		allowedGroundForUpwardsBlocks = allowedGroundBlocks;
+		footAllowedBlocks = AIHelper.walkableBlocks;
+		headAllowedBlocks = AIHelper.headWalkableBlocks;
 	}
 
 	@Override
@@ -72,9 +82,9 @@ public class PlantPathFinder extends MovePathFinder {
 		} else if (helper.isAirBlock(x, y, z) && hasFarmlandBelow(x, y, z)
 				&& helper.canSelectItem(new SeedFilter(type))) {
 			return distance + 1;
-		} else if (helper.isAirBlock(x, y, z)
-				&& AIHelper.blockIsOneOf(helper.getBlock(x, y - 1, z),
-						Blocks.dirt, Blocks.grass)
+		} else if (type.farmland == Blocks.farmland
+				&& helper.isAirBlock(x, y, z)
+				&& farmlandable.contains(helper.getBlock(x, y - 1, z))
 				&& helper.canSelectItem(new SeedFilter(type))
 				&& helper.canSelectItem(new HoeFilter())) {
 			return distance + 10;
@@ -94,13 +104,7 @@ public class PlantPathFinder extends MovePathFinder {
 	}
 
 	private boolean hasFarmlandBelow(int x, int y, int z) {
-		return Block.isEqualTo(helper.getBlock(x, y - 1, z), Blocks.farmland);
-	}
-
-	@Override
-	protected boolean isForbiddenBlock(Block block) {
-		return !(helper.canWalkOn(block) || AIHelper.blockIsOneOf(block,
-				Blocks.air));
+		return Block.isEqualTo(helper.getBlock(x, y - 1, z), type.farmland);
 	}
 
 	@Override

@@ -25,6 +25,9 @@ public final class InteractAlways extends KeyBinding {
 	@Override
 	public boolean isPressed() {
 		final boolean ret = isPressed;
+		if (isPressed) {
+			System.out.println("Sending key press event.");
+		}
 		isPressed = false;
 		return ret;
 	}

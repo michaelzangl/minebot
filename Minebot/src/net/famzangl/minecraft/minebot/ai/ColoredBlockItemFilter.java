@@ -90,8 +90,8 @@ public class ColoredBlockItemFilter extends BlockItemFilter {
 	}
 
 	@Override
-	public String getDescriptiveString() {
-		return COLORS[colorMeta] + " " + super.getDescriptiveString();
+	public String getDescription() {
+		return COLORS[colorMeta] + " " + super.getDescription();
 	}
 
 }

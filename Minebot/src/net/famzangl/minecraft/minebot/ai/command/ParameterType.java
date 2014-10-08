@@ -8,5 +8,6 @@ public enum ParameterType {
 	COLOR,
 	FILE,
 	POSITION,
-	ENUM
+	ENUM,
+	STRING
 }

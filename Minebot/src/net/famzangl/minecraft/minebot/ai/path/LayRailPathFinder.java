@@ -12,7 +12,7 @@ import net.minecraft.init.Blocks;
 public class LayRailPathFinder extends AlongTrackPathFinder {
 
 	public LayRailPathFinder(int dx, int dz, int cx, int cy, int cz) {
-		super(dx, dz, cx, cy, cz);
+		super(dx, dz, cx, cy, cz, -1);
 	}
 
 	@Override

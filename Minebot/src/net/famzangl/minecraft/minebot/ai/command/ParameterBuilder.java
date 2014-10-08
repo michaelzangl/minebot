@@ -27,4 +27,7 @@ public abstract class ParameterBuilder {
 	 */
 	public abstract Object getParameter(AIHelper helper, String[] arguments);
 
+	boolean isOptional() {
+		return annot != null && annot.optional();
+	}
 }

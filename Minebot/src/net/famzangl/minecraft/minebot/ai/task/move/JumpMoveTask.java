@@ -26,7 +26,7 @@ public class JumpMoveTask extends HorizontalMoveTask {
 
 	@Override
 	public void runTick(AIHelper h, TaskOperations o) {
-		if (!h.isAirBlock(oldX, y + 1, oldZ)) {
+		if (!h.canWalkThrough(h.getBlock(oldX, y + 1, oldZ))) {
 			h.faceAndDestroy(oldX, y + 1, oldZ);
 		} else {
 			super.runTick(h, o);

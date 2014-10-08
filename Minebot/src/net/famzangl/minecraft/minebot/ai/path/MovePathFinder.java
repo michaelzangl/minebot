@@ -7,6 +7,7 @@ import net.famzangl.minecraft.minebot.MinebotSettings;
 import net.famzangl.minecraft.minebot.Pos;
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.BlockItemFilter;
+import net.famzangl.minecraft.minebot.ai.BlockWhitelist;
 import net.famzangl.minecraft.minebot.ai.PathFinderField;
 import net.famzangl.minecraft.minebot.ai.task.AITask;
 import net.famzangl.minecraft.minebot.ai.task.move.AlignToGridTask;
@@ -37,9 +38,22 @@ public class MovePathFinder extends PathFinderField {
 	 * Blocks we should not dig through, e.g. because we cannot handle them
 	 * correctly.
 	 */
-	protected static Block[] dangerous = new Block[] { Blocks.bedrock,
-			Blocks.cactus, Blocks.obsidian, Blocks.piston_extension,
-			Blocks.piston_head };
+	protected static final BlockWhitelist defaultForbiddenBlocks = new BlockWhitelist(
+			Blocks.bedrock, Blocks.cactus, Blocks.obsidian,
+			Blocks.piston_extension, Blocks.piston_head);
+
+	/**
+	 * This list can be changed. Only blocks of this type are walked to.
+	 */
+	protected BlockWhitelist allowedGroundBlocks = AIHelper.safeStandableBlocks;
+	protected BlockWhitelist allowedGroundForUpwardsBlocks = AIHelper.safeStandableBlocks
+			.unionWith(AIHelper.walkableBlocks);
+
+	protected BlockWhitelist footAllowedBlocks = AIHelper.safeDestructableBlocks
+			.unionWith(AIHelper.safeHeadBlocks)
+			.unionWith(AIHelper.fallingBlocks)
+			.intersectWith(defaultForbiddenBlocks.invert());
+	protected BlockWhitelist headAllowedBlocks = footAllowedBlocks;
 
 	private TaskReceiver receiver;
 
@@ -98,32 +112,48 @@ public class MovePathFinder extends PathFinderField {
 		return res;
 	}
 
-	protected boolean isForbiddenBlock(Block block) {
-		return AIHelper.blockIsOneOf(block, dangerous);
-	}
-
 	protected boolean isSafeToTravel(int currentNode, int cx, int cy, int cz) {
 		return helper.hasSafeSides(cx, cy + 1, cz)
-				&& !isForbiddenBlock(helper.getBlock(cx, cy + 1, cz))
+				&& isAllowedPosition(cx, cy, cz)
 				&& helper.hasSafeSides(cx, cy, cz)
-				&& !isForbiddenBlock(helper.getBlock(cx, cy, cz))
 				&& checkHeadBlock(currentNode, cx, cy, cz)
 				&& checkGroundBlock(currentNode, cx, cy, cz);
 	}
 
+	/**
+	 * Are we allowed to travel there, only looking at the blocks that we need.
+	 * 
+	 * @param cx
+	 * @param cy
+	 * @param cz
+	 * @return
+	 */
+	private boolean isAllowedPosition(int cx, int cy, int cz) {
+		return footAllowedBlocks.contains(helper.getBlockId(cx, cy, cz))
+				&& headAllowedBlocks
+						.contains(helper.getBlockId(cx, cy + 1, cz));
+	}
+
 	protected boolean checkGroundBlock(int currentNode, int cx, int cy, int cz) {
 		if (getY(currentNode) < cy) {
-			return helper.isSafeGroundBlock(cx, cy - 1, cz)
-					|| helper.canWalkOn(helper.getBlock(cx, cy - 1, cz));
+			return allowedGroundForUpwardsBlocks.contains(helper.getBlockId(cx,
+					cy - 1, cz));
 		} else {
-			return helper.isSafeGroundBlock(cx, cy - 1, cz);
+			return allowedGroundBlocks.contains(helper.getBlockId(cx, cy - 1,
+					cz));
 		}
 	}
 
 	private boolean checkHeadBlock(int currentNode, int cx, int cy, int cz) {
-		if (getY(currentNode) > cy && helper.isFallingBlock(cx, cy + 2, cz)) {
-			// moving down, so ignoring sand, gravel.
-			return true;
+		if (getY(currentNode) > cy) {
+			if (getX(currentNode) != cx || getZ(currentNode) != cz) {
+				return helper.isSafeHeadBlock(cx, cy + 3, cz)
+						&& AIHelper.headWalkableBlocks.contains(helper.getBlockId(cx,
+								cy + 2, cz));
+			} else if (helper.isFallingBlock(cx, cy + 2, cz)) {
+				// moving down, so ignoring sand, gravel.
+				return true;
+			}
 		}
 		return helper.isSafeHeadBlock(cx, cy + 2, cz);
 	}
@@ -140,8 +170,8 @@ public class MovePathFinder extends PathFinderField {
 		addTask(new AlignToGridTask(currentPos.x, currentPos.y, currentPos.z));
 		while (!path.isEmpty()) {
 			Pos nextPos = path.removeFirst();
-			final ForgeDirection moveDirection = direction(currentPos, nextPos);
-
+			ForgeDirection moveDirection;
+			moveDirection = direction(currentPos, nextPos);
 			if (torchLightLevel >= 0 && moveDirection != ForgeDirection.UP) {
 				ForgeDirection direction;
 				if (moveDirection == ForgeDirection.UP) {
@@ -155,7 +185,7 @@ public class MovePathFinder extends PathFinderField {
 
 			final Pos peeked = path.peekFirst();
 			if (moveDirection == ForgeDirection.UP && peeked != null
-					&& direction(nextPos, peeked).offsetY == 0) {
+					&& nextPos.subtract(peeked).y == 0) {
 				// Combine upwards-sidewards.
 				// System.out.println("Next direction is: "
 				// + direction(nextPos, peeked));
@@ -166,7 +196,7 @@ public class MovePathFinder extends PathFinderField {
 			} else if (nextPos.y > currentPos.y) {
 				addTask(new UpwardsMoveTask(nextPos.x, nextPos.y, nextPos.z,
 						new BlockItemFilter(upwardsBuildBlocks)));
-			} else if (nextPos.y < currentPos.y) {
+			} else if (nextPos.y < currentPos.y && nextPos.x == currentPos.x && nextPos.z == currentPos.z) {
 				addTask(new DownwardsMoveTask(nextPos.x, nextPos.y, nextPos.z));
 			} else {
 				addTask(new HorizontalMoveTask(nextPos.x, nextPos.y, nextPos.z));
@@ -177,7 +207,11 @@ public class MovePathFinder extends PathFinderField {
 	}
 
 	private ForgeDirection direction(Pos currentPos, final Pos nextPos) {
-		return AIHelper.getDirectionFor(nextPos.subtract(currentPos));
+		Pos delta = nextPos.subtract(currentPos);
+		if (delta.y != 0 && (delta.x != 0 || delta.z != 0)) {
+			delta = new Pos(delta.x, 0, delta.z);
+		}
+		return AIHelper.getDirectionFor(delta);
 	}
 
 	protected void addTasksForTarget(Pos currentPos) {
@@ -202,14 +236,15 @@ public class MovePathFinder extends PathFinderField {
 		return distance;
 	}
 
+	protected final static BlockWhitelist fastDestructableBlocks = new BlockWhitelist(
+			Blocks.dirt, Blocks.gravel, Blocks.sand, Blocks.sandstone);
+
 	protected int materialDistance(int x, int y, int z, boolean asFloor) {
 		final Block block = helper.getBlock(x, y, z);
-		if (Block.isEqualTo(block, Blocks.air) || asFloor
-				&& helper.canWalkOn(block) || !asFloor
+		if (asFloor && helper.canWalkOn(block) || !asFloor
 				&& helper.canWalkThrough(block)) {
 			return 0;
-		} else if (AIHelper.blockIsOneOf(block, Blocks.dirt, Blocks.gravel,
-				Blocks.sand, Blocks.sandstone)) {
+		} else if (fastDestructableBlocks.contains(block)) {
 			// fast breaking gives bonus.
 			return 1;
 		} else {

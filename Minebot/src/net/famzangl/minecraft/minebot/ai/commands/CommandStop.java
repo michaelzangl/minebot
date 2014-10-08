@@ -36,4 +36,32 @@ public class CommandStop {
 			@AICommandParameter(type = ParameterType.FIXED, fixedName = "force", description = "") String nameArg3) {
 		return new StopInStrategy(seconds, true);
 	}
+
+	@AICommandInvocation()
+	public static AIStrategy run(
+			AIHelper helper,
+			@AICommandParameter(type = ParameterType.FIXED, fixedName = "stop", description = "") String nameArg,
+			@AICommandParameter(type = ParameterType.FIXED, fixedName = "on", description = "") String nameArg2,
+			@AICommandParameter(type = ParameterType.FIXED, fixedName = "death", description = "") String nameArg3) {
+		return new AIStrategy() {
+			@Override
+			public boolean checkShouldTakeOver(AIHelper helper) {
+				return !helper.isAlive();
+			}
+			
+			@Override
+			public boolean takesOverAnyTime() {
+				return true;
+			}
+			
+			@Override
+			protected TickResult onGameTick(AIHelper helper) {
+				if (!helper.isAlive()) {
+					return TickResult.ABORT;
+				} else {
+					return TickResult.NO_MORE_WORK;
+				}
+			}
+		};
+	}
 }

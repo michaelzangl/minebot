@@ -2,15 +2,19 @@ package net.famzangl.minecraft.minebot.ai.path;
 
 import net.famzangl.minecraft.minebot.Pos;
 import net.famzangl.minecraft.minebot.ai.task.MineBlockTask;
+import net.famzangl.minecraft.minebot.ai.task.WaitTask;
+import net.famzangl.minecraft.minebot.ai.task.place.ReplantTask;
 import net.famzangl.minecraft.minebot.build.WoodType;
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
 
 public class TreePathFinder extends MovePathFinder {
 	private final WoodType type;
+	private final boolean replant;
 
-	public TreePathFinder(WoodType type) {
+	public TreePathFinder(WoodType type, boolean replant) {
 		this.type = type;
+		this.replant = replant;
 	}
 
 	private static final int TREE_HEIGHT = 7;
@@ -70,5 +74,9 @@ public class TreePathFinder extends MovePathFinder {
 						currentPos.z));
 			}
 		}
+		if (replant) {
+			addTask(new ReplantTask(currentPos.x, currentPos.y, currentPos.z));
+		}
+		addTask(new WaitTask(mineAbove * 2));
 	}
 }

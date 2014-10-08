@@ -7,6 +7,7 @@ import java.util.Collections;
 import net.famzangl.minecraft.minebot.Pos;
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.BlockItemFilter;
+import net.famzangl.minecraft.minebot.ai.BlockWhitelist;
 import net.famzangl.minecraft.minebot.ai.task.AITask;
 import net.famzangl.minecraft.minebot.ai.task.BlockSide;
 import net.famzangl.minecraft.minebot.ai.task.DestroyInRangeTask;
@@ -55,7 +56,7 @@ public class BuildWayPathfinder extends AlongTrackPathFinder {
 	private final int width = 2;
 
 	private BuildWayPathfinder(int dx, int dz, int cx, int cy, int cz) {
-		super(dx, dz, cx, cy, cz);
+		super(dx, dz, cx, cy, cz, -1);
 	}
 
 	public BuildWayPathfinder(ForgeDirection dir, Pos pos) {
@@ -170,6 +171,8 @@ public class BuildWayPathfinder extends AlongTrackPathFinder {
 	}
 
 	private class NormalWayType extends WayPiece {
+		private final BlockWhitelist airLike = AIHelper.air.unionWith(AIHelper.walkableBlocks);;
+
 		public NormalWayType(int stepIndex) {
 			super(stepIndex);
 		}
@@ -179,9 +182,8 @@ public class BuildWayPathfinder extends AlongTrackPathFinder {
 			for (int y = 2; y <= 3; y++) {
 				for (int u = -1; u <= width + 1; u++) {
 					final Block block = helper.getBlock(getPos(u, y));
-					if (AIHelper.blockIsOneOf(block, AIHelper.normalBlocks)
-							|| AIHelper.blockIsOneOf(block,
-									AIHelper.fallingBlocks)) {
+					if (AIHelper.normalBlocks.contains(block)
+							|| AIHelper.fallingBlocks.contains(block)) {
 						covered++;
 					}
 				}
@@ -198,8 +200,7 @@ public class BuildWayPathfinder extends AlongTrackPathFinder {
 
 		private boolean isAirlike(int u, int dy) {
 			final Block block = helper.getBlock(getPos(u, dy));
-			return AIHelper.blockIsOneOf(block, Blocks.air)
-					|| AIHelper.blockIsOneOf(block, AIHelper.walkableBlocks);
+			return airLike.contains(block);
 		}
 	}
 

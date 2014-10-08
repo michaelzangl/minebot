@@ -32,7 +32,7 @@ public abstract class PutItemInContainerTask extends AITask {
 		placed = true;
 		if (slotToPlace < 0) {
 			System.out.println("No item to put.");
-			o.desync(new StringTaskError("No itemto put in that slot."));
+			o.desync(new StringTaskError("No item to put in that slot."));
 		} else {
 			System.out.println("Moving from slot: " + slotToPlace);
 			Slot slot = screen.inventorySlots.getSlot(slotToPlace);

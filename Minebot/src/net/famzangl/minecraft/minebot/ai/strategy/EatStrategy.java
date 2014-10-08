@@ -17,7 +17,6 @@ public class EatStrategy extends AIStrategy {
 
 	@Override
 	public boolean checkShouldTakeOver(AIHelper helper) {
-		System.out.println("select: "+helper.canSelectItem(FILTER));
 		return needFood(helper) && helper.canSelectItem(FILTER);
 	}
 
@@ -27,12 +26,16 @@ public class EatStrategy extends AIStrategy {
 
 	@Override
 	protected TickResult onGameTick(AIHelper helper) {
-		if (needFood(helper) && helper.selectCurrentItem(FILTER)) {
-			helper.overrideSneak();
-			helper.overrideUseItem();
-			return TickResult.TICK_HANDLED;
+		if (needFood(helper))  {
+			if (helper.selectCurrentItem(FILTER)) {
+				helper.overrideSneak();
+				helper.overrideUseItem();
+				return TickResult.TICK_HANDLED;
+			} else {
+				AIChatController.addChatLine("Could not find anything to eat");
+				return TickResult.NO_MORE_WORK;
+			}
 		} else {
-			AIChatController.addChatLine("Could not find anything to eat");
 			return TickResult.NO_MORE_WORK;
 		}
 	}

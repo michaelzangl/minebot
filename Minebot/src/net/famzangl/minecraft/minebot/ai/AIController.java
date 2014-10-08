@@ -14,19 +14,20 @@ import net.famzangl.minecraft.minebot.ai.render.PosMarkerRenderer;
 import net.famzangl.minecraft.minebot.ai.strategy.AIStrategy;
 import net.famzangl.minecraft.minebot.ai.strategy.AIStrategy.TickResult;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiMainMenu;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.MouseHelper;
+import net.minecraftforge.client.event.GuiOpenEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent.ElementType;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent.Action;
-import net.minecraftforge.event.world.WorldEvent;
 
 import org.lwjgl.input.Keyboard;
 
@@ -241,9 +242,12 @@ public class AIController extends AIHelper implements IAIControllable {
 	}
 
 	@SubscribeEvent
-	public void resetOnGameEnd(WorldEvent.Unload unload) {
-		dead = true;
-		buildManager.reset();
+	public void resetOnGameEnd(GuiOpenEvent unload) {
+		if (unload.gui instanceof GuiMainMenu) {
+			System.out.println("Unloading world.");
+			dead = true;
+			buildManager.reset();
+		}
 	}
 
 	/**

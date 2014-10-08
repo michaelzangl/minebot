@@ -14,12 +14,9 @@ public class MinebotMod {
 
 	@EventHandler
 	public void init(FMLInitializationEvent event) {
-		// FMLCommonHandler.instance().bus().register(new KeyHandlers());
 		FMLCommonHandler.instance().bus().register(new PlayerUpdateHandler());
-		// FMLCommonHandler.instance().bus().register(new PlantKeyHandler());
 		final AIController controller = new AIController();
 		controller.initialize();
-		// FMLCommonHandler.instance().onPlayerPostTick(player)
 	}
 
 	public static String getVersion() {

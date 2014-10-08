@@ -88,16 +88,4 @@ public abstract class ValueActionStrategy extends AIStrategy {
 				: "Handling " + getSettingPrefix() + ".";
 	}
 
-	public static AIStrategy makeSafe(AIStrategy baseStrategy, boolean hard) {
-		final StrategyStack stack = new StrategyStack();
-		if (hard) {
-			stack.addStrategy(new DoNotSuffocateStrategy());
-		}
-		stack.addStrategy(new DamageTakenStrategy());
-		stack.addStrategy(new PlayerComesActionStrategy());
-		stack.addStrategy(new CreeperComesActionStrategy());
-		stack.addStrategy(baseStrategy);
-		return new StackStrategy(stack);
-	}
-
 }

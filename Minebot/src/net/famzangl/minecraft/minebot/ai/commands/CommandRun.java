@@ -18,7 +18,6 @@ import net.famzangl.minecraft.minebot.ai.strategy.StackStrategy;
 import net.famzangl.minecraft.minebot.ai.strategy.StrategyStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiChat;
-import net.minecraft.client.gui.GuiScreen;
 
 @AICommand(helpText = "Run commands from a file.", name = "minebot")
 public class CommandRun {
@@ -181,25 +180,6 @@ public class CommandRun {
 			activeStrategy.setActive(true, helper);
 		}
 
-		private AIStrategy runAndGetStrategy(AIHelper helper,
-				final String command) {
-			final IAIControllable controlled = AIChatController.getRegistry()
-					.getControlled();
-			final StrategyReceiver tempController = new StrategyReceiver(
-					controlled);
-			try {
-				AIChatController.getRegistry().setControlled(tempController);
-				runCommand(helper, command);
-			} finally {
-				AIChatController.getRegistry().setControlled(controlled);
-			}
-			return tempController.getReceivedStrategy();
-		}
-
-		private void runCommand(AIHelper helper, String command) {
-			CommandRun.runCommand(helper, command);
-		}
-
 		@Override
 		public String getDescription(AIHelper helper) {
 			return "Running from file..." + (activeStrategy != null ? "\n" + activeStrategy.getDescription(helper): "");
@@ -207,12 +187,28 @@ public class CommandRun {
 
 	}
 
+	public static AIStrategy runAndGetStrategy(AIHelper helper,
+			final String command) {
+		final IAIControllable controlled = AIChatController.getRegistry()
+				.getControlled();
+		final StrategyReceiver tempController = new StrategyReceiver(
+				controlled);
+		try {
+			AIChatController.getRegistry().setControlled(tempController);
+			runCommand(helper, command);
+		} finally {
+			AIChatController.getRegistry().setControlled(controlled);
+		}
+		return tempController.getReceivedStrategy();
+	}
+
 	public static void runCommand(AIHelper helper, String command) {
 		if (helper.getMinecraft().ingameGUI.getChatGUI() != null) {
 			final GuiChat chat = new GuiChat();
-			helper.getMinecraft().displayGuiScreen(chat);
+			//helper.getMinecraft().displayGuiScreen(chat);
+			chat.mc = helper.getMinecraft();
 			chat.func_146403_a(command);
-			helper.getMinecraft().displayGuiScreen((GuiScreen) null);
+			//helper.getMinecraft().displayGuiScreen((GuiScreen) null);
 		}
 	}
 

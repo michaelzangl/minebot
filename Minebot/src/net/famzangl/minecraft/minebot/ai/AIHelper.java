@@ -35,6 +35,7 @@ import net.minecraftforge.common.util.ForgeDirection;
  * 
  */
 public abstract class AIHelper {
+	private static final int BEDROCK_ID = Block.getIdFromBlock(Blocks.bedrock);
 	private static final double SNEAK_OFFSET = .2;
 	private static final double WALK_PER_STEP = 4.3 / 20;
 	private static final double MIN_DISTANCE_ERROR = 0.05;
@@ -44,59 +45,91 @@ public abstract class AIHelper {
 	/**
 	 * Blocks we can just walk over/next to without problems.
 	 */
-	public static final Block[] normalBlocks = new Block[] { Blocks.bedrock,
-			Blocks.bookshelf, Blocks.brick_block, Blocks.brown_mushroom_block,
-			Blocks.cake, Blocks.clay, Blocks.coal_block, Blocks.coal_ore,
-			Blocks.cobblestone, Blocks.crafting_table, Blocks.diamond_block,
-			Blocks.diamond_ore, Blocks.dirt, Blocks.double_stone_slab,
-			Blocks.double_wooden_slab, Blocks.emerald_block,
-			Blocks.emerald_ore, Blocks.farmland, Blocks.glass,
-			Blocks.glowstone, Blocks.grass, Blocks.gold_block, Blocks.gold_ore,
-			Blocks.hardened_clay, Blocks.iron_block, Blocks.iron_ore,
-			Blocks.lapis_block, Blocks.lapis_ore, Blocks.leaves,
-			Blocks.leaves2, Blocks.log, Blocks.log2,
+	public static final BlockWhitelist normalBlocks = new BlockWhitelist(
+			Blocks.bedrock, Blocks.bookshelf, Blocks.brick_block,
+			Blocks.brown_mushroom_block, Blocks.cake, Blocks.clay,
+			Blocks.coal_block, Blocks.coal_ore, Blocks.cobblestone,
+			Blocks.crafting_table, Blocks.diamond_block, Blocks.diamond_ore,
+			Blocks.dirt, Blocks.double_stone_slab, Blocks.double_wooden_slab,
+			Blocks.emerald_block, Blocks.emerald_ore, Blocks.farmland,
+			Blocks.furnace, Blocks.glass, Blocks.glowstone, Blocks.grass,
+			Blocks.gold_block, Blocks.gold_ore, Blocks.hardened_clay,
+			Blocks.iron_block, Blocks.iron_ore, Blocks.lapis_block,
+			Blocks.lapis_ore, Blocks.leaves, Blocks.leaves2,
+			Blocks.lit_pumpkin, Blocks.lit_furnace, Blocks.lit_redstone_lamp,
+			Blocks.lit_redstone_ore, Blocks.log, Blocks.log2,
 			Blocks.melon_block,
 			Blocks.mossy_cobblestone,
 			Blocks.mycelium,
 			Blocks.nether_brick,
 			Blocks.nether_brick_fence,
 			Blocks.netherrack,
-			// Watch out, this cannot be broken easilly !
+			// Watch out, this cannot be broken easily !
 			Blocks.obsidian, Blocks.packed_ice, Blocks.planks, Blocks.pumpkin,
 			Blocks.quartz_block, Blocks.quartz_ore, Blocks.red_mushroom_block,
 			Blocks.redstone_block, Blocks.redstone_lamp, Blocks.redstone_ore,
 			Blocks.sandstone, Blocks.snow, Blocks.soul_sand,
 			Blocks.stained_glass, Blocks.stained_hardened_clay, Blocks.stone,
-			Blocks.stonebrick, Blocks.wool };
+			Blocks.stonebrick, Blocks.wool);
 
-	public static final Block[] fallingBlocks = new Block[] { Blocks.gravel,
-			Blocks.sand, };
+	public static final BlockWhitelist fallingBlocks = new BlockWhitelist(
+			Blocks.gravel, Blocks.sand);
 
+	public static final BlockWhitelist air = new BlockWhitelist(Blocks.air);
 	/**
 	 * All stairs. It is no problem to walk on them.
 	 */
-	public static final Block[] stairBlocks = new Block[] {
+	public static final BlockWhitelist stairBlocks = new BlockWhitelist(
 			Blocks.acacia_stairs, Blocks.birch_stairs, Blocks.brick_stairs,
 			Blocks.dark_oak_stairs, Blocks.jungle_stairs,
 			Blocks.nether_brick_stairs, Blocks.oak_stairs,
 			Blocks.sandstone_stairs, Blocks.spruce_stairs,
 			Blocks.stone_brick_stairs, Blocks.stone_stairs, Blocks.stone_slab,
-			Blocks.wooden_slab, Blocks.quartz_stairs };
+			Blocks.wooden_slab, Blocks.quartz_stairs);
 
 	/**
 	 * Flowers and stuff like that
 	 */
-	public static final Block[] walkableBlocks = new Block[] {
+	private static final BlockWhitelist explicitFootWalkableBlocks = new BlockWhitelist(
 			Blocks.tallgrass, Blocks.yellow_flower, Blocks.red_flower,
 			Blocks.wheat, Blocks.carrots, Blocks.potatoes, Blocks.pumpkin_stem,
 			Blocks.melon_stem, Blocks.torch, Blocks.carpet, Blocks.golden_rail,
 			Blocks.detector_rail, Blocks.rail, Blocks.activator_rail,
 			Blocks.double_plant, Blocks.red_mushroom, Blocks.brown_mushroom,
-			Blocks.redstone_wire };
-	public static final Block[] safeSideBlocks = new Block[] { Blocks.fence,
-			Blocks.fence_gate, Blocks.cobblestone_wall, Blocks.cactus,
-			Blocks.reeds, Blocks.web};
+			Blocks.redstone_wire, Blocks.sapling, Blocks.snow_layer,
+			Blocks.nether_wart, Blocks.standing_sign, Blocks.wall_sign);
 
+	public static final BlockWhitelist headWalkableBlocks = new BlockWhitelist(
+			Blocks.air, Blocks.torch, Blocks.double_plant,
+			Blocks.redstone_torch, Blocks.cocoa);
+
+	public static final BlockWhitelist walkableBlocks = explicitFootWalkableBlocks
+			.unionWith(headWalkableBlocks);
+
+	public static final BlockWhitelist explicitSafeSideBlocks = new BlockWhitelist(Blocks.anvil,
+			Blocks.fence, Blocks.fence_gate, Blocks.cobblestone_wall,
+			Blocks.cactus, Blocks.reeds, Blocks.web, Blocks.glass_pane,
+			Blocks.bed, Blocks.enchanting_table, Blocks.waterlily,
+			Blocks.brewing_stand, Blocks.vine);
+
+	/**
+	 * Blocks that form a solid ground.
+	 */
+	public static final BlockWhitelist safeStandableBlocks = normalBlocks
+			.unionWith(fallingBlocks).unionWith(stairBlocks);
+
+	public static final BlockWhitelist safeSideBlocks = explicitSafeSideBlocks
+			.unionWith(safeStandableBlocks).unionWith(walkableBlocks)
+			.unionWith(air);
+
+	public static final BlockWhitelist safeHeadBlocks = stairBlocks
+			.unionWith(walkableBlocks).unionWith(normalBlocks).unionWith(air);
+
+	/**
+	 * Blocks you need to destroy but that are then safe.
+	 */
+	public static final BlockWhitelist safeDestructableBlocks = new BlockWhitelist(Blocks.vine);
+	
 	public final BuildManager buildManager = new BuildManager();
 	private boolean objectMouseOverInvalidated;
 
@@ -407,9 +440,10 @@ public abstract class AIHelper {
 	 * @return
 	 */
 	public boolean isAirBlock(int x, int y, int z) {
-		return Block.isEqualTo(mc.theWorld.getBlock(x, y, z), Blocks.air);
+		final int block = getBlockId(x, y, z);
+		return air.contains(block);
 	}
-	
+
 	/**
 	 * Check if this block is safe to stand on it on a path.
 	 * 
@@ -419,8 +453,8 @@ public abstract class AIHelper {
 	 * @return
 	 */
 	public boolean isSafeGroundBlock(int x, int y, int z) {
-		final Block block = getBlock(x, y, z);
-		return isSafeStandableBlock(block);
+		final int block = getBlockId(x, y, z);
+		return safeStandableBlocks.contains(block);
 	}
 
 	/**
@@ -432,15 +466,13 @@ public abstract class AIHelper {
 	 * @return
 	 */
 	public boolean isSafeHeadBlock(int x, int y, int z) {
-		final Block block = mc.theWorld.getBlock(x, y, z);
-		return blockIsOneOf(block, stairBlocks)
-				|| blockIsOneOf(block, walkableBlocks)
-				|| blockIsOneOf(block, normalBlocks) || isAirBlock(x, y, z);
+		final int block = getBlockId(x, y, z);
+		return safeHeadBlocks.contains(block);
 	}
 
 	public boolean isFallingBlock(int x, int y, int z) {
-		final Block block = mc.theWorld.getBlock(x, y, z);
-		return blockIsOneOf(block, fallingBlocks);
+		final int block = getBlockId(x, y, z);
+		return fallingBlocks.contains(block);
 	}
 
 	/**
@@ -452,18 +484,16 @@ public abstract class AIHelper {
 	 * @param cz
 	 * @return
 	 */
-	public boolean hasSafeSides(int cx, int cy, int cz) {
+	public final boolean hasSafeSides(int cx, int cy, int cz) {
 		return isSafeSideBlock(cx - 1, cy, cz)
 				&& isSafeSideBlock(cx + 1, cy, cz)
 				&& isSafeSideBlock(cx, cy, cz + 1)
 				&& isSafeSideBlock(cx, cy, cz - 1);
 	}
 
-	public boolean isSafeSideBlock(int x, int y, int z) {
-		final Block block = mc.theWorld.getBlock(x, y, z);
-		return isSafeStandableBlock(block) || canWalkOn(block)
-				|| canWalkThrough(block) || blockIsOneOf(block, safeSideBlocks)
-				|| isAirBlock(x, y, z);
+	public final boolean isSafeSideBlock(int x, int y, int z) {
+		final int block = getBlockId(x, y, z);
+		return safeSideBlocks.contains(block);
 	}
 
 	/**
@@ -485,8 +515,7 @@ public abstract class AIHelper {
 	 * @return
 	 */
 	public boolean canWalkThrough(Block block) {
-		return blockIsOneOf(block, Blocks.air, Blocks.torch,
-				Blocks.double_plant, Blocks.redstone_torch);
+		return headWalkableBlocks.contains(block);
 	}
 
 	/**
@@ -497,7 +526,7 @@ public abstract class AIHelper {
 	 * @return
 	 */
 	public boolean canWalkOn(Block block) {
-		return blockIsOneOf(block, walkableBlocks) || canWalkThrough(block);
+		return walkableBlocks.contains(block);
 	}
 
 	/**
@@ -519,9 +548,13 @@ public abstract class AIHelper {
 	 * @return
 	 */
 	public boolean isSafeStandableBlock(Block block) {
-		return blockIsOneOf(block, normalBlocks)
-				|| blockIsOneOf(block, fallingBlocks)
-				|| blockIsOneOf(block, stairBlocks);
+		return safeStandableBlocks.contains(block);
+	}
+
+	public boolean isSideTorch(int x, int y, int z) {
+		return blockIsOneOf(getBlock(x, y, z), Blocks.torch,
+				Blocks.redstone_torch)
+				&& getMinecraft().theWorld.getBlockMetadata(x, y, z) != 5;
 	}
 
 	/**
@@ -532,12 +565,73 @@ public abstract class AIHelper {
 	 * @param z
 	 */
 	public void faceAndDestroy(final int x, final int y, final int z) {
+		if (!isFacingBlock(x, y, z)) {
+			faceBlock(x, y, z);
+		}
+
 		if (isFacingBlock(x, y, z)) {
 			selectToolFor(x, y, z);
 			overrideAttack();
-		} else {
-			faceBlock(x, y, z);
 		}
+	}
+
+	public void faceAndDestroyWithHangingBlock(final int x, final int y,
+			final int z) {
+		faceAndDestroy(x, y, z);
+		if (!isFacingBlock(x, y, z)) {
+			// Check if there is a block hanging here.
+			for (ForgeDirection d : ForgeDirection.VALID_DIRECTIONS) {
+				if (isFacingBlock(x + d.offsetX, y + d.offsetY, z + d.offsetZ)) {
+					Pos hanging = getHaningOnBlock(x + d.offsetX,
+							y + d.offsetY, z + d.offsetZ);
+					if (hanging != null && hanging.x == x && hanging.y == y
+							&& hanging.z == z) {
+						overrideAttack();
+					}
+				}
+			}
+		}
+	}
+
+	public Pos getHaningOnBlock(int x, int y, int z) {
+		Block b = getBlock(x, y, z);
+		int meta = mc.theWorld.getBlockMetadata(x, y, z);
+		if (blockIsOneOf(b, Blocks.torch, Blocks.redstone_torch)) {
+			ForgeDirection dir = getTorchDirection(meta);
+			return new Pos(x - dir.offsetX, y - dir.offsetY, z - dir.offsetZ);
+		} else if (blockIsOneOf(b, Blocks.ladder, Blocks.wall_sign)) {
+			ForgeDirection dir = getSignDirection(meta);
+			return new Pos(x - dir.offsetX, y - dir.offsetY, z - dir.offsetZ);
+		} else if (walkableBlocks.contains(b)) {
+			return new Pos(x, y - 1, z);
+		}
+		return null;
+	}
+
+	/**
+	 * Get the sign/ladder/dispenser/dropper direction
+	 * 
+	 * @param meta
+	 * @return
+	 */
+	private ForgeDirection getSignDirection(int metaValue) {
+		return new ForgeDirection[] { ForgeDirection.DOWN, ForgeDirection.UP,
+				ForgeDirection.NORTH, ForgeDirection.SOUTH,
+				ForgeDirection.WEST, ForgeDirection.EAST }[metaValue];
+
+	}
+
+	// TODO: Move somewhere else.
+	/**
+	 * The direction the torch is facing. Default would be up.
+	 * 
+	 * @param metaValue
+	 * @return
+	 */
+	public ForgeDirection getTorchDirection(int metaValue) {
+		return new ForgeDirection[] { ForgeDirection.UNKNOWN,
+				ForgeDirection.EAST, ForgeDirection.WEST, ForgeDirection.SOUTH,
+				ForgeDirection.NORTH, ForgeDirection.UP }[metaValue];
 	}
 
 	/**
@@ -612,8 +706,8 @@ public abstract class AIHelper {
 	public void faceSideOf(int x, int y, int z, ForgeDirection sideToFace,
 			double minY, double maxY, double centerX, double centerZ,
 			ForgeDirection xzdir) {
-//		System.out.println("x = " + x + " y=" + y + " z=" + z + " dir="
-//				+ sideToFace);
+		// System.out.println("x = " + x + " y=" + y + " z=" + z + " dir="
+		// + sideToFace);
 		final Block block = getBoundsBlock(x, y, z);
 
 		minY = Math.max(minY, block.getBlockBoundsMinY());
@@ -711,26 +805,34 @@ public abstract class AIHelper {
 	public void overrideUseItem() {
 		if (resetUseItemKey == null) {
 			resetUseItemKey = mc.gameSettings.keyBindUseItem;
-			useItemKeyJustPressed = resetUseItemKey.getIsKeyPressed();
+			// useItemKeyJustPressed |= resetUseItemKey.getIsKeyPressed();
 		}
 		mc.gameSettings.keyBindUseItem = new InteractAlways(
 				mc.gameSettings.keyBindAttack.getKeyDescription(), 501,
 				mc.gameSettings.keyBindAttack.getKeyCategory(),
-				useItemKeyJustPressed);
+				!useItemKeyJustPressed);
 	}
 
 	/**
 	 * Presses the attack key in the next game tick.
 	 */
 	public void overrideAttack() {
+		if (mc.thePlayer.isUsingItem()) {
+			System.err
+					.println("WARNING: Player is currently using an item, but attack was requested.");
+		}
 		if (resetAttackKey == null) {
 			resetAttackKey = mc.gameSettings.keyBindAttack;
-			attackKeyJustPressed = resetAttackKey.getIsKeyPressed();
+			// if (resetAttackKey.getIsKeyPressed()) {
+			// System.out.println("Attack was pressed.");
+			// }
+			// This just made problems...
+			// attackKeyJustPressed |= resetAttackKey.getIsKeyPressed();
 		}
 		mc.gameSettings.keyBindAttack = new InteractAlways(
 				mc.gameSettings.keyBindAttack.getKeyDescription(), 502,
 				mc.gameSettings.keyBindAttack.getKeyCategory(),
-				attackKeyJustPressed);
+				!attackKeyJustPressed);
 	}
 
 	/**
@@ -739,12 +841,12 @@ public abstract class AIHelper {
 	public void overrideSneak() {
 		if (resetSneakKey == null) {
 			resetSneakKey = mc.gameSettings.keyBindSneak;
-			sneakKeyJustPressed = resetSneakKey.getIsKeyPressed();
+			// sneakKeyJustPressed |= resetSneakKey.getIsKeyPressed();
 		}
 		mc.gameSettings.keyBindSneak = new InteractAlways(
 				mc.gameSettings.keyBindSneak.getKeyDescription(), 503,
 				mc.gameSettings.keyBindSneak.getKeyCategory(),
-				sneakKeyJustPressed);
+				!sneakKeyJustPressed);
 	}
 
 	/**
@@ -753,18 +855,22 @@ public abstract class AIHelper {
 	protected void resetAllInputs() {
 		if (resetMovementInput != null) {
 			mc.thePlayer.movementInput = resetMovementInput;
+			resetMovementInput = null;
 		}
 		attackKeyJustPressed = resetAttackKey != null;
 		if (resetAttackKey != null) {
 			mc.gameSettings.keyBindAttack = resetAttackKey;
+			resetAttackKey = null;
 		}
 		useItemKeyJustPressed = resetUseItemKey != null;
 		if (resetUseItemKey != null) {
 			mc.gameSettings.keyBindUseItem = resetUseItemKey;
+			resetUseItemKey = null;
 		}
 		sneakKeyJustPressed = resetSneakKey != null;
 		if (resetSneakKey != null) {
 			mc.gameSettings.keyBindSneak = resetSneakKey;
+			resetSneakKey = null;
 		}
 	}
 
@@ -784,7 +890,8 @@ public abstract class AIHelper {
 	}
 
 	/**
-	 * Checks if a block is in a list of blocks.
+	 * Checks if a block is in a list of blocks. Use
+	 * {@link BlockWhitelist#contains(Block)} instead.
 	 * 
 	 * @param needle
 	 *            The block to search for
@@ -792,6 +899,7 @@ public abstract class AIHelper {
 	 *            The blocks allowed.
 	 * @return <code>true</code> if it is the list.
 	 */
+	@Deprecated
 	public static boolean blockIsOneOf(Block needle, Block... haystack) {
 		for (final Block h : haystack) {
 			if (Block.isEqualTo(needle, h)) {
@@ -804,7 +912,7 @@ public abstract class AIHelper {
 	/**
 	 * A fast method that gets a block id for a given position. Use it if you
 	 * need to scan many blocks, since the default minecraft block lookup is
-	 * slow.
+	 * slow. For x<0 or x>= 256 it returns bedrock, to make routing easy.
 	 * 
 	 * @param x
 	 * @param y
@@ -812,8 +920,12 @@ public abstract class AIHelper {
 	 * @return
 	 */
 	public int getBlockId(int x, int y, int z) {
+		if (y < 0 || y >= 256) {
+			return BEDROCK_ID;
+		}
+
 		final Chunk chunk = mc.theWorld.getChunkFromChunkCoords(x >> 4, z >> 4);
-		chunk.getBlock(x & 15, y, z & 15);
+		// chunk.getBlock(x & 15, y, z & 15);
 
 		int blockId = 0;
 
@@ -987,8 +1099,8 @@ public abstract class AIHelper {
 			final double dlength = Math.sqrt(dx * dx + dz * dz);
 			final double same = (lookX * dx + lookZ * dz) / dlength;
 			final double strafe = (lookZ * dx - lookX * dz) / dlength;
-//			System.out.println("look: " + lookX + "," + lookZ + "; d = " + dx
-//					+ "," + dz + "; walk: " + same + "," + strafe);
+			// System.out.println("look: " + lookX + "," + lookZ + "; d = " + dx
+			// + "," + dz + "; walk: " + same + "," + strafe);
 			final MovementInput movement = new MovementInput();
 			movement.moveForward = (float) (speed * same);
 			movement.moveStrafe = (float) (speed * strafe);
@@ -1045,6 +1157,23 @@ public abstract class AIHelper {
 			return ForgeDirection.EAST;
 		default:
 			return ForgeDirection.SOUTH;
+		}
+	}
+
+	/**
+	 * See if the player has not died (=> the game over screen would be
+	 * displayed).
+	 * 
+	 * @return <code>true</code> if it is alive.
+	 */
+	public boolean isAlive() {
+		return mc.thePlayer != null && mc.thePlayer.getHealth() > 0.0F;
+	}
+
+	public void respawn() {
+		if (!isAlive()) {
+			mc.thePlayer.respawnPlayer();
+			mc.displayGuiScreen(null);
 		}
 	}
 

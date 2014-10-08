@@ -14,4 +14,8 @@ public class DamageTakenStrategy extends ValueActionStrategy {
 		return "on_damage_";
 	}
 
+	@Override
+	public String getDescription(AIHelper helper) {
+		return "Check if health went down.";
+	}
 }

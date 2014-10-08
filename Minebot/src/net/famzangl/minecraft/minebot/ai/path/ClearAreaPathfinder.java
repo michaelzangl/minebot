@@ -5,6 +5,7 @@ import java.util.LinkedList;
 
 import net.famzangl.minecraft.minebot.Pos;
 import net.famzangl.minecraft.minebot.ai.AIHelper;
+import net.famzangl.minecraft.minebot.ai.BlockWhitelist;
 import net.famzangl.minecraft.minebot.ai.task.DestroyInRangeTask;
 import net.minecraft.init.Blocks;
 
@@ -86,10 +87,12 @@ public class ClearAreaPathfinder extends MovePathFinder {
 		return minPos.x <= x && x <= maxPos.x && minPos.y <= y && y <= maxPos.y
 				&& minPos.z <= z && z <= maxPos.z;
 	}
+	
+	private static final BlockWhitelist clearedBlocks = new BlockWhitelist(Blocks.air,
+			Blocks.torch);
 
 	private static boolean isClearedBlock(AIHelper helper, int x, int y, int z) {
-		return AIHelper.blockIsOneOf(helper.getBlock(x, y, z), Blocks.air,
-				Blocks.torch);
+		return clearedBlocks.contains(helper.getBlockId(x, y, z));
 	}
 
 	@Override

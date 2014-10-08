@@ -7,6 +7,8 @@ import net.famzangl.minecraft.minebot.ai.task.WaitTask;
 public class PathFinderStrategy extends TaskStrategy {
 	private final MovePathFinder pathFinder;
 	private final String description;
+	private boolean inShouldTakeOver;
+	private boolean noPathFound;
 
 	// private final HealthWatcher watcher = new HealthWatcher();
 
@@ -19,7 +21,24 @@ public class PathFinderStrategy extends TaskStrategy {
 	public void searchTasks(AIHelper helper) {
 		if (!pathFinder.searchSomethingAround(helper.getPlayerPosition(),
 				helper, this)) {
-			addTask(new WaitTask(1));
+			// Path finding needs more time
+			if (!(noPathFound && inShouldTakeOver)) {
+				addTask(new WaitTask(1));
+			}
+		} else {
+			if (!hasMoreTasks()) {
+				noPathFound = true;
+			}
+		}
+	}
+
+	@Override
+	public boolean checkShouldTakeOver(AIHelper helper) {
+		inShouldTakeOver = true;
+		try {
+			return super.checkShouldTakeOver(helper);
+		} finally {
+			inShouldTakeOver = false;
 		}
 	}
 

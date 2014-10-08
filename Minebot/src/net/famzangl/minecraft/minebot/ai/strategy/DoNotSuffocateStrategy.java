@@ -45,7 +45,7 @@ public class DoNotSuffocateStrategy extends AIStrategy {
 	
 	@Override
 	public String getDescription(AIHelper helper) {
-		return "Do not suffocate";
+		return "Do not suffocate in walls.";
 	}
 
 }

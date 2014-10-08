@@ -35,8 +35,8 @@ public class TunnelPathFinder extends AlongTrackPathFinder {
 	}
 
 	public TunnelPathFinder(int dx, int dz, int cx, int cy, int cz,
-			int addToSide, int addToTop, TorchSide torches) {
-		super(dx, dz, cx, cy, cz);
+			int addToSide, int addToTop, TorchSide torches, Integer length) {
+		super(dx, dz, cx, cy, cz, length);
 		this.addToSide = addToSide;
 		this.addToTop = addToTop;
 		this.torches = torches;

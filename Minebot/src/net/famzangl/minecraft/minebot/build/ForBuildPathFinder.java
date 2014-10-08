@@ -6,17 +6,17 @@ import java.util.LinkedList;
 import net.famzangl.minecraft.minebot.Pos;
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.BlockItemFilter;
+import net.famzangl.minecraft.minebot.ai.BlockWhitelist;
 import net.famzangl.minecraft.minebot.ai.path.MovePathFinder;
 import net.famzangl.minecraft.minebot.ai.task.move.AlignToGridTask;
 import net.famzangl.minecraft.minebot.build.blockbuild.BuildTask;
-import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
 
 public class ForBuildPathFinder extends MovePathFinder {
 
 	private static final int NEIGHBOURS_PER_DIRECTION = 6;
-	private static final Block[] FENCES = new Block[] { Blocks.fence,
-			Blocks.cobblestone_wall };
+	private static final BlockWhitelist FENCES = new BlockWhitelist(Blocks.fence,
+			Blocks.cobblestone_wall );
 	/**
 	 * Task we want to prepare for.
 	 */
@@ -27,6 +27,9 @@ public class ForBuildPathFinder extends MovePathFinder {
 
 	public ForBuildPathFinder(BuildTask task) {
 		this.task = task;
+		allowedGroundForUpwardsBlocks = allowedGroundBlocks;
+		footAllowedBlocks = AIHelper.walkableBlocks;
+		headAllowedBlocks = AIHelper.headWalkableBlocks;
 	}
 	
 	@Override
@@ -73,16 +76,10 @@ public class ForBuildPathFinder extends MovePathFinder {
 	}
 
 	@Override
-	protected boolean isForbiddenBlock(Block block) {
-		return !(helper.canWalkOn(block) || helper.canWalkThrough(block));
-	}
-
-	@Override
 	protected boolean checkGroundBlock(int currentNode, int cx, int cy, int cz) {
 		return helper.isSafeGroundBlock(cx, cy - 1, cz)
 				|| helper.isAirBlock(cx, cy - 1, cz)
-				&& AIHelper.blockIsOneOf(helper.getBlock(cx, cy - 2, cz),
-						FENCES);
+				&& FENCES.contains(helper.getBlockId(cx, cy - 2, cz));
 	}
 
 	@Override

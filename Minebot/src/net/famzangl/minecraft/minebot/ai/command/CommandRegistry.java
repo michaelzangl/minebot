@@ -11,6 +11,13 @@ import java.util.List;
 
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.strategy.AIStrategy;
+import net.famzangl.minecraft.minebot.ai.strategy.AbortOnDeathStrategy;
+import net.famzangl.minecraft.minebot.ai.strategy.CreeperComesActionStrategy;
+import net.famzangl.minecraft.minebot.ai.strategy.DamageTakenStrategy;
+import net.famzangl.minecraft.minebot.ai.strategy.DoNotSuffocateStrategy;
+import net.famzangl.minecraft.minebot.ai.strategy.PlayerComesActionStrategy;
+import net.famzangl.minecraft.minebot.ai.strategy.StackStrategy;
+import net.famzangl.minecraft.minebot.ai.strategy.StrategyStack;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.ICommandSender;
 import net.minecraftforge.client.ClientCommandHandler;
@@ -30,7 +37,7 @@ public class CommandRegistry {
 				AIChatController.addChatLine("ERROR: No controller started.");
 			}
 			try {
-				final AIStrategy strategy = evaluateCommand(
+				final AIStrategy strategy = evaluateCommandWithSaferule(
 						controlled.getAiHelper(), name, args);
 				if (strategy != null) {
 					controlled.requestUseStrategy(strategy);
@@ -93,7 +100,7 @@ public class CommandRegistry {
 	private IAIControllable controlled;
 
 	public void register(Class<?> commandClass) {
-		checkCommandCLass(commandClass);
+		checkCommandClass(commandClass);
 		final String name = commandClass.getAnnotation(AICommand.class).name();
 		List<CommandDefinition> list = commandTable.get(name);
 		if (list == null) {
@@ -109,15 +116,33 @@ public class CommandRegistry {
 		System.out.println("Command " + name + " registered.");
 	}
 
-	private void checkCommandCLass(Class<?> commandClass) {
+	private void checkCommandClass(Class<?> commandClass) {
 		if (!commandClass.isAnnotationPresent(AICommand.class)) {
 			throw new IllegalArgumentException(
 					"AICommand is not set for this class.");
 		}
 	}
 
+	public AIStrategy evaluateCommandWithSaferule(AIHelper helper,
+			String commandID, String[] arguments)
+			throws UnknownCommandException {
+		CommandDefinition evaluateableCommand = getEvaluatebale(commandID, arguments);
+		AIStrategy strategy = evaluateableCommand.evaluate(helper, arguments);
+		SafeStrategyRule safeRule = evaluateableCommand.getSafeStrategyRule();
+		if (safeRule != SafeStrategyRule.NONE && strategy != null) {
+			strategy = makeSafe(strategy, safeRule);
+		}
+		return strategy;
+	}
+
 	public AIStrategy evaluateCommand(AIHelper helper, String commandID,
 			String[] arguments) throws UnknownCommandException {
+		CommandDefinition evaluateableCommand = getEvaluatebale(commandID, arguments);
+		return evaluateableCommand.evaluate(helper, arguments);
+	}
+
+	private CommandDefinition getEvaluatebale(String commandID, String[] arguments)
+			throws UnknownCommandException {
 		final List<CommandDefinition> commands = getCommands(commandID);
 		final ArrayList<CommandDefinition> evaluateable = new ArrayList<CommandDefinition>();
 		for (final CommandDefinition c : commands) {
@@ -127,9 +152,22 @@ public class CommandRegistry {
 		}
 		if (evaluateable.size() != 1) {
 			throw new UnknownCommandException(evaluateable);
-		} else {
-			return evaluateable.get(0).evaluate(helper, arguments);
 		}
+		CommandDefinition evaluateableCommand = evaluateable.get(0);
+		return evaluateableCommand;
+	}
+
+	private AIStrategy makeSafe(AIStrategy strategy, SafeStrategyRule safeRule) {
+		final StrategyStack stack = new StrategyStack();
+		stack.addStrategy(new AbortOnDeathStrategy());
+		if (safeRule == SafeStrategyRule.DEFEND_MINING) {
+			stack.addStrategy(new DoNotSuffocateStrategy());
+		}
+		stack.addStrategy(new DamageTakenStrategy());
+		stack.addStrategy(new PlayerComesActionStrategy());
+		stack.addStrategy(new CreeperComesActionStrategy());
+		stack.addStrategy(strategy);
+		return new StackStrategy(stack);
 	}
 
 	public List<String> tabCompletion(AIHelper helper, String commandID,
@@ -166,13 +204,13 @@ public class CommandRegistry {
 		for (final Method m : commandClass.getMethods()) {
 			if (Modifier.isStatic(m.getModifiers())
 					&& m.isAnnotationPresent(AICommandInvocation.class)) {
-				commands.add(getCommandForMethod(m));
+				commands.addAll(getCommandsForMethod(m));
 			}
 		}
 	}
 
-	private CommandDefinition getCommandForMethod(Method m) {
-		return new CommandDefinition(m);
+	private ArrayList<CommandDefinition> getCommandsForMethod(Method m) {
+		return CommandDefinition.getDefinitions(m);
 	}
 
 	public List<CommandDefinition> getAllCommands() {

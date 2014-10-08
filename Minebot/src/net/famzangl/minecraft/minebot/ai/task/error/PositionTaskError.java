@@ -7,7 +7,7 @@ public class PositionTaskError extends TaskError {
 	private final Pos expectedPosition;
 
 	protected PositionTaskError(Pos expectedPosition) {
-		super("Not standing on: " + expectedPosition);
+		super("Not standing on " + expectedPosition.x + ", " + expectedPosition.y + ", " + expectedPosition.z + ".");
 		this.expectedPosition = expectedPosition;
 	}
 

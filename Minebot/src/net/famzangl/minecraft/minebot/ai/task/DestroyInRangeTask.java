@@ -54,18 +54,17 @@ public class DestroyInRangeTask extends AITask implements CanPrefaceAndDestroy {
 	}
 
 	private boolean isSafeToDestroy(AIHelper h, int x, int y, int z) {
+		Pos pos = h.getPlayerPosition();
 		return !h.isAirBlock(x, y, z)
 				&& h.hasSafeSides(x, y, z)
-				&& (h.isSafeHeadBlock(x, y + 1, z) || isSafeFallingBlock(h, x,
-						y + 1, z));
+				&& (h.isSafeHeadBlock(x, y + 1, z) || ((x != pos.x || y != pos.y) && isSafeFallingBlock(
+						h, x, y + 1, z)));
 	}
 
 	private boolean isSafeFallingBlock(AIHelper h, int x, int y, int z) {
-		return AIHelper.blockIsOneOf(h.getBlock(x, y, z),
-				AIHelper.fallingBlocks)
+		return AIHelper.fallingBlocks.contains(h.getBlock(x, y, z))
 				&& isSafeToDestroy(h, x, y, z)
-				|| AIHelper.blockIsOneOf(h.getBlock(x, y, z),
-						AIHelper.walkableBlocks);
+				|| AIHelper.walkableBlocks.contains(h.getBlock(x, y, z));
 	}
 
 	@Override

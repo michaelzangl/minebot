@@ -15,4 +15,9 @@ public class CreeperComesActionStrategy extends CloseEntityActionStrategy {
 	protected String getSettingPrefix() {
 		return "on_creeper_comes_";
 	}
+	
+	@Override
+	public String getDescription(AIHelper helper) {
+		return "Watch out for creepers.";
+	}
 }

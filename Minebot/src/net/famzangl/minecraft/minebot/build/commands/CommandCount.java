@@ -7,7 +7,7 @@ import java.util.Hashtable;
 import java.util.Map.Entry;
 
 import net.famzangl.minecraft.minebot.ai.AIHelper;
-import net.famzangl.minecraft.minebot.ai.BlockItemFilter;
+import net.famzangl.minecraft.minebot.ai.HumanReadableItemFilter;
 import net.famzangl.minecraft.minebot.ai.ItemFilter;
 import net.famzangl.minecraft.minebot.ai.command.AIChatController;
 import net.famzangl.minecraft.minebot.ai.command.AICommand;
@@ -58,7 +58,7 @@ public class CommandCount {
 	}
 
 	public static String niceFilterName(ItemFilter filter) {
-		return filter instanceof BlockItemFilter ? ((BlockItemFilter) filter)
-				.getDescriptiveString() : filter.toString();
+		return filter instanceof HumanReadableItemFilter ? ((HumanReadableItemFilter) filter)
+				.getDescription() : filter.toString();
 	}
 }

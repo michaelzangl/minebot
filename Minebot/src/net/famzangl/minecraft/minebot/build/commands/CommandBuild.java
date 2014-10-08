@@ -9,11 +9,11 @@ import net.famzangl.minecraft.minebot.ai.command.AICommand;
 import net.famzangl.minecraft.minebot.ai.command.AICommandInvocation;
 import net.famzangl.minecraft.minebot.ai.command.AICommandParameter;
 import net.famzangl.minecraft.minebot.ai.command.ParameterType;
+import net.famzangl.minecraft.minebot.ai.command.SafeStrategyRule;
 import net.famzangl.minecraft.minebot.ai.render.MarkingStrategy;
 import net.famzangl.minecraft.minebot.ai.render.PosMarkerRenderer;
 import net.famzangl.minecraft.minebot.ai.strategy.AIStrategy;
 import net.famzangl.minecraft.minebot.ai.strategy.TaskStrategy;
-import net.famzangl.minecraft.minebot.ai.strategy.ValueActionStrategy;
 import net.famzangl.minecraft.minebot.ai.task.GetOnHotBarTask;
 import net.famzangl.minecraft.minebot.ai.task.WaitTask;
 import net.famzangl.minecraft.minebot.ai.task.move.AlignToGridTask;
@@ -82,11 +82,11 @@ public class CommandBuild {
 		}
 	}
 
-	@AICommandInvocation()
+	@AICommandInvocation(safeRule = SafeStrategyRule.DEFEND)
 	public static AIStrategy run(
 			AIHelper helper,
 			@AICommandParameter(type = ParameterType.FIXED, fixedName = "build", description = "") String nameArg2) {
-		return ValueActionStrategy.makeSafe(new BuildStrategy(), false);
+		return new BuildStrategy();
 
 	}
 
