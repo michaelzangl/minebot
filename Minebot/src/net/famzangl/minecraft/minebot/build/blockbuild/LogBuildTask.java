@@ -2,15 +2,15 @@ package net.famzangl.minecraft.minebot.build.blockbuild;
 
 import net.famzangl.minecraft.minebot.Pos;
 import net.famzangl.minecraft.minebot.ai.BlockItemFilter;
+import net.famzangl.minecraft.minebot.ai.BlockWhitelist;
 import net.famzangl.minecraft.minebot.build.LogItemFilter;
 import net.famzangl.minecraft.minebot.build.WoodType;
-import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
 import net.minecraftforge.common.util.ForgeDirection;
 
 public class LogBuildTask extends CubeBuildTask {
 
-	public static final Block[] BLOCKS = new Block[] { Blocks.log, Blocks.log2 };
+	public static final BlockWhitelist BLOCKS = new BlockWhitelist( Blocks.log, Blocks.log2 );
 	public static final Pos[] UP_DOWN_POS = new Pos[] { new Pos(0, 0, 0) };
 	public static final Pos[] NORTH_SOUTH_POS = new Pos[] { new Pos(0, 1, 1),
 			new Pos(0, 1, -1) };

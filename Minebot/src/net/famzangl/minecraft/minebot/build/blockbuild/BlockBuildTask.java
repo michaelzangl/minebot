@@ -2,12 +2,13 @@ package net.famzangl.minecraft.minebot.build.blockbuild;
 
 import net.famzangl.minecraft.minebot.Pos;
 import net.famzangl.minecraft.minebot.ai.BlockItemFilter;
+import net.famzangl.minecraft.minebot.ai.BlockWhitelist;
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
 
 public class BlockBuildTask extends CubeBuildTask {
 
-	public static final Block[] BLOCKS = new Block[] { Blocks.dirt,
+	public static final BlockWhitelist BLOCKS = new BlockWhitelist(Blocks.dirt,
 			Blocks.stone, Blocks.cobblestone, Blocks.beacon, Blocks.bookshelf,
 			Blocks.brick_block, Blocks.cake, Blocks.coal_block,
 			Blocks.coal_ore, Blocks.crafting_table, Blocks.diamond_block,
@@ -19,7 +20,7 @@ public class BlockBuildTask extends CubeBuildTask {
 			Blocks.netherrack, Blocks.obsidian, Blocks.pumpkin,
 			Blocks.quartz_block, Blocks.quartz_ore, Blocks.red_mushroom_block,
 			Blocks.redstone_block, Blocks.redstone_lamp, Blocks.redstone_ore,
-			Blocks.sand, Blocks.stonebrick, Blocks.tnt };
+			Blocks.sand, Blocks.stonebrick, Blocks.tnt);
 
 	public BlockBuildTask(Pos forPosition, Block blockToPlace) {
 		this(forPosition, new BlockItemFilter(blockToPlace));

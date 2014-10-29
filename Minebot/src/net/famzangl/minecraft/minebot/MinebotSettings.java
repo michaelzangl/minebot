@@ -9,6 +9,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Properties;
 
+import net.famzangl.minecraft.minebot.ai.BlockWhitelist;
+import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 
 import org.apache.commons.io.IOUtils;
@@ -110,6 +112,24 @@ public class MinebotSettings {
 		} catch (final Throwable t) {
 			return defaultValue;
 		}
+	}
+
+	public BlockWhitelist getBlocks(String key, BlockWhitelist defaultValue) {
+		final String property = getSettings().getProperty(key);
+		if (property == null) {
+			return defaultValue;
+		}
+		ArrayList<Block> blocks = new ArrayList<Block>();
+		for (final String name : property
+				.split("\\s*[\\,\\s\\;]\\s*")) {
+			final Block block = (Block) Block.blockRegistry.getObject(name);
+			if (block != null) {
+				blocks.add(block);
+			} else {
+				System.out.println("Invalid block name: " + name);
+			}
+		}
+		return new BlockWhitelist(blocks.toArray(new Block[blocks.size()]));
 	}
 
 	public float getFloat(String string, float defaultValue, float min,

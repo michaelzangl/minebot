@@ -1,4 +1,4 @@
-package net.famzangl.minecraft.minebot.ai.task;
+package net.famzangl.minecraft.minebot.ai.task.inventory;
 
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.minecraft.client.gui.inventory.GuiChest;

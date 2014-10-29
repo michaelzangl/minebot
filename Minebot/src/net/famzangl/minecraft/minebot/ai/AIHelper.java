@@ -1,5 +1,6 @@
 package net.famzangl.minecraft.minebot.ai;
 
+import java.io.File;
 import java.util.List;
 import java.util.Random;
 
@@ -41,6 +42,10 @@ public abstract class AIHelper {
 	private static final double MIN_DISTANCE_ERROR = 0.05;
 	private static Minecraft mc = Minecraft.getMinecraft();
 	private final Random rand = new Random();
+	
+	private Chunk chunkCache1 = null;
+	private Chunk chunkCache2 = null;
+	private boolean chunkCacheReplaceCounter = false;
 
 	/**
 	 * Blocks we can just walk over/next to without problems.
@@ -93,7 +98,7 @@ public abstract class AIHelper {
 	private static final BlockWhitelist explicitFootWalkableBlocks = new BlockWhitelist(
 			Blocks.tallgrass, Blocks.yellow_flower, Blocks.red_flower,
 			Blocks.wheat, Blocks.carrots, Blocks.potatoes, Blocks.pumpkin_stem,
-			Blocks.melon_stem, Blocks.torch, Blocks.carpet, Blocks.golden_rail,
+			Blocks.melon_stem, Blocks.carpet, Blocks.golden_rail,
 			Blocks.detector_rail, Blocks.rail, Blocks.activator_rail,
 			Blocks.double_plant, Blocks.red_mushroom, Blocks.brown_mushroom,
 			Blocks.redstone_wire, Blocks.sapling, Blocks.snow_layer,
@@ -110,7 +115,7 @@ public abstract class AIHelper {
 			Blocks.fence, Blocks.fence_gate, Blocks.cobblestone_wall,
 			Blocks.cactus, Blocks.reeds, Blocks.web, Blocks.glass_pane,
 			Blocks.bed, Blocks.enchanting_table, Blocks.waterlily,
-			Blocks.brewing_stand, Blocks.vine);
+			Blocks.brewing_stand, Blocks.vine, Blocks.chest);
 
 	/**
 	 * Blocks that form a solid ground.
@@ -122,7 +127,7 @@ public abstract class AIHelper {
 			.unionWith(safeStandableBlocks).unionWith(walkableBlocks)
 			.unionWith(air);
 
-	public static final BlockWhitelist safeHeadBlocks = stairBlocks
+	public static final BlockWhitelist safeCeilingBlocks = stairBlocks
 			.unionWith(walkableBlocks).unionWith(normalBlocks).unionWith(air);
 
 	/**
@@ -467,7 +472,7 @@ public abstract class AIHelper {
 	 */
 	public boolean isSafeHeadBlock(int x, int y, int z) {
 		final int block = getBlockId(x, y, z);
-		return safeHeadBlocks.contains(block);
+		return safeCeilingBlocks.contains(block);
 	}
 
 	public boolean isFallingBlock(int x, int y, int z) {
@@ -909,6 +914,8 @@ public abstract class AIHelper {
 		return false;
 	}
 
+	private int chunkHitCounter = 0;
+	private int chunkMissCounter = 0;
 	/**
 	 * A fast method that gets a block id for a given position. Use it if you
 	 * need to scan many blocks, since the default minecraft block lookup is
@@ -924,7 +931,26 @@ public abstract class AIHelper {
 			return BEDROCK_ID;
 		}
 
-		final Chunk chunk = mc.theWorld.getChunkFromChunkCoords(x >> 4, z >> 4);
+		int chunkX = x >> 4;
+		int chunkZ = z >> 4;
+		final Chunk chunk;
+		if (chunkCache1 != null && chunkCache1.xPosition == chunkX && chunkCache1.zPosition == chunkZ) {
+			chunk = chunkCache1;
+			chunkHitCounter++;
+		} else if (chunkCache2 != null && chunkCache2.xPosition == chunkX && chunkCache2.zPosition == chunkZ) {
+			chunk = chunkCache2;
+			chunkHitCounter++;
+		} else {
+			chunk = mc.theWorld.getChunkFromChunkCoords(chunkX, chunkZ);
+			if (chunkCacheReplaceCounter) {
+				chunkCache1 = chunk;
+			} else {
+				chunkCache2 = chunk;
+			}
+			chunkCacheReplaceCounter = !chunkCacheReplaceCounter;
+			chunkMissCounter++;
+		}
+		
 		// chunk.getBlock(x & 15, y, z & 15);
 
 		int blockId = 0;
@@ -952,6 +978,16 @@ public abstract class AIHelper {
 		return blockId;
 	}
 
+	protected void invalidateChunkCache() {
+		if (chunkHitCounter > 0 || chunkMissCounter > 0) {
+			System.out.println("Last chunk cache hit: " + chunkHitCounter + " but missed " + chunkMissCounter);
+			chunkHitCounter = 0;
+			chunkMissCounter = 0;
+		}
+		chunkCache1 = null;
+		chunkCache2 = null;
+	}
+	
 	/**
 	 * The real top y cord of the block we stand on. Watch out: Minecraft blocks
 	 * do not always provide the right bounds with it's block objects.
@@ -1081,11 +1117,19 @@ public abstract class AIHelper {
 		return walkTowards(x, z, jump, true);
 	}
 
+	public boolean arrivedAt(double x, double z) {
+		final double dx = x - mc.thePlayer.posX;
+		final double dz = z - mc.thePlayer.posZ;
+		final double distTo = Math.sqrt(dx * dx + dz * dz);
+		return distTo <= MIN_DISTANCE_ERROR;
+	}
+	
 	public boolean walkTowards(double x, double z, boolean jump, boolean face) {
 		final double dx = x - mc.thePlayer.posX;
 		final double dz = z - mc.thePlayer.posZ;
 		final double distTo = Math.sqrt(dx * dx + dz * dz);
-		if (distTo > MIN_DISTANCE_ERROR) {
+		boolean arrived = distTo > MIN_DISTANCE_ERROR;
+		if (arrived) {
 			if (face) {
 				face(x, mc.thePlayer.posY, z);
 			}
@@ -1231,6 +1275,14 @@ public abstract class AIHelper {
 			return storage.getExtBlocklightValue(pos.x & 15, pos.y & 15,
 					pos.z & 15);
 		}
+	}
+
+	public static File getMinebotDir() {
+		File dir = new File(mc.mcDataDir, "minebot");
+		if (!dir.exists()) {
+			dir.mkdir();
+		}
+		return dir;
 	}
 
 }

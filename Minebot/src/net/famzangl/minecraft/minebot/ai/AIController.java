@@ -117,6 +117,7 @@ public class AIController extends AIHelper implements IAIControllable {
 		testUngrabMode();
 		invalidateObjectMouseOver();
 		resetAllInputs();
+		invalidateChunkCache();
 
 		if (ungrab.isPressed()) {
 			doUngrab = true;

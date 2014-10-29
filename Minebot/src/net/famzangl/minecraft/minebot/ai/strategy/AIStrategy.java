@@ -24,7 +24,8 @@ public abstract class AIStrategy {
 		 * This stategy did not do anything and has nothing more to do
 		 * currently. Deactivate it.
 		 */
-		NO_MORE_WORK, ABORT
+		NO_MORE_WORK,
+		ABORT
 	};
 
 	private boolean active;
@@ -100,11 +101,23 @@ public abstract class AIStrategy {
 
 	/**
 	 * 
-	 * @param helper TODO
+	 * @param helper
+	 *            TODO
 	 * @return A String to display in the top right hand corner of the screen.
 	 */
 	public String getDescription(AIHelper helper) {
 		return "No description so far... " + getClass().getSimpleName();
+	}
+
+	/**
+	 * A flag indicating that this strategy has failed. Most strategies cannot
+	 * fail, they just do as good as they can and then finish. This flag should
+	 * only be set if the strategy has no more work.
+	 * 
+	 * @return
+	 */
+	public boolean hasFailed() {
+		return false;
 	}
 
 }

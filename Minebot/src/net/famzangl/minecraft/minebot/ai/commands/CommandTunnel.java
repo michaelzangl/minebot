@@ -21,7 +21,7 @@ public class CommandTunnel {
 			@AICommandParameter(type = ParameterType.FIXED, fixedName = "tunnel", description = "") String nameArg,
 			@AICommandParameter(type = ParameterType.ENUM, description = "direction", optional = true) ForgeDirection inDirection,
 			@AICommandParameter(type = ParameterType.ENUM, description = "torch side", optional = true) TorchSide torches,
-			@AICommandParameter(type = ParameterType.NUMBER, description = "max length") int length) {
+			@AICommandParameter(type = ParameterType.NUMBER, description = "max length", optional = true) int length) {
 		return run(helper, nameArg, inDirection, 0, 0, torches, length);
 	}
 
@@ -33,7 +33,7 @@ public class CommandTunnel {
 			@AICommandParameter(type = ParameterType.NUMBER, description = "add to side") int addToSide,
 			@AICommandParameter(type = ParameterType.NUMBER, description = "add to top") int addToTop,
 			@AICommandParameter(type = ParameterType.ENUM, description = "torch side", optional = true) TorchSide torches,
-			@AICommandParameter(type = ParameterType.NUMBER, description = "max length") Integer length) {
+			@AICommandParameter(type = ParameterType.NUMBER, description = "max length", optional = true) Integer length) {
 		if (inDirection == null) {
 			inDirection = helper.getLookDirection();
 		}

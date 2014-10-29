@@ -91,7 +91,7 @@ public abstract class TaskStrategy extends AIStrategy implements
 	@Override
 	public boolean checkShouldTakeOver(AIHelper helper) {
 		if (tasks.isEmpty()) {
-			searchTasks(helper);
+			searchAndPrintTasks(helper);
 			searchNewTasks = false;
 		}
 		return !tasks.isEmpty();
@@ -107,7 +107,7 @@ public abstract class TaskStrategy extends AIStrategy implements
 		}
 
 		if (searchNewTasks) {
-			searchTasks(helper);
+			searchAndPrintTasks(helper);
 			if (tasks.isEmpty()) {
 				System.out.println("No more tasks found.");
 				return TickResult.NO_MORE_WORK;
@@ -123,6 +123,7 @@ public abstract class TaskStrategy extends AIStrategy implements
 		if (task.isFinished(helper)) {
 			System.out.println("Task done: " + task);
 			tasks.removeFirst();
+			System.out.println("Next will be: " + tasks.peekFirst());
 			taskTimeout = 0;
 			return TickResult.TICK_AGAIN;
 		} else if (taskTimeout > task.getGameTickTimeout()) {
@@ -134,6 +135,13 @@ public abstract class TaskStrategy extends AIStrategy implements
 			temporaryHelper = null;
 			taskTimeout++;
 			return TickResult.TICK_HANDLED;
+		}
+	}
+
+	private void searchAndPrintTasks(AIHelper helper) {
+		searchTasks(helper);
+		if (!tasks.isEmpty()) {
+			System.out.println("Found " + tasks.size() + " tasks, first task: " + tasks.peekFirst());
 		}
 	}
 	

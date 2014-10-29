@@ -12,7 +12,6 @@ import net.famzangl.minecraft.minebot.ai.command.AICommandParameter;
 import net.famzangl.minecraft.minebot.ai.command.ParameterType;
 import net.famzangl.minecraft.minebot.ai.strategy.AIStrategy;
 import net.famzangl.minecraft.minebot.build.reverse.RunReverseBuildStrategy;
-import net.minecraft.client.Minecraft;
 
 @AICommand(helpText = "Get a build script for the selected area.\n"
 		+ "out-file is the file to write to."
@@ -24,7 +23,7 @@ public class CommandReverse {
 	public static AIStrategy run(
 			AIHelper helper,
 			@AICommandParameter(type = ParameterType.FIXED, fixedName = "reverse", description = "") String nameArg) {
-		final File dir = new File(Minecraft.getMinecraft().mcDataDir, "minebot");
+		final File dir = AIHelper.getMinebotDir();
 		dir.mkdirs();
 		final DateFormat df = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss");
 		final String date = df.format(Calendar.getInstance().getTime());

@@ -11,7 +11,9 @@ import cpw.mods.fml.common.event.FMLInitializationEvent;
 public class MinebotMod {
 	@Instance(value = "minebot-mod")
 	public static MinebotMod instance;
-
+	
+	// Note: 6364136223846793005L * 0xc097ef87329e28a5l = 1
+	
 	@EventHandler
 	public void init(FMLInitializationEvent event) {
 		FMLCommonHandler.instance().bus().register(new PlayerUpdateHandler());
@@ -23,4 +25,7 @@ public class MinebotMod {
 		return MinebotMod.class.getAnnotation(Mod.class).version();
 	}
 
+	public static void main(String[] args) {
+		System.out.println(6364136223846793005L * 0xc097ef87329e28a5l + "");
+	}
 }

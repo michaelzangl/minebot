@@ -19,9 +19,8 @@ public class JumpMoveTask extends HorizontalMoveTask {
 
 	@Override
 	protected boolean doJump(AIHelper h) {
-		// Pos player = h.getPlayerPosition();
-		// return player.x != x && player.z != z;
-		return true;
+		Pos player = h.getPlayerPosition();
+		return player.x != x || player.z != z;
 	}
 
 	@Override

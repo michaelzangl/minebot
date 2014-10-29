@@ -17,6 +17,7 @@ public class FaceAndInteractTask extends AITask {
 	private final IEntitySelector alsoAcceptedAnimal;
 	private final boolean doRightClick;
 	private int ticksRun = 0;
+	protected boolean wasJumping;
 
 	public FaceAndInteractTask(Entity preferedAnimal,
 			IEntitySelector alsoAcceptedAnimal) {
@@ -41,7 +42,7 @@ public class FaceAndInteractTask extends AITask {
 	@Override
 	public void runTick(AIHelper h, TaskOperations o) {
 		final MovingObjectPosition over = h.getObjectMouseOver();
-		if (over != null && over.typeOfHit == MovingObjectType.ENTITY
+		if (ticksRun > 2 && over != null && over.typeOfHit == MovingObjectType.ENTITY
 				&& alsoAcceptedAnimal.isEntityApplicable(over.entityHit)) {
 			doInteractWithCurrent(h);
 		} else {
@@ -52,7 +53,7 @@ public class FaceAndInteractTask extends AITask {
 			h.face(preferedAnimal.posX, preferedAnimal.posY,
 					preferedAnimal.posZ);
 			final MovementInput i = new MovementInput();
-			i.jump = speed < 0.01 && ticksRun > 8;
+			i.jump =  speed < 0.01 && ticksRun > 8;
 			i.moveForward = 1;
 			h.overrideMovement(i);
 		}

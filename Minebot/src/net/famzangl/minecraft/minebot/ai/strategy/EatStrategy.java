@@ -1,19 +1,15 @@
 package net.famzangl.minecraft.minebot.ai.strategy;
 
 import net.famzangl.minecraft.minebot.ai.AIHelper;
+import net.famzangl.minecraft.minebot.ai.ClassItemFilter;
 import net.famzangl.minecraft.minebot.ai.ItemFilter;
 import net.famzangl.minecraft.minebot.ai.command.AIChatController;
 import net.minecraft.item.ItemFood;
-import net.minecraft.item.ItemStack;
 
 public class EatStrategy extends AIStrategy {
-	private static final ItemFilter FILTER = new ItemFilter() {
-		
-		@Override
-		public boolean matches(ItemStack itemStack) {
-			return itemStack != null && itemStack.getItem() instanceof ItemFood;
-		}
-	};
+	// TODO: Is this really what we want?
+	private static final ItemFilter FILTER = new ClassItemFilter(ItemFood.class);
+	private boolean failed;
 
 	@Override
 	public boolean checkShouldTakeOver(AIHelper helper) {
@@ -30,14 +26,22 @@ public class EatStrategy extends AIStrategy {
 			if (helper.selectCurrentItem(FILTER)) {
 				helper.overrideSneak();
 				helper.overrideUseItem();
+				failed = false;
 				return TickResult.TICK_HANDLED;
 			} else {
 				AIChatController.addChatLine("Could not find anything to eat");
+				failed = true;
 				return TickResult.NO_MORE_WORK;
 			}
 		} else {
+			failed = false;
 			return TickResult.NO_MORE_WORK;
 		}
+	}
+	
+	@Override
+	public boolean hasFailed() {
+		return failed;
 	}
 	
 	@Override

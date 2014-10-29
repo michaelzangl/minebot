@@ -1,6 +1,7 @@
 package net.famzangl.minecraft.minebot.ai.strategy;
 
 import net.famzangl.minecraft.minebot.ai.AIHelper;
+import net.famzangl.minecraft.minebot.ai.ItemFilter;
 import net.famzangl.minecraft.minebot.ai.selectors.AndSelector;
 import net.famzangl.minecraft.minebot.ai.selectors.ColorSelector;
 import net.famzangl.minecraft.minebot.ai.selectors.FeedableSelector;
@@ -11,6 +12,9 @@ import net.famzangl.minecraft.minebot.ai.task.FaceAndInteractTask;
 import net.minecraft.command.IEntitySelector;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.passive.EntityAnimal;
+import net.minecraft.init.Items;
+import net.minecraft.item.ItemSeeds;
+import net.minecraft.item.ItemStack;
 
 public class FeedAnimalsStrategy extends TaskStrategy {
 
@@ -29,7 +33,6 @@ public class FeedAnimalsStrategy extends TaskStrategy {
 	public void searchTasks(AIHelper helper) {
 		feedWithFood(helper);
 	}
-	
 
 	private void feedWithFood(AIHelper helper) {
 		IEntitySelector selector = new FeedableSelector(helper);
@@ -44,6 +47,21 @@ public class FeedAnimalsStrategy extends TaskStrategy {
 
 		if (found != null) {
 			addTask(new FaceAndInteractTask(found, selector) {
+				@Override
+				public void runTick(AIHelper h, TaskOperations o) {
+					h.selectCurrentItem(new ItemFilter() {
+						@Override
+						public boolean matches(ItemStack itemStack) {
+							return itemStack == null
+									|| itemStack.getItem() == null
+									|| !(itemStack.getItem() == Items.wheat
+											|| itemStack.getItem() == Items.carrot || itemStack
+											.getItem() instanceof ItemSeeds);
+						}
+					});
+					super.runTick(h, o);
+				}
+
 				@Override
 				protected void doInteractWithCurrent(AIHelper h) {
 					final Entity over = h.getObjectMouseOver().entityHit;

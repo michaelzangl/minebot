@@ -3,6 +3,7 @@ package net.famzangl.minecraft.minebot.ai.path;
 import net.famzangl.minecraft.minebot.Pos;
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.BlockWhitelist;
+import net.famzangl.minecraft.minebot.ai.ClassItemFilter;
 import net.famzangl.minecraft.minebot.ai.ItemFilter;
 import net.famzangl.minecraft.minebot.ai.task.UseItemOnBlockAtTask;
 import net.famzangl.minecraft.minebot.ai.task.place.DestroyBlockTask;
@@ -42,13 +43,6 @@ public class PlantPathFinder extends MovePathFinder {
 		}
 	}
 
-	private final class HoeFilter implements ItemFilter {
-		@Override
-		public boolean matches(ItemStack itemStack) {
-			return itemStack != null && itemStack.getItem() instanceof ItemHoe;
-		}
-	}
-
 	private final class SeedFilter implements ItemFilter {
 		private final PlantType type;
 
@@ -73,6 +67,8 @@ public class PlantPathFinder extends MovePathFinder {
 		allowedGroundForUpwardsBlocks = allowedGroundBlocks;
 		footAllowedBlocks = AIHelper.walkableBlocks;
 		headAllowedBlocks = AIHelper.headWalkableBlocks;
+		footAllowedBlocks = footAllowedBlocks.intersectWith(forbiddenBlocks.invert());
+		headAllowedBlocks = headAllowedBlocks.intersectWith(forbiddenBlocks.invert());
 	}
 
 	@Override
@@ -86,7 +82,7 @@ public class PlantPathFinder extends MovePathFinder {
 				&& helper.isAirBlock(x, y, z)
 				&& farmlandable.contains(helper.getBlock(x, y - 1, z))
 				&& helper.canSelectItem(new SeedFilter(type))
-				&& helper.canSelectItem(new HoeFilter())) {
+				&& helper.canSelectItem(new ClassItemFilter(ItemHoe.class))) {
 			return distance + 10;
 		} else {
 			return -1;
@@ -111,7 +107,7 @@ public class PlantPathFinder extends MovePathFinder {
 	protected void addTasksForTarget(Pos currentPos) {
 		if (helper.isAirBlock(currentPos.x, currentPos.y, currentPos.z)) {
 			if (!hasFarmlandBelow(currentPos.x, currentPos.y, currentPos.z)) {
-				addTask(new UseItemOnBlockAtTask(new HoeFilter(), currentPos.x,
+				addTask(new UseItemOnBlockAtTask(new ClassItemFilter(ItemHoe.class), currentPos.x,
 						currentPos.y - 1, currentPos.z));
 			}
 			addTask(new PlaceBlockAtFloorTask(currentPos.x, currentPos.y,

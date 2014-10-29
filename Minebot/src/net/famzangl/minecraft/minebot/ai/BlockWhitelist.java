@@ -102,6 +102,12 @@ public class BlockWhitelist {
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
 		builder.append("BlockWhitelist [");
+		getBlockString(builder);
+		builder.append("]");
+		return builder.toString();
+	}
+
+	public void getBlockString(StringBuilder builder) {
 		boolean needsComma = false;
 		for (int i = 0; i < MAX_BLOCKIDS; i++) {
 			if (contains(i)) {
@@ -116,8 +122,6 @@ public class BlockWhitelist {
 				builder.append(")");
 			}
 		}
-		builder.append("]");
-		return builder.toString();
 	}
 	
 	

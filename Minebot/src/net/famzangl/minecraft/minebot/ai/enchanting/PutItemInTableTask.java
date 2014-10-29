@@ -1,7 +1,7 @@
 package net.famzangl.minecraft.minebot.ai.enchanting;
 
 import net.famzangl.minecraft.minebot.ai.AIHelper;
-import net.famzangl.minecraft.minebot.ai.task.PutItemInContainerTask;
+import net.famzangl.minecraft.minebot.ai.task.inventory.PutItemInContainerTask;
 import net.minecraft.client.gui.GuiEnchantment;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;

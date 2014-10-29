@@ -79,6 +79,7 @@ import net.minecraft.network.play.server.S40PacketDisconnect;
 import net.minecraft.util.IChatComponent;
 
 public class DoFishTask extends AITask {
+	private static final double MAX_DISTANCE = 10;
 
 	private boolean revoked;
 	private int rightMotion = 2;
@@ -96,6 +97,11 @@ public class DoFishTask extends AITask {
 			h.overrideUseItem();
 			revoked = true;
 		}
+	}
+	
+	@Override
+	public int getGameTickTimeout() {
+		return 1000; // max 900
 	}
 
 	private class MyNetHandler implements INetHandlerPlayClient {
@@ -447,8 +453,10 @@ public class DoFishTask extends AITask {
 				Pos next = foundFishPositions.poll();
 				if (next == null) {
 					return false;
-				} else if (expectedPos.getDistance(next.x + 0.5, next.y + 0.5, next.z + 0.5) < 4) {
+				} else if (expectedPos.getDistance(next.x + 0.5, next.y + 0.5, next.z + 0.5) < MAX_DISTANCE) {
 					return true;
+				} else {
+					System.out.println("Found a fish bite at " + next + " but fishing at " + expectedPos + ".");
 				}
 			}
 		}

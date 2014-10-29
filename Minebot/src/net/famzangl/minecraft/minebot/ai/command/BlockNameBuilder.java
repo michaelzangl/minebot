@@ -5,19 +5,37 @@ import java.util.Collection;
 import java.util.Set;
 
 import net.famzangl.minecraft.minebot.ai.AIHelper;
+import net.famzangl.minecraft.minebot.ai.command.AICommandParameter.AnyBlockFilter;
+import net.famzangl.minecraft.minebot.ai.command.AICommandParameter.BlockFilter;
 import net.minecraft.block.Block;
 
 public class BlockNameBuilder extends ParameterBuilder {
 
 	private final static class BlockArgumentDefinition extends
 			ArgumentDefinition {
-		public BlockArgumentDefinition(String description) {
+
+		private final BlockFilter blockFilter;
+
+		public BlockArgumentDefinition(String description,
+				Class<? extends BlockFilter> blockFilterClass) {
 			super("Block", description);
+			BlockFilter blockFilter;
+			try {
+				blockFilter = blockFilterClass.newInstance();
+			} catch (InstantiationException e) {
+				e.printStackTrace();
+				blockFilter = new AnyBlockFilter();
+			} catch (IllegalAccessException e) {
+				e.printStackTrace();
+				blockFilter = new AnyBlockFilter();
+			}
+			this.blockFilter = blockFilter;
 		}
 
 		@Override
 		public boolean couldEvaluateAgainst(String string) {
-			return Block.blockRegistry.getObject(string) != null;
+			final Object block = Block.blockRegistry.getObject(string);
+			return block != null && blockFilter.matches((Block) block);
 		}
 
 		@Override
@@ -27,12 +45,15 @@ public class BlockNameBuilder extends ParameterBuilder {
 			@SuppressWarnings("unchecked")
 			final Set<String> keys = Block.blockRegistry.getKeys();
 			for (final String k : keys) {
-				if (k.startsWith(MINECRAFT_PREFIX)) {
-					final String subKey = k
-							.substring(MINECRAFT_PREFIX.length());
-					addKey(currentStart, addTo, subKey);
-				} else {
-					addKey(currentStart, addTo, k);
+				final Object block = Block.blockRegistry.getObject(k);
+				if (blockFilter.matches((Block) block)) {
+					if (k.startsWith(MINECRAFT_PREFIX)) {
+						final String subKey = k.substring(MINECRAFT_PREFIX
+								.length());
+						addKey(currentStart, addTo, subKey);
+					} else {
+						addKey(currentStart, addTo, k);
+					}
 				}
 			}
 		}
@@ -53,7 +74,8 @@ public class BlockNameBuilder extends ParameterBuilder {
 
 	@Override
 	public void addArguments(ArrayList<ArgumentDefinition> list) {
-		list.add(new BlockArgumentDefinition(annot.description()));
+		list.add(new BlockArgumentDefinition(annot.description(), annot
+				.blockFilter()));
 	}
 
 	@Override

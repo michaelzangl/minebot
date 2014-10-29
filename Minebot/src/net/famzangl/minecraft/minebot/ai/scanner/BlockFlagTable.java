@@ -4,6 +4,11 @@ import java.util.BitSet;
 
 import net.famzangl.minecraft.minebot.Pos;
 
+/**
+ * A simple 3-dimensional Bitset.
+ * @author michael
+ *
+ */
 public class BlockFlagTable {
 	private final BitSet bits = new BitSet();
 	private final Pos max;
@@ -21,6 +26,13 @@ public class BlockFlagTable {
 		}
 	}
 	
+	/**
+	 * Get a bit.
+	 * @param x
+	 * @param y
+	 * @param z
+	 * @return The stored bit or false when no bit was stored yet or the bit is outside the range.
+	 */
 	public boolean getBit(int x, int y, int z) {
 		int index = getIndex(x, y, z);
 		if (index >= 0) {

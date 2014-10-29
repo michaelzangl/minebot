@@ -1,17 +1,17 @@
 package net.famzangl.minecraft.minebot.build.blockbuild;
 
 import net.famzangl.minecraft.minebot.Pos;
+import net.famzangl.minecraft.minebot.ai.BlockWhitelist;
 import net.famzangl.minecraft.minebot.ai.task.AITask;
 import net.famzangl.minecraft.minebot.ai.task.BlockSide;
 import net.famzangl.minecraft.minebot.ai.task.place.JumpingPlaceAtHalfTask;
 import net.famzangl.minecraft.minebot.ai.task.place.SneakAndPlaceAtHalfTask;
-import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
 
 public class BuildHalfslabTask extends CubeBuildTask {
 
-	public static final Block[] BLOCKS = new Block[] { Blocks.stone_slab,
-			Blocks.wooden_slab };
+	public static final BlockWhitelist BLOCKS = new BlockWhitelist ( Blocks.stone_slab,
+			Blocks.wooden_slab );
 	private final BlockSide side;
 	private final SlabType slabType;
 

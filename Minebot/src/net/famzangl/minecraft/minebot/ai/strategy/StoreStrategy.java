@@ -10,8 +10,8 @@ import net.famzangl.minecraft.minebot.ai.scanner.BlockRangeScanner;
 import net.famzangl.minecraft.minebot.ai.scanner.ChestBlockHandler;
 import net.famzangl.minecraft.minebot.ai.scanner.ChestBlockHandler.ChestData;
 import net.famzangl.minecraft.minebot.ai.task.OpenChestTask;
-import net.famzangl.minecraft.minebot.ai.task.PutInChestTask;
 import net.famzangl.minecraft.minebot.ai.task.WaitTask;
+import net.famzangl.minecraft.minebot.ai.task.inventory.PutInChestTask;
 import net.minecraft.client.gui.inventory.GuiChest;
 import net.minecraft.item.ItemStack;
 
@@ -37,12 +37,12 @@ public class StoreStrategy extends PathFinderStrategy {
 		
 		@Override
 		protected float rateDestination(int distance, int x, int y, int z) {
-			ArrayList<ChestData> chests = chestBlockHandler.getChestsForPos(new Pos(
+			ArrayList<ChestData> chests = chestBlockHandler.getReachableForPos(new Pos(
 					x, y, z));
 			if (chests != null) {
 				for (ChestData c : chests) {
 					for (ItemStack s : helper.getMinecraft().thePlayer.inventory.mainInventory) {
-						if (c.isItemAllowed(s)) {
+						if (c.couldPutItem(s)) {
 							return distance;
 						}
 					}
@@ -54,7 +54,7 @@ public class StoreStrategy extends PathFinderStrategy {
 		@Override
 		protected void addTasksForTarget(Pos currentPos) {
 			ArrayList<ChestData> chests = chestBlockHandler
-					.getChestsForPos(currentPos);
+					.getReachableForPos(currentPos);
 			for (final ChestData c : chests) {
 				boolean chestOpen = false;
 				ItemStack[] inventory = helper.getMinecraft().thePlayer.inventory.mainInventory;

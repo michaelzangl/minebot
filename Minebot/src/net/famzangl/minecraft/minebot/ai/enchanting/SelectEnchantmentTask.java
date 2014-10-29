@@ -12,6 +12,8 @@ import net.minecraft.inventory.ContainerEnchantment;
 public class SelectEnchantmentTask extends AITask {
 
 	private static final int E_SLOT = 2;
+	
+	private boolean hasFailed = false;
 
 	@Override
 	public boolean isFinished(AIHelper h) {
@@ -50,25 +52,35 @@ public class SelectEnchantmentTask extends AITask {
 			final ContainerEnchantment c = (ContainerEnchantment) field
 					.get(screen);
 
-			if (c.enchantLevels[E_SLOT] == 0) {
-				System.out.println("No enchantment levels computed yet.");
-				return;
-			}
-			if (h.getMinecraft().thePlayer.experienceLevel < c.enchantLevels[E_SLOT]) {
-				System.out.println("Abort enchantment, not enough levels.");
-				return;
-			}
-			if (c.enchantItem(h.getMinecraft().thePlayer, E_SLOT)) {
-				h.getMinecraft().playerController.sendEnchantPacket(c.windowId,
-						E_SLOT);
-			}
-			System.out.println("Sent enchant request package.");
-			return;
+			hasFailed = !attemptEnchanting(h, c, E_SLOT);
 		} catch (final Throwable e) {
 			e.printStackTrace();
 			o.desync(new StringTaskError("Some error... :-("));
 			return;
 		}
+	}
+
+	private boolean attemptEnchanting(AIHelper h, ContainerEnchantment c,
+			int slot) {
+		if (c.enchantLevels[slot] == 0) {
+			System.out.println("No enchantment levels computed yet.");
+			return false;
+		}
+		if (h.getMinecraft().thePlayer.experienceLevel < c.enchantLevels[slot]) {
+			System.out.println("Abort enchantment, not enough levels.");
+			return slot > 0 ? attemptEnchanting(h, c, slot - 1) : false;
+		}
+		if (c.enchantItem(h.getMinecraft().thePlayer, slot)) {
+			h.getMinecraft().playerController.sendEnchantPacket(c.windowId,
+					slot);
+			System.out.println("Sent enchant request package.");
+			return true;
+		}
+		return false;
+	}
+	
+	public boolean hasFailed() {
+		return hasFailed;
 	}
 
 }

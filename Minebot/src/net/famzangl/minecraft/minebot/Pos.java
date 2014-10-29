@@ -1,5 +1,6 @@
 package net.famzangl.minecraft.minebot;
 
+import net.famzangl.minecraft.minebot.ai.scripting.DoublePos;
 import net.minecraftforge.common.util.ForgeDirection;
 
 /**
@@ -99,7 +100,14 @@ public class Pos {
 	}
 
 	public double distance(Pos other) {
-		return Math.hypot(Math.hypot(other.x - x, other.y - y), other.z - z);
+		return length(other.x - x, other.y - y, other.z - z);
+	}
+	
+	public static double length(double dx, double dy, double dz) {
+		return Math.sqrt(dx * dx + dy * dy + dz * dz);
 	}
 
+	public double distance(DoublePos other) {
+		return other.distance(this);
+	}
 }

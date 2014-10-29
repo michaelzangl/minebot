@@ -18,7 +18,6 @@ public final class ColorSelector implements IEntitySelector {
 		if (var1 instanceof EntityWolf) {
 			return ((EntityWolf) var1).getCollarColor() == color;
 		} else if (var1 instanceof EntitySheep) {
-			System.out.println(((EntitySheep) var1).getFleeceColor());
 			return ((EntitySheep) var1).getFleeceColor() == color;
 		} else {
 			return false;

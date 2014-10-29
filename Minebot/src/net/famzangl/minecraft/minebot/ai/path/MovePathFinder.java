@@ -1,6 +1,5 @@
 package net.famzangl.minecraft.minebot.ai.path;
 
-import java.util.ArrayList;
 import java.util.LinkedList;
 
 import net.famzangl.minecraft.minebot.MinebotSettings;
@@ -15,7 +14,7 @@ import net.famzangl.minecraft.minebot.ai.task.move.DownwardsMoveTask;
 import net.famzangl.minecraft.minebot.ai.task.move.HorizontalMoveTask;
 import net.famzangl.minecraft.minebot.ai.task.move.JumpMoveTask;
 import net.famzangl.minecraft.minebot.ai.task.move.UpwardsMoveTask;
-import net.minecraft.block.Block;
+import net.famzangl.minecraft.minebot.ai.task.move.WalkTowardsTask;
 import net.minecraft.init.Blocks;
 import net.minecraftforge.common.util.ForgeDirection;
 
@@ -26,8 +25,7 @@ import net.minecraftforge.common.util.ForgeDirection;
  * 
  */
 public class MovePathFinder extends PathFinderField {
-	protected Block[] upwardsBuildBlocks = new Block[] { Blocks.dirt,
-			Blocks.stone, Blocks.cobblestone };
+	protected BlockWhitelist upwardsBuildBlocks;
 
 	protected AIHelper helper;
 	protected MinebotSettings settings;
@@ -50,31 +48,38 @@ public class MovePathFinder extends PathFinderField {
 			.unionWith(AIHelper.walkableBlocks);
 
 	protected BlockWhitelist footAllowedBlocks = AIHelper.safeDestructableBlocks
-			.unionWith(AIHelper.safeHeadBlocks)
-			.unionWith(AIHelper.fallingBlocks)
-			.intersectWith(defaultForbiddenBlocks.invert());
+			.unionWith(AIHelper.safeCeilingBlocks).unionWith(
+					AIHelper.fallingBlocks);
 	protected BlockWhitelist headAllowedBlocks = footAllowedBlocks;
 
+	protected BlockWhitelist shortFootBlocks = AIHelper.walkableBlocks;
+	protected BlockWhitelist shortHeadBlocks = AIHelper.headWalkableBlocks;
+
+	protected final static BlockWhitelist fastDestructableBlocks = new BlockWhitelist(
+			Blocks.dirt, Blocks.gravel, Blocks.sand, Blocks.sandstone);
+
+	private static final BlockWhitelist defaultUpwardsBlocks = new BlockWhitelist(
+			Blocks.dirt, Blocks.stone, Blocks.cobblestone, Blocks.sand);
+
+	/**
+	 * Current forbidden block settings. Just FYI, never used by this
+	 * pathfinder.
+	 */
+	protected final BlockWhitelist forbiddenBlocks;
 	private TaskReceiver receiver;
 
 	public MovePathFinder() {
 		super();
 		settings = new MinebotSettings();
 
-		final ArrayList<Block> blocks = new ArrayList<Block>();
-		final String upwardsBuildBlockNames = settings.get(
-				"upwards_place_block", "dirt,stone,cobblestone");
-		for (final String name : upwardsBuildBlockNames
-				.split("\\s*[\\,\\s\\;]\\s*")) {
-			final Block block = (Block) Block.blockRegistry.getObject(name);
-			if (block != null) {
-				blocks.add(block);
-			} else {
-				System.out.println("Invalid block name: " + name);
-			}
-		}
-		upwardsBuildBlocks = blocks.toArray(new Block[blocks.size()]);
+		upwardsBuildBlocks = settings.getBlocks("upwards_place_block",
+				defaultUpwardsBlocks);
+		forbiddenBlocks = settings.getBlocks("blacklisted_blocks",
+				defaultForbiddenBlocks);
+
 		torchLightLevel = settings.getFloat("place_torches_at", 1.0f, -1, 15);
+		footAllowedBlocks = footAllowedBlocks.intersectWith(forbiddenBlocks.invert());
+		headAllowedBlocks = headAllowedBlocks.intersectWith(forbiddenBlocks.invert());
 	}
 
 	@Override
@@ -148,8 +153,8 @@ public class MovePathFinder extends PathFinderField {
 		if (getY(currentNode) > cy) {
 			if (getX(currentNode) != cx || getZ(currentNode) != cz) {
 				return helper.isSafeHeadBlock(cx, cy + 3, cz)
-						&& AIHelper.headWalkableBlocks.contains(helper.getBlockId(cx,
-								cy + 2, cz));
+						&& AIHelper.headWalkableBlocks.contains(helper
+								.getBlockId(cx, cy + 2, cz));
 			} else if (helper.isFallingBlock(cx, cy + 2, cz)) {
 				// moving down, so ignoring sand, gravel.
 				return true;
@@ -182,9 +187,19 @@ public class MovePathFinder extends PathFinderField {
 				addTask(new PlaceTorchIfLightBelowTask(currentPos, direction,
 						torchLightLevel));
 			}
-
+			int stepsAdded = 0;
+			while (path.peekFirst() != null
+					&& isAreaClear(currentPos, path.peekFirst())
+					&& stepsAdded < 20) {
+				nextPos = path.removeFirst();
+				stepsAdded++;
+			}
 			final Pos peeked = path.peekFirst();
-			if (moveDirection == ForgeDirection.UP && peeked != null
+			if (stepsAdded > 0) {
+				System.out.println("Shortcur from " + currentPos + " to "
+						+ nextPos);
+				addTask(new WalkTowardsTask(nextPos.x, nextPos.z, currentPos));
+			} else if (moveDirection == ForgeDirection.UP && peeked != null
 					&& nextPos.subtract(peeked).y == 0) {
 				// Combine upwards-sidewards.
 				// System.out.println("Next direction is: "
@@ -196,7 +211,8 @@ public class MovePathFinder extends PathFinderField {
 			} else if (nextPos.y > currentPos.y) {
 				addTask(new UpwardsMoveTask(nextPos.x, nextPos.y, nextPos.z,
 						new BlockItemFilter(upwardsBuildBlocks)));
-			} else if (nextPos.y < currentPos.y && nextPos.x == currentPos.x && nextPos.z == currentPos.z) {
+			} else if (nextPos.y < currentPos.y && nextPos.x == currentPos.x
+					&& nextPos.z == currentPos.z) {
 				addTask(new DownwardsMoveTask(nextPos.x, nextPos.y, nextPos.z));
 			} else {
 				addTask(new HorizontalMoveTask(nextPos.x, nextPos.y, nextPos.z));
@@ -204,6 +220,35 @@ public class MovePathFinder extends PathFinderField {
 			currentPos = nextPos;
 		}
 		addTasksForTarget(currentPos);
+	}
+
+	/**
+	 * Could we take a shortcut without any objects in the way.
+	 * 
+	 * @param pos1
+	 * @param pos2
+	 * @return
+	 */
+	private boolean isAreaClear(Pos pos1, Pos pos2) {
+		if (pos1.y != pos2.y) {
+			return false;
+		}
+		Pos min = Pos.minPos(pos1, pos2);
+		Pos max = Pos.maxPos(pos1, pos2);
+		int y = pos1.y;
+		for (int x = min.x; x <= max.x; x++) {
+			for (int z = min.z; z <= max.z; z++) {
+				if (!helper.isSafeGroundBlock(x, y - 1, z)
+						|| !helper.isSafeHeadBlock(x, y + 2, z)
+						|| !AIHelper.walkableBlocks.contains(helper.getBlockId(
+								x, y, z))
+						|| !AIHelper.headWalkableBlocks.contains(helper
+								.getBlockId(x, y + 1, z))) {
+					return false;
+				}
+			}
+		}
+		return true;
 	}
 
 	private ForgeDirection direction(Pos currentPos, final Pos nextPos) {
@@ -236,13 +281,10 @@ public class MovePathFinder extends PathFinderField {
 		return distance;
 	}
 
-	protected final static BlockWhitelist fastDestructableBlocks = new BlockWhitelist(
-			Blocks.dirt, Blocks.gravel, Blocks.sand, Blocks.sandstone);
-
 	protected int materialDistance(int x, int y, int z, boolean asFloor) {
-		final Block block = helper.getBlock(x, y, z);
-		if (asFloor && helper.canWalkOn(block) || !asFloor
-				&& helper.canWalkThrough(block)) {
+		final int block = helper.getBlockId(x, y, z);
+		if (asFloor && shortFootBlocks.contains(block) || !asFloor
+				&& shortHeadBlocks.contains(block)) {
 			return 0;
 		} else if (fastDestructableBlocks.contains(block)) {
 			// fast breaking gives bonus.

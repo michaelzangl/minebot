@@ -25,15 +25,15 @@ public abstract class BuildTask {
 				.replaceFirst("minecraft:", "");
 		final int blockMetadata = h.getMinecraft().theWorld.getBlockMetadata(x,
 				y, z);
-		if (AIHelper.blockIsOneOf(b, BlockBuildTask.BLOCKS)) {
+		if (BlockBuildTask.BLOCKS.contains(b)) {
 			return new TaskDescription(name, CubeBuildTask.STANDABLE);
-		} else if (AIHelper.blockIsOneOf(b, ColoredCubeBuildTask.BLOCKS)) {
+		} else if (ColoredCubeBuildTask.BLOCKS.contains(b)) {
 			return new TaskDescription(name + " "
 					+ ColoredBlockItemFilter.COLORS[blockMetadata],
 					CubeBuildTask.STANDABLE);
-		} else if (AIHelper.blockIsOneOf(b, FenceBuildTask.BLOCKS)) {
+		} else if (FenceBuildTask.BLOCKS.contains(b)) {
 			return new TaskDescription(name, FenceBuildTask.STANDABLE);
-		} else if (AIHelper.blockIsOneOf(b, LogBuildTask.BLOCKS)) {
+		} else if (LogBuildTask.BLOCKS.contains(b)) {
 			for (final WoodType t : WoodType.values()) {
 				if (t.lowerBits == (blockMetadata & 0x3) && t.block == b) {
 					String dir;
@@ -53,13 +53,13 @@ public abstract class BuildTask {
 				}
 			}
 			throw new UnknownBlockException("Unknown wood type " + b);
-		} else if (AIHelper.blockIsOneOf(b, WoodBuildTask.BLOCK)) {
+		} else if (WoodBuildTask.BLOCKS.contains(b)) {
 			return new TaskDescription(
 					name
 							+ " "
 							+ WoodType.values()[blockMetadata].toString()
 									.toLowerCase(), CubeBuildTask.STANDABLE);
-		} else if (AIHelper.blockIsOneOf(b, BuildNormalStairsTask.BLOCKS)) {
+		} else if (BuildNormalStairsTask.BLOCKS.contains(b)) {
 			ForgeDirection dir;
 			switch (blockMetadata & 0x3) {
 			case 0:
@@ -91,7 +91,7 @@ public abstract class BuildTask {
 			}
 			return new TaskDescription(name + " "
 					+ dir.toString().toLowerCase() + " " + up, standable);
-		} else if (AIHelper.blockIsOneOf(b, BuildHalfslabTask.BLOCKS)) {
+		} else if (BuildHalfslabTask.BLOCKS.contains(b)) {
 			for (final SlabType t : SlabType.values()) {
 				if (t.slabBlock == b && t.meta == (blockMetadata & 0x7)) {
 					Half up;

@@ -11,21 +11,19 @@ import net.minecraft.client.gui.GuiEnchantment;
  * 
  */
 
-public class EnchantStrategy extends TaskStrategy {
+public class XPFarmStrategy extends TaskStrategy {
 
 	private final int level;
+	private final boolean doEnchant;
 
-	public EnchantStrategy() {
-		this(30);
-	}
-
-	public EnchantStrategy(int level) {
+	public XPFarmStrategy(boolean doEnchant, int level) {
+		this.doEnchant = doEnchant;
 		this.level = level;
 	}
 
 	@Override
 	public void searchTasks(AIHelper helper) {
-		if (hasLevelsToEnchant(helper)) {
+		if (hasLevelsToEnchant(helper) && doEnchant) {
 			if (enchantmentTableOpened(helper)) {
 				addTask(new PutItemInTableTask());
 				addTask(new SelectEnchantmentTask());
@@ -36,7 +34,7 @@ public class EnchantStrategy extends TaskStrategy {
 		} else if (enchantmentTableOpened(helper)) {
 			addTask(new TakeEnchantedItemTask());
 			addTask(new CloseScreenTask());
-		} else {
+		} else if (helper.getMinecraft().thePlayer.experienceLevel < level) {
 			addTask(new FaceAnyMobTask());
 			addTask(new KillAnyMobTask());
 		}

@@ -30,6 +30,8 @@ public class ForBuildPathFinder extends MovePathFinder {
 		allowedGroundForUpwardsBlocks = allowedGroundBlocks;
 		footAllowedBlocks = AIHelper.walkableBlocks;
 		headAllowedBlocks = AIHelper.headWalkableBlocks;
+		footAllowedBlocks = footAllowedBlocks.intersectWith(forbiddenBlocks.invert());
+		headAllowedBlocks = headAllowedBlocks.intersectWith(forbiddenBlocks.invert());
 	}
 	
 	@Override

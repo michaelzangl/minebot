@@ -6,15 +6,13 @@ import net.famzangl.minecraft.minebot.ai.selectors.AndSelector;
 import net.famzangl.minecraft.minebot.ai.selectors.ColorSelector;
 import net.famzangl.minecraft.minebot.ai.selectors.ItemSelector;
 import net.famzangl.minecraft.minebot.ai.selectors.OrSelector;
-import net.famzangl.minecraft.minebot.ai.task.FaceAndInteractTask;
 import net.minecraft.command.IEntitySelector;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.passive.EntitySheep;
 import net.minecraft.item.ItemShears;
 import net.minecraft.item.ItemStack;
 
-public class ShearStrategy extends TaskStrategy {
-	private static final int DISTANCE = 20;
+public class ShearStrategy extends FaceInteractStrategy {
 	private final int color;
 
 	public ShearStrategy(int color) {
@@ -36,25 +34,38 @@ public class ShearStrategy extends TaskStrategy {
 					&& ((EntitySheep) var1).isShearable(null, null, 0, 0, 0);
 		}
 	}
-
+	
 	@Override
-	public void searchTasks(AIHelper helper) {
-		if (!helper.selectCurrentItem(new ShearsFilter())) {
-			return;
-		}
-
+	protected IEntitySelector entitiesToInteract(AIHelper helper) {
 		IEntitySelector selector = new SheepSelector();
 
 		if (color >= 0) {
 			selector = new AndSelector(selector, new ColorSelector(color));
 		}
-
-		final Entity found = helper.getClosestEntity(DISTANCE, new OrSelector(
-				selector, new ItemSelector()));
-
-		if (found != null) {
-			addTask(new FaceAndInteractTask(found, selector));
+		return selector;
+	}
+	@Override
+	protected IEntitySelector entitiesToFace(AIHelper helper) {
+		return new OrSelector(super.entitiesToFace(helper), new ItemSelector());
+	}
+	
+	@Override
+	public boolean checkShouldTakeOver(AIHelper helper) {
+		return super.checkShouldTakeOver(helper) && helper.canSelectItem(new ShearsFilter());
+	}
+	
+	@Override
+	protected TickResult onGameTick(AIHelper helper) {
+		if (!helper.canSelectItem(new ShearsFilter())) {
+			return TickResult.NO_MORE_WORK;
 		}
+		return super.onGameTick(helper);
+	}
+	
+	@Override
+	protected void doInteract(Entity entityHit, AIHelper helper) {
+		helper.selectCurrentItem(new ShearsFilter());
+		super.doInteract(entityHit, helper);
 	}
 
 	@Override

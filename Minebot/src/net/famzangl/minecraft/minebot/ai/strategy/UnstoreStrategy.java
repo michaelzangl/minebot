@@ -13,9 +13,9 @@ import net.famzangl.minecraft.minebot.ai.scanner.ChestBlockHandler.ChestData;
 import net.famzangl.minecraft.minebot.ai.scanner.SameItemFilter;
 import net.famzangl.minecraft.minebot.ai.strategy.InventoryDefinition.InventorySlot;
 import net.famzangl.minecraft.minebot.ai.task.AITask;
-import net.famzangl.minecraft.minebot.ai.task.MoveInInventoryTask;
 import net.famzangl.minecraft.minebot.ai.task.OpenChestTask;
 import net.famzangl.minecraft.minebot.ai.task.WaitTask;
+import net.famzangl.minecraft.minebot.ai.task.inventory.MoveInInventoryTask;
 import net.minecraft.client.gui.inventory.GuiChest;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
@@ -149,7 +149,7 @@ public class UnstoreStrategy extends PathFinderStrategy {
 
 		@Override
 		protected float rateDestination(int distance, int x, int y, int z) {
-			ArrayList<ChestData> chests = chestBlockHandler.getChestsForPos(new Pos(
+			ArrayList<ChestData> chests = chestBlockHandler.getReachableForPos(new Pos(
 					x, y, z));
 			if (chests != null) {
 				for (ChestData c : chests) {
@@ -164,7 +164,7 @@ public class UnstoreStrategy extends PathFinderStrategy {
 		@Override
 		protected void addTasksForTarget(Pos currentPos) {
 			ArrayList<ChestData> chests = chestBlockHandler
-					.getChestsForPos(currentPos);
+					.getReachableForPos(currentPos);
 			for (final ChestData c : chests) {
 				ItemStack[] inventory = helper.getMinecraft().thePlayer.inventory.mainInventory;
 				ArrayList<AITask> tasks = list.getTakeTasks(inventory, c);
@@ -178,6 +178,7 @@ public class UnstoreStrategy extends PathFinderStrategy {
 					}
 					addTask(new CloseScreenTask());
 					addTask(new WaitTask(5));
+					break;
 				}
 
 			}

@@ -21,7 +21,7 @@ public class NumberNameBuilder extends ParameterBuilder {
 		list.add(new ArgumentDefinition("Number", annot.description()) {
 			@Override
 			public boolean couldEvaluateAgainst(String string) {
-				return string.matches("\\d+");
+				return string.matches("^\\d+$");
 			}
 		});
 	}

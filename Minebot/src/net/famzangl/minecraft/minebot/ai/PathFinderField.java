@@ -1,5 +1,6 @@
 package net.famzangl.minecraft.minebot.ai;
 
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.PriorityQueue;
@@ -18,11 +19,21 @@ public class PathFinderField implements Comparator<Integer> {
 	private static final int Y_LEVEL = 32;
 	private static int SIZE_X_Z = 256;
 	private static int FIELD_SIZE = (1 << 16) * Y_LEVEL;
+	// Needs to be more than normal distance spread. Power of 2.
+	private static int FAST_DISTANCE_ACCESS = 64;
 
 	private final PathFinderFieldData data = new PathFinderFieldData();
 	private Dest currentDest = null;
+	// Priority queue for everything that is more than max distance spread.
 	private final PriorityQueue<Integer> pq = new PriorityQueue<Integer>(100,
 			this);
+
+	private final int[][] pqByDistance = new int[FAST_DISTANCE_ACCESS][256];
+	private final int[] pqByDistanceFill = new int[FAST_DISTANCE_ACCESS];
+	int pqMinDistance = -1;
+
+	// private int[] pqArray = new int[256];
+	// private int pqSize = 0;
 
 	private static int FIELD_VISITED_MASK = 0x10000000;
 	private static int FIELD_IN_QUEUE_MASK = 0x20000000;
@@ -83,8 +94,9 @@ public class PathFinderField implements Comparator<Integer> {
 	}
 
 	private int getDistance(int blockIndex) {
-		return (field[blockIndex] & FIELD_DISTANCE_SET_MASK) == 0 ? Integer.MAX_VALUE
-				: (field[blockIndex] & FIELD_DISTANCE_MASK) >> FIELD_DISTANCE_SHIFT;
+		int inField = field[blockIndex];
+		return (inField & FIELD_DISTANCE_SET_MASK) == 0 ? Integer.MAX_VALUE
+				: (inField & FIELD_DISTANCE_MASK) >> FIELD_DISTANCE_SHIFT;
 	}
 
 	private void setDistance(int blockIndex, int distance) {
@@ -136,7 +148,12 @@ public class PathFinderField implements Comparator<Integer> {
 
 	@Override
 	public int compare(Integer o1, Integer o2) {
-		return getDistance(o1) - getDistance(o2);
+		int c1 = getDistance(o1) - getDistance(o2);
+		// if (c1 == 0) {
+		// return o1 - o2;
+		// } else {
+		return c1;
+		// }
 	}
 
 	private static class Dest implements Comparable<Dest> {
@@ -168,11 +185,11 @@ public class PathFinderField implements Comparator<Integer> {
 			data.offsetX = cx - SIZE_X_Z / 2;
 			data.offsetY = cy - Y_LEVEL / 2;
 			data.offsetZ = cz - SIZE_X_Z / 2;
-			pq.clear();
+			pqClear();
 			final int start = getIndexForBlock(cx, cy, cz);
-			pq.add(start);
-			final float startRating = rateDestination(start);
 			setDistance(start, 1);
+			pqAdd(start, 1);
+			final float startRating = rateDestination(start);
 			if (startRating >= 0) {
 				currentDest = new Dest(start, startRating);
 			} else {
@@ -182,15 +199,14 @@ public class PathFinderField implements Comparator<Integer> {
 		}
 		startTime = System.currentTimeMillis();
 		long iteration = 0;
-		while (!pq.isEmpty()
+		while (!pqEmpty()
 				&& ((iteration++ & 0xff) != 0 || hasTimeLeft(startTime))) {
-			final int currentNode = pq.poll();
+			final int currentNode = pqPoll();
 			final int currentDistance = getDistance(currentNode);
-			final Dest head = currentDest;
-			if (head != null && currentDistance + 1 > head.destDistanceRating) {
-				planPathTo(head.destNode, cx, cy, cz);
-				terminated();
-				return true;
+			if (currentDest != null
+					&& currentDistance + 1 > currentDest.destDistanceRating) {
+				pqClear();
+				break;
 			}
 			final float rating = rateDestination(currentNode);
 			if (rating >= 0) {
@@ -210,27 +226,49 @@ public class PathFinderField implements Comparator<Integer> {
 				}
 				final int distance = distanceFor(currentNode, n)
 						+ currentDistance;
-				if (distance < getDistance(n)) {
+				if (!isInQueue(n)) {
 					setDistance(n, distance);
 					setMoveFrom(n, currentNode);
-				}
-				if (!isInQueue(n)) {
 					setInQueue(n);
-					pq.add(n);
+					pqAdd(n, distance);
+				} else {
+					int oldDistance = getDistance(n);
+					if (distance < oldDistance) {
+						setDistance(n, distance);
+						setMoveFrom(n, currentNode);
+						pqUpdate(n, oldDistance, distance);
+					}
 				}
 			}
 			setVisited(currentNode);
 		}
-		if (pq.isEmpty()) {
-			noPathFound();
-			terminated();
+		if (pqEmpty()) {
+			if (currentDest != null) {
+				planPathTo(currentDest.destNode, cx, cy, cz);
+				terminated();
+			} else {
+				noPathFound();
+				terminated();
+			}
 			return true;
 		} else {
 			System.out
 					.println("Warning: Path finding needs more time. Just got "
 							+ iteration + " iterations.");
+			pqStats();
+
 			return false;
 		}
+	}
+
+	private void pqStats() {
+		int min = Integer.MAX_VALUE;
+		int max = 0;
+		for (Integer i : pq) {
+			min = Math.min(min, getDistance(i));
+			max = Math.max(max, getDistance(i));
+		}
+		System.out.println("Queue range: " + min + " to " + max);
 	}
 
 	private boolean hasTimeLeft(long startTime) {
@@ -240,7 +278,7 @@ public class PathFinderField implements Comparator<Integer> {
 	private void terminated() {
 		isRunning = false;
 		field = null;
-		pq.clear();
+		pqClear();
 		currentDest = null;
 	}
 
@@ -300,8 +338,8 @@ public class PathFinderField implements Comparator<Integer> {
 		return distance;
 	}
 
+	private final int[] res = new int[10];
 	protected int[] getNeighbours(int currentNode) {
-		final int[] res = new int[10];
 		final int cx = getX(currentNode);
 		final int cz = getZ(currentNode);
 		final int cy = getY(currentNode);
@@ -334,5 +372,105 @@ public class PathFinderField implements Comparator<Integer> {
 				+ getFromDirectionY(nodeId) + ", fromZ="
 				+ getFromDirectionZ(nodeId) + ", data="
 				+ Integer.toHexString(field[nodeId]));
+	}
+
+	private void pqClear() {
+		// pqSize = 0;
+		pq.clear();
+		pqMinDistance = -1;
+		Arrays.fill(pqByDistanceFill, 0);
+	}
+
+	private boolean pqEmpty() {
+		// return pqSize == 0;
+		return pq.isEmpty() && pqMinDistance < 0;
+	}
+
+
+	private void pqUpdate(int n, int oldDistance, int distance) {
+		pqRemove(n, oldDistance);
+		pqAdd(n, distance);
+	}
+
+	private void pqRemove(int n, int oldDistance) {
+		if (pqMinDistance >= 0 && oldDistance < pqMinDistance + FAST_DISTANCE_ACCESS) {
+			int slot = pqSlotFor(oldDistance);
+			int[] slotArray = pqByDistance[slot];
+			int fill = pqByDistanceFill[slot];
+			pqByDistanceFill[slot] = fill - 1;
+			for (int i = 0; i < fill - 1; i++) {
+				if (slotArray[i] == n) {
+					slotArray[i] = slotArray[fill - 1];
+					break;
+				}
+			}
+			if (fill == 1 && oldDistance == pqMinDistance) {
+				pqFindNextMin();
+			}
+		} else {
+			pq.remove(n);
+		}
+	}
+
+	private void pqAdd(int node, int distance) {
+		// pqSize++;
+		// if (pqSize >= pqArray.length) {
+		// pqArray = Arrays.copyOf(pqArray, pqArray.length * 2);
+		// }
+		// pqArray[pqSize - 1] = node;
+		if (getDistance(node) != distance) {
+			throw new IllegalArgumentException("Got: " + distance + " but real distance is " + getDistance(node));
+		}
+		if (pqMinDistance < 0) {
+			pqMinDistance = distance;
+		}
+		if (distance < pqMinDistance + FAST_DISTANCE_ACCESS) {
+			int slot = pqSlotFor(distance);
+			int[] slotArray = pqByDistance[slot];
+			int fill = pqByDistanceFill[slot];
+			pqByDistanceFill[slot] = fill + 1;
+			if (slotArray.length <= fill + 1) {
+				slotArray = Arrays.copyOf(slotArray, slotArray.length * 2);
+				pqByDistance[slot] = slotArray;
+			}
+			slotArray[fill] = node;
+		} else {
+			pq.offer(node);
+		}
+	}
+
+	private int pqSlotFor(int distance) {
+		return distance & (FAST_DISTANCE_ACCESS - 1);
+	}
+
+	/**
+	 * Only allowed if pqSize < 0. Otherwise, the behaviour is undefined.
+	 * 
+	 * @return
+	 */
+	private int pqPoll() {
+		if (pqMinDistance >= 0) {
+			int slot = pqSlotFor(pqMinDistance);
+			int fill = pqByDistanceFill[slot];
+			int result = pqByDistance[slot][fill - 1];
+			pqByDistanceFill[slot] = fill - 1;
+			if (fill == 1) {
+				pqFindNextMin();
+			}
+			return result;
+		} else {
+			return pq.poll();
+		}
+	}
+
+	private void pqFindNextMin() {
+		int nextMin = -1;
+		for (int d = pqMinDistance; d < pqMinDistance + FAST_DISTANCE_ACCESS; d++) {
+			if (pqByDistanceFill[pqSlotFor(d)] > 0) {
+				nextMin = d;
+				break;
+			}
+		}
+		pqMinDistance = nextMin;
 	}
 }

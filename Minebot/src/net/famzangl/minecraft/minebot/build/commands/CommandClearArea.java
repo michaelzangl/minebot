@@ -17,6 +17,7 @@ public class CommandClearArea {
 
 	private static final class ClearAreaStrategy extends PathFinderStrategy {
 		private String progress = "?";
+		private boolean done = false;
 		private final ClearAreaPathfinder pathFinder;
 
 		private ClearAreaStrategy(ClearAreaPathfinder pathFinder) {
@@ -28,9 +29,11 @@ public class CommandClearArea {
 		public void searchTasks(AIHelper helper) {
 			final int max = pathFinder.getAreaSize();
 			if (max <= 100000) {
+				float toClearCount = pathFinder.getToClearCount(helper);
 				progress = 100
-						- Math.round(100f * pathFinder.getToClearCount(helper)
+						- Math.round(100f * toClearCount
 								/ max) + "%";
+				done = toClearCount == 0;
 			}
 			super.searchTasks(helper);
 		}
@@ -38,6 +41,11 @@ public class CommandClearArea {
 		@Override
 		public String getDescription(AIHelper helper) {
 			return "Clear area: " + progress;
+		}
+		
+		@Override
+		public boolean hasFailed() {
+			return !done;
 		}
 	}
 

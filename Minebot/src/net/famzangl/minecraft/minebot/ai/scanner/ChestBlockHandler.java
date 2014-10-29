@@ -1,14 +1,16 @@
 package net.famzangl.minecraft.minebot.ai.scanner;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map.Entry;
 
 import net.famzangl.minecraft.minebot.Pos;
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.ItemFilter;
-import net.famzangl.minecraft.minebot.ai.scanner.BlockRangeScanner.BlockHandler;
+import net.famzangl.minecraft.minebot.ai.scanner.ChestBlockHandler.ChestData;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockChest;
 import net.minecraft.entity.item.EntityItemFrame;
@@ -17,10 +19,10 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraftforge.common.util.ForgeDirection;
 
-public class ChestBlockHandler implements BlockHandler{
+public class ChestBlockHandler extends RangeBlockHandler<ChestData> {
 
-	private static final int[] IDS = new int[] {Block.getIdFromBlock(Blocks.chest)};
-
+	private static final int[] IDS = new int[] { Block
+			.getIdFromBlock(Blocks.chest) };
 
 	public static class ChestData {
 		private final Pos pos;
@@ -106,15 +108,14 @@ public class ChestBlockHandler implements BlockHandler{
 
 		public void markAsFullFor(ItemStack s, boolean full) {
 			removeFrom(fullItems, s);
-			if (full)  {
+			if (full) {
 				fullItems.add(new SameItemFilter(s));
 			}
 		}
 
-
 		public void markAsEmptyFor(ItemStack s, boolean empty) {
 			removeFrom(emptyItems, s);
-			if (empty)  {
+			if (empty) {
 				emptyItems.add(new SameItemFilter(s));
 			}
 		}
@@ -129,60 +130,27 @@ public class ChestBlockHandler implements BlockHandler{
 			}
 		}
 	}
+
 	private final Hashtable<Pos, ChestData> chests = new Hashtable<Pos, ChestData>();
-	private final Hashtable<Pos, ArrayList<ChestData>> reachable = new Hashtable<Pos, ArrayList<ChestData>>();
 
 	@Override
 	public int[] getIds() {
 		return IDS;
 	}
-	
+
 	@Override
-	public void scanningDone(AIHelper helper) {
-		updatePositionCache(helper);
-	}
-
-
-	private void updatePositionCache(AIHelper helper) {
-		reachable.clear();
-		for (ChestData c : chests.values()) {
-			for (ForgeDirection d : new ForgeDirection[] {
-					ForgeDirection.NORTH, ForgeDirection.SOUTH,
-					ForgeDirection.EAST, ForgeDirection.WEST }) {
-				addChestPositions(helper, c.pos, c, d);
-				if (c.secondaryPos != null) {
-					addChestPositions(helper, c.secondaryPos, c, d);
-				}
-			}
-		}
-	}
-	private void addChestPositions(AIHelper helper, Pos pos, ChestData c,
-			ForgeDirection d) {
-		int dvertMax = 4;
-		for (int dhor = 0; dhor < 4; dhor++) {
-			int y = pos.y - dhor;
-			for (int dvert = 1; dvert <= dvertMax; dvert++) {
-				int x = pos.x + dvert * d.offsetX;
-				int z = pos.z + dvert * d.offsetZ;
-				if (!helper.isAirBlock(x, y, z)) {
-					dvertMax = dvert;
-				} else {
-					Pos allowed = new Pos(x, y, z);
-					addReachable(allowed, c);
-				}
-			}
+	protected void addPositionToCache(AIHelper helper, Pos pos, ChestData c) {
+		super.addPositionToCache(helper, pos, c);
+		if (c.secondaryPos != null) {
+			super.addPositionToCache(helper, c.secondaryPos, c);
 		}
 	}
 
-	private void addReachable(Pos allowed, ChestData c) {
-		ArrayList<ChestData> list = reachable.get(allowed);
-		if (list == null) {
-			list = new ArrayList<ChestData>();
-			reachable.put(allowed, list);
-		}
-		list.add(c);
+	@Override
+	protected Collection<Entry<Pos, ChestData>> getTargetPositions() {
+		return chests.entrySet();
 	}
-
+	
 	@Override
 	public void scanBlock(AIHelper helper, int id, int x, int y, int z) {
 		if (helper.getBlock(x, y, z) instanceof BlockChest) {
@@ -249,9 +217,4 @@ public class ChestBlockHandler implements BlockHandler{
 		}
 		return null;
 	}
-
-	public ArrayList<ChestData> getChestsForPos(Pos pos) {
-		return reachable.get(pos);
-	}
-
 }

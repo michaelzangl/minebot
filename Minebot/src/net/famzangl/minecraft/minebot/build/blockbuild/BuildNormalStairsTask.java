@@ -2,6 +2,7 @@ package net.famzangl.minecraft.minebot.build.blockbuild;
 
 import net.famzangl.minecraft.minebot.Pos;
 import net.famzangl.minecraft.minebot.ai.BlockItemFilter;
+import net.famzangl.minecraft.minebot.ai.BlockWhitelist;
 import net.famzangl.minecraft.minebot.ai.task.AITask;
 import net.famzangl.minecraft.minebot.ai.task.BlockSide;
 import net.famzangl.minecraft.minebot.ai.task.place.JumpingPlaceBlockAtSideTask;
@@ -12,12 +13,12 @@ import net.minecraftforge.common.util.ForgeDirection;
 
 public class BuildNormalStairsTask extends CubeBuildTask {
 
-	public static final Block[] BLOCKS = new Block[] { Blocks.acacia_stairs,
+	public static final BlockWhitelist BLOCKS = new BlockWhitelist( Blocks.acacia_stairs,
 			Blocks.birch_stairs, Blocks.brick_stairs, Blocks.dark_oak_stairs,
 			Blocks.jungle_stairs, Blocks.nether_brick_stairs,
 			Blocks.oak_stairs, Blocks.sandstone_stairs, Blocks.spruce_stairs,
 			Blocks.stone_brick_stairs, Blocks.stone_stairs,
-			Blocks.quartz_stairs };
+			Blocks.quartz_stairs );
 	private final ForgeDirection upwardsDirection;
 	private final boolean inverted;
 	private final Block stairs;

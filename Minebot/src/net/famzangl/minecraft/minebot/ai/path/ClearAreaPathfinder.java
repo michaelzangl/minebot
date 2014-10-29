@@ -118,7 +118,7 @@ public class ClearAreaPathfinder extends MovePathFinder {
 				* (maxPos.z - minPos.z + 1);
 	}
 
-	public float getToClearCount(AIHelper helper) {
+	public int getToClearCount(AIHelper helper) {
 		int count = 0;
 		int newTopY = minPos.y;
 		for (int y = minPos.y; y <= maxPos.y; y++) {

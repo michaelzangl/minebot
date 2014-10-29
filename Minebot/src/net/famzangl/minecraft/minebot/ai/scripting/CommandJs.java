@@ -2,53 +2,21 @@ package net.famzangl.minecraft.minebot.ai.scripting;
 
 import java.io.FileNotFoundException;
 import java.io.FileReader;
-import java.util.List;
 
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 
-import net.famzangl.minecraft.minebot.Pos;
 import net.famzangl.minecraft.minebot.ai.AIHelper;
-import net.famzangl.minecraft.minebot.ai.command.AIChatController;
 import net.famzangl.minecraft.minebot.ai.command.AICommand;
 import net.famzangl.minecraft.minebot.ai.command.AICommandInvocation;
 import net.famzangl.minecraft.minebot.ai.command.AICommandParameter;
 import net.famzangl.minecraft.minebot.ai.command.ParameterType;
-import net.famzangl.minecraft.minebot.ai.command.UnknownCommandException;
-import net.famzangl.minecraft.minebot.ai.commands.CommandRun;
 import net.famzangl.minecraft.minebot.ai.strategy.AIStrategy;
 import net.famzangl.minecraft.minebot.ai.strategy.AIStrategy.TickResult;
-import net.famzangl.minecraft.minebot.ai.strategy.StackStrategy;
-import net.famzangl.minecraft.minebot.ai.strategy.StrategyStack;
-import net.minecraft.entity.Entity;
-import net.minecraft.util.AxisAlignedBB;
-import net.minecraft.util.Vec3;
 
 @AICommand(name = "minebot", helpText = "Execute a javascript file.")
 public class CommandJs {
-	
-	public static class FoundEntity {
-		private final Entity entity;
-		private final Pos pos;
-		
-		public FoundEntity(Entity entity) {
-			this.entity = entity;
-			pos = new Pos((int) Math.floor(entity.posX), (int) Math.floor(entity.posY), (int) Math.floor(entity.posZ));
-		}
-
-		public Pos getPos() {
-			return pos;
-		}
-
-		public Class<?> getType()  {
-			return entity.getClass();
-		}
-		
-		public String getTypeName()  {
-			return entity.getClass().getSimpleName();
-		}
-	}
 	
 	public static class ScriptStrategy {
 		private final AIStrategy strategy;
@@ -59,6 +27,10 @@ public class CommandJs {
 
 		protected AIStrategy getStrategy() {
 			return strategy;
+		}
+
+		public boolean hasFailed() {
+			return strategy.hasFailed();
 		}
 	}
 
@@ -73,106 +45,6 @@ public class CommandJs {
 		void tickDone();
 
 		void pauseForStrategy();
-	}
-
-	public static class MineScript {
-
-		private final TickProvider tickProvider;
-
-		public MineScript(TickProvider tickProvider) {
-			this.tickProvider = tickProvider;
-		}
-
-		private AIHelper waitForTick() {
-			return tickProvider.getHelper();
-		}
-
-		/**
-		 * Evaluates a command and returns the strategy it resulted in. This is
-		 * as if the user entered the command, so there are multiple event
-		 * handlers active.
-		 * 
-		 * @param commandLine
-		 * @throws UnknownCommandException
-		 */
-		public ScriptStrategy safeStrategy(String command, String... arguments)
-				throws UnknownCommandException {
-			return new ScriptStrategy(AIChatController.getRegistry()
-					.evaluateCommandWithSaferule(waitForTick(), command,
-							arguments));
-		}
-
-		/**
-		 * Get a minebot strategy.
-		 * 
-		 * @param commandLine
-		 * @throws UnknownCommandException
-		 */
-		public ScriptStrategy strategy(String command, String... arguments)
-				throws UnknownCommandException {
-			return new ScriptStrategy(AIChatController.getRegistry()
-					.evaluateCommand(waitForTick(), command, arguments));
-		}
-
-		public Pos getPlayerPosition() {
-			return waitForTick().getPlayerPosition();
-		}
-		
-		public FoundEntity[] getEntities(Class clazz, double range){
-				AIHelper helper = waitForTick();
-				Vec3 p = helper.getMinecraft().thePlayer.getPosition(1);
-				AxisAlignedBB box = AxisAlignedBB.getBoundingBox(p.xCoord - range, p.yCoord-range, p.zCoord - range,p.xCoord +range, p.yCoord+range, p.zCoord +range);
-				List<Entity> es = helper.getMinecraft().theWorld.getEntitiesWithinAABB(clazz, box);
-				FoundEntity[] res = new FoundEntity[es.size()]; 
-				for (int i = 0; i < res.length; i++) {
-					res[i] = new FoundEntity(es.get(i));
-				}
-				return res;
-		}
-
-		public void displayChat(String message) {
-			AIChatController.addChatLine(message);
-		}
-		
-		public boolean isAlive() {
-			return waitForTick().isAlive();
-		}
-
-		public int getExperienceLevel() {
-			return waitForTick().getMinecraft().thePlayer.experienceLevel;
-		}
-
-		public int getCurrentTime() {
-			return (int) (waitForTick().getMinecraft().theWorld.getWorldTime() % 24000l);
-		}
-
-		public ScriptStrategy stack(ScriptStrategy... strats) {
-			StrategyStack stack = new StrategyStack();
-			for (ScriptStrategy s : strats) {
-				stack.addStrategy(s.getStrategy());
-			}
-			return new ScriptStrategy(new StackStrategy(stack));
-		}
-
-		public void doNothing() {
-			tickProvider.setActiveStrategy(null, waitForTick());
-			tickProvider.tickDone();
-		}
-
-		public void doStrategy(ScriptStrategy strategy) {
-			tickProvider.setActiveStrategy(strategy, waitForTick());
-			tickProvider.tickDone();
-			tickProvider.pauseForStrategy();
-		}
-
-		public void setDescription(String description) {
-			tickProvider.setDescription(description);
-		}
-		
-		public void serverCommand(String command) {
-			CommandRun.runCommand(waitForTick(), command);
-			tickProvider.tickDone();
-		}
 	}
 
 	public static class ScriptRunner implements Runnable, TickProvider {

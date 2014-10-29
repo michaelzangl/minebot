@@ -1,16 +1,18 @@
 package net.famzangl.minecraft.minebot.ai;
 
-import java.util.Arrays;
-
 import net.minecraft.block.Block;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 
 public class BlockItemFilter implements HumanReadableItemFilter {
 
-	private final Block[] matched;
+	private final BlockWhitelist matched;
 
 	public BlockItemFilter(Block... matched) {
+		this.matched = new BlockWhitelist(matched);
+	}
+
+	public BlockItemFilter(BlockWhitelist matched) {
 		this.matched = matched;
 	}
 
@@ -22,49 +24,44 @@ public class BlockItemFilter implements HumanReadableItemFilter {
 	}
 
 	protected boolean matchesItem(ItemStack itemStack, ItemBlock item) {
-		return AIHelper.blockIsOneOf(item.field_150939_a, matched);
+		return matched.contains(item.field_150939_a);
 	}
 
 	@Override
 	public String toString() {
-		return "BlockItemFilter [matched=" + Arrays.toString(matched) + "]";
+		return "BlockItemFilter [matched=" + matched + "]";
 	}
+
 
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + Arrays.hashCode(matched);
+		result = prime * result + ((matched == null) ? 0 : matched.hashCode());
 		return result;
 	}
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj) {
+		if (this == obj)
 			return true;
-		}
-		if (obj == null) {
+		if (obj == null)
 			return false;
-		}
-		if (getClass() != obj.getClass()) {
+		if (getClass() != obj.getClass())
 			return false;
-		}
-		final BlockItemFilter other = (BlockItemFilter) obj;
-		if (!Arrays.equals(matched, other.matched)) {
+		BlockItemFilter other = (BlockItemFilter) obj;
+		if (matched == null) {
+			if (other.matched != null)
+				return false;
+		} else if (!matched.equals(other.matched))
 			return false;
-		}
 		return true;
 	}
 
 	@Override
 	public String getDescription() {
 		final StringBuilder str = new StringBuilder();
-		for (final Block m : matched) {
-			if (str.length() > 0) {
-				str.append(", ");
-			}
-			str.append(m.getLocalizedName());
-		}
+		matched.getBlockString(str);
 		return str.toString();
 	}
 

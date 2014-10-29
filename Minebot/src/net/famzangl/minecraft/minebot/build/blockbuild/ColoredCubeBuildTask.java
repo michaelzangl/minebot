@@ -2,14 +2,15 @@ package net.famzangl.minecraft.minebot.build.blockbuild;
 
 import net.famzangl.minecraft.minebot.Pos;
 import net.famzangl.minecraft.minebot.ai.BlockItemFilter;
+import net.famzangl.minecraft.minebot.ai.BlockWhitelist;
 import net.famzangl.minecraft.minebot.ai.ColoredBlockItemFilter;
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
 
 public class ColoredCubeBuildTask extends CubeBuildTask {
 
-	public static final Block[] BLOCKS = new Block[] { Blocks.wool,
-			Blocks.stained_glass, Blocks.stained_hardened_clay };
+	public static final BlockWhitelist BLOCKS = new BlockWhitelist( Blocks.wool,
+			Blocks.stained_glass, Blocks.stained_hardened_clay);
 
 	public ColoredCubeBuildTask(Pos forPosition, Block blockType, int extraColor) {
 		this(forPosition, new ColoredBlockItemFilter(blockType, extraColor));
