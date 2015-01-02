@@ -1,0 +1,16 @@
+[
+{
+  "modid": "aimbow-mod",
+  "name": "AimBow",
+  "description": "Helps you aiming your bow.",
+  "version": "${version}",
+  "mcversion": "${mcversion}",
+  "url": "",
+  "updateUrl": "",
+  "authors": [""],
+  "credits": "",
+  "logoFile": "",
+  "screenshots": [],
+  "dependencies": []
+}
+]
