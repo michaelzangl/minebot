@@ -9,7 +9,6 @@ import net.famzangl.minecraft.minebot.Pos;
 import net.famzangl.minecraft.minebot.ai.command.AIChatController;
 import net.famzangl.minecraft.minebot.ai.command.IAIControllable;
 import net.famzangl.minecraft.minebot.ai.render.BuildMarkerRenderer;
-import net.famzangl.minecraft.minebot.ai.render.MarkingStrategy;
 import net.famzangl.minecraft.minebot.ai.render.PosMarkerRenderer;
 import net.famzangl.minecraft.minebot.ai.strategy.AIStrategy;
 import net.famzangl.minecraft.minebot.ai.strategy.AIStrategy.TickResult;
@@ -272,8 +271,9 @@ public class AIController extends AIHelper implements IAIControllable {
 			}
 			buildMarkerRenderer.render(event, this);
 		}
-		if (currentStrategy instanceof MarkingStrategy) {
-			((MarkingStrategy) currentStrategy).drawMarkers(event, this);
+		AIStrategy strat = currentStrategy;
+		if (strat != null) {
+			strat.drawMarkers(event, this);
 		}
 	}
 

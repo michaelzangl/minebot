@@ -10,7 +10,6 @@ import net.famzangl.minecraft.minebot.ai.command.AICommandInvocation;
 import net.famzangl.minecraft.minebot.ai.command.AICommandParameter;
 import net.famzangl.minecraft.minebot.ai.command.ParameterType;
 import net.famzangl.minecraft.minebot.ai.command.SafeStrategyRule;
-import net.famzangl.minecraft.minebot.ai.render.MarkingStrategy;
 import net.famzangl.minecraft.minebot.ai.render.PosMarkerRenderer;
 import net.famzangl.minecraft.minebot.ai.strategy.AIStrategy;
 import net.famzangl.minecraft.minebot.ai.strategy.TaskStrategy;
@@ -25,8 +24,7 @@ import net.minecraftforge.client.event.RenderWorldLastEvent;
 @AICommand(helpText = "Runs all tasks that are scheduled for building.", name = "minebuild")
 public class CommandBuild {
 
-	private static final class BuildStrategy extends TaskStrategy implements
-			MarkingStrategy {
+	private static final class BuildStrategy extends TaskStrategy {
 		private boolean alignSend;
 		private ForBuildPathFinder pathFinder;
 

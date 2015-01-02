@@ -1,14 +1,18 @@
 package net.famzangl.minecraft.minebot.ai.strategy;
 
+import net.famzangl.minecraft.minebot.Pos;
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.path.MovePathFinder;
+import net.famzangl.minecraft.minebot.ai.render.PosMarkerRenderer;
 import net.famzangl.minecraft.minebot.ai.task.WaitTask;
+import net.minecraftforge.client.event.RenderWorldLastEvent;
 
 public class PathFinderStrategy extends TaskStrategy {
 	private final MovePathFinder pathFinder;
 	private final String description;
 	private boolean inShouldTakeOver;
 	private boolean noPathFound;
+	private final PosMarkerRenderer renderer = new PosMarkerRenderer(255, 128, 0);;
 
 	// private final HealthWatcher watcher = new HealthWatcher();
 
@@ -66,6 +70,15 @@ public class PathFinderStrategy extends TaskStrategy {
 	public String toString() {
 		return "PathFinderStrategy [pathFinder=" + pathFinder
 				+ ", description=" + description + "]";
+	}
+
+	@Override
+	public void drawMarkers(RenderWorldLastEvent event, AIHelper helper) {
+		Pos target = pathFinder.getCurrentTarget();
+		if (target != null) {
+			renderer.render(event, helper, target, target.add(0, 1, 0));
+		}
+		super.drawMarkers(event, helper);
 	}
 
 }

@@ -68,6 +68,8 @@ public class MovePathFinder extends PathFinderField {
 	protected final BlockWhitelist forbiddenBlocks;
 	private TaskReceiver receiver;
 
+	private Pos currentTarget;
+
 	public MovePathFinder() {
 		super();
 		settings = new MinebotSettings();
@@ -93,6 +95,7 @@ public class MovePathFinder extends PathFinderField {
 
 	public final boolean searchSomethingAround(Pos playerPosition,
 			AIHelper helper, TaskReceiver receiver) {
+		currentTarget = null;
 		this.helper = helper;
 		this.receiver = receiver;
 		return runSearch(playerPosition);
@@ -219,6 +222,7 @@ public class MovePathFinder extends PathFinderField {
 			}
 			currentPos = nextPos;
 		}
+		currentTarget = currentPos;
 		addTasksForTarget(currentPos);
 	}
 
@@ -294,4 +298,8 @@ public class MovePathFinder extends PathFinderField {
 		}
 	}
 
+	public Pos getCurrentTarget() {
+		return currentTarget;
+	}
+	
 }

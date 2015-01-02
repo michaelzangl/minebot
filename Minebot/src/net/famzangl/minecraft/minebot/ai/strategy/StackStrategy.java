@@ -1,6 +1,7 @@
 package net.famzangl.minecraft.minebot.ai.strategy;
 
 import net.famzangl.minecraft.minebot.ai.AIHelper;
+import net.minecraftforge.client.event.RenderWorldLastEvent;
 
 /**
  * Run a whole stack of strategies.
@@ -59,5 +60,13 @@ public class StackStrategy extends AIStrategy {
 			str.append(s.getDescription(helper));
 		}
 		return str.toString();
+	}
+
+	@Override
+	public void drawMarkers(RenderWorldLastEvent event, AIHelper helper) {
+		AIStrategy current = stack.getCurrentStrategy();
+		if (current != null) {
+			current.drawMarkers(event, helper);
+		}
 	}
 }
