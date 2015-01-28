@@ -1,105 +1,62 @@
 package net.famzangl.minecraft.aimbow.aiming;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.util.AxisAlignedBB;
+import net.minecraft.init.Items;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.Vec3;
 
-/**
- * This is an incremental colission solver.
- * <p>
- * It can simulate multiple entities and detect which one is hit.
- * <p>
- * It uses a list of rays.
- * 
- * @author michael
- *
- */
-public class ColissionSolver {
-	private final Minecraft minecraft;
-	private final EntityLivingBase shootingEntity;
+public abstract class ColissionSolver {
 
-	private final ArrayList<BowRayData> simulated = new ArrayList<BowRayData>();
+	protected final Minecraft minecraft;
+	protected final EntityLivingBase shootingEntity;
+	private final ArrayList<RayData> simulated = new ArrayList<RayData>();
 	private ArrayList<ColissionData> colissions;
 
 	public ColissionSolver(Minecraft mc, EntityLivingBase renderViewEntity) {
+		super();
 		minecraft = mc;
 		shootingEntity = renderViewEntity;
 	}
 
 	private void runTick(int tick) {
-		for (BowRayData s : simulated) {
+		for (RayData s : simulated) {
 			if (s.isDead()) {
 				continue;
 			}
 			s.moveTick();
 
-			Vec3 vec31 = Vec3.createVectorHelper(s.prevPosX, s.prevPosY, s.prevPosZ);
-			Vec3 vec3 = Vec3.createVectorHelper(s.posX, s.posY, s.posZ);
-			MovingObjectPosition hit = minecraft.theWorld.func_147447_a(vec31,
-					vec3, false, true, false);
-
-			vec31 = Vec3.createVectorHelper(s.prevPosX, s.prevPosY, s.prevPosZ);
-			if (hit == null) {
-				vec3 = Vec3.createVectorHelper(s.posX, s.posY
-					, s.posZ);
-			} else {
-				vec3 = Vec3.createVectorHelper(hit.hitVec.xCoord,
-						hit.hitVec.yCoord, hit.hitVec.zCoord);
-			}
-
-			double d0 = 0.0D;
-			List<Entity> entities = minecraft.theWorld.getEntitiesWithinAABB(
-					Entity.class,
-					s.boundingBox.addCoord(s.motionX, s.motionY, s.motionZ)
-							.expand(1.0D, 1.0D, 1.0D));
-			for (Entity e : entities) {
-				if (e.canBeCollidedWith()
-						&& (e != this.shootingEntity || tick >= 5)) {
-					float f1 = 0.3F;
-					AxisAlignedBB axisalignedbb1 = e.boundingBox.expand(f1, f1,
-							f1);
-					MovingObjectPosition myHit = axisalignedbb1
-							.calculateIntercept(vec31, vec3);
-
-					if (myHit != null) {
-						double d1 = vec31.distanceTo(myHit.hitVec);
-
-						if (d1 < d0 || d0 == 0.0D) {
-							hit = myHit;
-							hit.entityHit = e;
-							d0 = d1;
-						}
-					}
-				}
-			}
-
+			MovingObjectPosition hit = computeHit(s, tick);
 			if (hit != null) {
-//				System.out.println("Hit: " + hit.entityHit + " at " + hit.hitVec.xCoord + ","+
-//						hit.hitVec.yCoord +"," + hit.hitVec.zCoord + "," + hit.typeOfHit);
+				// System.out.println("Hit: " + hit.entityHit + " at " +
+				// hit.hitVec.xCoord + ","+
+				// hit.hitVec.yCoord +"," + hit.hitVec.zCoord + "," +
+				// hit.typeOfHit);
 				colissions.add(new ColissionData(hit.hitVec.xCoord,
-						hit.hitVec.yCoord, hit.hitVec.zCoord, hit.entityHit, tick));
+						hit.hitVec.yCoord, hit.hitVec.zCoord, hit.entityHit,
+						tick));
 				s.setDead(true);
 			}
 
 		}
 	}
 
-	private void generateRays(EntityLivingBase shootingEntity) {
+	protected abstract MovingObjectPosition computeHit(RayData s, int tick);
+
+	private void generateRays(Entity entity) {
 		simulated.clear();
-		BowRayData data = new BowRayData();
-		data.shootFrom(shootingEntity, 2);
+		RayData data = generateRayData();
+		data.shootFrom(entity);
 		simulated.add(data);
 	}
 
 	public ArrayList<ColissionData> computeCurrentColissionPoints() {
 		colissions = new ArrayList<ColissionData>();
-		generateRays(minecraft.renderViewEntity);
+		generateRays(minecraft.getRenderViewEntity());
 		run();
 		return colissions;
 	}
@@ -107,16 +64,36 @@ public class ColissionSolver {
 	public ArrayList<ColissionData> computeColissionWithLook(Vec3 look) {
 		colissions = new ArrayList<ColissionData>();
 		simulated.clear();
-		BowRayData data = new BowRayData();
-		data.shootFromTowards(shootingEntity, 2, look);
+		RayData data = generateRayData();
+		data.shootFromTowards(shootingEntity, look);
 		simulated.add(data);
 		run();
 		return colissions;
 	}
 
+	protected abstract RayData generateRayData();
+
 	private void run() {
-		for (int i = 0; i < 100; i++) {
+		for (int i = 0; i < 200; i++) {
 			runTick(i);
 		}
 	}
+
+	public static ColissionSolver forItem(ItemStack heldItem, Minecraft mc) {
+		if (heldItem == null) {
+			return null;
+		} else if (heldItem.getItem() == Items.snowball || heldItem.getItem() == Items.egg) {
+			return new ThrowableColissionSolver(mc, (EntityLivingBase) mc.getRenderViewEntity());
+		} else if (heldItem.getItem() == Items.bow) {
+			return new BowColissionSolver(mc, (EntityLivingBase) mc.getRenderViewEntity());
+		}
+		return null;
+	}
+
+	public float getGravity() {
+		return generateRayData().getGravity();
+	}
+
+	public abstract float getVelocity();
+
 }

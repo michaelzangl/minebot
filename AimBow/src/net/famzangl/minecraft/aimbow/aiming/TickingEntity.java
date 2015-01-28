@@ -35,8 +35,7 @@ public class TickingEntity {
 	 * Entity rotation Pitch
 	 */
 	public float rotationPitch;
-	final AxisAlignedBB boundingBox = AxisAlignedBB.getBoundingBox(0, 0, 0, 0,
-			0, 0);
+	AxisAlignedBB boundingBox = new AxisAlignedBB(0, 0, 0, 0, 0, 0);
 	public double prevPosX;
 	public double prevPosY;
 	public double prevPosZ;
@@ -51,7 +50,7 @@ public class TickingEntity {
 		this.posZ = par5;
 		float f = getWidth() / 2.0F;
 		float f1 = getHeight();
-		this.boundingBox.setBounds(par1 - f, par3, par5 - f, par1 + f, par3
+		this.boundingBox = new AxisAlignedBB(par1 - f, par3, par5 - f, par1 + f, par3
 				+ f1, par5 + f);
 	}
 
@@ -64,13 +63,13 @@ public class TickingEntity {
 	}
 
 	public void moveTick() {
-        this.prevPosX = this.posX;
-        this.prevPosY = this.posY;
-        this.prevPosZ = this.posZ;
+		this.prevPosX = this.posX;
+		this.prevPosY = this.posY;
+		this.prevPosZ = this.posZ;
 
-        this.posX += this.motionX;
-        this.posY += this.motionY;
-        this.posZ += this.motionZ;
+		this.posX += this.motionX;
+		this.posY += this.motionY;
+		this.posZ += this.motionZ;
 	}
 
 }

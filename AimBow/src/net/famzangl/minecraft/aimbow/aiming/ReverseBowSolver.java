@@ -1,8 +1,9 @@
 package net.famzangl.minecraft.aimbow.aiming;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.entity.EntityClientPlayerMP;
+import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.entity.Entity;
+import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.Vec3;
 
 /**
@@ -18,25 +19,32 @@ import net.minecraft.util.Vec3;
  *
  */
 public class ReverseBowSolver {
-	private static final float FORCE = 3;
 	private static final int MAX_STEPS = 120;
+	private float gravity;
+	private float velocity;
+	
+	public ReverseBowSolver(float gravity, float velocity) {
+		this.gravity = gravity;
+		this.velocity = velocity;
+	}
 	
 	public Vec3 getLookForTarget(Entity target) {
-		EntityClientPlayerMP player = Minecraft.getMinecraft().thePlayer;
-		double targetX = (target.boundingBox.maxX + target.boundingBox.minX) / 2;
-		double targetY = (target.boundingBox.maxY + target.boundingBox.minY) / 2;
-		double targetZ = (target.boundingBox.maxZ + target.boundingBox.minZ) / 2;
+		EntityPlayerSP player = Minecraft.getMinecraft().thePlayer;
+		AxisAlignedBB boundingBox = target.getEntityBoundingBox();
+		double targetX = (boundingBox.maxX + boundingBox.minX) / 2;
+		double targetY = (boundingBox.maxY + boundingBox.minY) / 2;
+		double targetZ = (boundingBox.maxZ + boundingBox.minZ) / 2;
 		
 		double dx = targetX - player.posX;
 		double dz = targetZ - player.posZ;
 		float dHor = (float) Math.sqrt(dx * dx + dz * dz );
-		float dVert = (float) (targetY - player.posY);
+		float dVert = (float) (targetY - (player.getEyeHeight() + player.posY));
 	
 		float y = getYForTarget(dHor, dVert);
 		float xz = (float) Math.sqrt(1 - y * y);
 		double x = dx / dHor * xz;
 		double z = dz / dHor * xz;
-		return Vec3.createVectorHelper(x, y, z);
+		return new Vec3(x, y, z);
 	}
 	
 	private float getYForTarget(float dHor, float dVert) {
@@ -44,7 +52,7 @@ public class ReverseBowSolver {
 		for (int attempts = 0; attempts < 50; attempts++) {
 			float vert = (maxVert + minVert) / 2;
 			float hor = (float) Math.sqrt(1 - vert * vert);
-			float newY = getYAtDistance(hor * FORCE, vert * FORCE, dHor);
+			float newY = getYAtDistance(hor * velocity, vert * velocity, dHor);
 			if (Float.isNaN(newY)) {
 				return 0;
 			} else if (newY > dVert) {
@@ -55,7 +63,7 @@ public class ReverseBowSolver {
 		}
 		
 		float res = (maxVert + minVert) / 2;
-//		System.out.println("Got new vertical vector: " + res + " for d= " + dHor + "," + dVert);
+		//System.out.println("Got new vertical vector: " + res + " for d= " + dHor + "," + dVert);
 		return res;
 	}
 
@@ -68,7 +76,7 @@ public class ReverseBowSolver {
 	 */
 	private float getYAtDistance(float motionX, float motionY, float dHor) {
 		float f3 = 0.99F;
-		float f1 = 0.05F;
+		float f1 = gravity;
 		float posX = 0, posY = 0;
 
 		for (int i = 0; i < MAX_STEPS; i++) {
