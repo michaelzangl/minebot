@@ -1,12 +1,12 @@
 package net.famzangl.minecraft.minebot.ai.selectors;
 
-import net.minecraft.command.IEntitySelector;
+import com.google.common.base.Predicate;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityXPOrb;
 
-public final class XPOrbSelector implements IEntitySelector {
+public final class XPOrbSelector implements Predicate<Entity> {
 	@Override
-	public boolean isEntityApplicable(Entity e) {
+	public boolean apply(Entity e) {
 		return e instanceof EntityXPOrb;
 	}
 }

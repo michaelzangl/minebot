@@ -16,7 +16,8 @@ import net.famzangl.minecraft.minebot.ai.task.move.JumpMoveTask;
 import net.famzangl.minecraft.minebot.ai.task.move.UpwardsMoveTask;
 import net.famzangl.minecraft.minebot.ai.task.move.WalkTowardsTask;
 import net.minecraft.init.Blocks;
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraft.util.BlockPos;
+import net.minecraft.util.EnumFacing;
 
 /**
  * A pathfinder that lets you move around a minecraft world.
@@ -107,8 +108,8 @@ public class MovePathFinder extends PathFinderField {
 	 * @return <code>false</code> When pathfinding should be given more time.
 	 */
 	protected boolean runSearch(Pos playerPosition) {
-		return super.searchSomethingAround(playerPosition.x, playerPosition.y,
-				playerPosition.z);
+		return super.searchSomethingAround(playerPosition.getX(), playerPosition.getY(),
+				playerPosition.getZ());
 	}
 
 	@Override
@@ -175,15 +176,15 @@ public class MovePathFinder extends PathFinderField {
 	protected void foundPath(LinkedList<Pos> path) {
 		super.foundPath(path);
 		Pos currentPos = path.removeFirst();
-		addTask(new AlignToGridTask(currentPos.x, currentPos.y, currentPos.z));
+		addTask(new AlignToGridTask(currentPos.getX(), currentPos.getY(), currentPos.getZ()));
 		while (!path.isEmpty()) {
 			Pos nextPos = path.removeFirst();
-			ForgeDirection moveDirection;
+			EnumFacing moveDirection;
 			moveDirection = direction(currentPos, nextPos);
-			if (torchLightLevel >= 0 && moveDirection != ForgeDirection.UP) {
-				ForgeDirection direction;
-				if (moveDirection == ForgeDirection.UP) {
-					direction = ForgeDirection.DOWN;
+			if (torchLightLevel >= 0 && moveDirection != EnumFacing.UP) {
+				EnumFacing direction;
+				if (moveDirection == EnumFacing.UP) {
+					direction = EnumFacing.DOWN;
 				} else {
 					direction = moveDirection;
 				}
@@ -201,24 +202,24 @@ public class MovePathFinder extends PathFinderField {
 			if (stepsAdded > 0) {
 				System.out.println("Shortcur from " + currentPos + " to "
 						+ nextPos);
-				addTask(new WalkTowardsTask(nextPos.x, nextPos.z, currentPos));
-			} else if (moveDirection == ForgeDirection.UP && peeked != null
-					&& nextPos.subtract(peeked).y == 0) {
+				addTask(new WalkTowardsTask(nextPos.getX(), nextPos.getZ(), currentPos));
+			} else if (moveDirection == EnumFacing.UP && peeked != null
+					&& nextPos.subtract(peeked).getY() == 0) {
 				// Combine upwards-sidewards.
 				// System.out.println("Next direction is: "
 				// + direction(nextPos, peeked));
-				addTask(new JumpMoveTask(peeked.x, peeked.y, peeked.z,
-						nextPos.x, nextPos.z));
+				addTask(new JumpMoveTask(peeked,
+						nextPos.getX(), nextPos.getZ()));
 				nextPos = peeked;
 				path.removeFirst();
-			} else if (nextPos.y > currentPos.y) {
-				addTask(new UpwardsMoveTask(nextPos.x, nextPos.y, nextPos.z,
+			} else if (nextPos.getY() > currentPos.getY()) {
+				addTask(new UpwardsMoveTask(nextPos,
 						new BlockItemFilter(upwardsBuildBlocks)));
-			} else if (nextPos.y < currentPos.y && nextPos.x == currentPos.x
-					&& nextPos.z == currentPos.z) {
-				addTask(new DownwardsMoveTask(nextPos.x, nextPos.y, nextPos.z));
+			} else if (nextPos.getY() < currentPos.getY() && nextPos.getX() == currentPos.getX()
+					&& nextPos.getZ() == currentPos.getZ()) {
+				addTask(new DownwardsMoveTask(nextPos));
 			} else {
-				addTask(new HorizontalMoveTask(nextPos.x, nextPos.y, nextPos.z));
+				addTask(new HorizontalMoveTask(nextPos));
 			}
 			currentPos = nextPos;
 		}
@@ -234,14 +235,14 @@ public class MovePathFinder extends PathFinderField {
 	 * @return
 	 */
 	private boolean isAreaClear(Pos pos1, Pos pos2) {
-		if (pos1.y != pos2.y) {
+		if (pos1.getY() != pos2.getY()) {
 			return false;
 		}
 		Pos min = Pos.minPos(pos1, pos2);
 		Pos max = Pos.maxPos(pos1, pos2);
-		int y = pos1.y;
-		for (int x = min.x; x <= max.x; x++) {
-			for (int z = min.z; z <= max.z; z++) {
+		int y = pos1.getY();
+		for (int x = min.getX(); x <= max.getX(); x++) {
+			for (int z = min.getZ(); z <= max.getZ(); z++) {
 				if (!helper.isSafeGroundBlock(x, y - 1, z)
 						|| !helper.isSafeHeadBlock(x, y + 2, z)
 						|| !AIHelper.walkableBlocks.contains(helper.getBlockId(
@@ -255,10 +256,10 @@ public class MovePathFinder extends PathFinderField {
 		return true;
 	}
 
-	private ForgeDirection direction(Pos currentPos, final Pos nextPos) {
-		Pos delta = nextPos.subtract(currentPos);
-		if (delta.y != 0 && (delta.x != 0 || delta.z != 0)) {
-			delta = new Pos(delta.x, 0, delta.z);
+	private EnumFacing direction(Pos currentPos, final Pos nextPos) {
+		BlockPos delta = nextPos.subtract(currentPos);
+		if (delta.getY() != 0 && (delta.getX() != 0 || delta.getZ() != 0)) {
+			delta = new Pos(delta.getX(), 0, delta.getZ());
 		}
 		return AIHelper.getDirectionFor(delta);
 	}

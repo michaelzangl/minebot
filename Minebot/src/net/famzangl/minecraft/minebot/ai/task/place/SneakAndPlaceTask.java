@@ -1,13 +1,13 @@
 package net.famzangl.minecraft.minebot.ai.task.place;
 
-import net.famzangl.minecraft.minebot.Pos;
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.BlockItemFilter;
 import net.famzangl.minecraft.minebot.ai.strategy.TaskOperations;
 import net.famzangl.minecraft.minebot.ai.task.AITask;
 import net.famzangl.minecraft.minebot.ai.task.error.SelectTaskError;
+import net.minecraft.util.BlockPos;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.MovementInput;
-import net.minecraftforge.common.util.ForgeDirection;
 
 /**
  * Sneak towards (x, y, z) and then place the block below you.
@@ -17,15 +17,13 @@ import net.minecraftforge.common.util.ForgeDirection;
  */
 public class SneakAndPlaceTask extends AITask {
 
-	protected final int x;
-	protected final int y;
-	protected final int z;
+	protected final BlockPos pos;
 	protected final BlockItemFilter filter;
-	protected final Pos relativeFrom;
+	protected final BlockPos relativeFrom;
 	/**
 	 * Direction we need to walk.
 	 */
-	private final ForgeDirection inDirection;
+	private final EnumFacing inDirection;
 	private final double minBuildHeight;
 	private int faceTimer;
 
@@ -39,17 +37,15 @@ public class SneakAndPlaceTask extends AITask {
 	 *            Vector: place position -> start standing pos.
 	 * @param minBuildHeight
 	 */
-	public SneakAndPlaceTask(int x, int y, int z, BlockItemFilter filter,
-			Pos relativeFrom, double minBuildHeight) {
-		this.x = x;
-		this.y = y;
-		this.z = z;
+	public SneakAndPlaceTask(BlockPos pos, BlockItemFilter filter,
+			BlockPos relativeFrom, double minBuildHeight) {
+		this.pos = pos;
 		this.filter = filter;
 		this.relativeFrom = relativeFrom;
 		this.minBuildHeight = minBuildHeight;
-		final ForgeDirection foundInDir = AIHelper.getDirectionForXZ(
-				-relativeFrom.x, -relativeFrom.z);
-		if (relativeFrom.y != 1 || foundInDir == null) {
+		final EnumFacing foundInDir = AIHelper.getDirectionForXZ(
+				-relativeFrom.getX(), -relativeFrom.getZ());
+		if (relativeFrom.getY() != 1 || foundInDir == null) {
 			throw new IllegalArgumentException();
 		}
 		inDirection = foundInDir;
@@ -57,7 +53,7 @@ public class SneakAndPlaceTask extends AITask {
 
 	@Override
 	public boolean isFinished(AIHelper h) {
-		return !h.isAirBlock(x, y - 1, z) && !h.isJumping();
+		return !h.isAirBlock(pos.add(0, -1, 0)) && !h.isJumping();
 	}
 
 	@Override
@@ -65,9 +61,9 @@ public class SneakAndPlaceTask extends AITask {
 		if (faceTimer > 0) {
 			faceTimer--;
 		}
-		if (h.sneakFrom(x + relativeFrom.x, y - 1, z + relativeFrom.z,
-				inDirection)) {
-			final boolean hasRequiredHeight = h.getMinecraft().thePlayer.boundingBox.minY > minBuildHeight - 0.05;
+		if (h.sneakFrom(getFromPos(), inDirection)) {
+			final boolean hasRequiredHeight = h.getMinecraft().thePlayer
+					.getEntityBoundingBox().minY > minBuildHeight - 0.05;
 			if (hasRequiredHeight) {
 				if (faceTimer == 0) {
 					faceBlock(h, o);
@@ -88,19 +84,22 @@ public class SneakAndPlaceTask extends AITask {
 	}
 
 	protected boolean isFacingRightBlock(AIHelper h) {
-		return h.isFacingBlock(x + relativeFrom.x, y - 1, z + relativeFrom.z,
-				inDirection);
+		return h.isFacingBlock(getFromPos(), inDirection);
 	}
 
 	protected void faceBlock(AIHelper h, TaskOperations o) {
-		h.faceSideOf(x + relativeFrom.x, y - 1, z + relativeFrom.z, inDirection);
+		h.faceSideOf(getFromPos(), inDirection);
+	}
+
+	protected BlockPos getFromPos() {
+		return pos.add(relativeFrom.getX(), -1, relativeFrom.getZ());
 	}
 
 	@Override
 	public String toString() {
-		return "SneakAndPlaceTask [x=" + x + ", y=" + y + ", z=" + z
-				+ ", filter=" + filter + ", relativeFrom=" + relativeFrom
-				+ ", inDirection=" + inDirection + ", minBuildHeight="
-				+ minBuildHeight + "]";
+		return "SneakAndPlaceTask [pos=" + pos + ", filter=" + filter
+				+ ", relativeFrom=" + relativeFrom + ", inDirection="
+				+ inDirection + ", minBuildHeight=" + minBuildHeight + "]";
 	}
+
 }

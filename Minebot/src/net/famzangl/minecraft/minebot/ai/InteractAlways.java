@@ -16,9 +16,9 @@ public final class InteractAlways extends KeyBinding {
 		super(p_i45001_1_, p_i45001_2_, p_i45001_3_);
 		isPressed = pressed;
 	}
-
+	
 	@Override
-	public boolean getIsKeyPressed() {
+	public boolean isKeyDown() {
 		return true;
 	}
 

@@ -6,7 +6,7 @@ import net.famzangl.minecraft.minebot.ai.BlockItemFilter;
 import net.famzangl.minecraft.minebot.ai.strategy.TaskOperations;
 import net.famzangl.minecraft.minebot.ai.task.error.SelectTaskError;
 import net.minecraft.block.Block;
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraft.util.EnumFacing;
 
 /**
  * Place a block somewhere within reach
@@ -16,11 +16,11 @@ import net.minecraftforge.common.util.ForgeDirection;
  */
 public class PlaceBlockTask extends AITask {
 	private final Pos placeOn;
-	private final ForgeDirection onSide;
+	private final EnumFacing onSide;
 	private int attemptsLeft = 20;
 	private final Block block;
 
-	public PlaceBlockTask(Pos placeOn, ForgeDirection onSide, Block block) {
+	public PlaceBlockTask(Pos placeOn, EnumFacing onSide, Block block) {
 		super();
 		this.placeOn = placeOn;
 		this.onSide = onSide;
@@ -30,8 +30,7 @@ public class PlaceBlockTask extends AITask {
 	@Override
 	public boolean isFinished(AIHelper h) {
 		return attemptsLeft <= 0
-				|| Block.isEqualTo(h.getBlock(placeOn.add(onSide.offsetX,
-						onSide.offsetY, onSide.offsetZ)), block);
+				|| Block.isEqualTo(h.getBlock(placeOn.offset(onSide)), block);
 	}
 
 	@Override
@@ -41,8 +40,8 @@ public class PlaceBlockTask extends AITask {
 			o.desync(new SelectTaskError(f));
 		}
 
-		h.faceSideOf(placeOn.x, placeOn.y, placeOn.z, onSide);
-		if (h.isFacingBlock(placeOn.x, placeOn.y, placeOn.z, onSide)) {
+		h.faceSideOf(placeOn, onSide);
+		if (h.isFacingBlock(placeOn, onSide)) {
 			h.overrideUseItem();
 		}
 		attemptsLeft--;

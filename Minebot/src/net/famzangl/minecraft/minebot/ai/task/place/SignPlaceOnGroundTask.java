@@ -4,16 +4,17 @@ import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.ClassItemFilter;
 import net.famzangl.minecraft.minebot.ai.strategy.TaskOperations;
 import net.minecraft.item.ItemSign;
+import net.minecraft.util.BlockPos;
 
 public class SignPlaceOnGroundTask extends PlaceBlockAtFloorTask {
 
 	private final int direction;
 	private final SetSignTextTask textTask;
 
-	public SignPlaceOnGroundTask(int x, int y, int z, int direction, String[] text) {
-		super(x, y, z, new ClassItemFilter(ItemSign.class));
+	public SignPlaceOnGroundTask(BlockPos pos, int direction, String[] text) {
+		super(pos, new ClassItemFilter(ItemSign.class));
 		this.direction = direction;
-		textTask = new SetSignTextTask(x, y, z, text);
+		textTask = new SetSignTextTask(pos, text);
 	}
 	
 	@Override

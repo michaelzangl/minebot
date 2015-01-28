@@ -76,6 +76,16 @@ import net.minecraft.network.play.server.S3DPacketDisplayScoreboard;
 import net.minecraft.network.play.server.S3EPacketTeams;
 import net.minecraft.network.play.server.S3FPacketCustomPayload;
 import net.minecraft.network.play.server.S40PacketDisconnect;
+import net.minecraft.network.play.server.S41PacketServerDifficulty;
+import net.minecraft.network.play.server.S42PacketCombatEvent;
+import net.minecraft.network.play.server.S43PacketCamera;
+import net.minecraft.network.play.server.S44PacketWorldBorder;
+import net.minecraft.network.play.server.S45PacketTitle;
+import net.minecraft.network.play.server.S46PacketSetCompressionLevel;
+import net.minecraft.network.play.server.S47PacketPlayerListHeaderFooter;
+import net.minecraft.network.play.server.S48PacketResourcePackSend;
+import net.minecraft.network.play.server.S49PacketUpdateEntityNBT;
+import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.IChatComponent;
 
 public class DoFishTask extends AITask {
@@ -106,6 +116,44 @@ public class DoFishTask extends AITask {
 
 	private class MyNetHandler implements INetHandlerPlayClient {
 		INetHandlerPlayClient root;
+		public void handleCombatEvent(S42PacketCombatEvent packetIn) {
+			root.handleCombatEvent(packetIn);
+		}
+
+		public void handleServerDifficulty(S41PacketServerDifficulty packetIn) {
+			root.handleServerDifficulty(packetIn);
+		}
+
+		public void handleCamera(S43PacketCamera packetIn) {
+			root.handleCamera(packetIn);
+		}
+
+		public void handleWorldBorder(S44PacketWorldBorder packetIn) {
+			root.handleWorldBorder(packetIn);
+		}
+
+		public void handleTitle(S45PacketTitle packetIn) {
+			root.handleTitle(packetIn);
+		}
+
+		public void handleSetCompressionLevel(
+				S46PacketSetCompressionLevel packetIn) {
+			root.handleSetCompressionLevel(packetIn);
+		}
+
+		public void handlePlayerListHeaderFooter(
+				S47PacketPlayerListHeaderFooter packetIn) {
+			root.handlePlayerListHeaderFooter(packetIn);
+		}
+
+		public void handleResourcePack(S48PacketResourcePackSend packetIn) {
+			root.handleResourcePack(packetIn);
+		}
+
+		public void handleEntityNBT(S49PacketUpdateEntityNBT packetIn) {
+			root.handleEntityNBT(packetIn);
+		}
+
 		private final ConcurrentLinkedQueue<Pos> foundFishPositions = new ConcurrentLinkedQueue<Pos>();
 
 		public MyNetHandler(INetHandlerPlayClient root) {
@@ -117,18 +165,7 @@ public class DoFishTask extends AITask {
 		public void onDisconnect(IChatComponent var1) {
 			root.onDisconnect(var1);
 		}
-
-		@Override
-		public void onConnectionStateTransition(EnumConnectionState var1,
-				EnumConnectionState var2) {
-			root.onConnectionStateTransition(var1, var2);
-		}
-
-		@Override
-		public void onNetworkTick() {
-			root.onNetworkTick();
-		}
-
+		
 		@Override
 		public void handleSpawnObject(S0EPacketSpawnObject var1) {
 			root.handleSpawnObject(var1);
@@ -321,11 +358,11 @@ public class DoFishTask extends AITask {
 
 		@Override
 		public void handleParticles(S2APacketParticles var1) {
-			if ("wake".equals(var1.func_149228_c())) {
-				if (var1.func_149222_k() > 0) {
-					double x = var1.func_149220_d();
-					double y = var1.func_149226_e();
-					double z = var1.func_149225_f();
+			if (var1.func_179749_a() == EnumParticleTypes.WATER_SPLASH) {
+				if (var1.getParticleCount() > 0) {
+					double x = var1.getXCoordinate();
+					double y = var1.getYCoordinate();
+					double z = var1.getZCoordinate();
 					foundFishPositions.add(new Pos((int) Math.floor(x),
 							(int) Math.floor(y), (int) Math.floor(z)));
 				}
@@ -453,7 +490,7 @@ public class DoFishTask extends AITask {
 				Pos next = foundFishPositions.poll();
 				if (next == null) {
 					return false;
-				} else if (expectedPos.getDistance(next.x + 0.5, next.y + 0.5, next.z + 0.5) < MAX_DISTANCE) {
+				} else if (expectedPos.getDistance(next.getX() + 0.5, next.getY() + 0.5, next.getZ() + 0.5) < MAX_DISTANCE) {
 					return true;
 				} else {
 					System.out.println("Found a fish bite at " + next + " but fishing at " + expectedPos + ".");

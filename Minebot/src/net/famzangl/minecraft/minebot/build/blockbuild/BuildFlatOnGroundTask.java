@@ -3,6 +3,7 @@ package net.famzangl.minecraft.minebot.build.blockbuild;
 import net.famzangl.minecraft.minebot.Pos;
 import net.famzangl.minecraft.minebot.ai.task.AITask;
 import net.famzangl.minecraft.minebot.ai.task.place.PlaceBlockAtFloorTask;
+import net.minecraft.util.BlockPos;
 
 /**
  * Build something that is just standing on the ground.
@@ -12,18 +13,17 @@ import net.famzangl.minecraft.minebot.ai.task.place.PlaceBlockAtFloorTask;
  */
 public abstract class BuildFlatOnGroundTask extends BuildTask {
 
-	protected BuildFlatOnGroundTask(Pos forPosition) {
+	protected BuildFlatOnGroundTask(BlockPos forPosition) {
 		super(forPosition);
 	}
 
 	@Override
-	public Pos[] getStandablePlaces() {
-		return new Pos[] { forPosition };
+	public BlockPos[] getStandablePlaces() {
+		return new BlockPos[] { forPosition };
 	}
 
 	@Override
-	public AITask getPlaceBlockTask(Pos relativeFromPos) {
-		return new PlaceBlockAtFloorTask(forPosition.x, forPosition.y,
-				forPosition.z, this.getRequiredItem());
+	public AITask getPlaceBlockTask(BlockPos relativeFromPos) {
+		return new PlaceBlockAtFloorTask(forPosition, this.getRequiredItem());
 	}
 }

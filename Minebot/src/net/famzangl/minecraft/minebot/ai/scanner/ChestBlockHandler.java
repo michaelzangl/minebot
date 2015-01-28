@@ -11,13 +11,16 @@ import net.famzangl.minecraft.minebot.Pos;
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.ItemFilter;
 import net.famzangl.minecraft.minebot.ai.scanner.ChestBlockHandler.ChestData;
+import net.famzangl.minecraft.minebot.ai.utils.PrivateFieldUtils;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockChest;
+import net.minecraft.entity.EntityHanging;
 import net.minecraft.entity.item.EntityItemFrame;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.AxisAlignedBB;
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraft.util.BlockPos;
+import net.minecraft.util.EnumFacing;
 
 public class ChestBlockHandler extends RangeBlockHandler<ChestData> {
 
@@ -25,13 +28,13 @@ public class ChestBlockHandler extends RangeBlockHandler<ChestData> {
 			.getIdFromBlock(Blocks.chest) };
 
 	public static class ChestData {
-		private final Pos pos;
+		private final BlockPos pos;
 		private final ArrayList<ItemFilter> allowedItems = new ArrayList<ItemFilter>();
 		private final ArrayList<ItemFilter> fullItems = new ArrayList<ItemFilter>();
 		private final ArrayList<ItemFilter> emptyItems = new ArrayList<ItemFilter>();
-		public Pos secondaryPos;
+		public BlockPos secondaryPos;
 
-		public ChestData(Pos pos) {
+		public ChestData(BlockPos pos) {
 			super();
 			this.pos = pos;
 		}
@@ -98,11 +101,11 @@ public class ChestBlockHandler extends RangeBlockHandler<ChestData> {
 			allowedItems.add(new SameItemFilter(displayed));
 		}
 
-		public Pos getPos() {
+		public BlockPos getPos() {
 			return pos;
 		}
 
-		public Pos getSecondaryPos() {
+		public BlockPos getSecondaryPos() {
 			return secondaryPos;
 		}
 
@@ -131,7 +134,7 @@ public class ChestBlockHandler extends RangeBlockHandler<ChestData> {
 		}
 	}
 
-	private final Hashtable<Pos, ChestData> chests = new Hashtable<Pos, ChestData>();
+	private final Hashtable<BlockPos, ChestData> chests = new Hashtable<BlockPos, ChestData>();
 
 	@Override
 	public int[] getIds() {
@@ -139,7 +142,7 @@ public class ChestBlockHandler extends RangeBlockHandler<ChestData> {
 	}
 
 	@Override
-	protected void addPositionToCache(AIHelper helper, Pos pos, ChestData c) {
+	protected void addPositionToCache(AIHelper helper, BlockPos pos, ChestData c) {
 		super.addPositionToCache(helper, pos, c);
 		if (c.secondaryPos != null) {
 			super.addPositionToCache(helper, c.secondaryPos, c);
@@ -147,40 +150,40 @@ public class ChestBlockHandler extends RangeBlockHandler<ChestData> {
 	}
 
 	@Override
-	protected Collection<Entry<Pos, ChestData>> getTargetPositions() {
+	protected Collection<Entry<BlockPos, ChestData>> getTargetPositions() {
 		return chests.entrySet();
 	}
 	
 	@Override
 	public void scanBlock(AIHelper helper, int id, int x, int y, int z) {
 		if (helper.getBlock(x, y, z) instanceof BlockChest) {
-			AxisAlignedBB abb = AxisAlignedBB.getBoundingBox(x - 1, y, z - 1,
+			AxisAlignedBB abb = new AxisAlignedBB(x - 1, y, z - 1,
 					x + 2, y + 1, z + 2);
 			List<EntityItemFrame> frames = helper.getMinecraft().theWorld
 					.getEntitiesWithinAABB(EntityItemFrame.class, abb);
 			for (EntityItemFrame f : frames) {
-				ForgeDirection direction = getDirection(f);
+				EnumFacing direction = getDirection(f);
 				if (direction == null) {
 					continue;
 				}
-				int frameX = f.field_146063_b;
-				int frameY = f.field_146064_c;
-				int frameZ = f.field_146062_d;
-				if (x == frameX && y == frameY && z == frameZ) {
+				BlockPos p = PrivateFieldUtils.getFieldValue(f, EntityHanging.class, BlockPos.class);
+				EnumFacing dir = PrivateFieldUtils.getFieldValue(f, EntityHanging.class, EnumFacing.class);
+				BlockPos myPos = new BlockPos(x, y, z);
+				if (p.offset(dir, -1).equals(myPos)) {
 					// Yeah, frame attached.
-					registerChest(new Pos(x, y, z), f);
+					registerChest(myPos, f);
 				}
 			}
 		}
 
 	}
 
-	private void registerChest(Pos pos, EntityItemFrame f) {
+	private void registerChest(BlockPos pos, EntityItemFrame f) {
 		ChestData chest = null;
-		for (ForgeDirection d : new ForgeDirection[] { ForgeDirection.UP,
-				ForgeDirection.NORTH, ForgeDirection.SOUTH,
-				ForgeDirection.EAST, ForgeDirection.WEST }) {
-			Pos p = pos.add(d.offsetX, 0, d.offsetZ);
+		for (EnumFacing d : new EnumFacing[] { EnumFacing.UP,
+				EnumFacing.NORTH, EnumFacing.SOUTH,
+				EnumFacing.EAST, EnumFacing.WEST }) {
+			BlockPos p = pos.add(d.getFrontOffsetX(), 0, d.getFrontOffsetZ());
 			if (chests.containsKey(p)) {
 				chest = chests.get(p);
 				if (!chest.pos.equals(pos)) {
@@ -204,17 +207,7 @@ public class ChestBlockHandler extends RangeBlockHandler<ChestData> {
 	 * @param f
 	 * @return
 	 */
-	private ForgeDirection getDirection(EntityItemFrame f) {
-		switch (f.hangingDirection) {
-		case 0:
-			return ForgeDirection.NORTH;
-		case 2:
-			return ForgeDirection.SOUTH;
-		case 1:
-			return ForgeDirection.EAST;
-		case 3:
-			return ForgeDirection.WEST;
-		}
-		return null;
+	private EnumFacing getDirection(EntityItemFrame f) {
+		return f.field_174860_b;
 	}
 }

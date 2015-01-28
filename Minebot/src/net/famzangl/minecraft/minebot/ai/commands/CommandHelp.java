@@ -15,7 +15,8 @@ import net.famzangl.minecraft.minebot.ai.command.CommandDefinition;
 import net.famzangl.minecraft.minebot.ai.command.FixedNameBuilder.FixedArgumentDefinition;
 import net.famzangl.minecraft.minebot.ai.command.ParameterType;
 import net.famzangl.minecraft.minebot.ai.strategy.AIStrategy;
-import net.minecraft.client.entity.EntityClientPlayerMP;
+import net.minecraft.client.entity.EntityPlayerSP;
+import net.minecraft.entity.Entity;
 import net.minecraft.util.ChatComponentText;
 
 import com.google.common.base.Function;
@@ -90,7 +91,7 @@ final public class CommandHelp {
 			@AICommandParameter(type = ParameterType.FIXED, fixedName = "help", description = "") String nameArg,
 			@AICommandParameter(type = ParameterType.COMMAND, description = "command help") String commandName) {
 		boolean found = false;
-		final EntityClientPlayerMP player = helper.getMinecraft().thePlayer;
+		final EntityPlayerSP player = helper.getMinecraft().thePlayer;
 		for (final CommandDefinition command : AIChatController.getRegistry()
 				.getAllCommands()) {
 			final ArrayList<ArgumentDefinition> args = command.getArguments();
@@ -109,7 +110,7 @@ final public class CommandHelp {
 		return null;
 	}
 
-	private static void printHelp(EntityClientPlayerMP player,
+	private static void printHelp(EntityPlayerSP player,
 			CommandDefinition command) {
 		final CommandToTextConverter conv = new CommandToTextConverter();
 

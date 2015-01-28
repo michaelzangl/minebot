@@ -9,7 +9,7 @@ import net.famzangl.minecraft.minebot.ai.BlockItemFilter;
 import net.famzangl.minecraft.minebot.ai.task.PlaceTorchSomewhereTask;
 import net.famzangl.minecraft.minebot.ai.task.SkipWhenSearchingPrefetch;
 import net.minecraft.init.Blocks;
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraft.util.EnumFacing;
 
 @SkipWhenSearchingPrefetch
 public class PlaceTorchIfLightBelowTask extends PlaceTorchSomewhereTask {
@@ -20,21 +20,21 @@ public class PlaceTorchIfLightBelowTask extends PlaceTorchSomewhereTask {
 	private final float torchLightLevel;
 
 	public PlaceTorchIfLightBelowTask(Pos currentPos,
-			ForgeDirection doNotPlaceAt, float torchLightLevel) {
+			EnumFacing doNotPlaceAt, float torchLightLevel) {
 		super(Arrays.asList(currentPos, currentPos.add(0, 1, 0)),
 				getDirections(doNotPlaceAt));
 		this.currentPos = currentPos;
 		this.torchLightLevel = torchLightLevel;
 	}
 
-	private static ForgeDirection[] getDirections(ForgeDirection except) {
-		final ArrayList<ForgeDirection> allowed = new ArrayList<ForgeDirection>();
-		for (final ForgeDirection d : ForgeDirection.VALID_DIRECTIONS) {
-			if (d != except && d != ForgeDirection.UP) {
+	private static EnumFacing[] getDirections(EnumFacing except) {
+		final ArrayList<EnumFacing> allowed = new ArrayList<EnumFacing>();
+		for (final EnumFacing d : EnumFacing.values()) {
+			if (d != except && d != EnumFacing.UP) {
 				allowed.add(d);
 			}
 		}
-		return allowed.toArray(new ForgeDirection[allowed.size()]);
+		return allowed.toArray(new EnumFacing[allowed.size()]);
 	}
 
 	@Override

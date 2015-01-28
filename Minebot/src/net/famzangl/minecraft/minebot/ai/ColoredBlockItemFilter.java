@@ -12,9 +12,9 @@ import net.minecraft.item.ItemStack;
  * 
  */
 public class ColoredBlockItemFilter extends BlockItemFilter {
-	public static final Block[] COLORABLE_BLOCKS = new Block[] { Blocks.wool,
+	public static final BlockWhitelist COLORABLE_BLOCKS = new BlockWhitelist( Blocks.wool,
 			Blocks.stained_hardened_clay, Blocks.stained_glass,
-			Blocks.stained_glass_pane, Blocks.carpet };
+			Blocks.stained_glass_pane, Blocks.carpet );
 	private final int colorMeta;
 
 	/**
@@ -46,7 +46,7 @@ public class ColoredBlockItemFilter extends BlockItemFilter {
 	public ColoredBlockItemFilter(Block matched, int color) {
 		super(matched);
 		colorMeta = color;
-		if (!AIHelper.blockIsOneOf(matched, COLORABLE_BLOCKS)) {
+		if (COLORABLE_BLOCKS.contains(matched)) {
 			throw new IllegalArgumentException();
 		}
 	}

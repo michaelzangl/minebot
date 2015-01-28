@@ -51,8 +51,8 @@ public class TreePathFinder extends MovePathFinder {
 					|| Block.isEqualTo(block, Blocks.log2);
 		} else {
 			return Block.isEqualTo(block, type.block)
-					&& (0x3 & helper.getMinecraft().theWorld.getBlockMetadata(
-							x, y, z)) == type.lowerBits;
+					&& (0x3 & helper.getBlockIdWithMeta(
+							x, y, z) & 0xf) == type.lowerBits;
 		}
 	}
 
@@ -61,25 +61,24 @@ public class TreePathFinder extends MovePathFinder {
 		int mineAbove = 0;
 
 		for (int i = 2; i < TREE_HEIGHT; i++) {
-			if (isTree(currentPos.x, currentPos.y + i, currentPos.z)) {
+			if (isTree(currentPos.getX(), currentPos.getY() + i, currentPos.getZ())) {
 				mineAbove = i;
 			}
 		}
 		for (int i = 2; i <= mineAbove; i++) {
-			if (!helper.hasSafeSides(currentPos.x, currentPos.y + i,
-					currentPos.z)
-					|| !helper.isSafeHeadBlock(currentPos.x, currentPos.y + i
-							+ 1, currentPos.z)) {
+			if (!helper.hasSafeSides(currentPos.getX(), currentPos.getY() + i,
+					currentPos.getZ())
+					|| !helper.isSafeHeadBlock(currentPos.getX(), currentPos.getY() + i
+							+ 1, currentPos.getZ())) {
 				break;
 			}
 			if (!helper
-					.isAirBlock(currentPos.x, currentPos.y + i, currentPos.z)) {
-				addTask(new MineBlockTask(currentPos.x, currentPos.y + i,
-						currentPos.z));
+					.isAirBlock(currentPos.getX(), currentPos.getY() + i, currentPos.getZ())) {
+				addTask(new MineBlockTask(currentPos.add(0,i,0)));
 			}
 		}
 		if (replant) {
-			addTask(new ReplantTask(currentPos.x, currentPos.y, currentPos.z));
+			addTask(new ReplantTask(currentPos));
 		}
 		addTask(new WaitTask(mineAbove * 2));
 	}

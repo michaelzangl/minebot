@@ -12,8 +12,11 @@ import net.famzangl.minecraft.minebot.ai.selectors.IsSittingSelector;
 import net.famzangl.minecraft.minebot.ai.selectors.NotSelector;
 import net.famzangl.minecraft.minebot.ai.selectors.OneOfListSelector;
 import net.famzangl.minecraft.minebot.ai.task.FaceAndInteractTask;
-import net.minecraft.command.IEntitySelector;
+
+import com.google.common.base.Predicate;
+
 import net.minecraft.entity.Entity;
+import net.minecraft.item.EnumDyeColor;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemDye;
 import net.minecraft.item.ItemFood;
@@ -41,7 +44,7 @@ public class LetAnimalsSitStrategy extends TaskStrategy {
 	}
 
 	private static final int DISTANCE = 20;
-	private final int color;
+	private final EnumDyeColor color;
 	private final boolean shouldSit;
 	private final List<Entity> handled = new ArrayList<Entity>();
 
@@ -56,7 +59,7 @@ public class LetAnimalsSitStrategy extends TaskStrategy {
 	 * @param color
 	 *            A color selector or -1 for no color.
 	 */
-	public LetAnimalsSitStrategy(AnimalyType wolf, boolean shouldSit, int color) {
+	public LetAnimalsSitStrategy(AnimalyType wolf, boolean shouldSit, EnumDyeColor color) {
 		if (wolf != AnimalyType.WOLF) {
 			throw new IllegalArgumentException();
 		}
@@ -70,10 +73,10 @@ public class LetAnimalsSitStrategy extends TaskStrategy {
 			return;
 		}
 
-		IEntitySelector selector = new AndSelector(new IsSittingSelector(
+		Predicate<Entity> selector = new AndSelector(new IsSittingSelector(
 				!shouldSit, helper.getMinecraft().thePlayer), new NotSelector(
 				new OneOfListSelector(handled)));
-		if (color >= 0) {
+		if (color != null) {
 			selector = new AndSelector(selector, new ColorSelector(color));
 		}
 

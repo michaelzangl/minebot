@@ -19,7 +19,8 @@ import net.famzangl.minecraft.minebot.ai.task.move.AlignToGridTask;
 import net.famzangl.minecraft.minebot.build.ForBuildPathFinder;
 import net.famzangl.minecraft.minebot.build.NextTaskTask;
 import net.famzangl.minecraft.minebot.build.blockbuild.BuildTask;
-import net.minecraftforge.client.event.RenderWorldLastEvent;
+import net.minecraft.util.BlockPos;
+import net.minecraftforge.fml.common.gameevent.TickEvent.RenderTickEvent;
 
 @AICommand(helpText = "Runs all tasks that are scheduled for building.", name = "minebuild")
 public class CommandBuild {
@@ -30,12 +31,12 @@ public class CommandBuild {
 
 		private final PosMarkerRenderer renderer = new PosMarkerRenderer(1, 1,
 				0);
-		private final Pos[] positions = new Pos[5];
+		private final BlockPos[] positions = new Pos[5];
 
 		@Override
 		public void searchTasks(AIHelper helper) {
 			final BuildTask task = helper.buildManager.peekNextTask();
-			Pos pos;
+			BlockPos pos;
 			if (task == null) {
 				AIChatController.addChatLine("No more build tasks.");
 			} else if (!alignSend) {
@@ -75,7 +76,7 @@ public class CommandBuild {
 		}
 
 		@Override
-		public void drawMarkers(RenderWorldLastEvent event, AIHelper helper) {
+		public void drawMarkers(RenderTickEvent event, AIHelper helper) {
 			renderer.render(event, helper, positions);
 		}
 	}
@@ -88,12 +89,12 @@ public class CommandBuild {
 
 	}
 
-	public static Pos isAroundSite(AIHelper helper, BuildTask task) {
-		final Pos forPosition = task.getForPosition();
-		for (final Pos p : task.getStandablePlaces()) {
-			final int x = p.x + forPosition.x;
-			final int y = p.y + forPosition.y;
-			final int z = p.z + forPosition.z;
+	public static BlockPos isAroundSite(AIHelper helper, BuildTask task) {
+		final BlockPos forPosition = task.getForPosition();
+		for (final BlockPos p : task.getStandablePlaces()) {
+			final int x = p.getX() + forPosition.getX();
+			final int y = p.getY() + forPosition.getY();
+			final int z = p.getZ() + forPosition.getZ();
 			System.out.println("Check " + forPosition + " + " + p + " -> "
 					+ helper.isStandingOn(x, y, z) + ", "
 					+ task.couldBuildFrom(helper, x, y, z));

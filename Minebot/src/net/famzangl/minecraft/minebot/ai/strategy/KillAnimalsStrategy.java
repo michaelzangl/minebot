@@ -12,9 +12,12 @@ import net.famzangl.minecraft.minebot.ai.selectors.NotSelector;
 import net.famzangl.minecraft.minebot.ai.selectors.OrSelector;
 import net.famzangl.minecraft.minebot.ai.selectors.OwnTameableSelector;
 import net.famzangl.minecraft.minebot.ai.selectors.XPOrbSelector;
-import net.minecraft.command.IEntitySelector;
+
+import com.google.common.base.Predicate;
+
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.passive.EntityAnimal;
+import net.minecraft.item.EnumDyeColor;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemSword;
 
@@ -26,9 +29,9 @@ import net.minecraft.item.ItemSword;
  */
 public class KillAnimalsStrategy extends FaceInteractStrategy {
 
-	private final class KillableSelector implements IEntitySelector {
+	private final class KillableSelector implements Predicate<Entity> {
 		@Override
-		public boolean isEntityApplicable(Entity e) {
+		public boolean apply(Entity e) {
 			if (!type.hasAnimalClass(e)) {
 				return false;
 			}
@@ -41,32 +44,32 @@ public class KillAnimalsStrategy extends FaceInteractStrategy {
 	private final int maxKills;
 	private final AnimalyType type;
 	private final HashSet<Entity> hitEntities = new HashSet<Entity>();
-	private final int color;
+	private final EnumDyeColor color;
 	private int cooldown;
 	private int lastKills;
 
 	public KillAnimalsStrategy() {
-		this(-1, AnimalyType.ANY, -1);
+		this(-1, AnimalyType.ANY, null);
 	}
 
-	public KillAnimalsStrategy(int maxKills, AnimalyType type, int color) {
+	public KillAnimalsStrategy(int maxKills, AnimalyType type, EnumDyeColor color) {
 		this.maxKills = maxKills;
 		this.type = type;
 		this.color = color;
 	}
 
 	@Override
-	protected IEntitySelector entitiesToInteract(AIHelper helper) {
+	protected Predicate<Entity> entitiesToInteract(AIHelper helper) {
 		if (maxKillsReached()) {
-			return new IEntitySelector() {
+			return new Predicate<Entity>() {
 				@Override
-				public boolean isEntityApplicable(Entity var1) {
+				public boolean apply(Entity var1) {
 					return false;
 				}
 			};
 		} else {
-			IEntitySelector s = new KillableSelector();
-			if (color >= 0) {
+			Predicate<Entity> s = new KillableSelector();
+			if (color != null) {
 				s = new AndSelector(new ColorSelector(color), s);
 			}
 			return new AndSelector(s, new NotSelector(new OwnTameableSelector(
@@ -75,7 +78,7 @@ public class KillAnimalsStrategy extends FaceInteractStrategy {
 	}
 
 	@Override
-	protected IEntitySelector entitiesToFace(AIHelper helper) {
+	protected Predicate<Entity> entitiesToFace(AIHelper helper) {
 		return new OrSelector(super.entitiesToFace(helper), new ItemSelector(),
 				new XPOrbSelector());
 	}

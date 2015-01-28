@@ -1,11 +1,11 @@
 package net.famzangl.minecraft.minebot;
 
 import net.famzangl.minecraft.minebot.ai.AIController;
-import cpw.mods.fml.common.FMLCommonHandler;
-import cpw.mods.fml.common.Mod;
-import cpw.mods.fml.common.Mod.EventHandler;
-import cpw.mods.fml.common.Mod.Instance;
-import cpw.mods.fml.common.event.FMLInitializationEvent;
+import net.minecraftforge.fml.common.FMLCommonHandler;
+import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.common.Mod.EventHandler;
+import net.minecraftforge.fml.common.Mod.Instance;
+import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 
 @Mod(modid = "minebot-mod", name = "Minebot", version = "0.3.0")
 public class MinebotMod {

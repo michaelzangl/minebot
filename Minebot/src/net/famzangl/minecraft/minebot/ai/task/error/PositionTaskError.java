@@ -1,18 +1,19 @@
 package net.famzangl.minecraft.minebot.ai.task.error;
 
 import net.famzangl.minecraft.minebot.Pos;
+import net.minecraft.util.BlockPos;
 
 public class PositionTaskError extends TaskError {
 
-	private final Pos expectedPosition;
+	private final BlockPos expectedPosition;
 
-	protected PositionTaskError(Pos expectedPosition) {
-		super("Not standing on " + expectedPosition.x + ", " + expectedPosition.y + ", " + expectedPosition.z + ".");
+	public PositionTaskError(BlockPos expectedPosition) {
+		super("Not standing on " + expectedPosition.getX() + ", " + expectedPosition.getY() + ", " + expectedPosition.getZ() + ".");
 		this.expectedPosition = expectedPosition;
 	}
 
 	public PositionTaskError(int x, int y, int z) {
-		this(new Pos(x, y, z));
+		this(new BlockPos(x, y, z));
 	}
 
 	@Override

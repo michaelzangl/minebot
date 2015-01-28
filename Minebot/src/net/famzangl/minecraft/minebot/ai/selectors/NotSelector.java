@@ -1,20 +1,20 @@
 package net.famzangl.minecraft.minebot.ai.selectors;
 
-import net.minecraft.command.IEntitySelector;
+import com.google.common.base.Predicate;
 import net.minecraft.entity.Entity;
 
-public class NotSelector implements IEntitySelector {
+public class NotSelector implements Predicate<Entity> {
 
-	private final IEntitySelector selector;
+	private final Predicate<Entity> selector;
 
-	public NotSelector(IEntitySelector selector) {
+	public NotSelector(Predicate<Entity> selector) {
 		this.selector = selector;
 
 	}
 
 	@Override
-	public boolean isEntityApplicable(Entity var1) {
-		return !selector.isEntityApplicable(var1);
+	public boolean apply(Entity var1) {
+		return !selector.apply(var1);
 	}
 
 }

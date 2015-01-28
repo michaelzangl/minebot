@@ -2,7 +2,6 @@ package net.famzangl.minecraft.minebot.ai.task;
 
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.strategy.TaskOperations;
-import net.minecraft.command.IEntitySelector;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.item.EntityXPOrb;
@@ -10,22 +9,24 @@ import net.minecraft.util.MovementInput;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.MovingObjectPosition.MovingObjectType;
 
+import com.google.common.base.Predicate;
+
 public class FaceAndInteractTask extends AITask {
 
 	protected boolean interacted = false;
 	private final Entity preferedAnimal;
-	private final IEntitySelector alsoAcceptedAnimal;
+	private final Predicate<Entity> alsoAcceptedAnimal;
 	private final boolean doRightClick;
 	private int ticksRun = 0;
 	protected boolean wasJumping;
 
 	public FaceAndInteractTask(Entity preferedAnimal,
-			IEntitySelector alsoAcceptedAnimal) {
+			Predicate<Entity> alsoAcceptedAnimal) {
 		this(preferedAnimal, alsoAcceptedAnimal, true);
 	}
 
 	public FaceAndInteractTask(Entity preferedAnimal,
-			IEntitySelector alsoAcceptedAnimal, boolean doRightClick) {
+			Predicate<Entity> alsoAcceptedAnimal, boolean doRightClick) {
 		this.preferedAnimal = preferedAnimal;
 		this.alsoAcceptedAnimal = alsoAcceptedAnimal;
 		this.doRightClick = doRightClick;
@@ -35,15 +36,15 @@ public class FaceAndInteractTask extends AITask {
 	public boolean isFinished(AIHelper h) {
 		final boolean collect = preferedAnimal instanceof EntityItem
 				|| preferedAnimal instanceof EntityXPOrb;
-		return collect ? preferedAnimal.boundingBox.intersectsWith(h
-				.getMinecraft().thePlayer.boundingBox) : interacted;
+		return collect ? preferedAnimal.getEntityBoundingBox().intersectsWith(h
+				.getMinecraft().thePlayer.getEntityBoundingBox()) : interacted;
 	}
 
 	@Override
 	public void runTick(AIHelper h, TaskOperations o) {
 		final MovingObjectPosition over = h.getObjectMouseOver();
 		if (ticksRun > 2 && over != null && over.typeOfHit == MovingObjectType.ENTITY
-				&& alsoAcceptedAnimal.isEntityApplicable(over.entityHit)) {
+				&& alsoAcceptedAnimal.apply(over.entityHit)) {
 			doInteractWithCurrent(h);
 		} else {
 			final double speed = h.getMinecraft().thePlayer.motionX

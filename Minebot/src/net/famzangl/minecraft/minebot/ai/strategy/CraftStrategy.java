@@ -21,6 +21,7 @@ import net.famzangl.minecraft.minebot.ai.task.inventory.ItemCountList;
 import net.famzangl.minecraft.minebot.ai.task.inventory.ItemWithSubtype;
 import net.famzangl.minecraft.minebot.ai.task.inventory.PutOnCraftingTableTask;
 import net.famzangl.minecraft.minebot.ai.task.inventory.TakeResultItem;
+import net.famzangl.minecraft.minebot.ai.utils.PrivateFieldUtils;
 import net.minecraft.block.Block;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.gui.inventory.GuiCrafting;
@@ -29,7 +30,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.CraftingManager;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.item.crafting.ShapedRecipes;
-import net.minecraftforge.oredict.ShapedOreRecipe;
+import net.minecraft.util.BlockPos;
 
 /**
  * Use the crafting table.
@@ -42,53 +43,90 @@ public class CraftStrategy extends PathFinderStrategy {
 	public static final class CraftingPossibility {
 		public static final int SUBTYPE_IGNORED = 32767;
 
+		private static final int WIDTH = 0;
+		private static final int HEIGHT = 1;
+
 		private final ItemWithSubtype[][] slots = new ItemWithSubtype[3][3];
 
 		public CraftingPossibility(IRecipe r) {
 			if (r instanceof ShapedRecipes) {
 				ShapedRecipes shapedRecipes = (ShapedRecipes) r;
-				for (int x = 0; x < shapedRecipes.recipeWidth; x++) {
-					for (int y = 0; y < shapedRecipes.recipeHeight; y++) {
-						ItemStack itemStack = shapedRecipes.recipeItems[x + y
-								* shapedRecipes.recipeWidth];
+				int[] dim = getSizes(shapedRecipes);
+				ItemStack[] items = PrivateFieldUtils.getFieldValue(
+						shapedRecipes, ShapedRecipes.class, ItemStack[].class);
+				for (int x = 0; x < dim[WIDTH]; x++) {
+					for (int y = 0; y < dim[HEIGHT]; y++) {
+						ItemStack itemStack = items[x + y * dim[WIDTH]];
 						if (itemStack != null) {
 							this.slots[x][y] = new ItemWithSubtype(itemStack);
 						}
 					}
 				}
-			} else if (r instanceof ShapedOreRecipe) {
-				ShapedOreRecipe shapedRecipes = (ShapedOreRecipe) r;
-				try {
-					Field widthFiled = ShapedOreRecipe.class
-							.getDeclaredField("width");
-					widthFiled.setAccessible(true);
-					int width = widthFiled.getInt(shapedRecipes);
-					for (int x = 0; x < width; x++) {
-						int height = shapedRecipes.getRecipeSize() / width;
-						for (int y = 0; y < height; y++) {
-							Object itemStack = shapedRecipes.getInput()[x + y
-									* width];
-							if (itemStack instanceof ItemStack) {
-								this.slots[x][y] = new ItemWithSubtype(
-										(ItemStack) itemStack);
-							} else if (itemStack instanceof ArrayList) {
-								ArrayList list = (ArrayList) itemStack;
-								this.slots[x][y] = new ItemWithSubtype(
-										(ItemStack) list.get(0));
-							}
-						}
-					}
-				} catch (NoSuchFieldException e) {
-					throw new IllegalArgumentException("Cannot access " + r);
-				} catch (SecurityException e) {
-					throw new IllegalArgumentException("Cannot access " + r);
-				} catch (IllegalAccessException e) {
-					throw new IllegalArgumentException("Cannot access " + r);
-				}
-
-			} else {
+			} /*
+			 * else if (r instanceof ShapedOreRecipe) { ShapedOreRecipe
+			 * shapedRecipes = (ShapedOreRecipe) r; try { Field widthFiled =
+			 * ShapedOreRecipe.class .getDeclaredField("width");
+			 * widthFiled.setAccessible(true); int width =
+			 * widthFiled.getInt(shapedRecipes); for (int x = 0; x < width; x++)
+			 * { int height = shapedRecipes.getRecipeSize() / width; for (int y
+			 * = 0; y < height; y++) { Object itemStack =
+			 * shapedRecipes.getInput()[x + y width]; if (itemStack instanceof
+			 * ItemStack) { this.slots[x][y] = new ItemWithSubtype( (ItemStack)
+			 * itemStack); } else if (itemStack instanceof ArrayList) {
+			 * ArrayList list = (ArrayList) itemStack; this.slots[x][y] = new
+			 * ItemWithSubtype( (ItemStack) list.get(0)); } } } } catch
+			 * (NoSuchFieldException e) { throw new
+			 * IllegalArgumentException("Cannot access " + r); } catch
+			 * (SecurityException e) { throw new
+			 * IllegalArgumentException("Cannot access " + r); } catch
+			 * (IllegalAccessException e) { throw new
+			 * IllegalArgumentException("Cannot access " + r); }
+			 * 
+			 * }
+			 */else {
 				throw new IllegalArgumentException("Cannot (yet) craft " + r);
 			}
+		}
+
+		private ItemStack[] getItems(ShapedRecipes shapedRecipes) {
+			for (Field f : ShapedRecipes.class.getDeclaredFields()) {
+				if (f.getType().isArray()) {
+					Class<?> componentType = f.getType().getComponentType();
+					if (componentType == ItemStack.class) {
+						f.setAccessible(true);
+						try {
+							return (ItemStack[]) f.get(shapedRecipes);
+						} catch (IllegalArgumentException e) {
+							e.printStackTrace();
+						} catch (IllegalAccessException e) {
+							e.printStackTrace();
+						}
+					}
+				}
+			}
+			return null;
+		}
+
+		private int[] getSizes(ShapedRecipes shapedRecipes) {
+			int i = 0;
+			int[] sizes = new int[2];
+			for (Field f : ShapedRecipes.class.getDeclaredFields()) {
+				if (f.getType() == Integer.TYPE) {
+					f.setAccessible(true);
+					try {
+						sizes[i] = f.getInt(shapedRecipes);
+					} catch (IllegalArgumentException e) {
+						e.printStackTrace();
+					} catch (IllegalAccessException e) {
+						e.printStackTrace();
+					}
+					i++;
+					if (i >= sizes.length) {
+						break;
+					}
+				}
+			}
+			return sizes;
 		}
 
 		public ItemCountList getRequiredItems(int count) {
@@ -144,9 +182,9 @@ public class CraftStrategy extends PathFinderStrategy {
 
 	public static class CraftingTableData {
 
-		public final Pos pos;
+		public final BlockPos pos;
 
-		public CraftingTableData(Pos pos) {
+		public CraftingTableData(BlockPos pos) {
 			this.pos = pos;
 		}
 	}
@@ -156,7 +194,7 @@ public class CraftStrategy extends PathFinderStrategy {
 		private static final int[] IDS = new int[] { Block
 				.getIdFromBlock(Blocks.crafting_table) };
 
-		private final Hashtable<Pos, CraftingTableData> found = new Hashtable<Pos, CraftingTableData>();
+		private final Hashtable<BlockPos, CraftingTableData> found = new Hashtable<BlockPos, CraftingTableData>();
 
 		@Override
 		public int[] getIds() {
@@ -165,12 +203,12 @@ public class CraftStrategy extends PathFinderStrategy {
 
 		@Override
 		public void scanBlock(AIHelper helper, int id, int x, int y, int z) {
-			Pos pos = new Pos(x, y, z);
+			BlockPos pos = new BlockPos(x, y, z);
 			found.put(pos, new CraftingTableData(pos));
 		}
 
 		@Override
-		protected Collection<Entry<Pos, CraftingTableData>> getTargetPositions() {
+		protected Collection<Entry<BlockPos, CraftingTableData>> getTargetPositions() {
 			return found.entrySet();
 		}
 	}
@@ -193,7 +231,7 @@ public class CraftStrategy extends PathFinderStrategy {
 		public CraftingTableFinder(CraftingWish wish) {
 			this.wish = wish;
 		}
-		
+
 		@Override
 		protected boolean runSearch(Pos playerPosition) {
 			int missing = getMissing();
@@ -205,6 +243,7 @@ public class CraftStrategy extends PathFinderStrategy {
 
 		/**
 		 * Might be negative.
+		 * 
 		 * @return
 		 */
 		private int getMissing() {
@@ -245,12 +284,10 @@ public class CraftStrategy extends PathFinderStrategy {
 				return;
 			}
 
-			addTask(new UseItemOnBlockAtTask(table.pos.x, table.pos.y,
-					table.pos.z) {
+			addTask(new UseItemOnBlockAtTask(table.pos) {
 				@Override
-				protected boolean isBlockAllowed(AIHelper h, int blockX,
-						int blockY, int blockZ) {
-					return h.getBlock(blockX, blockY, blockZ) == Blocks.crafting_table;
+				protected boolean isBlockAllowed(AIHelper h, BlockPos pos) {
+					return h.getBlock(pos) == Blocks.crafting_table;
 				}
 
 				@Override
@@ -276,7 +313,8 @@ public class CraftStrategy extends PathFinderStrategy {
 					if (grid[x][y] != null) {
 						int inventoryTotal = countInInventory(grid[x][y]);
 						int slotCount = countInGrid(grid, grid[x][y]);
-						int itemCount = Math.min(inventoryTotal / slotCount, missing);
+						int itemCount = Math.min(inventoryTotal / slotCount,
+								missing);
 						addTask(new PutOnCraftingTableTask(y * 3 + x,
 								grid[x][y], itemCount));
 						addTask(new WaitTask(3));

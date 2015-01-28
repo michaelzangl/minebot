@@ -12,6 +12,7 @@ import net.famzangl.minecraft.minebot.ai.strategy.AIStrategy;
 import net.famzangl.minecraft.minebot.ai.strategy.TaskStrategy;
 import net.famzangl.minecraft.minebot.ai.task.AITask;
 import net.famzangl.minecraft.minebot.build.blockbuild.BuildTask;
+import net.minecraft.util.BlockPos;
 
 @AICommand(helpText = "Place the next block.\n Use the walk command before this command or walk there yourself.", name = "minebuild")
 public class CommandStepPlace {
@@ -34,12 +35,12 @@ public class CommandStepPlace {
 			}
 
 			private void addStep(AIHelper helper, final BuildTask task) {
-				final Pos forPosition = task.getForPosition();
-				final Pos fromPos = getFromPos(helper, task, forPosition);
+				final BlockPos forPosition = task.getForPosition();
+				final BlockPos fromPos = getFromPos(helper, task, forPosition);
 				if (fromPos == null) {
 					AIChatController.addChatLine("Not at starting position.");
-				} else if (helper.isAirBlock(task.getForPosition().x,
-						task.getForPosition().y, task.getForPosition().z)) {
+				} else if (helper.isAirBlock(task.getForPosition().getX(),
+						task.getForPosition().getY(), task.getForPosition().getZ())) {
 					final AITask t = task.getPlaceBlockTask(fromPos);
 					if (t != null) {
 						addTask(t);
@@ -57,12 +58,12 @@ public class CommandStepPlace {
 		};
 	}
 
-	private static Pos getFromPos(AIHelper helper, final BuildTask task,
-			Pos forPosition) {
-		Pos fromPos = null;
-		for (final Pos p : task.getStandablePlaces()) {
-			if (helper.isStandingOn(p.x + forPosition.x, p.y + forPosition.y,
-					p.z + forPosition.z)) {
+	private static BlockPos getFromPos(AIHelper helper, final BuildTask task,
+			BlockPos forPosition) {
+		BlockPos fromPos = null;
+		for (final BlockPos p : task.getStandablePlaces()) {
+			if (helper.isStandingOn(p.getX() + forPosition.getX(), p.getY() + forPosition.getY(),
+					p.getZ() + forPosition.getZ())) {
 				fromPos = p;
 			}
 		}

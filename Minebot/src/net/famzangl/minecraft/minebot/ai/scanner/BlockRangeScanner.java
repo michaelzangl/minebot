@@ -37,10 +37,10 @@ public class BlockRangeScanner {
 	}
 
 	public void scanArea(AIHelper helper) {
-		for (int y = center.y - VERTICAL_SCAN; y <= center.y + VERTICAL_SCAN; y++) {
-			for (int z = center.z - HORIZONTAL_SCAN; z <= center.z
+		for (int y = center.getY() - VERTICAL_SCAN; y <= center.getY() + VERTICAL_SCAN; y++) {
+			for (int z = center.getZ() - HORIZONTAL_SCAN; z <= center.getZ()
 					+ HORIZONTAL_SCAN; z++) {
-				for (int x = center.x - HORIZONTAL_SCAN; x <= center.x
+				for (int x = center.getX() - HORIZONTAL_SCAN; x <= center.getX()
 						+ HORIZONTAL_SCAN; x++) {
 					int id = helper.getBlockId(x, y, z);					
 					BlockHandler handler = handlersCache[id];

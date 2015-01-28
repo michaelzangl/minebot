@@ -6,7 +6,7 @@ import net.famzangl.minecraft.minebot.ai.strategy.TaskOperations;
 import net.famzangl.minecraft.minebot.ai.task.AITask;
 import net.famzangl.minecraft.minebot.ai.task.SkipWhenSearchingPrefetch;
 import net.famzangl.minecraft.minebot.ai.task.error.SelectTaskError;
-import net.minecraft.client.entity.EntityClientPlayerMP;
+import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.gui.inventory.GuiInventory;
 import net.minecraft.client.multiplayer.PlayerControllerMP;
 import net.minecraft.inventory.Slot;
@@ -76,7 +76,7 @@ public class GetOnHotBarTask extends AITask {
 	private void swap(AIHelper h, GuiInventory screen, int i) {
 		final PlayerControllerMP playerController = h.getMinecraft().playerController;
 		final int windowId = screen.inventorySlots.windowId;
-		final EntityClientPlayerMP player = h.getMinecraft().thePlayer;
+		final EntityPlayerSP player = h.getMinecraft().thePlayer;
 		playerController.windowClick(windowId, i, 0, 0, player);
 		playerController.windowClick(windowId, 35 + 5, 0, 0, player);
 		playerController.windowClick(windowId, i, 0, 0, player);

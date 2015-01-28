@@ -43,14 +43,14 @@ public class BlockFlagTable {
 	}
 
 	private int getIndex(int x, int y, int z) {
-		if (x < min.x || x > max.x || y < min.y || y > max.y || z < min.z || z > max.z) {
+		if (x < min.getX() || x > max.getX() || y < min.getY() || y > max.getY() || z < min.getZ() || z > max.getZ()) {
 			return -1;
 		}
-		int v = z - min.z;
-		v *= (max.y - min.y + 1);
-		v += y - min.y;
-		v *= (max.x - min.x + 1);
-		v += x - min.x;
+		int v = z - min.getZ();
+		v *= (max.getY() - min.getY() + 1);
+		v += y - min.getY();
+		v *= (max.getX() - min.getX() + 1);
+		v += x - min.getX();
 		return v;
 	}
 }

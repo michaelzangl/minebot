@@ -1,11 +1,11 @@
 package net.famzangl.minecraft.minebot.ai.selectors;
 
 import net.famzangl.minecraft.minebot.ai.AIHelper;
-import net.minecraft.command.IEntitySelector;
+import com.google.common.base.Predicate;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.passive.EntityAnimal;
 
-public final class FeedableSelector implements IEntitySelector {
+public final class FeedableSelector implements Predicate<Entity> {
 	private final AIHelper helper;
 
 	public FeedableSelector(AIHelper helper) {
@@ -13,7 +13,7 @@ public final class FeedableSelector implements IEntitySelector {
 	}
 
 	@Override
-	public boolean isEntityApplicable(Entity e) {
+	public boolean apply(Entity e) {
 		if (!(e instanceof EntityAnimal)) {
 			return false;
 		}

@@ -7,11 +7,12 @@ import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.item.EntityMinecart;
 import net.minecraft.entity.passive.EntitySheep;
 import net.minecraft.entity.passive.EntityWolf;
+import net.minecraft.item.EnumDyeColor;
 
 public class FoundEntity extends DoublePos {
 	private final Entity entity;
 	private final Pos pos;
-	private int color = -1;
+	private EnumDyeColor color = null;
 	
 	public FoundEntity(Entity entity) {
 		super(entity);
@@ -37,18 +38,18 @@ public class FoundEntity extends DoublePos {
 	}
 
 	public String getColor() {
-		return color < 0 ? null : ColoredBlockItemFilter.COLORS[color];
+		return color == null ? null : color.getName();
 	}
 	
 	public String getName() {
-		return entity.getCommandSenderName();
+		return entity.getCommandSenderEntity().getName();
 	}
 	
 	public String getCustomName() {
 		if (entity instanceof EntityLiving) {
-			return ((EntityLiving) entity).hasCustomNameTag() ? ((EntityLiving) entity).getCustomNameTag() : null;
+			return ((EntityLiving) entity).hasCustomName() ? ((EntityLiving) entity).getCustomNameTag() : null;
 		} else if (entity instanceof EntityMinecart) {
-			return ((EntityMinecart) entity).hasCustomInventoryName() ? entity.getCommandSenderName() : null;
+			return ((EntityMinecart) entity).hasCustomName() ? entity.getCommandSenderEntity().getName() : null;
 		} else {
 			return null;
 		}

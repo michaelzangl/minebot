@@ -7,7 +7,8 @@ import net.famzangl.minecraft.minebot.Pos;
 import net.famzangl.minecraft.minebot.ai.BlockWhitelist;
 import net.famzangl.minecraft.minebot.ai.task.DestroyInRangeTask;
 import net.minecraft.block.Block;
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.ResourceLocation;
 
 public abstract class MinePathfinder extends MovePathFinder {
 	protected static final float MIN_FACTOR = 0.1f;
@@ -20,7 +21,7 @@ public abstract class MinePathfinder extends MovePathFinder {
 	/**
 	 * A horizontal direction that is prefered
 	 */
-	protected final ForgeDirection preferedDirection;
+	protected final EnumFacing preferedDirection;
 	/**
 	 * 0.0 - 1.0.
 	 */
@@ -64,13 +65,16 @@ public abstract class MinePathfinder extends MovePathFinder {
 	}
 
 	@SuppressWarnings("unchecked")
-	public MinePathfinder(ForgeDirection preferedDirection, int preferedLayer) {
+	public MinePathfinder(EnumFacing preferedDirection, int preferedLayer) {
 		this.preferedDirection = preferedDirection;
 		this.preferedLayer = preferedLayer;
 		points = new FloatBlockCache(getPointsProvider());
 		factors = new FloatBlockCache(getFactorProvider());
-		
-		for (String k : (Set<String>)Block.blockRegistry.getKeys()) {
+	}
+	
+	@Override
+	protected boolean runSearch(Pos playerPosition) {
+		for (ResourceLocation k : (Set<ResourceLocation>)Block.blockRegistry.getKeys()) {
 			int id = Block.getIdFromBlock((Block) Block.blockRegistry.getObject(k));
 			float f = factors.getForBlock(id);
 			if (f > 0) {
@@ -78,6 +82,7 @@ public abstract class MinePathfinder extends MovePathFinder {
 				footAllowedBlocks.intersectWith(new BlockWhitelist(id));
 			}
 		}
+		return super.runSearch(playerPosition);
 	}
 
 	protected abstract ISettingsProvider getFactorProvider();
@@ -103,15 +108,15 @@ public abstract class MinePathfinder extends MovePathFinder {
 		} else {
 			float badDirectionMalus = 0;
 			final Pos current = helper.getPlayerPosition();
-			if (preferedDirection != null && preferedDirection.offsetX != 0) {
-				final int dx = x - current.x;
-				if (Math.signum(dx) != preferedDirection.offsetX) {
+			if (preferedDirection != null && preferedDirection.getFrontOffsetX() != 0) {
+				final int dx = x - current.getX();
+				if (Math.signum(dx) != preferedDirection.getFrontOffsetX()) {
 					badDirectionMalus = dx * preferedDirectionInfluence;
 				}
 			} else if (preferedDirection != null
-					&& preferedDirection.offsetZ != 0) {
-				final int dz = z - current.z;
-				if (Math.signum(dz) != preferedDirection.offsetZ) {
+					&& preferedDirection.getFrontOffsetZ() != 0) {
+				final int dz = z - current.getZ();
+				if (Math.signum(dz) != preferedDirection.getFrontOffsetZ()) {
 					badDirectionMalus = dz * preferedDirectionInfluence;
 				}
 			}
@@ -134,8 +139,12 @@ public abstract class MinePathfinder extends MovePathFinder {
 		final float point = points.getForBlock(id);
 
 		final float factor = factors.getForBlock(id);
-		return factor == 0 ? Float.POSITIVE_INFINITY : distance / factor
-				* maxDistanceFactor + maxDistancePoints - point;
+		if (factor == 0) {
+			return Float.POSITIVE_INFINITY;
+		} else {
+			return distance / factor
+					* maxDistanceFactor + maxDistancePoints - point;
+		}
 	}
 
 	private boolean isOreBlock(int x, int y, int z) {
@@ -145,25 +154,25 @@ public abstract class MinePathfinder extends MovePathFinder {
 	@Override
 	protected void addTasksForTarget(Pos currentPos) {
 		Pos top, bottom;
-		if (isOreBlock(currentPos.x, currentPos.y + 1, currentPos.z)) {
+		if (isOreBlock(currentPos.getX(), currentPos.getY() + 1, currentPos.getZ())) {
 			top = currentPos.add(0, 1, 0);
 		} else {
 			top = currentPos;
 		}
-		if (isOreBlock(currentPos.x, currentPos.y, currentPos.z)) {
+		if (isOreBlock(currentPos.getX(), currentPos.getY(), currentPos.getZ())) {
 			bottom = currentPos;
 		} else {
 			bottom = currentPos.add(0, 1, 0);
 		}
 
 		for (int i = 2; i < 5; i++) {
-			if (!helper.hasSafeSides(currentPos.x, currentPos.y + i,
-					currentPos.z)
-					|| !helper.isSafeHeadBlock(currentPos.x, currentPos.y + i
-							+ 1, currentPos.z)) {
+			if (!helper.hasSafeSides(currentPos.getX(), currentPos.getY() + i,
+					currentPos.getZ())
+					|| !helper.isSafeHeadBlock(currentPos.getX(), currentPos.getY() + i
+							+ 1, currentPos.getZ())) {
 				break;
 			}
-			if (isOreBlock(currentPos.x, currentPos.y + i, currentPos.z)) {
+			if (isOreBlock(currentPos.getX(), currentPos.getY() + i, currentPos.getZ())) {
 				top = currentPos.add(0, i, 0);
 			} else {
 				break;

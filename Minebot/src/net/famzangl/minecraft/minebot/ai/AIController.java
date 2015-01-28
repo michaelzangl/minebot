@@ -1,5 +1,6 @@
 package net.famzangl.minecraft.minebot.ai;
 
+import java.lang.annotation.ElementType;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Hashtable;
@@ -8,35 +9,32 @@ import java.util.Map.Entry;
 import net.famzangl.minecraft.minebot.Pos;
 import net.famzangl.minecraft.minebot.ai.command.AIChatController;
 import net.famzangl.minecraft.minebot.ai.command.IAIControllable;
+import net.famzangl.minecraft.minebot.ai.net.MinebotNetHandler;
 import net.famzangl.minecraft.minebot.ai.render.BuildMarkerRenderer;
 import net.famzangl.minecraft.minebot.ai.render.PosMarkerRenderer;
 import net.famzangl.minecraft.minebot.ai.strategy.AIStrategy;
 import net.famzangl.minecraft.minebot.ai.strategy.AIStrategy.TickResult;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.gui.GuiMainMenu;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.settings.KeyBinding;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.MouseHelper;
-import net.minecraftforge.client.event.GuiOpenEvent;
-import net.minecraftforge.client.event.RenderGameOverlayEvent;
-import net.minecraftforge.client.event.RenderGameOverlayEvent.ElementType;
-import net.minecraftforge.client.event.RenderWorldLastEvent;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.entity.player.PlayerInteractEvent;
-import net.minecraftforge.event.entity.player.PlayerInteractEvent.Action;
+import net.minecraftforge.fml.client.registry.ClientRegistry;
+import net.minecraftforge.fml.common.FMLCommonHandler;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent;
+import net.minecraftforge.fml.common.gameevent.TickEvent.Phase;
+import net.minecraftforge.fml.common.gameevent.TickEvent.RenderTickEvent;
+import net.minecraftforge.fml.common.network.FMLNetworkEvent.ClientConnectedToServerEvent;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 import org.lwjgl.input.Keyboard;
-
-import cpw.mods.fml.client.registry.ClientRegistry;
-import cpw.mods.fml.common.FMLCommonHandler;
-import cpw.mods.fml.common.eventhandler.SubscribeEvent;
-import cpw.mods.fml.common.gameevent.TickEvent.ClientTickEvent;
-import cpw.mods.fml.common.gameevent.TickEvent.Phase;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 
 /**
  * The main class that handles the bot.
@@ -99,6 +97,11 @@ public class AIController extends AIHelper implements IAIControllable {
 		AIChatController.getRegistry().setControlled(this);
 	}
 
+	@SubscribeEvent
+	public void connect(ClientConnectedToServerEvent e) {
+		MinebotNetHandler.inject(this, e.manager, e.handler);
+	}
+	
 	/**
 	 * Checks if the Bot is active and what it should do.
 	 * 
@@ -106,7 +109,8 @@ public class AIController extends AIHelper implements IAIControllable {
 	 */
 	@SubscribeEvent
 	public void onPlayerTick(ClientTickEvent evt) {
-		if (evt.phase != Phase.START || getMinecraft().thePlayer == null) {
+		if (evt.phase != ClientTickEvent.Phase.START
+				|| getMinecraft().thePlayer == null) {
 			return;
 		}
 		if (skipNextTick) {
@@ -123,7 +127,7 @@ public class AIController extends AIHelper implements IAIControllable {
 		}
 
 		AIStrategy newStrat;
-		if (dead || stop.isPressed() || stop.getIsKeyPressed()) {
+		if (dead || stop.isPressed() || stop.isKeyDown()) {
 			deactivateCurrentStrategy();
 			dead = false;
 		} else if ((newStrat = findNewStrategy()) != null) {
@@ -162,8 +166,8 @@ public class AIController extends AIHelper implements IAIControllable {
 	}
 
 	@SubscribeEvent
-	public void drawHUD(RenderGameOverlayEvent.Post event) {
-		if (event.type != ElementType.CHAT) {
+	public void drawHUD(RenderTickEvent event) {
+		if (event.phase != Phase.END) {
 			return;
 		}
 		if (doUngrab) {
@@ -193,11 +197,11 @@ public class AIController extends AIHelper implements IAIControllable {
 			}
 			int y = 10;
 			for (String s : str) {
-				getMinecraft().fontRenderer.drawStringWithShadow(
+				getMinecraft().fontRendererObj.drawStringWithShadow(
 						s,
 						res.getScaledWidth()
-								- getMinecraft().fontRenderer.getStringWidth(s)
-								- 10, y, 16777215);
+								- getMinecraft().fontRendererObj
+										.getStringWidth(s) - 10, y, 16777215);
 				y += 15;
 			}
 		} catch (final InstantiationException e) {
@@ -241,14 +245,15 @@ public class AIController extends AIHelper implements IAIControllable {
 		}
 	}
 
-	@SubscribeEvent
-	public void resetOnGameEnd(GuiOpenEvent unload) {
-		if (unload.gui instanceof GuiMainMenu) {
-			System.out.println("Unloading world.");
-			dead = true;
-			buildManager.reset();
-		}
-	}
+	// FIXME: Find alternative
+	// @SubscribeEvent
+	// public void resetOnGameEnd(GuiOpenEvent unload) {
+	// if (unload.gui instanceof GuiMainMenu) {
+	// System.out.println("Unloading world.");
+	// dead = true;
+	// buildManager.reset();
+	// }
+	// }
 
 	/**
 	 * Draws the position markers.
@@ -256,8 +261,15 @@ public class AIController extends AIHelper implements IAIControllable {
 	 * @param event
 	 */
 	@SubscribeEvent
-	public void drawMarkers(RenderWorldLastEvent event) {
-		final EntityLivingBase player = getMinecraft().renderViewEntity;
+	public void drawMarkers(RenderTickEvent event) {
+		if (event.phase != Phase.END) {
+			return;
+		}
+		final Entity view = getMinecraft().getRenderViewEntity();
+		if (!(view instanceof EntityPlayerSP)) {
+			return;
+		}
+		EntityPlayerSP player = (EntityPlayerSP) view;
 		if (player.getHeldItem() != null
 				&& player.getHeldItem().getItem() == Items.wooden_axe) {
 			if (markerRenderer == null) {
@@ -312,22 +324,20 @@ public class AIController extends AIHelper implements IAIControllable {
 		requestedStrategy = strategy;
 	}
 
-	@SubscribeEvent
-	@SideOnly(Side.CLIENT)
-	public void playerInteract(PlayerInteractEvent event) {
-		final ItemStack stack = event.entityPlayer.inventory.getCurrentItem();
-		if (stack != null && stack.getItem() == Items.wooden_axe) {
-			if (event.action == Action.RIGHT_CLICK_BLOCK) {
-				if (event.entityPlayer.worldObj.isRemote) {
-					positionMarkEvent(event.x, event.y, event.z, 0);
-				}
-			}
-		}
-	}
-
+//	@SubscribeEvent
+//	@SideOnly(Side.CLIENT)
+	// public void playerInteract(PlayerInteractEvent event) {
+	// final ItemStack stack = event.entityPlayer.inventory.getCurrentItem();
+	// if (stack != null && stack.getItem() == Items.wooden_axe) {
+	// if (event.action == Action.RIGHT_CLICK_BLOCK) {
+	// if (event.entityPlayer.worldObj.isRemote) {
+	// positionMarkEvent(event.x, event.y, event.z, 0);
+	// }
+	// }
+	// }
+	// }
 	public void initialize() {
 		FMLCommonHandler.instance().bus().register(this);
-		MinecraftForge.EVENT_BUS.register(this);
 
 		// registerAxe();
 	}

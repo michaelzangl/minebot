@@ -12,7 +12,8 @@ import net.famzangl.minecraft.minebot.ai.command.ParameterType;
 import net.famzangl.minecraft.minebot.ai.strategy.AIStrategy;
 import net.famzangl.minecraft.minebot.build.blockbuild.BuildTask;
 import net.famzangl.minecraft.minebot.build.blockbuild.MirrorDirection;
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraft.util.BlockPos;
+import net.minecraft.util.EnumFacing;
 
 /**
  * Move all scheduled builds by x.
@@ -23,12 +24,12 @@ import net.minecraftforge.common.util.ForgeDirection;
 @AICommand(helpText = "Move everything that is scheduled in the direction you are looking / given", name = "minebuild")
 public class CommandMove {
 	private static final class MoveStrategy extends AIStrategy {
-		private final Pos relative;
+		private final BlockPos relative;
 		private final Rotate rotate;
 		private final MirrorDirection mirror;
 		private boolean moved;
 
-		private MoveStrategy(Pos relative, Rotate rotate, MirrorDirection mirror) {
+		private MoveStrategy(BlockPos relative, Rotate rotate, MirrorDirection mirror) {
 			this.relative = relative;
 			this.rotate = rotate;
 			this.mirror = mirror;
@@ -46,18 +47,18 @@ public class CommandMove {
 				final Pos center = getCenter(helper.buildManager.getScheduled());
 				while (helper.buildManager.peekNextTask() != null) {
 					final BuildTask next = helper.buildManager.popNextTask();
-					Pos nextPos = next.getForPosition().add(relative);
+					BlockPos nextPos = next.getForPosition().add(relative);
 					if (rotate != null) {
 						nextPos = rotate.apply(nextPos.subtract(center)).add(
 								center);
 					}
 					if (mirror == MirrorDirection.EAST_WEST) {
 						// mirror on x axes
-						nextPos = new Pos(center.x * 2 - nextPos.x, nextPos.y,
-								nextPos.z);
+						nextPos = new Pos(center.getX() * 2 - nextPos.getX(), nextPos.getY(),
+								nextPos.getZ());
 					} else if (mirror == MirrorDirection.NORTH_SOUTH) {
-						nextPos = new Pos(nextPos.x, nextPos.y, center.z * 2
-								- nextPos.z);
+						nextPos = new Pos(nextPos.getX(), nextPos.getY(), center.getZ() * 2
+								- nextPos.getZ());
 					}
 
 					final BuildTask task = next.withPositionAndRotation(
@@ -76,10 +77,10 @@ public class CommandMove {
 		private Pos getCenter(List<BuildTask> scheduled) {
 			double x = 0, y = 0, z = 0;
 			for (final BuildTask s : scheduled) {
-				final Pos pos = s.getForPosition();
-				x += pos.x;
-				y += pos.y;
-				z += pos.z;
+				final BlockPos pos = s.getForPosition();
+				x += pos.getX();
+				y += pos.getY();
+				z += pos.getZ();
 			}
 			final int c = Math.max(1, scheduled.size());
 			return new Pos((int) (x / c), (int) (y / c), (int) (z / c));
@@ -101,16 +102,16 @@ public class CommandMove {
 			this.r = r;
 		}
 
-		public Pos apply(Pos current) {
+		public BlockPos apply(BlockPos blockPos) {
 			switch (this) {
 			case CLOCKWISE:
-				return new Pos(-current.z, current.y, current.x);
+				return new BlockPos(-blockPos.getZ(), blockPos.getY(), blockPos.getX());
 			case COUNTERCLOCKWISE:
-				return new Pos(current.z, current.y, -current.x);
+				return new BlockPos(blockPos.getZ(), blockPos.getY(), -blockPos.getX());
 			case HALF:
-				return new Pos(-current.x, current.y, -current.z);
+				return new BlockPos(-blockPos.getX(), blockPos.getY(), -blockPos.getZ());
 			default:
-				return current;
+				return blockPos;
 			}
 		}
 	}
@@ -127,7 +128,7 @@ public class CommandMove {
 	public static AIStrategy run(
 			AIHelper helper,
 			@AICommandParameter(type = ParameterType.FIXED, fixedName = "move", description = "") String nameArg,
-			@AICommandParameter(type = ParameterType.ENUM, fixedName = "", description = "Direction") final ForgeDirection dir,
+			@AICommandParameter(type = ParameterType.ENUM, fixedName = "", description = "Direction") final EnumFacing dir,
 			@AICommandParameter(type = ParameterType.NUMBER, fixedName = "", description = "How much") final int howMuch) {
 		return new MoveStrategy(Pos.fromDir(dir).multiply(howMuch), null, null);
 	}

@@ -24,7 +24,7 @@ public class BlockItemFilter implements HumanReadableItemFilter {
 	}
 
 	protected boolean matchesItem(ItemStack itemStack, ItemBlock item) {
-		return matched.contains(item.field_150939_a);
+		return matched.contains(item.block);
 	}
 
 	@Override

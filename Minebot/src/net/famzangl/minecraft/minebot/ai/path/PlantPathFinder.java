@@ -18,11 +18,10 @@ import net.minecraft.item.ItemStack;
 
 public class PlantPathFinder extends MovePathFinder {
 	public enum PlantType {
-		ANY(Blocks.farmland, Items.wheat_seeds, Items.carrot, Items.potato),
-		WHEAT(Blocks.farmland, Items.wheat_seeds),
-		CARROT(Blocks.farmland, Items.carrot),
-		POTATO(Blocks.farmland, Items.potato),
-		NETHERWART(Blocks.soul_sand, Items.nether_wart);
+		ANY(Blocks.farmland, Items.wheat_seeds, Items.carrot, Items.potato), WHEAT(
+				Blocks.farmland, Items.wheat_seeds), CARROT(Blocks.farmland,
+				Items.carrot), POTATO(Blocks.farmland, Items.potato), NETHERWART(
+				Blocks.soul_sand, Items.nether_wart);
 
 		public final Block farmland;
 
@@ -67,8 +66,10 @@ public class PlantPathFinder extends MovePathFinder {
 		allowedGroundForUpwardsBlocks = allowedGroundBlocks;
 		footAllowedBlocks = AIHelper.walkableBlocks;
 		headAllowedBlocks = AIHelper.headWalkableBlocks;
-		footAllowedBlocks = footAllowedBlocks.intersectWith(forbiddenBlocks.invert());
-		headAllowedBlocks = headAllowedBlocks.intersectWith(forbiddenBlocks.invert());
+		footAllowedBlocks = footAllowedBlocks.intersectWith(forbiddenBlocks
+				.invert());
+		headAllowedBlocks = headAllowedBlocks.intersectWith(forbiddenBlocks
+				.invert());
 	}
 
 	@Override
@@ -92,8 +93,7 @@ public class PlantPathFinder extends MovePathFinder {
 	private boolean isGrown(AIHelper helper, int x, int y, int z) {
 		final Block block = helper.getBlock(x, y, z);
 		if (block instanceof BlockCrops) {
-			final int metadata = helper.getMinecraft().theWorld
-					.getBlockMetadata(x, y, z);
+			final int metadata = helper.getBlockIdWithMeta(x, y, z) & 0xf;
 			return metadata >= 7;
 		}
 		return false;
@@ -105,16 +105,16 @@ public class PlantPathFinder extends MovePathFinder {
 
 	@Override
 	protected void addTasksForTarget(Pos currentPos) {
-		if (helper.isAirBlock(currentPos.x, currentPos.y, currentPos.z)) {
-			if (!hasFarmlandBelow(currentPos.x, currentPos.y, currentPos.z)) {
-				addTask(new UseItemOnBlockAtTask(new ClassItemFilter(ItemHoe.class), currentPos.x,
-						currentPos.y - 1, currentPos.z));
+		if (helper.isAirBlock(currentPos.getX(), currentPos.getY(),
+				currentPos.getZ())) {
+			if (!hasFarmlandBelow(currentPos.getX(), currentPos.getY(),
+					currentPos.getZ())) {
+				addTask(new UseItemOnBlockAtTask(new ClassItemFilter(
+						ItemHoe.class), currentPos.add(0, -1, 0)));
 			}
-			addTask(new PlaceBlockAtFloorTask(currentPos.x, currentPos.y,
-					currentPos.z, new SeedFilter(type)));
+			addTask(new PlaceBlockAtFloorTask(currentPos, new SeedFilter(type)));
 		} else {
-			addTask(new DestroyBlockTask(currentPos.x, currentPos.y,
-					currentPos.z));
+			addTask(new DestroyBlockTask(currentPos));
 		}
 	}
 }

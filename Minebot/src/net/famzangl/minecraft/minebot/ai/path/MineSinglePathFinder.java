@@ -1,13 +1,13 @@
 package net.famzangl.minecraft.minebot.ai.path;
 
 import net.minecraft.block.Block;
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraft.util.EnumFacing;
 
 public class MineSinglePathFinder extends MinePathfinder {
 
 	private final Block block;
 
-	public MineSinglePathFinder(Block block, ForgeDirection preferedDirection,
+	public MineSinglePathFinder(Block block, EnumFacing preferedDirection,
 			int preferedLayer) {
 		super(preferedDirection, preferedLayer);
 		this.block = block;

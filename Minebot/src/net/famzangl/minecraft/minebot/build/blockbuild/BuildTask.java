@@ -9,22 +9,24 @@ import net.famzangl.minecraft.minebot.ai.task.place.JumpingPlaceAtHalfTask;
 import net.famzangl.minecraft.minebot.build.WoodType;
 import net.famzangl.minecraft.minebot.build.blockbuild.BuildNormalStairsTask.Half;
 import net.minecraft.block.Block;
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraft.block.state.IBlockState;
+import net.minecraft.util.BlockPos;
+import net.minecraft.util.EnumFacing;
 
 public abstract class BuildTask {
 
-	protected final Pos forPosition;
+	protected final BlockPos forPosition;
 
-	protected BuildTask(Pos forPosition) {
+	protected BuildTask(BlockPos forPosition) {
 		this.forPosition = forPosition;
 	}
 
 	public static TaskDescription getTaskDescription(Block b, AIHelper h,
-			int x, int y, int z) throws UnknownBlockException {
-		final String name = Block.blockRegistry.getNameForObject(b)
+			BlockPos worldPos) throws UnknownBlockException {
+		final String name = ((String) (Block.blockRegistry.getNameForObject(b)))
 				.replaceFirst("minecraft:", "");
-		final int blockMetadata = h.getMinecraft().theWorld.getBlockMetadata(x,
-				y, z);
+		final IBlockState blockState = h.getMinecraft().theWorld.getBlockState(worldPos);
+		final int blockMetadata = h.getBlockIdWithMeta(worldPos) & 0xf;
 		if (BlockBuildTask.BLOCKS.contains(b)) {
 			return new TaskDescription(name, CubeBuildTask.STANDABLE);
 		} else if (ColoredCubeBuildTask.BLOCKS.contains(b)) {
@@ -37,7 +39,7 @@ public abstract class BuildTask {
 			for (final WoodType t : WoodType.values()) {
 				if (t.lowerBits == (blockMetadata & 0x3) && t.block == b) {
 					String dir;
-					Pos[] pos;
+					BlockPos[] pos;
 					if ((blockMetadata & 0xc) == 0x4) {
 						dir = "east";
 						pos = LogBuildTask.EAST_WEST_POS;
@@ -60,34 +62,34 @@ public abstract class BuildTask {
 							+ WoodType.values()[blockMetadata].toString()
 									.toLowerCase(), CubeBuildTask.STANDABLE);
 		} else if (BuildNormalStairsTask.BLOCKS.contains(b)) {
-			ForgeDirection dir;
+			EnumFacing dir;
 			switch (blockMetadata & 0x3) {
 			case 0:
-				dir = ForgeDirection.WEST;
+				dir = EnumFacing.WEST;
 				break;
 			case 1:
-				dir = ForgeDirection.EAST;
+				dir = EnumFacing.EAST;
 				break;
 			case 2:
-				dir = ForgeDirection.NORTH;
+				dir = EnumFacing.NORTH;
 				break;
 			default:
-				dir = ForgeDirection.SOUTH;
+				dir = EnumFacing.SOUTH;
 				break;
 			}
-			final Pos p1 = Pos.fromDir(dir.getOpposite()).add(0, 1, 0);
-			final Pos p2 = Pos.fromDir(dir.getRotation(ForgeDirection.UP)).add(
+			final BlockPos p1 = Pos.fromDir(dir.getOpposite()).add(0, 1, 0);
+			final BlockPos p2 = Pos.fromDir(dir.rotateY()).add(
 					0, 1, 0);
-			final Pos p3 = Pos.fromDir(dir.getRotation(ForgeDirection.DOWN))
+			final BlockPos p3 = Pos.fromDir(dir.rotateYCCW())
 					.add(0, 1, 0);
 			String up;
-			Pos[] standable;
+			BlockPos[] standable;
 			if ((blockMetadata & 0x4) == 0) {
 				up = "lower";
-				standable = new Pos[] { new Pos(0, 0, 0), p1, p2, p3 };
+				standable = new BlockPos[] { Pos.ZERO, p1, p2, p3 };
 			} else {
 				up = "upper";
-				standable = new Pos[] { p1, p2, p3 };
+				standable = new BlockPos[] { p1, p2, p3 };
 			}
 			return new TaskDescription(name + " "
 					+ dir.toString().toLowerCase() + " " + up, standable);
@@ -95,7 +97,7 @@ public abstract class BuildTask {
 			for (final SlabType t : SlabType.values()) {
 				if (t.slabBlock == b && t.meta == (blockMetadata & 0x7)) {
 					Half up;
-					ForgeDirection[] standable;
+					EnumFacing[] standable;
 					if ((blockMetadata & 0x8) == 0) {
 						up = Half.LOWER;
 						standable = JumpingPlaceAtHalfTask.TRY_FOR_LOWER;
@@ -118,16 +120,16 @@ public abstract class BuildTask {
 		}
 	}
 
-	public abstract Pos[] getStandablePlaces();
+	public abstract BlockPos[] getStandablePlaces();
 
-	public Pos getForPosition() {
+	public BlockPos getForPosition() {
 		return forPosition;
 	}
 
-	public abstract AITask getPlaceBlockTask(Pos relativeFromPos);
+	public abstract AITask getPlaceBlockTask(BlockPos relativeFromPos);
 
-	public boolean isStandablePlace(Pos relativeFromPos) {
-		for (final Pos p : getStandablePlaces()) {
+	public boolean isStandablePlace(BlockPos relativeFromPos) {
+		for (final BlockPos p : getStandablePlaces()) {
 			if (p.equals(relativeFromPos)) {
 				return true;
 			}
@@ -145,9 +147,9 @@ public abstract class BuildTask {
 	 * @return
 	 */
 	public boolean couldBuildFrom(AIHelper helper, int x, int y, int z) {
-		final Pos pos = getForPosition();
-		for (final Pos p : getStandablePlaces()) {
-			if (p.x + pos.x == x && p.y + pos.y == y && p.z + pos.z == z) {
+		final BlockPos pos = getForPosition();
+		for (final BlockPos p : getStandablePlaces()) {
+			if (p.getX() + pos.getX() == x && p.getY() + pos.getY() == y && p.getZ() + pos.getZ() == z) {
 				return true;
 			}
 		}
@@ -159,12 +161,12 @@ public abstract class BuildTask {
 	/**
 	 * @param add
 	 * @param rotateSteps
-	 *            0..3 Steps of ForgeDirection.rotate(UP).
+	 *            0..3 Steps of EnumFacing.rotate(UP).
 	 * @param mirror
 	 *            Applied after rotate (if possible);
 	 * @return
 	 */
-	public abstract BuildTask withPositionAndRotation(Pos add, int rotateSteps,
+	public abstract BuildTask withPositionAndRotation(BlockPos add, int rotateSteps,
 			MirrorDirection mirror);
 
 }

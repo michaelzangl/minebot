@@ -3,10 +3,10 @@ package net.famzangl.minecraft.minebot.ai.path;
 import net.famzangl.minecraft.minebot.Pos;
 import net.famzangl.minecraft.minebot.ai.BlockWhitelist;
 import net.minecraft.init.Blocks;
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraft.util.EnumFacing;
 
 public class OrebfuscatedMinePathFinder extends MineBySettingsPathFinder {
-	public OrebfuscatedMinePathFinder(ForgeDirection preferedDirection,
+	public OrebfuscatedMinePathFinder(EnumFacing preferedDirection,
 			int preferedLayer) {
 		super(preferedDirection, preferedLayer);
 	}
@@ -32,7 +32,7 @@ public class OrebfuscatedMinePathFinder extends MineBySettingsPathFinder {
 	@Override
 	protected float rateDestination(int distance, int x, int y, int z) {
 		if (y == preferedLayer && isGoodForOrebufscator(x, y, z)) {
-			int d = ignoredAbs(x - searchCenter.x, preferedDirection.offsetX) + ignoredAbs(z - searchCenter.z, preferedDirection.offsetZ);
+			int d = ignoredAbs(x - searchCenter.getX(), preferedDirection.getFrontOffsetX()) + ignoredAbs(z - searchCenter.getZ(), preferedDirection.getFrontOffsetZ());
 			return distance + maxDistancePoints + 10 + d * 5;
 		} else if (/*searchCenter.distance(new Pos(x, y, z)) < 10
 				&& */isVisible(x, y, z) || isVisible(x, y + 1, z)) {

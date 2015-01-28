@@ -1,6 +1,7 @@
 package net.famzangl.minecraft.minebot.ai.path;
 
 import net.famzangl.minecraft.minebot.Pos;
+import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.BlockItemFilter;
 import net.famzangl.minecraft.minebot.ai.task.MineBlockTask;
 import net.famzangl.minecraft.minebot.ai.task.move.DownwardsMoveTask;
@@ -18,7 +19,7 @@ public class LayRailPathFinder extends AlongTrackPathFinder {
 	@Override
 	protected int getNeighbour(int currentNode, int cx, int cy, int cz) {
 		final int res = super.getNeighbour(currentNode, cx, cy, cz);
-		if (res > 0 && helper.isRailBlock(helper.getBlock(cx, cy + 1, cz))) {
+		if (res > 0 && AIHelper.railBlocks.contains(helper.getBlock(cx, cy + 1, cz))) {
 			return -1;
 		}
 		return res;
@@ -31,7 +32,7 @@ public class LayRailPathFinder extends AlongTrackPathFinder {
 						Blocks.redstone_block)) {
 			return distance + 2;
 		} else if (isOnTrack(x, z) && y == cy
-				&& !helper.isRailBlock(helper.getBlock(x, y, z))) {
+				&& !AIHelper.railBlocks.contains(helper.getBlock(x, y, z))) {
 			return distance + 5;
 		} else {
 			return -1;
@@ -49,21 +50,18 @@ public class LayRailPathFinder extends AlongTrackPathFinder {
 
 	@Override
 	protected void addTasksForTarget(Pos currentPos) {
-		if (isRedstoneBlockPosition(currentPos.x, currentPos.y, currentPos.z)) {
+		if (isRedstoneBlockPosition(currentPos.getX(), currentPos.getY(), currentPos.getZ())) {
 			// For those server lags
-			addTask(new UpwardsMoveTask(currentPos.x, currentPos.y + 1,
-					currentPos.z, new BlockItemFilter(Blocks.redstone_block)));
-		} else if (placeAccRail(currentPos.x, currentPos.z)) {
-			if (!Block.isEqualTo(helper.getBlock(currentPos.x,
-					currentPos.y - 1, currentPos.z), Blocks.redstone_block)
-					&& helper.hasSafeSides(currentPos.x, currentPos.y - 1,
-							currentPos.z)
-					&& helper.isSafeGroundBlock(currentPos.x, currentPos.y - 2,
-							currentPos.z)) {
-				addTask(new DownwardsMoveTask(currentPos.x, currentPos.y - 1,
-						currentPos.z));
-				addTask(new UpwardsMoveTask(currentPos.x, currentPos.y,
-						currentPos.z,
+			addTask(new UpwardsMoveTask(currentPos.add(0,1,0), new BlockItemFilter(Blocks.redstone_block)));
+		} else if (placeAccRail(currentPos.getX(), currentPos.getZ())) {
+			if (!Block.isEqualTo(helper.getBlock(currentPos.getX(),
+					currentPos.getY() - 1, currentPos.getZ()), Blocks.redstone_block)
+					&& helper.hasSafeSides(currentPos.getX(), currentPos.getY() - 1,
+							currentPos.getZ())
+					&& helper.isSafeGroundBlock(currentPos.getX(), currentPos.getY() - 2,
+							currentPos.getZ())) {
+				addTask(new DownwardsMoveTask(currentPos.add(0,-1,0)));
+				addTask(new UpwardsMoveTask(currentPos,
 						new BlockItemFilter(Blocks.redstone_block)));
 			}
 			placeRail(currentPos, Blocks.golden_rail);
@@ -73,11 +71,10 @@ public class LayRailPathFinder extends AlongTrackPathFinder {
 	}
 
 	private void placeRail(Pos currentPos, Block rail) {
-		if (!helper.isAirBlock(currentPos.x, currentPos.y, currentPos.z)) {
-			addTask(new MineBlockTask(currentPos.x, currentPos.y, currentPos.z));
+		if (!helper.isAirBlock(currentPos.getX(), currentPos.getY(), currentPos.getZ())) {
+			addTask(new MineBlockTask(currentPos));
 		}
-		addTask(new PlaceBlockAtFloorTask(currentPos.x, currentPos.y,
-				currentPos.z, new BlockItemFilter(rail)));
+		addTask(new PlaceBlockAtFloorTask(currentPos, new BlockItemFilter(rail)));
 	}
 
 	@Override

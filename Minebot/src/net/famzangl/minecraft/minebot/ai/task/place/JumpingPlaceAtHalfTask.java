@@ -5,32 +5,33 @@ import net.famzangl.minecraft.minebot.ai.ItemFilter;
 import net.famzangl.minecraft.minebot.ai.strategy.TaskOperations;
 import net.famzangl.minecraft.minebot.ai.task.BlockSide;
 import net.famzangl.minecraft.minebot.ai.task.error.StringTaskError;
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraft.util.BlockPos;
+import net.minecraft.util.EnumFacing;
 
 public class JumpingPlaceAtHalfTask extends JumpingPlaceBlockAtFloorTask {
 
-	public final static ForgeDirection[] TRY_FOR_LOWER = new ForgeDirection[] {
-			ForgeDirection.DOWN, ForgeDirection.EAST, ForgeDirection.NORTH,
-			ForgeDirection.WEST, ForgeDirection.SOUTH };
+	public final static EnumFacing[] TRY_FOR_LOWER = new EnumFacing[] {
+			EnumFacing.DOWN, EnumFacing.EAST, EnumFacing.NORTH,
+			EnumFacing.WEST, EnumFacing.SOUTH };
 
-	public final static ForgeDirection[] TRY_FOR_UPPER = new ForgeDirection[] {
-			ForgeDirection.EAST, ForgeDirection.NORTH, ForgeDirection.WEST,
-			ForgeDirection.SOUTH };
+	public final static EnumFacing[] TRY_FOR_UPPER = new EnumFacing[] {
+			EnumFacing.EAST, EnumFacing.NORTH, EnumFacing.WEST,
+			EnumFacing.SOUTH };
 
 	protected BlockSide side;
-	protected ForgeDirection lookingDirection = ForgeDirection.UNKNOWN;
+	protected EnumFacing lookingDirection = null;
 
 	private int attempts;
 
-	public JumpingPlaceAtHalfTask(int x, int y, int z, ItemFilter filter,
+	public JumpingPlaceAtHalfTask(BlockPos pos, ItemFilter filter,
 			BlockSide side) {
-		super(x, y, z, filter);
+		super(pos, filter);
 		this.side = side;
 	}
 
 	@Override
 	protected void faceBlock(AIHelper h, TaskOperations o) {
-		final ForgeDirection[] dirs = getBuildDirs();
+		final EnumFacing[] dirs = getBuildDirs();
 		for (int i = 0; i < dirs.length; i++) {
 			if (faceSideBlock(h, dirs[attempts++ % dirs.length])) {
 				return;
@@ -39,39 +40,32 @@ public class JumpingPlaceAtHalfTask extends JumpingPlaceBlockAtFloorTask {
 		o.desync(new StringTaskError("Could not face anywhere to place."));
 	}
 
-	protected ForgeDirection[] getBuildDirs() {
+	protected EnumFacing[] getBuildDirs() {
 		return side == BlockSide.UPPER_HALF ? TRY_FOR_UPPER : TRY_FOR_LOWER;
 	}
 
-	protected boolean faceSideBlock(AIHelper h, ForgeDirection dir) {
+	protected boolean faceSideBlock(AIHelper h, EnumFacing dir) {
 		System.out.println("Facing side " + dir);
-		final int x2 = x + dir.offsetX;
-		final int y2 = getPlaceAtY() + dir.offsetY;
-		final int z2 = z + dir.offsetZ;
-		if (h.isAirBlock(x2, y2, z2)) {
+		BlockPos facingBlock = getPlaceAtPos().offset(dir);
+		if (h.isAirBlock(facingBlock)) {
 			return false;
 		} else {
-			h.faceSideOf(x2, y2, z2, dir.getOpposite(),
+			h.faceSideOf(facingBlock, dir.getOpposite(),
 					getSide(dir) == BlockSide.UPPER_HALF ? 0.5 : 0,
 					getSide(dir) == BlockSide.LOWER_HALF ? 0.5 : 1,
-					h.getMinecraft().thePlayer.posX - x,
-					h.getMinecraft().thePlayer.posZ - z, lookingDirection);
+					h.getMinecraft().thePlayer.posX - pos.getX(),
+					h.getMinecraft().thePlayer.posZ - pos.getZ(), lookingDirection);
 			return true;
 		}
 	}
 
-	protected boolean isFacing(AIHelper h, ForgeDirection dir) {
-		return h.isFacingBlock(x + dir.offsetX, getPlaceAtY() + dir.offsetY, z
-				+ dir.offsetZ, dir.getOpposite(), getSide(dir));
-	}
-
-	private BlockSide getSide(ForgeDirection dir) {
-		return dir.offsetY < 0 ? BlockSide.UPPER_HALF : BlockSide.LOWER_HALF;
+	protected BlockSide getSide(EnumFacing dir) {
+		return dir == EnumFacing.DOWN ? BlockSide.UPPER_HALF : BlockSide.LOWER_HALF;
 	}
 
 	@Override
 	protected boolean isFacingRightBlock(AIHelper h) {
-		for (final ForgeDirection d : getBuildDirs()) {
+		for (final EnumFacing d : getBuildDirs()) {
 			if (isFacing(h, d)) {
 				return true;
 			}

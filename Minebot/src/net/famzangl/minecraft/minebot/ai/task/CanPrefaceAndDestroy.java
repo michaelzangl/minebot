@@ -2,8 +2,8 @@ package net.famzangl.minecraft.minebot.ai.task;
 
 import java.util.List;
 
-import net.famzangl.minecraft.minebot.Pos;
 import net.famzangl.minecraft.minebot.ai.AIHelper;
+import net.minecraft.util.BlockPos;
 
 public interface CanPrefaceAndDestroy {
 
@@ -16,6 +16,6 @@ public interface CanPrefaceAndDestroy {
 	 * 
 	 * @return
 	 */
-	List<Pos> getPredestroyPositions(AIHelper helper);
+	List<BlockPos> getPredestroyPositions(AIHelper helper);
 
 }

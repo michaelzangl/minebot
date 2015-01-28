@@ -1,20 +1,22 @@
 package net.famzangl.minecraft.minebot.ai.selectors;
 
-import net.minecraft.command.IEntitySelector;
+import com.google.common.base.Predicate;
+
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.passive.EntitySheep;
 import net.minecraft.entity.passive.EntityWolf;
+import net.minecraft.item.EnumDyeColor;
 
-public final class ColorSelector implements IEntitySelector {
-	private final int color;
+public final class ColorSelector implements Predicate<Entity> {
+	private final EnumDyeColor color;
 
-	public ColorSelector(int color) {
+	public ColorSelector(EnumDyeColor color) {
 		super();
 		this.color = color;
 	}
 
 	@Override
-	public boolean isEntityApplicable(Entity var1) {
+	public boolean apply(Entity var1) {
 		if (var1 instanceof EntityWolf) {
 			return ((EntityWolf) var1).getCollarColor() == color;
 		} else if (var1 instanceof EntitySheep) {

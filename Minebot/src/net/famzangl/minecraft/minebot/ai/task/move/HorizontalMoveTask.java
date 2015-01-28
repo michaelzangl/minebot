@@ -5,49 +5,49 @@ import java.util.List;
 
 import net.famzangl.minecraft.minebot.Pos;
 import net.famzangl.minecraft.minebot.ai.AIHelper;
+import net.famzangl.minecraft.minebot.ai.BlockWhitelist;
 import net.famzangl.minecraft.minebot.ai.strategy.TaskOperations;
 import net.famzangl.minecraft.minebot.ai.task.AITask;
 import net.famzangl.minecraft.minebot.ai.task.CanPrefaceAndDestroy;
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
+import net.minecraft.util.BlockPos;
 
 public class HorizontalMoveTask extends AITask implements CanPrefaceAndDestroy {
+	private static final BlockWhitelist hardBlocks = new BlockWhitelist(
+			Blocks.obsidian);
 	static final int OBSIDIAN_TIME = 10 * 20;
-	protected final int x;
-	protected final int y;
-	protected final int z;
+	protected final BlockPos pos;
 	private boolean hasObsidianLower;
 	private boolean hasObsidianUpper;
 
-	public HorizontalMoveTask(int x, int y, int z) {
-		this.x = x;
-		this.y = y;
-		this.z = z;
+	public HorizontalMoveTask(BlockPos pos) {
+		this.pos = pos;
 	}
 
 	@Override
 	public boolean isFinished(AIHelper h) {
-		return h.isStandingOn(x, y, z);
+		return h.isStandingOn(pos);
 	}
 
 	@Override
 	public void runTick(AIHelper h, TaskOperations o) {
-		Block upper = h.getBlock(x, y + 1, z);
+		Block upper = h.getBlock(pos.add(0,1,0));
 		if (!h.canWalkThrough(upper)) {
-			if (AIHelper.blockIsOneOf(upper, Blocks.obsidian)) {
+			if (hardBlocks.contains(upper)) {
 				hasObsidianUpper = true;
 			}
-			h.faceAndDestroyWithHangingBlock(x, y + 1, z);
+			h.faceAndDestroyWithHangingBlock(pos.add(0,1,0));
 		} else {
-			Block lower = h.getBlock(x, y, z);
+			Block lower = h.getBlock(pos);
 			if (!h.canWalkOn(lower)) {
-				if (AIHelper.blockIsOneOf(lower, Blocks.obsidian)) {
+				if (hardBlocks.contains(lower)) {
 					hasObsidianLower = true;
 				}
-				h.faceAndDestroyWithHangingBlock(x, y, z);
+				h.faceAndDestroyWithHangingBlock(pos);
 			} else {
 				final boolean nextIsFacing = o.faceAndDestroyForNextTask();
-				h.walkTowards(x + 0.5, z + 0.5, doJump(h), !nextIsFacing);
+				h.walkTowards(pos.getX() + 0.5, pos.getZ() + 0.5, doJump(h), !nextIsFacing);
 			}
 		}
 	}
@@ -61,19 +61,20 @@ public class HorizontalMoveTask extends AITask implements CanPrefaceAndDestroy {
 		return false;
 	}
 
+
 	@Override
 	public String toString() {
-		return "HorizontalMoveTask [x=" + x + ", y=" + y + ", z=" + z + "]";
+		return "HorizontalMoveTask [pos=" + pos + "]";
 	}
 
 	@Override
-	public List<Pos> getPredestroyPositions(AIHelper helper) {
-		final ArrayList<Pos> arrayList = new ArrayList<Pos>();
-		if (!helper.canWalkThrough(helper.getBlock(x, y + 1, z))) {
-			arrayList.add(new Pos(x, y + 1, z));
+	public List<BlockPos> getPredestroyPositions(AIHelper helper) {
+		final ArrayList<BlockPos> arrayList = new ArrayList<BlockPos>();
+		if (!helper.canWalkThrough(helper.getBlock(pos.add(0,1,0)))) {
+			arrayList.add(pos.add(0,1,0));
 		}
-		if (!helper.canWalkOn(helper.getBlock(x, y, z))) {
-			arrayList.add(new Pos(x, y, z));
+		if (!helper.canWalkOn(helper.getBlock(pos))) {
+			arrayList.add(pos);
 		}
 		return arrayList;
 	}

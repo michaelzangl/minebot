@@ -12,6 +12,7 @@ import net.famzangl.minecraft.minebot.ai.strategy.AIStrategy;
 import net.famzangl.minecraft.minebot.ai.strategy.PathFinderStrategy;
 import net.famzangl.minecraft.minebot.build.ForBuildPathFinder;
 import net.famzangl.minecraft.minebot.build.blockbuild.BuildTask;
+import net.minecraft.util.BlockPos;
 
 @AICommand(helpText = "Go to next building site.", name = "minebuild")
 public class CommandStepWalk {
@@ -31,7 +32,7 @@ public class CommandStepWalk {
 			return new PathFinderStrategy(pf, "Going to building site.") {
 				@Override
 				public void searchTasks(AIHelper helper) {
-					final Pos atTarget = CommandBuild
+					final BlockPos atTarget = CommandBuild
 							.isAroundSite(helper, task);
 					if (atTarget == null) {
 						super.searchTasks(helper);

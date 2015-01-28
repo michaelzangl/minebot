@@ -5,7 +5,7 @@ import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.path.MovePathFinder;
 import net.famzangl.minecraft.minebot.ai.render.PosMarkerRenderer;
 import net.famzangl.minecraft.minebot.ai.task.WaitTask;
-import net.minecraftforge.client.event.RenderWorldLastEvent;
+import net.minecraftforge.fml.common.gameevent.TickEvent.RenderTickEvent;
 
 public class PathFinderStrategy extends TaskStrategy {
 	private final MovePathFinder pathFinder;
@@ -73,7 +73,7 @@ public class PathFinderStrategy extends TaskStrategy {
 	}
 
 	@Override
-	public void drawMarkers(RenderWorldLastEvent event, AIHelper helper) {
+	public void drawMarkers(RenderTickEvent event, AIHelper helper) {
 		Pos target = pathFinder.getCurrentTarget();
 		if (target != null) {
 			renderer.render(event, helper, target, target.add(0, 1, 0));

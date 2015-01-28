@@ -5,13 +5,16 @@ import java.util.Collections;
 
 import net.famzangl.minecraft.minebot.Pos;
 import net.famzangl.minecraft.minebot.ai.AIHelper;
+import net.famzangl.minecraft.minebot.ai.BlockWhitelist;
 import net.famzangl.minecraft.minebot.ai.task.DestroyInRangeTask;
 import net.famzangl.minecraft.minebot.ai.task.PlaceTorchSomewhereTask;
 import net.minecraft.init.Blocks;
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraft.util.EnumFacing;
 
 public class TunnelPathFinder extends AlongTrackPathFinder {
 
+	private final static BlockWhitelist tunneled = AIHelper.air.unionWith(AIHelper.torches);
+	
 	private final int addToSide;
 	private final int addToTop;
 	private final TorchSide torches;
@@ -46,8 +49,7 @@ public class TunnelPathFinder extends AlongTrackPathFinder {
 	protected float rateDestination(int distance, int x, int y, int z) {
 		if (isOnTrack(x, z)
 				&& y == cy
-				&& !AIHelper.blockIsOneOf(helper.getBlock(x, y, z), Blocks.air,
-						Blocks.torch)) {
+				&& !tunneled.contains(helper.getBlockId(x, y, z))) {
 			return distance + 1;
 		} else {
 			return -1;
@@ -58,17 +60,17 @@ public class TunnelPathFinder extends AlongTrackPathFinder {
 	protected void addTasksForTarget(Pos currentPos) {
 		Pos p1, p2;
 		if (dx == 0) {
-			p1 = new Pos(currentPos.x + addToSide, currentPos.y, currentPos.z);
-			p2 = new Pos(currentPos.x - addToSide, currentPos.y + 1 + addToTop,
-					currentPos.z);
+			p1 = new Pos(currentPos.getX() + addToSide, currentPos.getY(), currentPos.getZ());
+			p2 = new Pos(currentPos.getX() - addToSide, currentPos.getY() + 1 + addToTop,
+					currentPos.getZ());
 		} else {
-			p1 = new Pos(currentPos.x, currentPos.y, currentPos.z + addToSide);
-			p2 = new Pos(currentPos.x, currentPos.y + 1 + addToTop,
-					currentPos.z - addToSide);
+			p1 = new Pos(currentPos.getX(), currentPos.getY(), currentPos.getZ() + addToSide);
+			p2 = new Pos(currentPos.getX(), currentPos.getY() + 1 + addToTop,
+					currentPos.getZ() - addToSide);
 		}
 		addTask(new DestroyInRangeTask(p1, p2));
 
-		final boolean isTorchStep = getStepNumber(currentPos.x, currentPos.z) % 8 == 0;
+		final boolean isTorchStep = getStepNumber(currentPos.getX(), currentPos.getZ()) % 8 == 0;
 		if (torches.right && isTorchStep) {
 			addTorchesTask(currentPos, -dz, dx);
 		}
@@ -77,21 +79,21 @@ public class TunnelPathFinder extends AlongTrackPathFinder {
 		}
 		if (torches.floor && isTorchStep) {
 			addTask(new PlaceTorchSomewhereTask(
-					Collections.singletonList(currentPos), ForgeDirection.DOWN));
+					Collections.singletonList(currentPos), EnumFacing.DOWN));
 		}
 	}
 
 	private void addTorchesTask(Pos currentPos, int dirX, int dirZ) {
 		final ArrayList<Pos> positions = new ArrayList<Pos>();
-		positions.add(new Pos(currentPos.x + dirX * addToSide,
-				currentPos.y + 1, currentPos.z + dirZ * addToSide));
+		positions.add(new Pos(currentPos.getX() + dirX * addToSide,
+				currentPos.getY() + 1, currentPos.getZ() + dirZ * addToSide));
 
 		for (int i = addToSide; i >= 0; i--) {
-			positions.add(new Pos(currentPos.x + dirX * i, currentPos.y,
-					currentPos.z + dirZ * i));
+			positions.add(new Pos(currentPos.getX() + dirX * i, currentPos.getY(),
+					currentPos.getZ() + dirZ * i));
 		}
 		addTask(new PlaceTorchSomewhereTask(positions,
-				AIHelper.getDirectionForXZ(dirX, dirZ), ForgeDirection.DOWN));
+				AIHelper.getDirectionForXZ(dirX, dirZ), EnumFacing.DOWN));
 	}
 
 	@Override

@@ -9,7 +9,8 @@ import net.famzangl.minecraft.minebot.Pos;
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.build.BuildManager;
 import net.famzangl.minecraft.minebot.build.blockbuild.BuildTask;
-import net.minecraftforge.client.event.RenderWorldLastEvent;
+import net.minecraft.util.BlockPos;
+import net.minecraftforge.fml.common.gameevent.TickEvent.RenderTickEvent;
 
 public class BuildMarkerRenderer extends RenderHelper {
 
@@ -25,10 +26,10 @@ public class BuildMarkerRenderer extends RenderHelper {
 
 		@Override
 		public int compare(BuildTask o1, BuildTask o2) {
-			final Pos p1 = o1.getForPosition();
-			final Pos p2 = o2.getForPosition();
-			final int[] points = new int[] { p1.x, p1.y, p1.z };
-			final int[] points2 = new int[] { p2.x, p2.y, p2.z };
+			final BlockPos p1 = o1.getForPosition();
+			final BlockPos p2 = o2.getForPosition();
+			final int[] points = new int[] { p1.getX(), p1.getY(), p1.getZ() };
+			final int[] points2 = new int[] { p2.getX(), p2.getY(), p2.getZ() };
 			for (int i = 0; i < 3; i++) {
 				final int res = ((Integer) points[orders[i]])
 						.compareTo(points2[orders[i]]);
@@ -40,32 +41,32 @@ public class BuildMarkerRenderer extends RenderHelper {
 		}
 	}
 
-	public void render(RenderWorldLastEvent event, AIHelper helper) {
+	public void render(RenderTickEvent event, AIHelper helper) {
 		renderStart(event, helper);
 		final BuildManager buildManager = helper.buildManager;
 		final List<BuildTask> scheduled = buildManager.getScheduled();
 		if (scheduled.size() > 0) {
 			final BuildTask nextTask = scheduled.get(0);
-			final HashSet<Pos> corners = new HashSet<Pos>();
+			final HashSet<BlockPos> corners = new HashSet<BlockPos>();
 
 			renderMarker(nextTask.getForPosition(), 1, 1, 0, 0.7f);
 			findCorners(corners, scheduled);
 			corners.remove(nextTask.getForPosition());
-			for (final Pos c : corners) {
+			for (final BlockPos c : corners) {
 				renderMarker(c, 0, 0, 1, 0.5f);
 			}
 		}
 		renderEnd();
 	}
 
-	private void findCorners(HashSet<Pos> corners, List<BuildTask> scheduled) {
+	private void findCorners(HashSet<BlockPos> corners, List<BuildTask> scheduled) {
 		for (int i = 0; i < 3; i++) {
 			addWith(corners, scheduled, i, true);
 			addWith(corners, scheduled, i, false);
 		}
 	}
 
-	private void addWith(HashSet<Pos> corners, List<BuildTask> scheduled,
+	private void addWith(HashSet<BlockPos> corners, List<BuildTask> scheduled,
 			int side1, boolean side1Inverted) {
 		for (int i = 0; i < 3; i++) {
 			if (i != side1) {
@@ -75,7 +76,7 @@ public class BuildMarkerRenderer extends RenderHelper {
 		}
 	}
 
-	private void addWith(HashSet<Pos> corners, List<BuildTask> scheduled,
+	private void addWith(HashSet<BlockPos> corners, List<BuildTask> scheduled,
 			int side1, boolean side1Inverted, int side2, boolean side2Inverted) {
 		for (int i = 0; i < 3; i++) {
 			if (i != side1 && i != side2) {
@@ -87,7 +88,7 @@ public class BuildMarkerRenderer extends RenderHelper {
 		}
 	}
 
-	private void addWith(HashSet<Pos> corners, List<BuildTask> scheduled,
+	private void addWith(HashSet<BlockPos> corners, List<BuildTask> scheduled,
 			int side1, boolean side1Inverted, int side2, boolean side2Inverted,
 			int side3, boolean side3Inverted) {
 		final BuildTask p = Collections.min(scheduled, new CornerComparator(

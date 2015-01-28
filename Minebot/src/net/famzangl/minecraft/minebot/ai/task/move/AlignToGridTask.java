@@ -25,7 +25,7 @@ public class AlignToGridTask extends AITask {
 	}
 
 	public AlignToGridTask(Pos p) {
-		this(p.x, p.y, p.z);
+		this(p.getX(), p.getY(), p.getZ());
 	}
 
 	@Override

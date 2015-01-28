@@ -1,43 +1,45 @@
 package net.famzangl.minecraft.minebot.ai.task.move;
 
 import net.famzangl.minecraft.minebot.ai.AIHelper;
+import net.famzangl.minecraft.minebot.ai.BlockWhitelist;
 import net.famzangl.minecraft.minebot.ai.strategy.TaskOperations;
 import net.famzangl.minecraft.minebot.ai.task.AITask;
 import net.famzangl.minecraft.minebot.ai.task.error.PositionTaskError;
 import net.minecraft.init.Blocks;
+import net.minecraft.util.BlockPos;
 
 public class DownwardsMoveTask extends AITask {
-	private final int x;
-	private final int y;
-	private final int z;
-	private boolean obsidianMining;
 
-	public DownwardsMoveTask(int x, int y, int z) {
-		this.x = x;
-		this.y = y;
-		this.z = z;
+	private static final BlockWhitelist hardBlocks = new BlockWhitelist(
+			Blocks.obsidian);
+	
+	private boolean obsidianMining;
+	private BlockPos pos;
+
+	public DownwardsMoveTask(BlockPos pos) {
+		this.pos = pos;
 	}
 
 	@Override
 	public boolean isFinished(AIHelper h) {
-		return h.isStandingOn(x, y, z);
+		return h.isStandingOn(pos);
 	}
 
 	@Override
 	public void runTick(AIHelper h, TaskOperations o) {
-		if (!h.isAirBlock(x, y + 1, z) && !h.isSideTorch(x, y + 1, z)) {
+		if (!h.isAirBlock(pos.add(0,1,0)) && !h.isSideTorch(pos.add(0,1,0))) {
 			// grass, ...
-			h.faceAndDestroy(x, y + 1, z);
-		} else if (!h.isAirBlock(x, y, z)) {
-			if (!h.isStandingOn(x, y + 1, z)) {
+			h.faceAndDestroy(pos.add(0,1,0));
+		} else if (!h.isAirBlock(pos)) {
+			if (!h.isStandingOn(pos.add(0,1,0))) {
 				System.out.println("Not standing on the right block.");
-				o.desync(new PositionTaskError(x, y + 1, z));
+				o.desync(new PositionTaskError(pos.add(0,1,0)));
 			}
-			if (AIHelper.blockIsOneOf(h.getBlock(x, y, z), Blocks.obsidian)) {
+			if (hardBlocks.contains(h.getBlock(pos))) {
 				obsidianMining = true;
 			}
 
-			h.faceAndDestroy(x, y, z);
+			h.faceAndDestroy(pos);
 		}
 	}
 
@@ -49,6 +51,7 @@ public class DownwardsMoveTask extends AITask {
 
 	@Override
 	public String toString() {
-		return "DownwardsMoveTask [x=" + x + ", y=" + y + ", z=" + z + "]";
+		return "DownwardsMoveTask [obsidianMining=" + obsidianMining + ", pos="
+				+ pos + "]";
 	}
 }

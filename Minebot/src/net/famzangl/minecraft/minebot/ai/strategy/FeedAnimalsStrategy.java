@@ -9,23 +9,26 @@ import net.famzangl.minecraft.minebot.ai.selectors.FilterFeedingItem;
 import net.famzangl.minecraft.minebot.ai.selectors.OrSelector;
 import net.famzangl.minecraft.minebot.ai.selectors.XPOrbSelector;
 import net.famzangl.minecraft.minebot.ai.task.FaceAndInteractTask;
-import net.minecraft.command.IEntitySelector;
+
+import com.google.common.base.Predicate;
+
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.passive.EntityAnimal;
 import net.minecraft.init.Items;
+import net.minecraft.item.EnumDyeColor;
 import net.minecraft.item.ItemSeeds;
 import net.minecraft.item.ItemStack;
 
 public class FeedAnimalsStrategy extends TaskStrategy {
 
 	private static final int DISTANCE = 20;
-	private final int color;
+	private final EnumDyeColor color;
 
 	public FeedAnimalsStrategy() {
-		this(-1);
+		this(null);
 	}
 
-	public FeedAnimalsStrategy(int color) {
+	public FeedAnimalsStrategy(EnumDyeColor color) {
 		this.color = color;
 	}
 
@@ -35,12 +38,12 @@ public class FeedAnimalsStrategy extends TaskStrategy {
 	}
 
 	private void feedWithFood(AIHelper helper) {
-		IEntitySelector selector = new FeedableSelector(helper);
-		if (color >= 0) {
+		Predicate<Entity> selector = new FeedableSelector(helper);
+		if (color != null) {
 			selector = new AndSelector(selector, new ColorSelector(color));
 		}
 
-		final IEntitySelector collect = new XPOrbSelector();
+		final Predicate<Entity> collect = new XPOrbSelector();
 
 		final Entity found = helper.getClosestEntity(DISTANCE, new OrSelector(
 				selector, collect));

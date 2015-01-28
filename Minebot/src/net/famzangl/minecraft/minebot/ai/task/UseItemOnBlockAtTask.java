@@ -2,38 +2,34 @@ package net.famzangl.minecraft.minebot.ai.task;
 
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.ItemFilter;
+import net.minecraft.util.BlockPos;
 
 public class UseItemOnBlockAtTask extends UseItemTask {
 
-	private final int x, y, z;
+	private final BlockPos pos;
 
-	public UseItemOnBlockAtTask(ItemFilter filter, int x, int y, int z) {
+	public UseItemOnBlockAtTask(ItemFilter filter,  BlockPos pos) {
 		super(filter);
-		this.x = x;
-		this.y = y;
-		this.z = z;
+		this.pos = pos;
 	}
 
-	public UseItemOnBlockAtTask(int x, int y, int z) {
+	public UseItemOnBlockAtTask(BlockPos pos) {
 		super();
-		this.x = x;
-		this.y = y;
-		this.z = z;
+		this.pos = pos;
 	}
 
 	@Override
 	public String toString() {
-		return "UseItemOnBlockAtTask [x=" + x + ", y=" + y + ", z=" + z + "]";
+		return "UseItemOnBlockAtTask [pos=" + pos + "]";
 	}
 
 	@Override
-	protected boolean isBlockAllowed(AIHelper h, int blockX, int blockY,
-			int blockZ) {
-		return blockX == x && blockY == y && blockZ == z;
+	protected boolean isBlockAllowed(AIHelper h, BlockPos pos) {
+		return this.pos.equals(pos);
 	}
 
 	@Override
 	protected void notFacingBlock(AIHelper h) {
-		h.faceBlock(x, y, z);
+		h.faceBlock(pos);
 	}
 }

@@ -6,6 +6,7 @@ import net.famzangl.minecraft.minebot.ai.BlockWhitelist;
 import net.famzangl.minecraft.minebot.ai.ItemFilter;
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
+import net.minecraft.util.BlockPos;
 
 public class ItemPlaceOnGroundTask extends BuildFlatOnGroundTask {
 
@@ -24,7 +25,7 @@ public class ItemPlaceOnGroundTask extends BuildFlatOnGroundTask {
 			Blocks.sand, Blocks.stonebrick, Blocks.tnt);
 	private final Block block;
 
-	protected ItemPlaceOnGroundTask(Pos forPosition, Block block) {
+	protected ItemPlaceOnGroundTask(BlockPos forPosition, Block block) {
 		super(forPosition);
 		this.block = block;
 	}
@@ -35,7 +36,7 @@ public class ItemPlaceOnGroundTask extends BuildFlatOnGroundTask {
 	}
 
 	@Override
-	public BuildTask withPositionAndRotation(Pos add, int rotateSteps,
+	public BuildTask withPositionAndRotation(BlockPos add, int rotateSteps,
 			MirrorDirection mirror) {
 		return new ItemPlaceOnGroundTask(add, block);
 	}

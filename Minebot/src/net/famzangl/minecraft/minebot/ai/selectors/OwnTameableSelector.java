@@ -2,12 +2,12 @@ package net.famzangl.minecraft.minebot.ai.selectors;
 
 import java.lang.reflect.Method;
 
-import net.minecraft.command.IEntitySelector;
+import com.google.common.base.Predicate;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.passive.EntityTameable;
 
-public class OwnTameableSelector implements IEntitySelector {
+public class OwnTameableSelector implements Predicate<Entity> {
 	private final EntityLivingBase owner;
 
 	public OwnTameableSelector(EntityLivingBase owner) {
@@ -16,7 +16,7 @@ public class OwnTameableSelector implements IEntitySelector {
 	}
 
 	@Override
-	public boolean isEntityApplicable(Entity var1) {
+	public boolean apply(Entity var1) {
 		return var1 instanceof EntityTameable && isMine((EntityTameable) var1);
 	}
 

@@ -7,15 +7,15 @@ import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.strategy.TaskOperations;
 import net.famzangl.minecraft.minebot.ai.task.AITask;
 import net.minecraft.client.Minecraft;
-import net.minecraft.command.IEntitySelector;
+import com.google.common.base.Predicate;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.util.AxisAlignedBB;
 
 public class FaceAnyMobTask extends AITask {
-	private final class LivingSelector implements IEntitySelector {
+	private final class LivingSelector implements Predicate<Entity> {
 		@Override
-		public boolean isEntityApplicable(Entity var1) {
+		public boolean apply(Entity var1) {
 			// TODO: better filter
 			return var1 instanceof EntityLiving;
 		}
@@ -43,7 +43,7 @@ public class FaceAnyMobTask extends AITask {
 			System.out.println("Face next entity in range");
 			final int n = new Random().nextInt(entsInBBList.size());
 			final Entity e = entsInBBList.get(n);
-			final AxisAlignedBB ebb = e.boundingBox;
+			final AxisAlignedBB ebb = e.getEntityBoundingBox();
 			h.face((ebb.maxX + ebb.minX) / 2, ebb.minY + 0.2,
 					(ebb.maxZ + ebb.minZ) / 2);
 		}

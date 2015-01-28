@@ -26,21 +26,21 @@ public class DoNotSuffocateStrategy extends AIStrategy {
 	protected TickResult onGameTick(AIHelper helper) {
 		Pos p = helper.getPlayerPosition();
 		if (!safeGround(helper, p)) {
-			helper.faceAndDestroy(p.x, p.y, p.z);
+			helper.faceAndDestroy(p);
 			return TickResult.TICK_HANDLED;
 		} else if (!safeHead(helper, p)) {
-			helper.faceAndDestroy(p.x, p.y + 1, p.z);
+			helper.faceAndDestroy(p.add(0,1,0));
 			return TickResult.TICK_HANDLED;
 		}
 		return TickResult.NO_MORE_WORK;
 	}
 
 	private boolean safeHead(AIHelper helper, Pos p) {
-		return helper.canWalkThrough(helper.getBlock(p.x, p.y + 1, p.z));
+		return helper.canWalkThrough(helper.getBlock(p.getX(), p.getY() + 1, p.getZ()));
 	}
 
 	private boolean safeGround(AIHelper helper, Pos p) {
-		return helper.canWalkOn(helper.getBlock(p.x, p.y, p.z));
+		return helper.canWalkOn(helper.getBlock(p.getX(), p.getY(), p.getZ()));
 	}
 	
 	@Override

@@ -50,6 +50,8 @@ public class ColorNameBuilder extends ParameterBuilder {
 		for (int i = 0; i < colors.length; i++) {
 			final String color = colors[i];
 			if (color.equalsIgnoreCase(arguments[0])) {
+				// FIXME: REturn color object.
+				// EnumDyeColor
 				return i;
 			}
 		}

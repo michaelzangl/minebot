@@ -3,6 +3,7 @@ package net.famzangl.minecraft.minebot.ai.task;
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.ItemFilter;
 import net.famzangl.minecraft.minebot.ai.strategy.TaskOperations;
+import net.minecraft.util.BlockPos;
 import net.minecraft.util.MovingObjectPosition;
 
 public class UseItemTask extends AITask {
@@ -37,8 +38,7 @@ public class UseItemTask extends AITask {
 				notFacingBlock(h);
 				return;
 			}
-			if (!isBlockAllowed(h, objectMouseOver.blockX,
-					objectMouseOver.blockY, objectMouseOver.blockZ)) {
+			if (!isBlockAllowed(h, objectMouseOver.getBlockPos())) {
 				notFacingBlock(h);
 				return;
 			}
@@ -51,8 +51,7 @@ public class UseItemTask extends AITask {
 	protected void notFacingBlock(AIHelper h) {
 	}
 
-	protected boolean isBlockAllowed(AIHelper h, int blockX, int blockY,
-			int blockZ) {
+	protected boolean isBlockAllowed(AIHelper h, BlockPos pos) {
 		return true;
 	}
 }

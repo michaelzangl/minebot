@@ -1,32 +1,29 @@
 package net.famzangl.minecraft.minebot.ai.task;
 
+import net.famzangl.minecraft.minebot.Pos;
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.strategy.TaskOperations;
 
 public class MineBlockTask extends AITask {
-	private final int x;
-	private final int y;
-	private final int z;
+	private Pos pos;
 
-	public MineBlockTask(int x, int y, int z) {
-		this.x = x;
-		this.y = y;
-		this.z = z;
+	public MineBlockTask(Pos pos) {
+		this.pos = pos;
 	}
 
 	@Override
 	public boolean isFinished(AIHelper h) {
-		return h.isAirBlock(x, y, z);
+		return h.isAirBlock(pos);
 	}
 
 	@Override
 	public void runTick(AIHelper h, TaskOperations o) {
-		h.faceAndDestroy(x, y, z);
+		h.faceAndDestroy(pos);
 	}
 
 	@Override
 	public String toString() {
-		return "MineBlockTask [x=" + x + ", y=" + y + ", z=" + z + "]";
+		return "MineBlockTask [pos=" + pos + "]";
 	}
 
 }

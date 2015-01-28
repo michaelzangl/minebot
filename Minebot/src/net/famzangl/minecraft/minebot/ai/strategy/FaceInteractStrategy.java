@@ -2,9 +2,10 @@ package net.famzangl.minecraft.minebot.ai.strategy;
 
 import java.util.ArrayList;
 
+import com.google.common.base.Predicate;
+
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.selectors.AndSelector;
-import net.minecraft.command.IEntitySelector;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.MovementInput;
 import net.minecraft.util.MovingObjectPosition;
@@ -13,9 +14,9 @@ import net.minecraft.util.MovingObjectPosition.MovingObjectType;
 public abstract class FaceInteractStrategy extends AIStrategy {
 
 	private final class NotOnBlacklistSelector implements
-			IEntitySelector {
+			Predicate<Entity> {
 		@Override
-		public boolean isEntityApplicable(Entity var1) {
+		public boolean apply(Entity var1) {
 			return !blacklist.contains(var1);
 		}
 	}
@@ -74,7 +75,7 @@ public abstract class FaceInteractStrategy extends AIStrategy {
 	}
 
 	protected boolean doInteractWithCurrent(Entity entityHit, AIHelper helper) {
-		if (entitiesToInteract(helper).isEntityApplicable(entityHit)) {
+		if (entitiesToInteract(helper).apply(entityHit)) {
 			doInteract(entityHit, helper);
 			return true;
 		} else {
@@ -87,14 +88,14 @@ public abstract class FaceInteractStrategy extends AIStrategy {
 	}
 
 	private Entity getCloseEntity(AIHelper helper) {
-		IEntitySelector collect = entitiesToFace(helper);
+		Predicate<Entity> collect = entitiesToFace(helper);
 		collect = new AndSelector(collect, new NotOnBlacklistSelector());
 		return helper.getClosestEntity(DISTANCE, collect);
 	}
 
-	protected abstract IEntitySelector entitiesToInteract(AIHelper helper);
+	protected abstract Predicate<Entity> entitiesToInteract(AIHelper helper);
 
-	protected IEntitySelector entitiesToFace(AIHelper helper) {
+	protected Predicate<Entity> entitiesToFace(AIHelper helper) {
 		return entitiesToInteract(helper);
 	}
 }

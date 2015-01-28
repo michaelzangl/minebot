@@ -19,6 +19,7 @@ import net.minecraft.entity.monster.EntityCreeper;
 import net.minecraft.entity.monster.EntitySkeleton;
 import net.minecraft.entity.monster.EntitySpider;
 import net.minecraft.entity.monster.EntityZombie;
+import net.minecraft.util.ClassInheritanceMultiMap;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.storage.ExtendedBlockStorage;
 
@@ -102,26 +103,24 @@ public class MoveScanner {
 		 */
 		public void scanBlocks(Chunk chunk, int chunkY, ScannerPolicy policy) {
 			ExtendedBlockStorage storage = chunk.getBlockStorageArray()[chunkY];
-			byte[] array = storage.getBlockLSBArray();
-			byte[] metaArray = storage.getMetadataArray().data;
+			char[] array = storage.getData();
 			for (int y = 0; y < 16; y++) {
 				for (int z = 0; z < 16; z++) {
 					int oResult = local(0, y, z);
 					int oFrom = (y << 8 | z << 4);
-					for (int x = 0; x < 16; x += 2) {
-						byte meta = metaArray[oFrom + x / 2];
+					for (int x = 0; x < 16; x ++) {
+						int data = array[oFrom + x];
+						
 						blocks[oResult + x] = (short) (policy.getPositionFlags(
-								array[oFrom + x] & 0xff, meta & 0xf) | DEFAULT_POSITION_FLAGS);
-						blocks[oResult + x + 1] = (short) (policy
-								.getPositionFlags(array[oFrom + x + 1] & 0xff,
-										(meta & 0xf0) >> 4) | DEFAULT_POSITION_FLAGS);
+								(data >> 4) & 0xfff, data & 0xf) | DEFAULT_POSITION_FLAGS);
 					}
 				}
 			}
 
 			@SuppressWarnings("unchecked")
-			List<Entity> entities = chunk.entityLists[chunkY];
-			for (Entity e : entities) {
+			ClassInheritanceMultiMap entities = chunk.getEntityLists()[chunkY];
+			for (Object o : entities) {
+				Entity e = (Entity) o;
 				int distance = policy.getDangerDistanceFor(e);
 				if (distance > 0) {
 					int lx = ((int) Math.floor(e.posX + .5)) & 0xf;
@@ -141,7 +140,7 @@ public class MoveScanner {
 		 * 
 		 * @param fromDirection
 		 */
-		// public void propagateBlockChanges(ForgeDirection fromDirection,
+		// public void propagateBlockChanges(EnumFacing fromDirection,
 		// short flagsToMerge, short flagToRevoke) {
 		// for (int y = 0; y < 16; y++) {
 		// if (local(0, y + fromDirection.offsetY, 0) < 0

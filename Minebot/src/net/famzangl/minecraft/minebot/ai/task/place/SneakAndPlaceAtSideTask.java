@@ -4,22 +4,23 @@ import net.famzangl.minecraft.minebot.Pos;
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.BlockItemFilter;
 import net.famzangl.minecraft.minebot.ai.task.BlockSide;
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraft.util.BlockPos;
+import net.minecraft.util.EnumFacing;
 
 public class SneakAndPlaceAtSideTask extends SneakAndPlaceAtHalfTask {
 
-	public SneakAndPlaceAtSideTask(int x, int y, int z, BlockItemFilter filter,
-			Pos relativeFrom, double minBuildHeight,
-			ForgeDirection lookingDirection, BlockSide side) {
-		super(x, y, z, filter, relativeFrom, minBuildHeight, side);
+	public SneakAndPlaceAtSideTask(BlockPos pos, BlockItemFilter filter,
+			BlockPos relativeFrom, double minBuildHeight,
+			EnumFacing lookingDirection, BlockSide side) {
+		super(pos, filter, relativeFrom, minBuildHeight, side);
 		this.lookingDirection = lookingDirection;
 	}
 
 	@Override
-	protected ForgeDirection[] getBuildDirs() {
-		return new ForgeDirection[] { lookingDirection,
-				lookingDirection.getRotation(ForgeDirection.UP),
-				lookingDirection.getRotation(ForgeDirection.DOWN) };
+	protected EnumFacing[] getBuildDirs() {
+		return new EnumFacing[] { lookingDirection,
+				lookingDirection.rotateY(),
+				lookingDirection.rotateYCCW() };
 	}
 
 	@Override

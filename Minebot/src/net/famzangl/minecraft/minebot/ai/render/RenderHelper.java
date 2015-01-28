@@ -4,8 +4,11 @@ import net.famzangl.minecraft.minebot.Pos;
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.WorldRenderer;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
-import net.minecraftforge.client.event.RenderWorldLastEvent;
+import net.minecraft.util.BlockPos;
+import net.minecraftforge.fml.common.gameevent.TickEvent.RenderTickEvent;
 
 import org.lwjgl.opengl.GL11;
 
@@ -22,15 +25,15 @@ public class RenderHelper {
 
 	private boolean hadBlend;
 
-	public void renderStart(RenderWorldLastEvent event, AIHelper helper) {
-		final Tessellator tessellator = Tessellator.instance;
-		final EntityLivingBase player = helper.getMinecraft().renderViewEntity;
+	public void renderStart(RenderTickEvent event, AIHelper helper) {
+		final Tessellator tessellator = Tessellator.getInstance();
+		final Entity player = helper.getMinecraft().getRenderViewEntity();
 		final double x = player.lastTickPosX
-				+ (player.posX - player.lastTickPosX) * event.partialTicks;
+				+ (player.posX - player.lastTickPosX) * event.renderTickTime;
 		final double y = player.lastTickPosY
-				+ (player.posY - player.lastTickPosY) * event.partialTicks;
+				+ (player.posY - player.lastTickPosY) * event.renderTickTime;
 		final double z = player.lastTickPosZ
-				+ (player.posZ - player.lastTickPosZ) * event.partialTicks;
+				+ (player.posZ - player.lastTickPosZ) * event.renderTickTime;
 
 		GL11.glBlendFunc(GL11.GL_DST_COLOR, GL11.GL_SRC_COLOR);
 		GL11.glDisable(GL11.GL_TEXTURE_2D);
@@ -43,15 +46,15 @@ public class RenderHelper {
 		GL11.glEnable(GL11.GL_ALPHA_TEST);
 		hadBlend = GL11.glIsEnabled(GL11.GL_BLEND);
 		GL11.glEnable(GL11.GL_BLEND);
-		tessellator.startDrawingQuads();
-		tessellator.setTranslation(-x, -y, -z);
+		tessellator.getWorldRenderer().startDrawingQuads();
+		tessellator.getWorldRenderer().setTranslation(-x, -y, -z);
 	}
 
 	protected void renderEnd() {
-		final Tessellator tessellator = Tessellator.instance;
+		final Tessellator tessellator = Tessellator.getInstance();
 
 		tessellator.draw();
-		tessellator.setTranslation(0.0D, 0.0D, 0.0D);
+		tessellator.getWorldRenderer().setTranslation(0.0D, 0.0D, 0.0D);
 		GL11.glDisable(GL11.GL_ALPHA_TEST);
 		GL11.glPolygonOffset(0.0F, 0.0F);
 		GL11.glDisable(GL11.GL_POLYGON_OFFSET_FILL);
@@ -64,41 +67,41 @@ public class RenderHelper {
 		GL11.glPopMatrix();
 	}
 
-	protected void renderMarker(Pos m, float r, float g, float b, float a) {
-		final Tessellator tessellator = Tessellator.instance;
-		tessellator.setColorRGBA_F(r, g, b, a);
-		renderMarkerP(tessellator, m.x, m.y, m.z);
+	protected void renderMarker(BlockPos m, float r, float g, float b, float a) {
+		final Tessellator tessellator = Tessellator.getInstance();
+		tessellator.getWorldRenderer().setColorRGBA_F(r, g, b, a);
+		renderMarkerP(tessellator.getWorldRenderer(), m.getX(), m.getY(), m.getZ());
 	}
 
-	private void renderMarkerP(Tessellator tessellator, int x, int y, int z) {
-		tessellator.addVertex(x + MIN, y + MAX, z + MIN);
-		tessellator.addVertex(x + MIN, y + MAX, z + MAX);
-		tessellator.addVertex(x + MAX, y + MAX, z + MAX);
-		tessellator.addVertex(x + MAX, y + MAX, z + MIN);
+	private void renderMarkerP(WorldRenderer worldRenderer, int x, int y, int z) {
+		worldRenderer.addVertex(x + MIN, y + MAX, z + MIN);
+		worldRenderer.addVertex(x + MIN, y + MAX, z + MAX);
+		worldRenderer.addVertex(x + MAX, y + MAX, z + MAX);
+		worldRenderer.addVertex(x + MAX, y + MAX, z + MIN);
 
-		tessellator.addVertex(x + MIN, y + MIN, z + MIN);
-		tessellator.addVertex(x + MIN, y + MIN, z + MAX);
-		tessellator.addVertex(x + MIN, y + MAX, z + MAX);
-		tessellator.addVertex(x + MIN, y + MAX, z + MIN);
+		worldRenderer.addVertex(x + MIN, y + MIN, z + MIN);
+		worldRenderer.addVertex(x + MIN, y + MIN, z + MAX);
+		worldRenderer.addVertex(x + MIN, y + MAX, z + MAX);
+		worldRenderer.addVertex(x + MIN, y + MAX, z + MIN);
 
-		tessellator.addVertex(x + MAX, y + MAX, z + MIN);
-		tessellator.addVertex(x + MAX, y + MAX, z + MAX);
-		tessellator.addVertex(x + MAX, y + MIN, z + MAX);
-		tessellator.addVertex(x + MAX, y + MIN, z + MIN);
+		worldRenderer.addVertex(x + MAX, y + MAX, z + MIN);
+		worldRenderer.addVertex(x + MAX, y + MAX, z + MAX);
+		worldRenderer.addVertex(x + MAX, y + MIN, z + MAX);
+		worldRenderer.addVertex(x + MAX, y + MIN, z + MIN);
 
-		tessellator.addVertex(x + MIN, y + MIN, z + MIN);
-		tessellator.addVertex(x + MIN, y + MAX, z + MIN);
-		tessellator.addVertex(x + MAX, y + MAX, z + MIN);
-		tessellator.addVertex(x + MAX, y + MIN, z + MIN);
+		worldRenderer.addVertex(x + MIN, y + MIN, z + MIN);
+		worldRenderer.addVertex(x + MIN, y + MAX, z + MIN);
+		worldRenderer.addVertex(x + MAX, y + MAX, z + MIN);
+		worldRenderer.addVertex(x + MAX, y + MIN, z + MIN);
 
-		tessellator.addVertex(x + MIN, y + MAX, z + MAX);
-		tessellator.addVertex(x + MIN, y + MIN, z + MAX);
-		tessellator.addVertex(x + MAX, y + MIN, z + MAX);
-		tessellator.addVertex(x + MAX, y + MAX, z + MAX);
+		worldRenderer.addVertex(x + MIN, y + MAX, z + MAX);
+		worldRenderer.addVertex(x + MIN, y + MIN, z + MAX);
+		worldRenderer.addVertex(x + MAX, y + MIN, z + MAX);
+		worldRenderer.addVertex(x + MAX, y + MAX, z + MAX);
 
-		tessellator.addVertex(x + MIN, y + MIN, z + MAX);
-		tessellator.addVertex(x + MIN, y + MIN, z + MIN);
-		tessellator.addVertex(x + MAX, y + MIN, z + MIN);
-		tessellator.addVertex(x + MAX, y + MIN, z + MAX);
+		worldRenderer.addVertex(x + MIN, y + MIN, z + MAX);
+		worldRenderer.addVertex(x + MIN, y + MIN, z + MIN);
+		worldRenderer.addVertex(x + MAX, y + MIN, z + MIN);
+		worldRenderer.addVertex(x + MAX, y + MIN, z + MAX);
 	}
 }

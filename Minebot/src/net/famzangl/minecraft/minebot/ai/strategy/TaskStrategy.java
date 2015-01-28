@@ -12,6 +12,7 @@ import net.famzangl.minecraft.minebot.ai.task.CanPrefaceAndDestroy;
 import net.famzangl.minecraft.minebot.ai.task.SkipWhenSearchingPrefetch;
 import net.famzangl.minecraft.minebot.ai.task.error.StringTaskError;
 import net.famzangl.minecraft.minebot.ai.task.error.TaskError;
+import net.minecraft.util.BlockPos;
 
 /**
  * This is a strategy that always queries for new tasks to do and then executes
@@ -67,11 +68,11 @@ public abstract class TaskStrategy extends AIStrategy implements
 				continue;
 			} else if (task instanceof CanPrefaceAndDestroy) {
 				final CanPrefaceAndDestroy dTask = (CanPrefaceAndDestroy) task;
-				final List<Pos> positions = dTask
+				final List<BlockPos> positions = dTask
 						.getPredestroyPositions(temporaryHelper);
-				for (final Pos pos : positions) {
-					if (!temporaryHelper.isAirBlock(pos.x, pos.y, pos.z)) {
-						temporaryHelper.faceAndDestroy(pos.x, pos.y, pos.z);
+				for (final BlockPos pos : positions) {
+					if (!temporaryHelper.isAirBlock(pos)) {
+						temporaryHelper.faceAndDestroy(pos);
 						found = true;
 						break;
 					}

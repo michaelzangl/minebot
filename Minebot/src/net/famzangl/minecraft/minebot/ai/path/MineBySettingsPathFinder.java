@@ -1,7 +1,8 @@
 package net.famzangl.minecraft.minebot.ai.path;
 
 import net.minecraft.block.Block;
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.ResourceLocation;
 
 public class MineBySettingsPathFinder extends MinePathfinder {
 
@@ -21,16 +22,17 @@ public class MineBySettingsPathFinder extends MinePathfinder {
 
 		@Override
 		public float getFloat(Block block) {
-			final String name = Block.blockRegistry.getNameForObject(block)
-					.replace("minecraft:", "");
-			final float val = settings.getFloat(name_prefix + name,
+			final ResourceLocation name = ((ResourceLocation) Block.blockRegistry
+					.getNameForObject(block));
+			String domain = name.getResourceDomain().equals("minecraft") ? "" : name.getResourceDomain() + ":";
+			final float val = settings.getFloat(name_prefix + domain + name.getResourcePath(),
 					defaultValue, min, max);
 			System.out.println(name_prefix + name + " -> " + val);
 			return val;
 		}
 	}
 
-	public MineBySettingsPathFinder(ForgeDirection preferedDirection,
+	public MineBySettingsPathFinder(EnumFacing preferedDirection,
 			int preferedLayer) {
 		super(preferedDirection, preferedLayer);
 		maxDistancePoints = 0;

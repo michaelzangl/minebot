@@ -7,36 +7,36 @@ import net.famzangl.minecraft.minebot.ai.ItemFilter;
 import net.famzangl.minecraft.minebot.ai.task.AITask;
 import net.famzangl.minecraft.minebot.ai.task.move.UpwardsMoveTask;
 import net.famzangl.minecraft.minebot.ai.task.place.SneakAndPlaceTask;
+import net.minecraft.util.BlockPos;
 
 public abstract class CubeBuildTask extends BuildTask {
 
 	protected final BlockItemFilter blockFilter;
 
-	protected CubeBuildTask(Pos forPosition, BlockItemFilter blockFilter) {
+	protected CubeBuildTask(BlockPos forPosition, BlockItemFilter blockFilter) {
 		super(forPosition);
 		this.blockFilter = blockFilter;
 	}
 
-	protected static final Pos FROM_GROUND = new Pos(0, 0, 0);
-	public static final Pos[] STANDABLE = new Pos[] { new Pos(-1, 1, 0),
-			new Pos(0, 1, -1), new Pos(1, 1, 0), new Pos(0, 1, 1), FROM_GROUND, };
+	protected static final BlockPos FROM_GROUND = Pos.ZERO;
+	public static final BlockPos[] STANDABLE = new BlockPos[] {
+			new BlockPos(-1, 1, 0), new BlockPos(0, 1, -1),
+			new BlockPos(1, 1, 0), new BlockPos(0, 1, 1), FROM_GROUND, };
 
 	@Override
-	public AITask getPlaceBlockTask(Pos relativeFromPos) {
+	public AITask getPlaceBlockTask(BlockPos relativeFromPos) {
 		if (!isStandablePlace(relativeFromPos)) {
 			return null;
 		} else if (relativeFromPos.equals(FROM_GROUND)) {
-			return new UpwardsMoveTask(forPosition.x, forPosition.y + 1,
-					forPosition.z, blockFilter);
+			return new UpwardsMoveTask(forPosition.add(0, 1, 0), blockFilter);
 		} else {
-			return new SneakAndPlaceTask(forPosition.x, forPosition.y + 1,
-					forPosition.z, blockFilter, relativeFromPos,
-					getMinHeightToBuild());
+			return new SneakAndPlaceTask(forPosition.add(0, 1, 0), blockFilter,
+					relativeFromPos, getMinHeightToBuild());
 		}
 	}
 
 	protected double getMinHeightToBuild() {
-		return forPosition.y + getBlockHeight();
+		return forPosition.getY() + getBlockHeight();
 	}
 
 	protected double getBlockHeight() {
@@ -44,7 +44,7 @@ public abstract class CubeBuildTask extends BuildTask {
 	}
 
 	@Override
-	public Pos[] getStandablePlaces() {
+	public BlockPos[] getStandablePlaces() {
 		return STANDABLE;
 	}
 

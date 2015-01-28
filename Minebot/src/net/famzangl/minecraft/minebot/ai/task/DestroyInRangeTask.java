@@ -8,6 +8,7 @@ import java.util.List;
 import net.famzangl.minecraft.minebot.Pos;
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.strategy.TaskOperations;
+import net.minecraft.util.BlockPos;
 
 public class DestroyInRangeTask extends AITask implements CanPrefaceAndDestroy {
 
@@ -25,9 +26,9 @@ public class DestroyInRangeTask extends AITask implements CanPrefaceAndDestroy {
 		Pos next = null;
 		double currentMin = Float.POSITIVE_INFINITY;
 
-		for (int x = minPos.x; x <= maxPos.x; x++) {
-			for (int y = minPos.y; y <= maxPos.y; y++) {
-				for (int z = minPos.z; z <= maxPos.z; z++) {
+		for (int x = minPos.getX(); x <= maxPos.getX(); x++) {
+			for (int y = minPos.getY(); y <= maxPos.getY(); y++) {
+				for (int z = minPos.getZ(); z <= maxPos.getZ(); z++) {
 					final double rating = rate(h, x, y, z);
 					if (rating >= 0 && rating < currentMin) {
 						next = new Pos(x, y, z);
@@ -57,7 +58,7 @@ public class DestroyInRangeTask extends AITask implements CanPrefaceAndDestroy {
 		Pos pos = h.getPlayerPosition();
 		return !h.isAirBlock(x, y, z)
 				&& h.hasSafeSides(x, y, z)
-				&& (h.isSafeHeadBlock(x, y + 1, z) || ((x != pos.x || y != pos.y) && isSafeFallingBlock(
+				&& (h.isSafeHeadBlock(x, y + 1, z) || ((x != pos.getX() || y != pos.getY()) && isSafeFallingBlock(
 						h, x, y + 1, z)));
 	}
 
@@ -80,11 +81,11 @@ public class DestroyInRangeTask extends AITask implements CanPrefaceAndDestroy {
 			n = getNextToDestruct(h);
 		}
 		if (n != null) {
-			if (h.isFacingBlock(n.x, n.y, n.z)) {
-				h.faceAndDestroy(n.x, n.y, n.z);
+			if (h.isFacingBlock(n)) {
+				h.faceAndDestroy(n);
 				facingAttempts = 0;
 			} else {
-				h.faceBlock(n.x, n.y, n.z);
+				h.faceBlock(n);
 				facingAttempts++;
 			}
 		}
@@ -92,9 +93,9 @@ public class DestroyInRangeTask extends AITask implements CanPrefaceAndDestroy {
 
 	@Override
 	public int getGameTickTimeout() {
-		return 100 * (Math.abs(minPos.x - maxPos.x) + 1)
-				* (Math.abs(minPos.y - maxPos.y) + 1)
-				* (Math.abs(minPos.z - maxPos.z) + 1);
+		return 100 * (Math.abs(minPos.getX() - maxPos.getX()) + 1)
+				* (Math.abs(minPos.getY() - maxPos.getY()) + 1)
+				* (Math.abs(minPos.getZ() - maxPos.getZ()) + 1);
 	}
 
 	@Override
@@ -109,9 +110,9 @@ public class DestroyInRangeTask extends AITask implements CanPrefaceAndDestroy {
 	}
 
 	@Override
-	public List<Pos> getPredestroyPositions(AIHelper helper) {
-		final Pos next = getNextToDestruct(helper);
+	public List<BlockPos> getPredestroyPositions(AIHelper helper) {
+		final BlockPos next = getNextToDestruct(helper);
 		return next != null ? Arrays.asList(next) : Collections
-				.<Pos> emptyList();
+				.<BlockPos> emptyList();
 	}
 }

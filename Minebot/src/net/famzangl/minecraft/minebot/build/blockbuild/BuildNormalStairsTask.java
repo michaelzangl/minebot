@@ -9,7 +9,8 @@ import net.famzangl.minecraft.minebot.ai.task.place.JumpingPlaceBlockAtSideTask;
 import net.famzangl.minecraft.minebot.ai.task.place.SneakAndPlaceAtSideTask;
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraft.util.BlockPos;
+import net.minecraft.util.EnumFacing;
 
 public class BuildNormalStairsTask extends CubeBuildTask {
 
@@ -19,7 +20,7 @@ public class BuildNormalStairsTask extends CubeBuildTask {
 			Blocks.oak_stairs, Blocks.sandstone_stairs, Blocks.spruce_stairs,
 			Blocks.stone_brick_stairs, Blocks.stone_stairs,
 			Blocks.quartz_stairs );
-	private final ForgeDirection upwardsDirection;
+	private final EnumFacing upwardsDirection;
 	private final boolean inverted;
 	private final Block stairs;
 
@@ -28,33 +29,31 @@ public class BuildNormalStairsTask extends CubeBuildTask {
 		LOWER
 	}
 
-	public BuildNormalStairsTask(Pos forPosition, Block stairs,
-			ForgeDirection upwardsDirection, Half half) {
+	public BuildNormalStairsTask(BlockPos forPosition, Block stairs,
+			EnumFacing upwardsDirection, Half half) {
 		super(forPosition, new BlockItemFilter(stairs));
 		this.stairs = stairs;
 		this.upwardsDirection = upwardsDirection;
 		this.inverted = half == Half.UPPER;
-		if (upwardsDirection != ForgeDirection.EAST
-				&& upwardsDirection != ForgeDirection.WEST
-				&& upwardsDirection != ForgeDirection.NORTH
-				&& upwardsDirection != ForgeDirection.SOUTH) {
+		if (upwardsDirection != EnumFacing.EAST
+				&& upwardsDirection != EnumFacing.WEST
+				&& upwardsDirection != EnumFacing.NORTH
+				&& upwardsDirection != EnumFacing.SOUTH) {
 			throw new IllegalArgumentException();
 		}
 	}
 
 	@Override
-	public AITask getPlaceBlockTask(Pos relativeFromPos) {
+	public AITask getPlaceBlockTask(BlockPos relativeFromPos) {
 		final BlockSide side = inverted ? BlockSide.UPPER_HALF
 				: BlockSide.LOWER_HALF;
 		if (!isStandablePlace(relativeFromPos)) {
 			return null;
 		} else if (relativeFromPos.equals(FROM_GROUND)) {
-			return new JumpingPlaceBlockAtSideTask(forPosition.x,
-					forPosition.y + 1, forPosition.z, blockFilter,
+			return new JumpingPlaceBlockAtSideTask(forPosition.add(0,1,0), blockFilter,
 					upwardsDirection.getOpposite(), side);
 		} else {
-			return new SneakAndPlaceAtSideTask(forPosition.x,
-					forPosition.y + 1, forPosition.z, blockFilter,
+			return new SneakAndPlaceAtSideTask(forPosition.add(0,1,0), blockFilter,
 					relativeFromPos, getMinHeightToBuild(),
 					upwardsDirection.getOpposite(), side);
 		}
@@ -68,24 +67,24 @@ public class BuildNormalStairsTask extends CubeBuildTask {
 	}
 
 	@Override
-	public BuildTask withPositionAndRotation(Pos add, int rotateSteps,
+	public BuildTask withPositionAndRotation(BlockPos add, int rotateSteps,
 			MirrorDirection mirror) {
-		ForgeDirection dir = upwardsDirection;
+		EnumFacing dir = upwardsDirection;
 		for (int i = 0; i < rotateSteps; i++) {
-			dir = dir.getRotation(ForgeDirection.UP);
+			dir = dir.rotateY();
 		}
 
-		if (mirror == MirrorDirection.EAST_WEST && dir == ForgeDirection.EAST) {
-			dir = ForgeDirection.WEST;
+		if (mirror == MirrorDirection.EAST_WEST && dir == EnumFacing.EAST) {
+			dir = EnumFacing.WEST;
 		} else if (mirror == MirrorDirection.EAST_WEST
-				&& dir == ForgeDirection.WEST) {
-			dir = ForgeDirection.EAST;
+				&& dir == EnumFacing.WEST) {
+			dir = EnumFacing.EAST;
 		} else if (mirror == MirrorDirection.NORTH_SOUTH
-				&& dir == ForgeDirection.NORTH) {
-			dir = ForgeDirection.SOUTH;
+				&& dir == EnumFacing.NORTH) {
+			dir = EnumFacing.SOUTH;
 		} else if (mirror == MirrorDirection.NORTH_SOUTH
-				&& dir == ForgeDirection.SOUTH) {
-			dir = ForgeDirection.NORTH;
+				&& dir == EnumFacing.SOUTH) {
+			dir = EnumFacing.NORTH;
 		}
 
 		return new BuildNormalStairsTask(add, stairs, dir,

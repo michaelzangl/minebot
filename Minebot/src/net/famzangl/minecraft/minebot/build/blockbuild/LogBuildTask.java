@@ -6,31 +6,32 @@ import net.famzangl.minecraft.minebot.ai.BlockWhitelist;
 import net.famzangl.minecraft.minebot.build.LogItemFilter;
 import net.famzangl.minecraft.minebot.build.WoodType;
 import net.minecraft.init.Blocks;
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraft.util.BlockPos;
+import net.minecraft.util.EnumFacing;
 
 public class LogBuildTask extends CubeBuildTask {
 
 	public static final BlockWhitelist BLOCKS = new BlockWhitelist( Blocks.log, Blocks.log2 );
-	public static final Pos[] UP_DOWN_POS = new Pos[] { new Pos(0, 0, 0) };
-	public static final Pos[] NORTH_SOUTH_POS = new Pos[] { new Pos(0, 1, 1),
-			new Pos(0, 1, -1) };
-	public static final Pos[] EAST_WEST_POS = new Pos[] { new Pos(1, 1, 0),
-			new Pos(-1, 1, 0) };
-	private final ForgeDirection dir;
+	public static final BlockPos[] UP_DOWN_POS = new BlockPos[] { Pos.ZERO };
+	public static final BlockPos[] NORTH_SOUTH_POS = new BlockPos[] { new BlockPos(0, 1, 1),
+			new BlockPos(0, 1, -1) };
+	public static final BlockPos[] EAST_WEST_POS = new BlockPos[] { new BlockPos(1, 1, 0),
+			new BlockPos(-1, 1, 0) };
+	private final EnumFacing dir;
 
-	public LogBuildTask(Pos forPosition, WoodType logType,
-			ForgeDirection direction) {
+	public LogBuildTask(BlockPos forPosition, WoodType logType,
+			EnumFacing direction) {
 		this(forPosition, new LogItemFilter(logType), direction);
 	}
 
-	private LogBuildTask(Pos forPosition, BlockItemFilter logItemFilter,
-			ForgeDirection direction) {
+	private LogBuildTask(BlockPos forPosition, BlockItemFilter logItemFilter,
+			EnumFacing direction) {
 		super(forPosition, logItemFilter);
 		dir = direction;
 	}
 
 	@Override
-	public Pos[] getStandablePlaces() {
+	public BlockPos[] getStandablePlaces() {
 		switch (dir) {
 		case EAST:
 		case WEST:
@@ -44,11 +45,11 @@ public class LogBuildTask extends CubeBuildTask {
 	}
 
 	@Override
-	public BuildTask withPositionAndRotation(Pos add, int rotateSteps,
+	public BuildTask withPositionAndRotation(BlockPos add, int rotateSteps,
 			MirrorDirection mirror) {
-		ForgeDirection newDir = dir;
+		EnumFacing newDir = dir;
 		for (int i = 0; i < rotateSteps; i++) {
-			newDir = newDir.getRotation(ForgeDirection.UP);
+			newDir = newDir.rotateY();
 		}
 
 		return new LogBuildTask(add, blockFilter, newDir);

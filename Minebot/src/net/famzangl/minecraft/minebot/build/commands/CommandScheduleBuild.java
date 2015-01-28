@@ -25,7 +25,7 @@ import net.famzangl.minecraft.minebot.build.blockbuild.StandingSignBuildTask;
 import net.famzangl.minecraft.minebot.build.blockbuild.StandingSignBuildTask.SignDirection;
 import net.famzangl.minecraft.minebot.build.blockbuild.WoodBuildTask;
 import net.minecraft.block.Block;
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraft.util.EnumFacing;
 
 @AICommand(helpText = "Schedules a build task.", name = "minebuild")
 public class CommandScheduleBuild {
@@ -116,7 +116,7 @@ public class CommandScheduleBuild {
 			@AICommandParameter(type = ParameterType.POSITION, description = "Where to place it (relative is to your current pos)") Pos forPosition,
 			@AICommandParameter(type = ParameterType.BLOCK_NAME, description = "The block", blockFilter = LogBlockFilter.class) Block blockToPlace,
 			@AICommandParameter(type = ParameterType.ENUM, description = "The type of wood logs") WoodType woodType,
-			@AICommandParameter(type = ParameterType.ENUM, description = "The direction the log is facing") ForgeDirection direction) {
+			@AICommandParameter(type = ParameterType.ENUM, description = "The direction the log is facing") EnumFacing direction) {
 		if (LogBuildTask.BLOCKS.contains(blockToPlace)) {
 			addTask(helper, new LogBuildTask(forPosition, woodType, direction));
 		} else {
@@ -138,7 +138,7 @@ public class CommandScheduleBuild {
 			@AICommandParameter(type = ParameterType.FIXED, fixedName = "schedule", description = "") String nameArg,
 			@AICommandParameter(type = ParameterType.POSITION, description = "Where to place it (relative is to your current pos)") Pos forPosition,
 			@AICommandParameter(type = ParameterType.BLOCK_NAME, description = "The block", blockFilter = StairsBlockFilter.class) Block blockToPlace,
-			@AICommandParameter(type = ParameterType.ENUM, description = "The direction the stairs face") ForgeDirection direction,
+			@AICommandParameter(type = ParameterType.ENUM, description = "The direction the stairs face") EnumFacing direction,
 			@AICommandParameter(type = ParameterType.ENUM, description = "Upper for inverted stairs", optional = true) Half half) {
 		if (BuildNormalStairsTask.BLOCKS.contains(blockToPlace)) {
 			addTask(helper, new BuildNormalStairsTask(forPosition,

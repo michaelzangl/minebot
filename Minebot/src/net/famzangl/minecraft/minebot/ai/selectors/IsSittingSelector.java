@@ -13,8 +13,8 @@ public final class IsSittingSelector extends OwnTameableSelector {
 	}
 
 	@Override
-	public boolean isEntityApplicable(Entity var1) {
-		return super.isEntityApplicable(var1)
+	public boolean apply(Entity var1) {
+		return super.apply(var1)
 				&& ((EntityWolf) var1).isSitting() == sitting;
 	}
 }

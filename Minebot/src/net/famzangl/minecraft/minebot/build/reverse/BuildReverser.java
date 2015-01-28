@@ -13,7 +13,8 @@ import net.famzangl.minecraft.minebot.build.blockbuild.TaskDescription;
 import net.famzangl.minecraft.minebot.build.blockbuild.UnknownBlockException;
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraft.util.BlockPos;
+import net.minecraft.util.EnumFacing;
 
 public class BuildReverser {
 	private final AIHelper helper;
@@ -33,8 +34,8 @@ public class BuildReverser {
 		this.helper = helper;
 		this.pos1 = pos1;
 		this.pos2 = pos2;
-		field = new ReverseBuildField(pos2.x - pos1.x + 1, pos2.y - pos1.y + 1,
-				pos2.z - pos1.z + 1);
+		field = new ReverseBuildField(pos2.getX() - pos1.getX() + 1,
+				pos2.getY() - pos1.getY() + 1, pos2.getZ() - pos1.getZ() + 1);
 		this.outFile = outFile;
 	}
 
@@ -53,13 +54,13 @@ public class BuildReverser {
 			out.println("");
 			out.println("/minebuild reset");
 			out.println("");
-			for (int y = pos1.y; y <= pos2.y; y++) {
-				out.println("# Layer " + (y - pos1.y));
-				for (int x = pos1.x; x <= pos2.x; x++) {
-					final boolean row2 = (x - pos1.x & 1) == 1;
-					addRow(new Pos(x, y, row2 ? pos2.z : pos1.z),
-							row2 ? ForgeDirection.NORTH : ForgeDirection.SOUTH,
-							pos2.z - pos1.z + 1);
+			for (int y = pos1.getY(); y <= pos2.getY(); y++) {
+				out.println("# Layer " + (y - pos1.getY()));
+				for (int x = pos1.getX(); x <= pos2.getX(); x++) {
+					final boolean row2 = (x - pos1.getX() & 1) == 1;
+					addRow(new Pos(x, y, row2 ? pos2.getZ() : pos1.getZ()),
+							row2 ? EnumFacing.NORTH : EnumFacing.SOUTH,
+							pos2.getZ() - pos1.getZ() + 1);
 				}
 				out.println("");
 			}
@@ -82,28 +83,27 @@ public class BuildReverser {
 		}
 	}
 
-	public void addRow(Pos start, ForgeDirection direction, int length) {
+	public void addRow(Pos start, EnumFacing direction, int length) {
 		for (int i = 0; i < length; i++) {
-			addBuildPlace(start.x + direction.offsetX * i, start.y
-					+ direction.offsetY * i, start.z + direction.offsetZ * i);
+			addBuildPlace(start.offset(direction, length));
 		}
 	}
 
-	private void addBuildPlace(int x, int y, int z) {
-		final int lx = x - pos1.x;
-		final int ly = y - pos1.y;
-		final int lz = z - pos1.z;
+	private void addBuildPlace(BlockPos pos) {
+		BlockPos localPos = pos.subtract(pos1);
 
-		final Block b = helper.getBlock(x, y, z);
+		final Block b = helper.getBlock(pos);
 		if (b != Blocks.air) {
 			try {
 				final TaskDescription taskString = BuildTask
-						.getTaskDescription(b, helper, x, y, z);
-				field.setBlockAt(lx, ly, lz, b, taskString);
-				out.println("/minebuild schedule ~" + lx + " ~" + ly + " ~"
-						+ lz + " " + taskString.getCommandArgs());
+						.getTaskDescription(b, helper, pos);
+				field.setBlockAt(localPos, b, taskString);
+				out.println("/minebuild schedule ~" + localPos.getX() + " ~"
+						+ localPos.getY() + " ~" + localPos.getZ() + " "
+						+ taskString.getCommandArgs());
 			} catch (final UnknownBlockException e) {
-				out.println("# Missing: ~" + lx + " ~" + ly + " ~" + lz + " "
+				out.println("# Missing: ~" + localPos.getX() + " ~"
+						+ localPos.getY() + " ~" + localPos.getZ() + " "
 						+ b.getLocalizedName());
 				missingBlocks++;
 			}

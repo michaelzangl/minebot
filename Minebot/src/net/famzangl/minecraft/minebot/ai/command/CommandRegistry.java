@@ -10,6 +10,7 @@ import java.util.Hashtable;
 import java.util.List;
 
 import net.famzangl.minecraft.minebot.ai.AIHelper;
+import net.famzangl.minecraft.minebot.ai.net.MinebotNetHandler;
 import net.famzangl.minecraft.minebot.ai.strategy.AIStrategy;
 import net.famzangl.minecraft.minebot.ai.strategy.AbortOnDeathStrategy;
 import net.famzangl.minecraft.minebot.ai.strategy.CreeperComesActionStrategy;
@@ -18,83 +19,17 @@ import net.famzangl.minecraft.minebot.ai.strategy.DoNotSuffocateStrategy;
 import net.famzangl.minecraft.minebot.ai.strategy.PlayerComesActionStrategy;
 import net.famzangl.minecraft.minebot.ai.strategy.StackStrategy;
 import net.famzangl.minecraft.minebot.ai.strategy.StrategyStack;
+import net.minecraft.client.Minecraft;
 import net.minecraft.command.CommandBase;
+import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
-import net.minecraftforge.client.ClientCommandHandler;
+import net.minecraft.command.ServerCommandManager;
+import net.minecraft.network.ThreadQuickExitException;
+import net.minecraft.network.play.server.S3APacketTabComplete;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.util.BlockPos;
 
 public class CommandRegistry {
-	private final class CommandHandler extends CommandBase {
-		private final String name;
-
-		public CommandHandler(String name) {
-			super();
-			this.name = name;
-		}
-
-		@Override
-		public void processCommand(ICommandSender sender, String[] args) {
-			if (controlled == null) {
-				AIChatController.addChatLine("ERROR: No controller started.");
-			}
-			try {
-				final AIStrategy strategy = evaluateCommandWithSaferule(
-						controlled.getAiHelper(), name, args);
-				if (strategy != null) {
-					controlled.requestUseStrategy(strategy);
-				}
-			} catch (final UnknownCommandException e) {
-				if (e.getEvaluateable().size() > 0) {
-					AIChatController
-							.addChatLine("ERROR: More than 1 command matches your command line.");
-				} else {
-
-					AIChatController.addChatLine("ERROR: No command:"
-							+ combine(args) + ".");
-				}
-			} catch (final CommandEvaluationException e) {
-				AIChatController.addChatLine("ERROR while evaluating: "
-						+ e.getMessage());
-			} catch (final Throwable e) {
-				e.printStackTrace();
-				AIChatController
-						.addChatLine("ERROR: Could not evaluate. Please report.");
-			}
-		}
-
-		private String combine(String[] args) {
-			final StringBuilder b = new StringBuilder();
-			for (final String a : args) {
-				b.append(" ");
-				b.append(a);
-			}
-			return b.toString();
-		}
-
-		@Override
-		public String getCommandUsage(ICommandSender var1) {
-			return "/" + name + " ...";
-		}
-
-		@Override
-		public String getCommandName() {
-			return name;
-		}
-
-		@Override
-		public List<String> addTabCompletionOptions(
-				ICommandSender par1iCommandSender, String[] par2ArrayOfStr) {
-			if (controlled == null) {
-				return Collections.emptyList();
-			}
-			return tabCompletion(controlled.getAiHelper(), name, par2ArrayOfStr);
-		}
-
-		@Override
-		public int getRequiredPermissionLevel() {
-			return 0;
-		}
-
-	}
 
 	private final Hashtable<String, List<CommandDefinition>> commandTable = new Hashtable<String, List<CommandDefinition>>();
 	private IAIControllable controlled;
@@ -111,8 +46,57 @@ public class CommandRegistry {
 		getCommandsForClass(commandClass, list);
 	}
 
+	public void execute(String name, String[] args) {
+		if (controlled == null) {
+			AIChatController.addChatLine("ERROR: No controller started.");
+		}
+		try {
+			final AIStrategy strategy = evaluateCommandWithSaferule(
+					controlled.getAiHelper(), name, args);
+			if (strategy != null) {
+				controlled.requestUseStrategy(strategy);
+			}
+		} catch (final UnknownCommandException e) {
+			if (e.getEvaluateable().size() > 0) {
+				AIChatController
+						.addChatLine("ERROR: More than 1 command matches your command line.");
+			} else {
+				AIChatController.addChatLine("ERROR: No command:"
+						+ combine(args) + ".");
+			}
+		} catch (final CommandEvaluationException e) {
+			AIChatController.addChatLine("ERROR while evaluating: "
+					+ e.getMessage());
+		} catch (final Throwable e) {
+			e.printStackTrace();
+			AIChatController
+					.addChatLine("ERROR: Could not evaluate. Please report.");
+		}
+	}
+
+	private String combine(String[] args) {
+		final StringBuilder b = new StringBuilder();
+		for (final String a : args) {
+			b.append(" ");
+			b.append(a);
+		}
+		return b.toString();
+	}
+
+	public List<String> addTabCompletionOptions(String name, String[] args,
+			BlockPos pos) {
+		// FIXME
+		if (controlled == null) {
+			return Collections.emptyList();
+		}
+		return tabCompletion(controlled.getAiHelper(), name, args);
+	}
+
 	private void addCommandHandler(String name) {
-		ClientCommandHandler.instance.registerCommand(new CommandHandler(name));
+		ServerCommandManager cm = ((ServerCommandManager) (MinecraftServer
+				.getServer().getCommandManager()));
+		// FIXME!
+		// cm.registerCommand(new CommandHandler(name));
 		System.out.println("Command " + name + " registered.");
 	}
 
@@ -126,7 +110,8 @@ public class CommandRegistry {
 	public AIStrategy evaluateCommandWithSaferule(AIHelper helper,
 			String commandID, String[] arguments)
 			throws UnknownCommandException {
-		CommandDefinition evaluateableCommand = getEvaluatebale(commandID, arguments);
+		CommandDefinition evaluateableCommand = getEvaluatebale(commandID,
+				arguments);
 		AIStrategy strategy = evaluateableCommand.evaluate(helper, arguments);
 		SafeStrategyRule safeRule = evaluateableCommand.getSafeStrategyRule();
 		if (safeRule != SafeStrategyRule.NONE && strategy != null) {
@@ -137,12 +122,13 @@ public class CommandRegistry {
 
 	public AIStrategy evaluateCommand(AIHelper helper, String commandID,
 			String[] arguments) throws UnknownCommandException {
-		CommandDefinition evaluateableCommand = getEvaluatebale(commandID, arguments);
+		CommandDefinition evaluateableCommand = getEvaluatebale(commandID,
+				arguments);
 		return evaluateableCommand.evaluate(helper, arguments);
 	}
 
-	private CommandDefinition getEvaluatebale(String commandID, String[] arguments)
-			throws UnknownCommandException {
+	private CommandDefinition getEvaluatebale(String commandID,
+			String[] arguments) throws UnknownCommandException {
 		final List<CommandDefinition> commands = getCommands(commandID);
 		final ArrayList<CommandDefinition> evaluateable = new ArrayList<CommandDefinition>();
 		for (final CommandDefinition c : commands) {
@@ -174,21 +160,83 @@ public class CommandRegistry {
 			String[] currentArgs) {
 		final List<CommandDefinition> commands = getCommands(commandID);
 		final HashSet<String> suggestions = new HashSet<String>();
-		final String[] fixedArgs = Arrays.copyOf(currentArgs,
-				currentArgs.length - 1);
+		final String[] fixedArgs;
+		if (currentArgs.length > 0) {
+			fixedArgs = Arrays.copyOf(currentArgs, currentArgs.length - 1);
+		} else {
+			fixedArgs = currentArgs;
+			currentArgs = new String[] { "" };
+		}
 		for (final CommandDefinition c : commands) {
 			final ArrayList<ArgumentDefinition> args = c.getArguments();
 			if (c.couldEvaluateStartingWith(fixedArgs)
 					&& args.size() > fixedArgs.length) {
 				final ArgumentDefinition lastArg = c.getArguments().get(
-						currentArgs.length - 1);
-				lastArg.getTabCompleteOptions(
-						currentArgs[currentArgs.length - 1], suggestions);
+						fixedArgs.length);
+				lastArg.getTabCompleteOptions(currentArgs[fixedArgs.length],
+						suggestions);
 			}
 		}
 		final ArrayList<String> asList = new ArrayList<String>(suggestions);
 		Collections.sort(asList);
 		return asList;
+	}
+
+	public boolean interceptCommand(String m) {
+		if (!m.startsWith("/")) {
+			return false;
+		}
+		String commandId = getCommandId(m);
+		if (commandTable.containsKey(commandId)) {
+			System.out.println("Minebot handling command: " + m);
+			String[] args = getCommandArgs(m);
+			execute(commandId, args);
+			return true;
+		}
+
+		return false;
+	}
+
+	private String[] getCommandArgs(String m) {
+		String[] args = m.split("\\s+", -1);
+		args = Arrays.copyOfRange(args, 1, args.length);
+		return args;
+	}
+
+	private String getCommandId(String m) {
+		int end = m.indexOf(' ');
+		if (end < 0) {
+			end = m.length();
+		}
+		String commandId = m.substring(1, end);
+		return commandId;
+	}
+
+	public boolean interceptTab(String m, final MinebotNetHandler respondTo) {
+		if (!m.startsWith("/")) {
+			return false;
+		}
+		String commandId = getCommandId(m);
+		if (commandTable.containsKey(commandId)) {
+			String[] args = getCommandArgs(m);
+			System.out.println("Minebot handling tab: " + commandId + ", "
+					+ combine(args));
+			List<String> options = addTabCompletionOptions(commandId, args,
+					null);
+			final S3APacketTabComplete packet = new S3APacketTabComplete(
+					options.toArray(new String[options.size()]));
+			new Thread("Tab response") {
+				public void run() {
+					try {
+						respondTo.handleTabComplete(packet);
+					} catch (ThreadQuickExitException t) {
+					}
+				};
+			}.start();
+			return true;
+		}
+
+		return false;
 	}
 
 	private List<CommandDefinition> getCommands(String commandID) {
@@ -228,4 +276,5 @@ public class CommandRegistry {
 	public void setControlled(IAIControllable controlled) {
 		this.controlled = controlled;
 	}
+
 }

@@ -2,10 +2,10 @@ package net.famzangl.minecraft.minebot.ai.selectors;
 
 import java.util.List;
 
-import net.minecraft.command.IEntitySelector;
+import com.google.common.base.Predicate;
 import net.minecraft.entity.Entity;
 
-public class OneOfListSelector implements IEntitySelector {
+public class OneOfListSelector implements Predicate<Entity> {
 
 	private final List<Entity> list;
 
@@ -14,7 +14,7 @@ public class OneOfListSelector implements IEntitySelector {
 	}
 
 	@Override
-	public boolean isEntityApplicable(Entity var1) {
+	public boolean apply(Entity var1) {
 		return list.contains(var1);
 	}
 

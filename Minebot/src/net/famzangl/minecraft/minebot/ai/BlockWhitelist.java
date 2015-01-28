@@ -3,6 +3,7 @@ package net.famzangl.minecraft.minebot.ai;
 import java.util.Arrays;
 
 import net.minecraft.block.Block;
+import net.minecraft.block.state.IBlockState;
 
 /**
  * A set of blocks, identified by Id.
@@ -50,6 +51,10 @@ public class BlockWhitelist {
 	
 	public boolean contains(Block block) {
 		return contains(Block.getIdFromBlock(block));
+	}
+
+	public boolean contains(IBlockState meta) {
+		return contains(meta.getBlock());
 	}
 	
 	public BlockWhitelist intersectWith(BlockWhitelist wl2) {

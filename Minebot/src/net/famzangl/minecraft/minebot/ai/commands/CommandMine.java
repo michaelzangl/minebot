@@ -30,7 +30,7 @@ public class CommandMine {
 			AIHelper helper,
 			@AICommandParameter(type = ParameterType.FIXED, fixedName = "mine", description = "") String nameArg) {
 		return new PathFinderStrategy(new MineBySettingsPathFinder(
-				helper.getLookDirection(), helper.getPlayerPosition().y),
+				helper.getLookDirection(), helper.getPlayerPosition().getY()),
 				"Mining ores");
 	}
 
@@ -47,7 +47,7 @@ public class CommandMine {
 			@AICommandParameter(type = ParameterType.FIXED, fixedName = "mine", description = "") String nameArg,
 			@AICommandParameter(type = ParameterType.BLOCK_NAME, description = "The block to mine.", blockFilter = MineBlockFilter.class) Block blockName) {
 		return new PathFinderStrategy(new MineSinglePathFinder(blockName,
-				helper.getLookDirection(), helper.getPlayerPosition().y),
+				helper.getLookDirection(), helper.getPlayerPosition().getY()),
 				"Mining " + blockName.getLocalizedName());
 	}
 
@@ -57,7 +57,7 @@ public class CommandMine {
 			@AICommandParameter(type = ParameterType.FIXED, fixedName = "mine", description = "") String nameArg,
 			@AICommandParameter(type = ParameterType.FIXED, fixedName = "orebfuscated", description = "") String orebfuscated) {
 		return new PathFinderStrategy(new OrebfuscatedMinePathFinder(
-				helper.getLookDirection(), helper.getPlayerPosition().y),
+				helper.getLookDirection(), helper.getPlayerPosition().getY()),
 				"Mining ores");
 	}
 

@@ -2,6 +2,7 @@ package net.famzangl.minecraft.minebot.ai.task.place;
 
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.ItemFilter;
+import net.minecraft.util.BlockPos;
 import net.minecraft.util.MovementInput;
 
 /**
@@ -11,18 +12,18 @@ import net.minecraft.util.MovementInput;
  * 
  */
 public class JumpingPlaceBlockAtFloorTask extends PlaceBlockAtFloorTask {
-	public JumpingPlaceBlockAtFloorTask(int x, int y, int z, ItemFilter filter) {
-		super(x, y, z, filter);
+	public JumpingPlaceBlockAtFloorTask(BlockPos pos, ItemFilter filter) {
+		super(pos, filter);
 	}
 
 	@Override
-	protected int getPlaceAtY() {
-		return y - 1;
+	protected int getRelativePlaceAtY() {
+		return -1;
 	}
 
 	@Override
 	public boolean isFinished(AIHelper h) {
-		return h.isStandingOn(x, y, z) && super.isFinished(h);
+		return h.isStandingOn(pos) && super.isFinished(h);
 	}
 
 	@Override
@@ -35,7 +36,7 @@ public class JumpingPlaceBlockAtFloorTask extends PlaceBlockAtFloorTask {
 
 	@Override
 	public String toString() {
-		return "JumpingPlaceBlockAtFloorTask [x=" + x + ", y=" + y + ", z=" + z
-				+ "]";
+		return "JumpingPlaceBlockAtFloorTask [pos=" + pos + "]";
 	}
+
 }

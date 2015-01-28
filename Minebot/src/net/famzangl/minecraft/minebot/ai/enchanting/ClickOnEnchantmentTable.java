@@ -1,6 +1,7 @@
 package net.famzangl.minecraft.minebot.ai.enchanting;
 
 import net.famzangl.minecraft.minebot.ai.AIHelper;
+import net.famzangl.minecraft.minebot.ai.BlockWhitelist;
 import net.famzangl.minecraft.minebot.ai.task.UseItemOnBlockTask;
 import net.minecraft.client.gui.GuiEnchantment;
 import net.minecraft.init.Blocks;
@@ -8,7 +9,7 @@ import net.minecraft.init.Blocks;
 public class ClickOnEnchantmentTable extends UseItemOnBlockTask {
 
 	public ClickOnEnchantmentTable() {
-		super(Blocks.enchanting_table);
+		super(new BlockWhitelist(Blocks.enchanting_table));
 	}
 
 	@Override

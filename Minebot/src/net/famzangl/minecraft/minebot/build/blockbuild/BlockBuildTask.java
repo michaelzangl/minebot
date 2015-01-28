@@ -5,6 +5,7 @@ import net.famzangl.minecraft.minebot.ai.BlockItemFilter;
 import net.famzangl.minecraft.minebot.ai.BlockWhitelist;
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
+import net.minecraft.util.BlockPos;
 
 public class BlockBuildTask extends CubeBuildTask {
 
@@ -22,11 +23,11 @@ public class BlockBuildTask extends CubeBuildTask {
 			Blocks.redstone_block, Blocks.redstone_lamp, Blocks.redstone_ore,
 			Blocks.sand, Blocks.stonebrick, Blocks.tnt);
 
-	public BlockBuildTask(Pos forPosition, Block blockToPlace) {
+	public BlockBuildTask(BlockPos forPosition, Block blockToPlace) {
 		this(forPosition, new BlockItemFilter(blockToPlace));
 	}
 
-	private BlockBuildTask(Pos forPosition, BlockItemFilter blockFilter) {
+	private BlockBuildTask(BlockPos forPosition, BlockItemFilter blockFilter) {
 		super(forPosition, blockFilter);
 	}
 
@@ -37,7 +38,7 @@ public class BlockBuildTask extends CubeBuildTask {
 	}
 
 	@Override
-	public BuildTask withPositionAndRotation(Pos add, int rotateSteps,
+	public BuildTask withPositionAndRotation(BlockPos add, int rotateSteps,
 			MirrorDirection mirror) {
 		return new BlockBuildTask(add, this.blockFilter);
 	}

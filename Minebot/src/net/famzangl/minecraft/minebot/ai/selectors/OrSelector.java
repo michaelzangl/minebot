@@ -1,20 +1,20 @@
 package net.famzangl.minecraft.minebot.ai.selectors;
 
-import net.minecraft.command.IEntitySelector;
+import com.google.common.base.Predicate;
 import net.minecraft.entity.Entity;
 
-public class OrSelector implements IEntitySelector {
+public class OrSelector implements Predicate<Entity> {
 
-	private final IEntitySelector[] selectors;
+	private final Predicate<Entity>[] selectors;
 
-	public OrSelector(IEntitySelector... selectors) {
+	public OrSelector(Predicate<Entity>... selectors) {
 		this.selectors = selectors;
 	}
 
 	@Override
-	public boolean isEntityApplicable(Entity var1) {
-		for (final IEntitySelector s : selectors) {
-			if (s.isEntityApplicable(var1)) {
+	public boolean apply(Entity var1) {
+		for (final Predicate<Entity> s : selectors) {
+			if (s.apply(var1)) {
 				return true;
 			}
 		}

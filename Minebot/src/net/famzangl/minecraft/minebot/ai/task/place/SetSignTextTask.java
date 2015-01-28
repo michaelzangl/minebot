@@ -5,6 +5,7 @@ import net.famzangl.minecraft.minebot.ai.strategy.TaskOperations;
 import net.famzangl.minecraft.minebot.ai.task.AITask;
 import net.minecraft.client.gui.inventory.GuiEditSign;
 import net.minecraft.tileentity.TileEntitySign;
+import net.minecraft.util.BlockPos;
 import net.minecraft.util.ChatAllowedCharacters;
 
 /**
@@ -16,16 +17,12 @@ import net.minecraft.util.ChatAllowedCharacters;
 public class SetSignTextTask extends AITask {
 	private boolean guiOpened;
 	private int timer = 0;
-	private final int x;
-	private final int y;
-	private final int z;
 
 	private final String[] text = new String[4];
+	private final BlockPos pos;
 
-	public SetSignTextTask(int x, int y, int z, String[] text) {
-		this.x = x;
-		this.y = y;
-		this.z = z;
+	public SetSignTextTask(BlockPos pos, String[] text) {
+		this.pos = pos;
 		for (int i = 0; i < this.text.length; i++) {
 			if (text.length > i && text[i] != null) {
 				this.text[i] = makeTextSafe(text[i]);
@@ -61,8 +58,8 @@ public class SetSignTextTask extends AITask {
 		} else {
 			if (timer == 0) {
 				TileEntitySign sign = (TileEntitySign) h
-						.getMinecraft().theWorld.getTileEntity(x, y, z);
-				sign.signText = text;
+						.getMinecraft().theWorld.getTileEntity(pos);
+				//sign.signText = text;
 			} else if (timer == 5) {
 				//GuiEditSign edit = (GuiEditSign) h.getMinecraft().currentScreen;
 				h.getMinecraft().displayGuiScreen(null);

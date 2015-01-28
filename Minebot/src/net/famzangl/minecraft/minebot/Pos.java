@@ -1,7 +1,8 @@
 package net.famzangl.minecraft.minebot;
 
 import net.famzangl.minecraft.minebot.ai.scripting.DoublePos;
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraft.util.BlockPos;
+import net.minecraft.util.EnumFacing;
 
 /**
  * A position consisting of integer x y and z coordinates. Uses mainly for block
@@ -10,67 +11,24 @@ import net.minecraftforge.common.util.ForgeDirection;
  * @author michael
  * 
  */
-public class Pos {
-	public int x;
-	public int y;
-	public int z;
+public class Pos extends BlockPos {
+	
+	public static BlockPos ZERO = new BlockPos(0,0,0);
 
 	public Pos(int x, int y, int z) {
-		super();
-		this.x = x;
-		this.y = y;
-		this.z = z;
+		super(x, y, z);
 	}
 
-	@Override
-	public String toString() {
-		return "Pos [x=" + x + ", y=" + y + ", z=" + z + "]";
-	}
-
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + x;
-		result = prime * result + y;
-		result = prime * result + z;
-		return result;
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj) {
-			return true;
-		}
-		if (obj == null) {
-			return false;
-		}
-		if (getClass() != obj.getClass()) {
-			return false;
-		}
-		final Pos other = (Pos) obj;
-		if (x != other.x) {
-			return false;
-		}
-		if (y != other.y) {
-			return false;
-		}
-		if (z != other.z) {
-			return false;
-		}
-		return true;
-	}
-
-	public static Pos fromDir(ForgeDirection dir) {
-		return new Pos(dir.offsetX, dir.offsetY, dir.offsetZ);
+	public static BlockPos fromDir(EnumFacing dir) {
+		return ZERO.offset(dir);
 	}
 
 	public Pos add(int x, int y, int z) {
-		return new Pos(this.x + x, this.y + y, this.z + z);
+		return new Pos(this.getX() + x, this.getY() + y, this.getZ() + z);
 	}
 
-	public static Pos[] fromDir(ForgeDirection[] standable) {
-		final Pos[] res = new Pos[standable.length];
+	public static BlockPos[] fromDir(EnumFacing[] standable) {
+		final BlockPos[] res = new BlockPos[standable.length];
 		for (int i = 0; i < res.length; i++) {
 			res[i] = fromDir(standable[i]);
 		}
@@ -78,29 +36,17 @@ public class Pos {
 	}
 
 	public static Pos minPos(Pos p1, Pos p2) {
-		return new Pos(Math.min(p1.x, p2.x), Math.min(p1.y, p2.y), Math.min(
-				p1.z, p2.z));
+		return new Pos(Math.min(p1.getX(), p2.getX()), Math.min(p1.getY(), p2.getY()), Math.min(
+				p1.getZ(), p2.getZ()));
 	}
 
 	public static Pos maxPos(Pos p1, Pos p2) {
-		return new Pos(Math.max(p1.x, p2.x), Math.max(p1.y, p2.y), Math.max(
-				p1.z, p2.z));
-	}
-
-	public Pos add(Pos pos) {
-		return add(pos.x, pos.y, pos.z);
-	}
-
-	public Pos subtract(Pos pos) {
-		return new Pos(x - pos.x, y - pos.y, z - pos.z);
-	}
-
-	public Pos multiply(int howMuch) {
-		return new Pos(x * howMuch, y * howMuch, z * howMuch);
+		return new Pos(Math.max(p1.getX(), p2.getX()), Math.max(p1.getY(), p2.getY()), Math.max(
+				p1.getZ(), p2.getZ()));
 	}
 
 	public double distance(Pos other) {
-		return length(other.x - x, other.y - y, other.z - z);
+		return length(other.getX() - getX(), other.getY() - getY(), other.getZ() - getZ());
 	}
 	
 	public static double length(double dx, double dy, double dz) {

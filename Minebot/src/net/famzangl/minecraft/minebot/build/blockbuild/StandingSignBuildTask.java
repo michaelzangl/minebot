@@ -10,6 +10,7 @@ import net.famzangl.minecraft.minebot.ai.task.AITask;
 import net.famzangl.minecraft.minebot.ai.task.place.SignPlaceOnGroundTask;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemSign;
+import net.minecraft.util.BlockPos;
 
 public class StandingSignBuildTask extends BuildFlatOnGroundTask {
 
@@ -38,7 +39,7 @@ public class StandingSignBuildTask extends BuildFlatOnGroundTask {
 		SOUTHSOUTHEAST
 	}
 
-	public StandingSignBuildTask(Pos forPosition, SignDirection direction, String[] texts) {
+	public StandingSignBuildTask(BlockPos forPosition, SignDirection direction, String[] texts) {
 		super(forPosition);
 		this.direction = direction;
 		this.texts = texts;
@@ -50,13 +51,12 @@ public class StandingSignBuildTask extends BuildFlatOnGroundTask {
 	}
 
 	@Override
-	public AITask getPlaceBlockTask(Pos relativeFromPos) {
-		return new SignPlaceOnGroundTask(forPosition.x, forPosition.y,
-				forPosition.z, direction.ordinal(), texts);
+	public AITask getPlaceBlockTask(BlockPos relativeFromPos) {
+		return new SignPlaceOnGroundTask(forPosition, direction.ordinal(), texts);
 	}
 
 	@Override
-	public BuildTask withPositionAndRotation(Pos add, int rotateSteps,
+	public BuildTask withPositionAndRotation(BlockPos add, int rotateSteps,
 			MirrorDirection mirror) {
 		// TODO: Rotate and mirror
 		return new StandingSignBuildTask(forPosition, direction, texts);

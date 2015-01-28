@@ -31,8 +31,8 @@ public class WalkTowardsTask extends AITask {
 	@Override
 	public void runTick(AIHelper h, TaskOperations o) {
 		if (fromPos != null) {
-			if (!h.isStandingOn(fromPos.x, fromPos.y, fromPos.z)) {
-				o.desync(new PositionTaskError(fromPos.x, fromPos.y, fromPos.z));
+			if (!h.isStandingOn(fromPos.getX(), fromPos.getY(), fromPos.getZ())) {
+				o.desync(new PositionTaskError(fromPos.getX(), fromPos.getY(), fromPos.getZ()));
 			}
 			fromPos = null;
 		}

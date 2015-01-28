@@ -10,43 +10,43 @@ import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.BlockWhitelist;
 import net.famzangl.minecraft.minebot.ai.scanner.BlockRangeScanner.BlockHandler;
 import net.minecraft.init.Blocks;
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraft.util.BlockPos;
+import net.minecraft.util.EnumFacing;
 
-public abstract class RangeBlockHandler<ReachData> implements BlockHandler{
-	private static final BlockWhitelist THROUGH_REACHABLE = new BlockWhitelist(Blocks.air, Blocks.torch);
-	private final Hashtable<Pos, ArrayList<ReachData>> reachable = new Hashtable<Pos, ArrayList<ReachData>>();
+public abstract class RangeBlockHandler<ReachData> implements BlockHandler {
+	private static final BlockWhitelist THROUGH_REACHABLE = new BlockWhitelist(
+			Blocks.air, Blocks.torch);
+	private final Hashtable<BlockPos, ArrayList<ReachData>> reachable = new Hashtable<BlockPos, ArrayList<ReachData>>();
 
-	
 	@Override
 	public void scanningDone(AIHelper helper) {
 		updatePositionCache(helper);
 	}
-	
-	protected abstract Collection<Entry<Pos, ReachData>> getTargetPositions();
+
+	protected abstract Collection<Entry<BlockPos, ReachData>> getTargetPositions();
 
 	private void updatePositionCache(AIHelper helper) {
 		reachable.clear();
-		for (Entry<Pos, ReachData> c : getTargetPositions()) {
-				addPositionToCache(helper, c.getKey(), c.getValue());
+		for (Entry<BlockPos, ReachData> c : getTargetPositions()) {
+			addPositionToCache(helper, c.getKey(), c.getValue());
 		}
 	}
-	
-	protected void addPositionToCache(AIHelper helper, Pos pos, ReachData c) {
-		for (ForgeDirection d : new ForgeDirection[] {
-				ForgeDirection.NORTH, ForgeDirection.SOUTH,
-				ForgeDirection.EAST, ForgeDirection.WEST }) {
+
+	protected void addPositionToCache(AIHelper helper, BlockPos pos, ReachData c) {
+		for (EnumFacing d : new EnumFacing[] { EnumFacing.NORTH,
+				EnumFacing.SOUTH, EnumFacing.EAST, EnumFacing.WEST }) {
 			addPositions(helper, pos, c, d);
 		}
 	}
-	
-	private void addPositions(AIHelper helper, Pos pos, ReachData c,
-			ForgeDirection d) {
+
+	private void addPositions(AIHelper helper, BlockPos pos, ReachData c,
+			EnumFacing d) {
 		int dvertMax = 4;
 		for (int dhor = 0; dhor < 4; dhor++) {
-			int y = pos.y - dhor;
+			int y = pos.getY() - dhor;
 			for (int dvert = 1; dvert <= dvertMax; dvert++) {
-				int x = pos.x + dvert * d.offsetX;
-				int z = pos.z + dvert * d.offsetZ;
+				int x = pos.getX() + dvert * d.getFrontOffsetX();
+				int z = pos.getZ() + dvert * d.getFrontOffsetZ();
 				if (!THROUGH_REACHABLE.contains(helper.getBlockId(x, y, z))) {
 					dvertMax = dvert;
 				} else if (dvert > 1) {
@@ -56,8 +56,8 @@ public abstract class RangeBlockHandler<ReachData> implements BlockHandler{
 			}
 		}
 	}
-	
-	private void addReachable(Pos allowed, ReachData c) {
+
+	private void addReachable(BlockPos allowed, ReachData c) {
 		ArrayList<ReachData> list = reachable.get(allowed);
 		if (list == null) {
 			list = new ArrayList<ReachData>();
@@ -65,7 +65,6 @@ public abstract class RangeBlockHandler<ReachData> implements BlockHandler{
 		}
 		list.add(c);
 	}
-
 
 	public ArrayList<ReachData> getReachableForPos(Pos pos) {
 		return reachable.get(pos);

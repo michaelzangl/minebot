@@ -19,14 +19,15 @@ import net.famzangl.minecraft.minebot.ai.task.inventory.ItemWithSubtype;
 import net.minecraft.block.Block;
 import net.minecraft.client.gui.GuiEnchantment;
 import net.minecraft.init.Blocks;
+import net.minecraft.util.BlockPos;
 
 public class EnchantStrategy extends PathFinderStrategy {
 
 	public static class EnchantingTableData {
 
-		public final Pos pos;
+		public final BlockPos pos;
 
-		public EnchantingTableData(Pos pos) {
+		public EnchantingTableData(BlockPos pos) {
 			this.pos = pos;
 			// TODO: Get level?
 		}
@@ -37,7 +38,7 @@ public class EnchantStrategy extends PathFinderStrategy {
 		private static final int[] IDS = new int[] { Block
 				.getIdFromBlock(Blocks.enchanting_table) };
 
-		private final Hashtable<Pos, EnchantingTableData> found = new Hashtable<Pos, EnchantingTableData>();
+		private final Hashtable<BlockPos, EnchantingTableData> found = new Hashtable<BlockPos, EnchantingTableData>();
 
 		@Override
 		public int[] getIds() {
@@ -46,12 +47,12 @@ public class EnchantStrategy extends PathFinderStrategy {
 
 		@Override
 		public void scanBlock(AIHelper helper, int id, int x, int y, int z) {
-			Pos pos = new Pos(x, y, z);
+			BlockPos pos = new BlockPos(x, y, z);
 			found.put(pos, new EnchantingTableData(pos));
 		}
 
 		@Override
-		protected Collection<Entry<Pos, EnchantingTableData>> getTargetPositions() {
+		protected Collection<Entry<BlockPos, EnchantingTableData>> getTargetPositions() {
 			return found.entrySet();
 		}
 	}
@@ -89,8 +90,7 @@ public class EnchantStrategy extends PathFinderStrategy {
 					.getReachableForPos(currentPos);
 			EnchantingTableData table = tables.get(0);
 
-			addTask(new UseItemOnBlockAtTask(table.pos.x, table.pos.y,
-					table.pos.z) {
+			addTask(new UseItemOnBlockAtTask(table.pos) {
 				@Override
 				public boolean isFinished(AIHelper h) {
 					return super.isFinished(h)

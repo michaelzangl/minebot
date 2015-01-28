@@ -13,21 +13,25 @@ import net.minecraft.block.BlockFence;
 import net.minecraft.block.BlockFenceGate;
 import net.minecraft.block.BlockSlab;
 import net.minecraft.block.BlockStairs;
+import net.minecraft.block.BlockTorch;
 import net.minecraft.block.BlockWall;
+import net.minecraft.block.BlockWallSign;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.settings.KeyBinding;
-import net.minecraft.command.IEntitySelector;
 import net.minecraft.entity.Entity;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.BlockPos;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.MovementInput;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.MovingObjectPosition.MovingObjectType;
 import net.minecraft.world.chunk.Chunk;
-import net.minecraft.world.chunk.NibbleArray;
 import net.minecraft.world.chunk.storage.ExtendedBlockStorage;
-import net.minecraftforge.common.util.ForgeDirection;
+
+import com.google.common.base.Predicate;
 
 /**
  * Everything needed to control the AI.
@@ -42,7 +46,7 @@ public abstract class AIHelper {
 	private static final double MIN_DISTANCE_ERROR = 0.05;
 	private static Minecraft mc = Minecraft.getMinecraft();
 	private final Random rand = new Random();
-	
+
 	private Chunk chunkCache1 = null;
 	private Chunk chunkCache2 = null;
 	private boolean chunkCacheReplaceCounter = false;
@@ -62,12 +66,12 @@ public abstract class AIHelper {
 			Blocks.iron_block, Blocks.iron_ore, Blocks.lapis_block,
 			Blocks.lapis_ore, Blocks.leaves, Blocks.leaves2,
 			Blocks.lit_pumpkin, Blocks.lit_furnace, Blocks.lit_redstone_lamp,
-			Blocks.lit_redstone_ore, Blocks.log, Blocks.log2,
+			Blocks.lit_redstone_ore, Blocks.log,
+			Blocks.log2,
 			Blocks.melon_block,
 			Blocks.mossy_cobblestone,
 			Blocks.mycelium,
 			Blocks.nether_brick,
-			Blocks.nether_brick_fence,
 			Blocks.netherrack,
 			// Watch out, this cannot be broken easily !
 			Blocks.obsidian, Blocks.packed_ice, Blocks.planks, Blocks.pumpkin,
@@ -92,30 +96,49 @@ public abstract class AIHelper {
 			Blocks.stone_brick_stairs, Blocks.stone_stairs, Blocks.stone_slab,
 			Blocks.wooden_slab, Blocks.quartz_stairs);
 
+	public static final BlockWhitelist railBlocks = new BlockWhitelist(
+			Blocks.golden_rail, Blocks.detector_rail, Blocks.rail,
+			Blocks.activator_rail);
+
 	/**
 	 * Flowers and stuff like that
 	 */
 	private static final BlockWhitelist explicitFootWalkableBlocks = new BlockWhitelist(
 			Blocks.tallgrass, Blocks.yellow_flower, Blocks.red_flower,
 			Blocks.wheat, Blocks.carrots, Blocks.potatoes, Blocks.pumpkin_stem,
-			Blocks.melon_stem, Blocks.carpet, Blocks.golden_rail,
-			Blocks.detector_rail, Blocks.rail, Blocks.activator_rail,
-			Blocks.double_plant, Blocks.red_mushroom, Blocks.brown_mushroom,
-			Blocks.redstone_wire, Blocks.sapling, Blocks.snow_layer,
-			Blocks.nether_wart, Blocks.standing_sign, Blocks.wall_sign);
+			Blocks.melon_stem, Blocks.carpet, Blocks.double_plant,
+			Blocks.red_mushroom, Blocks.brown_mushroom, Blocks.redstone_wire,
+			Blocks.sapling, Blocks.snow_layer, Blocks.nether_wart,
+			Blocks.standing_sign, Blocks.wall_sign).unionWith(railBlocks);
+
+	public static final BlockWhitelist torches = new BlockWhitelist(
+			Blocks.torch, Blocks.redstone_torch);
 
 	public static final BlockWhitelist headWalkableBlocks = new BlockWhitelist(
-			Blocks.air, Blocks.torch, Blocks.double_plant,
-			Blocks.redstone_torch, Blocks.cocoa);
+			Blocks.air, Blocks.double_plant, Blocks.cocoa).unionWith(torches);
 
 	public static final BlockWhitelist walkableBlocks = explicitFootWalkableBlocks
 			.unionWith(headWalkableBlocks);
 
-	public static final BlockWhitelist explicitSafeSideBlocks = new BlockWhitelist(Blocks.anvil,
-			Blocks.fence, Blocks.fence_gate, Blocks.cobblestone_wall,
-			Blocks.cactus, Blocks.reeds, Blocks.web, Blocks.glass_pane,
-			Blocks.bed, Blocks.enchanting_table, Blocks.waterlily,
-			Blocks.brewing_stand, Blocks.vine, Blocks.chest);
+	public static final BlockWhitelist fences = new BlockWhitelist(
+			Blocks.oak_fence, Blocks.spruce_fence, Blocks.birch_fence,
+			Blocks.jungle_fence, Blocks.dark_oak_fence, Blocks.acacia_fence,
+			Blocks.nether_brick_fence);
+
+	public static final BlockWhitelist woodenDoors = new BlockWhitelist(
+			Blocks.oak_door, Blocks.spruce_door, Blocks.birch_door,
+			Blocks.jungle_door, Blocks.dark_oak_door, Blocks.acacia_door);
+
+	public static final BlockWhitelist fenceGates = new BlockWhitelist(
+			Blocks.oak_fence_gate, Blocks.spruce_fence_gate,
+			Blocks.birch_fence_gate, Blocks.jungle_fence_gate,
+			Blocks.dark_oak_fence_gate, Blocks.acacia_fence_gate);
+
+	public static final BlockWhitelist explicitSafeSideBlocks = new BlockWhitelist(
+			Blocks.anvil, Blocks.cobblestone_wall, Blocks.cactus, Blocks.reeds,
+			Blocks.web, Blocks.glass_pane, Blocks.bed, Blocks.enchanting_table,
+			Blocks.waterlily, Blocks.brewing_stand, Blocks.vine, Blocks.chest)
+			.unionWith(fences).unionWith(fenceGates);
 
 	/**
 	 * Blocks that form a solid ground.
@@ -133,38 +156,64 @@ public abstract class AIHelper {
 	/**
 	 * Blocks you need to destroy but that are then safe.
 	 */
-	public static final BlockWhitelist safeDestructableBlocks = new BlockWhitelist(Blocks.vine);
-	
+	public static final BlockWhitelist safeDestructableBlocks = new BlockWhitelist(
+			Blocks.vine);
+
 	public final BuildManager buildManager = new BuildManager();
 	private boolean objectMouseOverInvalidated;
 
 	protected Pos pos1 = null;
 	protected Pos pos2 = null;
 
+	private MovementInput resetMovementInput;
+	private KeyBinding resetAttackKey;
+	private KeyBinding resetUseItemKey;
+	private boolean useItemKeyJustPressed;
+	private boolean attackKeyJustPressed;
+	protected boolean doUngrab;
+	private KeyBinding resetSneakKey;
+	private boolean sneakKeyJustPressed;
+
+	private int chunkHitCounter = 0;
+	private int chunkMissCounter = 0;
+
+	/**
+	 * A random number in a range, that does not exactly hit the sides.
+	 * 
+	 * @param minY
+	 * @param maxY
+	 * @return
+	 */
+	private double randBetweenNice(double minY, double maxY) {
+		return maxY - minY < 0.1 ? (maxY + minY) / 2 : randBetween(minY + 0.03,
+				maxY - 0.03);
+	}
+
+	private double randBetween(double a, double b) {
+		return rand.nextDouble() * (b - a) + a;
+	}
+
+	protected void invalidateChunkCache() {
+		if (chunkHitCounter > 0 || chunkMissCounter > 0) {
+			System.out.println("Last chunk cache hit: " + chunkHitCounter
+					+ " but missed " + chunkMissCounter);
+			chunkHitCounter = 0;
+			chunkMissCounter = 0;
+		}
+		chunkCache1 = null;
+		chunkCache2 = null;
+	}
+
 	public Minecraft getMinecraft() {
 		return mc;
 	}
 
-	/**
-	 * Gets the block at that position.
-	 * 
-	 * @param x
-	 * @param y
-	 * @param z
-	 * @return The block.
-	 */
-	public Block getBlock(int x, int y, int z) {
-		return mc.theWorld.getBlock(x, y, z);
-	}
-
-	/**
-	 * Gets the block at that position.
-	 * 
-	 * @param pos
-	 * @return
-	 */
-	public Block getBlock(Pos pos) {
-		return getBlock(pos.x, pos.y, pos.z);
+	public static File getMinebotDir() {
+		File dir = new File(mc.mcDataDir, "minebot");
+		if (!dir.exists()) {
+			dir.mkdir();
+		}
+		return dir;
 	}
 
 	/**
@@ -205,167 +254,6 @@ public abstract class AIHelper {
 	}
 
 	/**
-	 * Faces an exact position in space.
-	 * 
-	 * @param x
-	 * @param y
-	 * @param z
-	 */
-	public void face(double x, double y, double z) {
-		final double d0 = x - mc.thePlayer.posX;
-		final double d1 = z - mc.thePlayer.posZ;
-		final double d2 = y - mc.thePlayer.posY;
-		final double d3 = d0 * d0 + d2 * d2 + d1 * d1;
-
-		if (d3 >= 2.500000277905201E-7D) {
-			final float rotationYaw = mc.thePlayer.rotationYaw;
-			final float rotationPitch = mc.thePlayer.rotationPitch;
-
-			final float yaw = (float) (Math.atan2(d1, d0) * 180.0D / Math.PI) - 90.0F;
-			final float pitch = (float) -(Math.atan2(d2,
-					Math.sqrt(d0 * d0 + d1 * d1)) * 180.0D / Math.PI);
-			mc.thePlayer.setAngles((yaw - rotationYaw) / 0.15f,
-					-(pitch - rotationPitch) / 0.15f);
-			invalidateObjectMouseOver();
-		}
-	}
-
-	/*
-	 * public void moveTo(int x, int y, int z) { face(x + .5, mc.thePlayer.posY,
-	 * z + .5); MovementInput i = new MovementInput(); i.moveForward = 0.8f;
-	 * overrideMovement(i); }
-	 */
-
-	/**
-	 * Checks if an item is on the hotbar.
-	 * 
-	 * @param f
-	 *            The item to search
-	 * @return <code>true</code> if it is selectable.
-	 */
-	public boolean canSelectItem(ItemFilter f) {
-		for (int i = 0; i < 9; ++i) {
-			if (f.matches(mc.thePlayer.inventory.getStackInSlot(i))) {
-				return true;
-			}
-		}
-		return false;
-	}
-
-	/**
-	 * Selects an item.
-	 * 
-	 * @param f
-	 *            The item to search for.
-	 * @return <code>true</code> if the player is now holding that item.
-	 */
-	public boolean selectCurrentItem(ItemFilter f) {
-		if (f.matches(mc.thePlayer.inventory.getCurrentItem())) {
-			return true;
-		}
-		for (int i = 0; i < 9; ++i) {
-			if (f.matches(mc.thePlayer.inventory.getStackInSlot(i))) {
-				mc.thePlayer.inventory.currentItem = i;
-				return true;
-			}
-		}
-		return false;
-	}
-
-	/**
-	 * Finds any Block of that type directly around the player.
-	 * 
-	 * @param blockType
-	 *            The block to search.
-	 * @return the position or <code>null</code> if it was not found.
-	 */
-	public Pos findBlock(Block blockType) {
-		final Pos current = getPlayerPosition();
-		Pos pos = null;
-		for (int x = current.x - 2; x <= current.x + 2; x++) {
-			for (int z = current.z - 2; z <= current.z + 2; z++) {
-				for (int y = current.y - 1; y <= current.y + 2; y++) {
-					final Block block = mc.theWorld.getBlock(x, y, z);
-					if (Block.isEqualTo(block, blockType)) {
-						pos = new Pos(x, y, z);
-					}
-				}
-			}
-		}
-		return pos;
-	}
-
-	/**
-	 * Checks if the player is currently facing the block so that it can be
-	 * interacted with.
-	 * 
-	 * @param x
-	 * @param y
-	 * @param z
-	 * @return <code>true</code> if it is facing the Block.
-	 */
-	public boolean isFacingBlock(int x, int y, int z) {
-		final MovingObjectPosition o = getObjectMouseOver();
-		return o != null && o.typeOfHit == MovingObjectType.BLOCK
-				&& o.blockX == x && o.blockY == y && o.blockZ == z;
-	}
-
-	/**
-	 * Checks if the player is facing a specific side of the block.
-	 * 
-	 * @param x
-	 * @param y
-	 * @param z
-	 * @param blockSide
-	 *            The side of the block.
-	 * @param half
-	 *            Can restrict the check to the upper or lower half of the side
-	 *            (not useful for top/bottom)
-	 * @return <code>true</code> if the player faces the block.
-	 */
-	public boolean isFacingBlock(int x, int y, int z, ForgeDirection blockSide,
-			BlockSide half) {
-		if (!isFacingBlock(x, y, z, sideToDir(blockSide))) {
-			return false;
-		} else {
-			final double fy = getObjectMouseOver().hitVec.yCoord - y;
-			return half != BlockSide.LOWER_HALF && fy > .5
-					|| half != BlockSide.UPPER_HALF && fy <= .5;
-		}
-	}
-
-	/**
-	 * Checks if the player is facing a specific side of the block.
-	 * 
-	 * @param x
-	 * @param y
-	 * @param z
-	 * @param blockSide
-	 *            The side of the block.
-	 * @return <code>true</code> if the player faces the block.
-	 */
-	public boolean isFacingBlock(int x, int y, int z, ForgeDirection blockSide) {
-		return isFacingBlock(x, y, z, sideToDir(blockSide));
-	}
-
-	/**
-	 * Checks if the player is facing a specific side of the block.
-	 * 
-	 * @param x
-	 * @param y
-	 * @param z
-	 * @param blockSide
-	 *            The side of the block as game integer.
-	 * @return <code>true</code> if the player faces the block.
-	 */
-	public boolean isFacingBlock(int x, int y, int z, int side) {
-		final MovingObjectPosition o = getObjectMouseOver();
-		return o != null && o.typeOfHit == MovingObjectType.BLOCK
-				&& o.blockX == x && o.blockY == y && o.blockZ == z
-				&& o.sideHit == side;
-	}
-
-	/**
 	 * Needs to be called whenever the player moved and the block faced might
 	 * have changed.
 	 */
@@ -389,51 +277,97 @@ public abstract class AIHelper {
 	}
 
 	/**
-	 * Are the feet standing on that block?
+	 * Gets the block at that position.
+	 * 
+	 * @param pos
+	 * @return
+	 */
+	public Block getBlock(BlockPos pos) {
+		return getBlock(pos.getX(), pos.getY(), pos.getZ());
+	}
+
+	/**
+	 * Gets the block at that position.
+	 * 
+	 * @param x
+	 * @param y
+	 * @param z
+	 * @return The block.
+	 */
+	public Block getBlock(int x, int y, int z) {
+		return mc.theWorld.getBlockState(new BlockPos(x, y, z)).getBlock();
+	}
+
+	public int getBlockId(BlockPos pos) {
+		return getBlockId(pos.getX(), pos.getY(), pos.getZ());
+	}
+
+	public int getBlockId(int x, int y, int z) {
+		return getBlockIdWithMeta(x, y, z) >> 4;
+	}
+
+	public int getBlockIdWithMeta(BlockPos pos) {
+		return getBlockIdWithMeta(pos.getX(), pos.getY(), pos.getZ());
+	}
+
+	/**
+	 * A fast method that gets a block id for a given position. Use it if you
+	 * need to scan many blocks, since the default minecraft block lookup is
+	 * slow. For x<0 or x>= 256 it returns bedrock, to make routing easy.
 	 * 
 	 * @param x
 	 * @param y
 	 * @param z
 	 * @return
 	 */
-	public boolean isStandingOn(int x, int y, int z) {
-		// boolean isFence = blockIsOneOf(getBlock(x, y - 1, z),
-		// FenceBuildTask.BLOCKS);
-		return Math.abs(x + 0.5 - mc.thePlayer.posX) < 0.2
-				&& Math.abs(z + 0.5 - mc.thePlayer.posZ) < 0.2
-				&& Math.abs(mc.thePlayer.boundingBox.minY - y) < 0.52;
-	}
+	public int getBlockIdWithMeta(int x, int y, int z) {
+		if (y < 0 || y >= 256) {
+			return BEDROCK_ID;
+		}
 
-	/**
-	 * Get the current position the player is at.
-	 * 
-	 * @return The position.
-	 */
-	public Pos getPlayerPosition() {
-		final int x = (int) Math.floor(getMinecraft().thePlayer.posX);
-		final int y = (int) Math
-				.floor(getMinecraft().thePlayer.boundingBox.minY + 0.05);
-		final int z = (int) Math.floor(getMinecraft().thePlayer.posZ);
-		return new Pos(x, y, z);
-	}
-
-	/**
-	 * Selects a good tool for mining the given Block.
-	 * 
-	 * @param x
-	 * @param y
-	 * @param z
-	 */
-	public void selectToolFor(final int x, final int y, final int z) {
-		selectCurrentItem(new ItemFilter() {
-			@Override
-			public boolean matches(ItemStack itemStack) {
-				return itemStack != null
-						&& itemStack.getItem() != null
-						&& itemStack.getItem().func_150893_a(itemStack,
-								getBlock(x, y, z)) > 1;
+		int chunkX = x >> 4;
+		int chunkZ = z >> 4;
+		final Chunk chunk;
+		if (chunkCache1 != null && chunkCache1.xPosition == chunkX
+				&& chunkCache1.zPosition == chunkZ) {
+			chunk = chunkCache1;
+			chunkHitCounter++;
+		} else if (chunkCache2 != null && chunkCache2.xPosition == chunkX
+				&& chunkCache2.zPosition == chunkZ) {
+			chunk = chunkCache2;
+			chunkHitCounter++;
+		} else {
+			chunk = mc.theWorld.getChunkFromChunkCoords(chunkX, chunkZ);
+			if (chunkCacheReplaceCounter) {
+				chunkCache1 = chunk;
+			} else {
+				chunkCache2 = chunk;
 			}
-		});
+			chunkCacheReplaceCounter = !chunkCacheReplaceCounter;
+			chunkMissCounter++;
+		}
+
+		// chunk.getBlock(x & 15, y, z & 15);
+
+		int blockId = 0;
+
+		final ExtendedBlockStorage[] sa = chunk.getBlockStorageArray();
+		if (y >> 4 < sa.length) {
+			final ExtendedBlockStorage extendedblockstorage = sa[y >> 4];
+
+			if (extendedblockstorage != null) {
+				final int lx = x & 15;
+				final int ly = y & 15;
+				final int lz = z & 15;
+				blockId = extendedblockstorage.getData()[ly << 8 | lz << 4 | lx] & 0xffff;
+			}
+		}
+
+		return blockId;
+	}
+
+	public boolean isAirBlock(BlockPos pos) {
+		return isAirBlock(pos.getX(), pos.getY(), pos.getZ());
 	}
 
 	/**
@@ -535,18 +469,6 @@ public abstract class AIHelper {
 	}
 
 	/**
-	 * Check if it is a railway line.
-	 * 
-	 * @param block
-	 * @return
-	 */
-	@Deprecated
-	public boolean isRailBlock(Block block) {
-		return blockIsOneOf(block, Blocks.golden_rail, Blocks.detector_rail,
-				Blocks.rail, Blocks.activator_rail);
-	}
-
-	/**
 	 * Check if we can stand on the block.
 	 * 
 	 * @param block
@@ -556,61 +478,25 @@ public abstract class AIHelper {
 		return safeStandableBlocks.contains(block);
 	}
 
-	public boolean isSideTorch(int x, int y, int z) {
-		return blockIsOneOf(getBlock(x, y, z), Blocks.torch,
-				Blocks.redstone_torch)
-				&& getMinecraft().theWorld.getBlockMetadata(x, y, z) != 5;
+	public boolean isSideTorch(BlockPos pos) {
+		int id = getBlockId(pos);
+		return torches.contains(id)
+				&& getMinecraft().theWorld.getBlockState(pos)
+						.getValue(BlockTorch.FACING) != EnumFacing.UP;
 	}
 
-	/**
-	 * Faces a block and destroys it if possible.
-	 * 
-	 * @param x
-	 * @param y
-	 * @param z
-	 */
-	public void faceAndDestroy(final int x, final int y, final int z) {
-		if (!isFacingBlock(x, y, z)) {
-			faceBlock(x, y, z);
+	public BlockPos getHaningOnBlock(BlockPos pos) {
+		IBlockState meta = mc.theWorld.getBlockState(pos);
+		EnumFacing facing = null;
+		if (torches.contains(meta.getBlock())) {
+			facing = getTorchDirection(meta);
+		} else if (meta.getBlock().equals(Blocks.wall_sign)) {
+			facing = getSignDirection(meta);
+			// TODO Ladder and other hanging blocks.
+		} else if (walkableBlocks.contains(meta)) {
+			facing = EnumFacing.UP;
 		}
-
-		if (isFacingBlock(x, y, z)) {
-			selectToolFor(x, y, z);
-			overrideAttack();
-		}
-	}
-
-	public void faceAndDestroyWithHangingBlock(final int x, final int y,
-			final int z) {
-		faceAndDestroy(x, y, z);
-		if (!isFacingBlock(x, y, z)) {
-			// Check if there is a block hanging here.
-			for (ForgeDirection d : ForgeDirection.VALID_DIRECTIONS) {
-				if (isFacingBlock(x + d.offsetX, y + d.offsetY, z + d.offsetZ)) {
-					Pos hanging = getHaningOnBlock(x + d.offsetX,
-							y + d.offsetY, z + d.offsetZ);
-					if (hanging != null && hanging.x == x && hanging.y == y
-							&& hanging.z == z) {
-						overrideAttack();
-					}
-				}
-			}
-		}
-	}
-
-	public Pos getHaningOnBlock(int x, int y, int z) {
-		Block b = getBlock(x, y, z);
-		int meta = mc.theWorld.getBlockMetadata(x, y, z);
-		if (blockIsOneOf(b, Blocks.torch, Blocks.redstone_torch)) {
-			ForgeDirection dir = getTorchDirection(meta);
-			return new Pos(x - dir.offsetX, y - dir.offsetY, z - dir.offsetZ);
-		} else if (blockIsOneOf(b, Blocks.ladder, Blocks.wall_sign)) {
-			ForgeDirection dir = getSignDirection(meta);
-			return new Pos(x - dir.offsetX, y - dir.offsetY, z - dir.offsetZ);
-		} else if (walkableBlocks.contains(b)) {
-			return new Pos(x, y - 1, z);
-		}
-		return null;
+		return facing == null ? null : pos.offset(facing, -1);
 	}
 
 	/**
@@ -619,10 +505,8 @@ public abstract class AIHelper {
 	 * @param meta
 	 * @return
 	 */
-	private ForgeDirection getSignDirection(int metaValue) {
-		return new ForgeDirection[] { ForgeDirection.DOWN, ForgeDirection.UP,
-				ForgeDirection.NORTH, ForgeDirection.SOUTH,
-				ForgeDirection.WEST, ForgeDirection.EAST }[metaValue];
+	private EnumFacing getSignDirection(IBlockState metaValue) {
+		return (EnumFacing) metaValue.getValue(BlockWallSign.FACING);
 
 	}
 
@@ -633,10 +517,305 @@ public abstract class AIHelper {
 	 * @param metaValue
 	 * @return
 	 */
-	public ForgeDirection getTorchDirection(int metaValue) {
-		return new ForgeDirection[] { ForgeDirection.UNKNOWN,
-				ForgeDirection.EAST, ForgeDirection.WEST, ForgeDirection.SOUTH,
-				ForgeDirection.NORTH, ForgeDirection.UP }[metaValue];
+	public EnumFacing getTorchDirection(IBlockState metaValue) {
+		return (EnumFacing) metaValue.getValue(BlockTorch.FACING);
+	}
+
+	private Block getBoundsBlock(BlockPos pos) {
+		Block block = getBlock(pos);
+		if (block instanceof BlockStairs) {
+			// Stairs have crazy bounds
+			block = Blocks.dirt;
+		}
+		block.setBlockBoundsBasedOnState(mc.theWorld, pos);
+		return block;
+	}
+
+	/**
+	 * Finds any Block of that type directly around the player.
+	 * 
+	 * @param blockType
+	 *            The block to search.
+	 * @return the position or <code>null</code> if it was not found.
+	 */
+	public BlockPos findBlock(Block blockType) {
+		final BlockPos current = getPlayerPosition();
+		BlockPos pos = null;
+		for (int x = current.getX() - 2; x <= current.getX() + 2; x++) {
+			for (int z = current.getZ() - 2; z <= current.getZ() + 2; z++) {
+				for (int y = current.getY() - 1; y <= current.getY() + 2; y++) {
+					final Block block = getBlock(x, y, z);
+					if (Block.isEqualTo(block, blockType)) {
+						pos = new BlockPos(x, y, z);
+					}
+				}
+			}
+		}
+		return pos;
+	}
+
+	/**
+	 * Faces an exact position in space.
+	 * 
+	 * @param x
+	 * @param y
+	 * @param z
+	 */
+	public void face(double x, double y, double z) {
+		final double d0 = x - mc.thePlayer.posX;
+		final double d1 = z - mc.thePlayer.posZ;
+		final double d2 = y - mc.thePlayer.posY - mc.thePlayer.getEyeHeight();
+		final double d3 = d0 * d0 + d2 * d2 + d1 * d1;
+
+		if (d3 >= 2.500000277905201E-7D) {
+			final float rotationYaw = mc.thePlayer.rotationYaw;
+			final float rotationPitch = mc.thePlayer.rotationPitch;
+
+			final float yaw = (float) (Math.atan2(d1, d0) * 180.0D / Math.PI) - 90.0F;
+			final float pitch = (float) -(Math.atan2(d2,
+					Math.sqrt(d0 * d0 + d1 * d1)) * 180.0D / Math.PI);
+			mc.thePlayer.setAngles((yaw - rotationYaw) / 0.15f,
+					-(pitch - rotationPitch) / 0.15f);
+			invalidateObjectMouseOver();
+		}
+	}
+
+	/*
+	 * public void moveTo(int x, int y, int z) { face(x + .5, mc.thePlayer.posY,
+	 * z + .5); MovementInput i = new MovementInput(); i.moveForward = 0.8f;
+	 * overrideMovement(i); }
+	 */
+
+	public boolean isFacingBlock(BlockPos pos) {
+		return isFacingBlock(pos.getX(), pos.getY(), pos.getZ());
+	}
+
+	/**
+	 * Checks if the player is currently facing the block so that it can be
+	 * interacted with.
+	 * 
+	 * @param x
+	 * @param y
+	 * @param z
+	 * @return <code>true</code> if it is facing the Block.
+	 */
+	public boolean isFacingBlock(int x, int y, int z) {
+		final MovingObjectPosition o = getObjectMouseOver();
+		return o != null && o.typeOfHit == MovingObjectType.BLOCK
+				&& new BlockPos(x, y, z).equals(o.getBlockPos());
+	}
+
+	public boolean isFacingBlock(BlockPos pos, EnumFacing blockSide,
+			BlockSide half) {
+		return isFacingBlock(pos.getX(), pos.getY(), pos.getZ(), blockSide,
+				half);
+	}
+
+	/**
+	 * Checks if the player is facing a specific side of the block.
+	 * 
+	 * @param x
+	 * @param y
+	 * @param z
+	 * @param blockSide
+	 *            The side of the block.
+	 * @param half
+	 *            Can restrict the check to the upper or lower half of the side
+	 *            (not useful for top/bottom)
+	 * @return <code>true</code> if the player faces the block.
+	 */
+	public boolean isFacingBlock(int x, int y, int z, EnumFacing blockSide,
+			BlockSide half) {
+		if (!isFacingBlock(x, y, z, blockSide)) {
+			return false;
+		} else {
+			final double fy = getObjectMouseOver().hitVec.yCoord - y;
+			return half != BlockSide.LOWER_HALF && fy > .5
+					|| half != BlockSide.UPPER_HALF && fy <= .5;
+		}
+	}
+
+	public boolean isFacingBlock(BlockPos pos, EnumFacing side) {
+		return isFacingBlock(pos.getX(), pos.getY(), pos.getZ(), side);
+	}
+
+	/**
+	 * Checks if the player is facing a specific side of the block.
+	 * 
+	 * @param x
+	 * @param y
+	 * @param z
+	 * @param blockSide
+	 *            The side of the block as game integer.
+	 * @return <code>true</code> if the player faces the block.
+	 */
+	public boolean isFacingBlock(int x, int y, int z, EnumFacing side) {
+		final MovingObjectPosition o = getObjectMouseOver();
+		return o != null && o.typeOfHit == MovingObjectType.BLOCK
+				&& new BlockPos(x, y, z).equals(o.getBlockPos())
+				&& o.sideHit == side;
+	}
+
+	public boolean isStandingOn(BlockPos pos) {
+		return isStandingOn(pos.getX(), pos.getY(), pos.getZ());
+	}
+
+	/**
+	 * Are the feet standing on that block?
+	 * 
+	 * @param x
+	 * @param y
+	 * @param z
+	 * @return
+	 */
+	public boolean isStandingOn(int x, int y, int z) {
+		// boolean isFence = blockIsOneOf(getBlock(x, y - 1, z),
+		// FenceBuildTask.BLOCKS);
+		return Math.abs(x + 0.5 - mc.thePlayer.posX) < 0.2
+				&& Math.abs(z + 0.5 - mc.thePlayer.posZ) < 0.2
+				&& Math.abs(mc.thePlayer.getEntityBoundingBox().minY - y) < 0.52;
+	}
+
+	public double realBlockTopY(BlockPos pos) {
+		return realBlockTopY(pos.getX(), pos.getY(), pos.getZ());
+	}
+
+	/**
+	 * The real top y cord of the block we stand on. Watch out: Minecraft blocks
+	 * do not always provide the right bounds with it's block objects.
+	 * 
+	 * @param x
+	 * @param y
+	 * @param z
+	 * @return
+	 */
+	public double realBlockTopY(int x, int y, int z) {
+		final Block block = getBlock(x, y - 1, z);
+		// Fence bounds are not exposed...
+		double maxY;
+		if (block instanceof BlockFence || block instanceof BlockFenceGate
+				|| block instanceof BlockWall) {
+			maxY = 1.5;
+		} else if (block instanceof BlockSlab) {
+			final int blockMetadata = getBlockIdWithMeta(x, y, z) & 0xf;
+			maxY = (blockMetadata & 0x8) == 0 ? 0.5 : 1;
+		} else {
+			maxY = block.getBlockBoundsMaxY();
+		}
+
+		return y - 1 + maxY;
+	}
+
+	/**
+	 * Get the current position the player is at.
+	 * 
+	 * @return The position.
+	 */
+	public Pos getPlayerPosition() {
+		final int x = (int) Math.floor(getMinecraft().thePlayer.posX);
+		final int y = (int) Math.floor(getMinecraft().thePlayer
+				.getEntityBoundingBox().minY + 0.05);
+		final int z = (int) Math.floor(getMinecraft().thePlayer.posZ);
+		return new Pos(x, y, z);
+	}
+
+	/*
+	 * public void moveTo(int x, int y, int z) { face(x + .5, mc.thePlayer.posY,
+	 * z + .5); MovementInput i = new MovementInput(); i.moveForward = 0.8f;
+	 * overrideMovement(i); }
+	 */
+
+	/**
+	 * Checks if an item is on the hotbar.
+	 * 
+	 * @param f
+	 *            The item to search
+	 * @return <code>true</code> if it is selectable.
+	 */
+	public boolean canSelectItem(ItemFilter f) {
+		for (int i = 0; i < 9; ++i) {
+			if (f.matches(mc.thePlayer.inventory.getStackInSlot(i))) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/**
+	 * Selects an item.
+	 * 
+	 * @param f
+	 *            The item to search for.
+	 * @return <code>true</code> if the player is now holding that item.
+	 */
+	public boolean selectCurrentItem(ItemFilter f) {
+		if (f.matches(mc.thePlayer.inventory.getCurrentItem())) {
+			return true;
+		}
+		for (int i = 0; i < 9; ++i) {
+			if (f.matches(mc.thePlayer.inventory.getStackInSlot(i))) {
+				mc.thePlayer.inventory.currentItem = i;
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/**
+	 * Selects a good tool for mining the given Block.
+	 * 
+	 * @param x
+	 * @param y
+	 * @param z
+	 */
+	public void selectToolFor(final BlockPos pos) {
+		selectCurrentItem(new ItemFilter() {
+			@Override
+			public boolean matches(ItemStack itemStack) {
+				return itemStack != null
+						&& itemStack.getItem() != null
+						&& itemStack.getItem().getStrVsBlock(itemStack,
+								getBlock(pos)) > 1;
+			}
+		});
+	}
+
+	/**
+	 * Faces a block and destroys it if possible.
+	 * 
+	 * @param x
+	 * @param y
+	 * @param z
+	 */
+	public void faceAndDestroy(final BlockPos pos) {
+		if (!isFacingBlock(pos)) {
+			faceBlock(pos);
+		}
+
+		if (isFacingBlock(pos)) {
+			selectToolFor(pos);
+			overrideAttack();
+		}
+	}
+
+	public void faceAndDestroyWithHangingBlock(final BlockPos pos) {
+		faceAndDestroy(pos);
+		if (!isFacingBlock(pos)) {
+			// Check if there is a block hanging here.
+			for (EnumFacing d : EnumFacing.values()) {
+				BlockPos offseted = pos.offset(d);
+				if (isFacingBlock(offseted)) {
+					BlockPos hanging = getHaningOnBlock(offseted);
+					if (hanging != null && hanging.equals(pos)) {
+						overrideAttack();
+					}
+				}
+			}
+		}
+	}
+
+	public void faceBlock(BlockPos pos) {
+		faceBlock(pos.getX(), pos.getY(), pos.getZ());
 	}
 
 	/**
@@ -652,19 +831,20 @@ public abstract class AIHelper {
 	}
 
 	/**
-	 * Faces the side of a block.
+	 * Face the side of a block.
 	 * 
-	 * @param x
-	 * @param y
-	 * @param z
+	 * @param pos
 	 * @param sideToFace
 	 */
-	public void faceSideOf(int x, int y, int z, ForgeDirection sideToFace) {
+	public void faceSideOf(BlockPos pos, EnumFacing sideToFace) {
+		int x = pos.getX();
+		int y = pos.getY();
+		int z = pos.getZ();
 		double faceX = x + randBetween(0.1, 0.9);
 		double faceY = y + randBetween(0.1, 0.9);
 		double faceZ = z + randBetween(0.1, 0.9);
 
-		final Block block = getBoundsBlock(x, y, z);
+		final Block block = getBoundsBlock(pos);
 		switch (sideToFace) {
 		case UP:
 			faceY = y + block.getBlockBoundsMaxY();
@@ -708,31 +888,30 @@ public abstract class AIHelper {
 	 * @param xzdir
 	 *            The direction the xz restriction affects.
 	 */
-	public void faceSideOf(int x, int y, int z, ForgeDirection sideToFace,
-			double minY, double maxY, double centerX, double centerZ,
-			ForgeDirection xzdir) {
+	public void faceSideOf(BlockPos pos, EnumFacing sideToFace, double minY,
+			double maxY, double centerX, double centerZ, EnumFacing xzdir) {
 		// System.out.println("x = " + x + " y=" + y + " z=" + z + " dir="
 		// + sideToFace);
-		final Block block = getBoundsBlock(x, y, z);
+		final Block block = getBoundsBlock(pos);
 
 		minY = Math.max(minY, block.getBlockBoundsMinY());
 		maxY = Math.min(maxY, block.getBlockBoundsMaxY());
 		double faceY = randBetweenNice(minY, maxY);
 		double faceX, faceZ;
 
-		if (xzdir == ForgeDirection.EAST) {
+		if (xzdir == EnumFacing.EAST) {
 			faceX = randBetween(Math.max(block.getBlockBoundsMinX(), centerX),
 					block.getBlockBoundsMaxX());
 			faceZ = centerZ;
-		} else if (xzdir == ForgeDirection.WEST) {
+		} else if (xzdir == EnumFacing.WEST) {
 			faceX = randBetween(block.getBlockBoundsMinX(),
 					Math.min(block.getBlockBoundsMaxX(), centerX));
 			faceZ = centerZ;
-		} else if (xzdir == ForgeDirection.SOUTH) {
+		} else if (xzdir == EnumFacing.SOUTH) {
 			faceZ = randBetween(Math.max(block.getBlockBoundsMinZ(), centerZ),
 					block.getBlockBoundsMaxZ());
 			faceX = centerX;
-		} else if (xzdir == ForgeDirection.NORTH) {
+		} else if (xzdir == EnumFacing.NORTH) {
 			faceZ = randBetween(block.getBlockBoundsMinZ(),
 					Math.min(block.getBlockBoundsMaxZ(), centerZ));
 			faceX = centerX;
@@ -764,33 +943,23 @@ public abstract class AIHelper {
 		default:
 			break;
 		}
-		face(faceX + x, faceY + y, faceZ + z);
+		face(faceX + pos.getX(), faceY + pos.getY(), faceZ + pos.getZ());
 	}
 
 	/**
-	 * A random number in a range, that does not exactly hit the sides.
+	 * Checks if an item is in the main inventory.
 	 * 
-	 * @param minY
-	 * @param maxY
+	 * @param itemFiler
 	 * @return
 	 */
-	private double randBetweenNice(double minY, double maxY) {
-		return maxY - minY < 0.1 ? (maxY + minY) / 2 : randBetween(minY + 0.03,
-				maxY - 0.03);
+	public boolean hasItemInInvetory(ItemFilter itemFiler) {
+		for (final ItemStack s : mc.thePlayer.inventory.mainInventory) {
+			if (itemFiler.matches(s)) {
+				return true;
+			}
+		}
+		return false;
 	}
-
-	private double randBetween(double a, double b) {
-		return rand.nextDouble() * (b - a) + a;
-	}
-
-	private MovementInput resetMovementInput;
-	private KeyBinding resetAttackKey;
-	private KeyBinding resetUseItemKey;
-	private boolean useItemKeyJustPressed;
-	private boolean attackKeyJustPressed;
-	protected boolean doUngrab;
-	private KeyBinding resetSneakKey;
-	private boolean sneakKeyJustPressed;
 
 	/**
 	 * overrides the keyboard input in the next game tick.
@@ -890,129 +1059,14 @@ public abstract class AIHelper {
 				: resetSneakKey;
 
 		return mi.moveForward != 0 || mi.moveStrafe != 0 || mi.jump
-				|| attack.getIsKeyPressed() || use.getIsKeyPressed()
-				|| sneak.getIsKeyPressed();
+				|| attack.isKeyDown() || use.isKeyDown() || sneak.isKeyDown();
 	}
 
 	/**
-	 * Checks if a block is in a list of blocks. Use
-	 * {@link BlockWhitelist#contains(Block)} instead.
-	 * 
-	 * @param needle
-	 *            The block to search for
-	 * @param haystack
-	 *            The blocks allowed.
-	 * @return <code>true</code> if it is the list.
+	 * Ungrabs the mouse.
 	 */
-	@Deprecated
-	public static boolean blockIsOneOf(Block needle, Block... haystack) {
-		for (final Block h : haystack) {
-			if (Block.isEqualTo(needle, h)) {
-				return true;
-			}
-		}
-		return false;
-	}
-
-	private int chunkHitCounter = 0;
-	private int chunkMissCounter = 0;
-	/**
-	 * A fast method that gets a block id for a given position. Use it if you
-	 * need to scan many blocks, since the default minecraft block lookup is
-	 * slow. For x<0 or x>= 256 it returns bedrock, to make routing easy.
-	 * 
-	 * @param x
-	 * @param y
-	 * @param z
-	 * @return
-	 */
-	public int getBlockId(int x, int y, int z) {
-		if (y < 0 || y >= 256) {
-			return BEDROCK_ID;
-		}
-
-		int chunkX = x >> 4;
-		int chunkZ = z >> 4;
-		final Chunk chunk;
-		if (chunkCache1 != null && chunkCache1.xPosition == chunkX && chunkCache1.zPosition == chunkZ) {
-			chunk = chunkCache1;
-			chunkHitCounter++;
-		} else if (chunkCache2 != null && chunkCache2.xPosition == chunkX && chunkCache2.zPosition == chunkZ) {
-			chunk = chunkCache2;
-			chunkHitCounter++;
-		} else {
-			chunk = mc.theWorld.getChunkFromChunkCoords(chunkX, chunkZ);
-			if (chunkCacheReplaceCounter) {
-				chunkCache1 = chunk;
-			} else {
-				chunkCache2 = chunk;
-			}
-			chunkCacheReplaceCounter = !chunkCacheReplaceCounter;
-			chunkMissCounter++;
-		}
-		
-		// chunk.getBlock(x & 15, y, z & 15);
-
-		int blockId = 0;
-
-		final ExtendedBlockStorage[] sa = chunk.getBlockStorageArray();
-		if (y >> 4 < sa.length) {
-			final ExtendedBlockStorage extendedblockstorage = sa[y >> 4];
-
-			if (extendedblockstorage != null) {
-				final int lx = x & 15;
-				final int ly = y & 15;
-				final int lz = z & 15;
-
-				blockId = extendedblockstorage.getBlockLSBArray()[ly << 8
-						| lz << 4 | lx] & 255;
-
-				final NibbleArray blockMSBArray = extendedblockstorage
-						.getBlockMSBArray();
-				if (blockMSBArray != null) {
-					blockId |= blockMSBArray.get(lx, ly, lz) << 8;
-				}
-			}
-		}
-
-		return blockId;
-	}
-
-	protected void invalidateChunkCache() {
-		if (chunkHitCounter > 0 || chunkMissCounter > 0) {
-			System.out.println("Last chunk cache hit: " + chunkHitCounter + " but missed " + chunkMissCounter);
-			chunkHitCounter = 0;
-			chunkMissCounter = 0;
-		}
-		chunkCache1 = null;
-		chunkCache2 = null;
-	}
-	
-	/**
-	 * The real top y cord of the block we stand on. Watch out: Minecraft blocks
-	 * do not always provide the right bounds with it's block objects.
-	 * 
-	 * @param x
-	 * @param y
-	 * @param z
-	 * @return
-	 */
-	public double realBlockTopY(int x, int y, int z) {
-		final Block block = getBlock(x, y - 1, z);
-		// Fence bounds are not exposed...
-		double maxY;
-		if (block instanceof BlockFence || block instanceof BlockFenceGate
-				|| block instanceof BlockWall) {
-			maxY = 1.5;
-		} else if (block instanceof BlockSlab) {
-			final int blockMetadata = getMinecraft().theWorld.getBlockMetadata(
-					x, y, z);
-			maxY = (blockMetadata & 0x8) == 0 ? 0.5 : 1;
-		} else {
-			maxY = block.getBlockBoundsMaxY();
-		}
-
-		return y - 1 + maxY;
+	public void ungrab() {
+		doUngrab = true;
 	}
 
 	/**
@@ -1023,10 +1077,11 @@ public abstract class AIHelper {
 	 * @return
 	 */
 	@SuppressWarnings("unchecked")
-	public List<Entity> getEntities(int dist, IEntitySelector selector) {
-		return mc.theWorld.getEntitiesWithinAABBExcludingEntity(
-				mc.renderViewEntity,
-				mc.renderViewEntity.boundingBox.addCoord(-dist, -dist, -dist)
+	public List<Entity> getEntities(int dist, Predicate<Entity> selector) {
+		return mc.theWorld.func_175674_a(
+				mc.getRenderViewEntity(),
+				mc.getRenderViewEntity().getEntityBoundingBox()
+						.addCoord(-dist, -dist, -dist)
 						.addCoord(dist, dist, dist).expand(1, 1, 1), selector);
 	}
 
@@ -1036,9 +1091,9 @@ public abstract class AIHelper {
 	 * @param dist
 	 * @param selector
 	 * @return
-	 * @see #getEntities(int, IEntitySelector)
+	 * @see #getEntities(int, Predicate<Entity>)
 	 */
-	public Entity getClosestEntity(int dist, IEntitySelector selector) {
+	public Entity getClosestEntity(int dist, Predicate<Entity> selector) {
 		final List<Entity> entities = getEntities(dist, selector);
 
 		double mindist = Double.MAX_VALUE;
@@ -1055,13 +1110,6 @@ public abstract class AIHelper {
 	}
 
 	/**
-	 * Ungrabs the mouse.
-	 */
-	public void ungrab() {
-		doUngrab = true;
-	}
-
-	/**
 	 * Sneak while standing on that block.
 	 * 
 	 * @param blockX
@@ -1070,38 +1118,27 @@ public abstract class AIHelper {
 	 * @param inDirection
 	 * @return
 	 */
-	public boolean sneakFrom(int blockX, int blockY, int blockZ,
-			ForgeDirection inDirection) {
-		final Block block = getBoundsBlock(blockX, blockY, blockZ);
-		double destX = blockX + .5;
-		double destZ = blockZ + .5;
+	public boolean sneakFrom(BlockPos pos, EnumFacing inDirection) {
+		final Block block = getBoundsBlock(pos);
+		double destX = pos.getX() + .5;
+		double destZ = pos.getZ() + .5;
 		switch (inDirection) {
 		case EAST:
-			destX = blockX + block.getBlockBoundsMaxX() + SNEAK_OFFSET;
+			destX = pos.getX() + block.getBlockBoundsMaxX() + SNEAK_OFFSET;
 			break;
 		case WEST:
-			destX = blockX + block.getBlockBoundsMinX() - SNEAK_OFFSET;
+			destX = pos.getX() + block.getBlockBoundsMinX() - SNEAK_OFFSET;
 			break;
 		case SOUTH:
-			destZ = blockZ + block.getBlockBoundsMaxZ() + SNEAK_OFFSET;
+			destZ = pos.getZ() + block.getBlockBoundsMaxZ() + SNEAK_OFFSET;
 			break;
 		case NORTH:
-			destZ = blockZ + block.getBlockBoundsMinZ() - SNEAK_OFFSET;
+			destZ = pos.getZ() + block.getBlockBoundsMinZ() - SNEAK_OFFSET;
 			break;
 		default:
 			throw new IllegalArgumentException("Cannot handle " + inDirection);
 		}
 		return walkTowards(destX, destZ, false);
-	}
-
-	private Block getBoundsBlock(int blockX, int blockY, int blockZ) {
-		Block block = getBlock(blockX, blockY, blockZ);
-		if (block instanceof BlockStairs) {
-			// Stairs have crazy bounds
-			block = Blocks.dirt;
-		}
-		block.setBlockBoundsBasedOnState(mc.theWorld, blockX, blockY, blockZ);
-		return block;
 	}
 
 	/**
@@ -1117,13 +1154,6 @@ public abstract class AIHelper {
 		return walkTowards(x, z, jump, true);
 	}
 
-	public boolean arrivedAt(double x, double z) {
-		final double dx = x - mc.thePlayer.posX;
-		final double dz = z - mc.thePlayer.posZ;
-		final double distTo = Math.sqrt(dx * dx + dz * dz);
-		return distTo <= MIN_DISTANCE_ERROR;
-	}
-	
 	public boolean walkTowards(double x, double z, boolean jump, boolean face) {
 		final double dx = x - mc.thePlayer.posX;
 		final double dz = z - mc.thePlayer.posZ;
@@ -1131,7 +1161,7 @@ public abstract class AIHelper {
 		boolean arrived = distTo > MIN_DISTANCE_ERROR;
 		if (arrived) {
 			if (face) {
-				face(x, mc.thePlayer.posY, z);
+				face(x, mc.thePlayer.getEyeHeight() + mc.thePlayer.posY, z);
 			}
 			double speed = 1;
 			if (distTo < 4 * WALK_PER_STEP) {
@@ -1159,26 +1189,11 @@ public abstract class AIHelper {
 		}
 	}
 
-	/**
-	 * Bottom = 0, Top = 1, East = 2, West = 3, North = 4, South = 5.
-	 */
-	public static int sideToDir(ForgeDirection blockSide) {
-		switch (blockSide) {
-		case DOWN:
-			return 0;
-		case UP:
-			return 1;
-		case EAST:
-			return 5;
-		case WEST:
-			return 4;
-		case NORTH:
-			return 2;
-		case SOUTH:
-			return 3;
-		default:
-			throw new IllegalArgumentException("Cannot handle: " + blockSide);
-		}
+	public boolean arrivedAt(double x, double z) {
+		final double dx = x - mc.thePlayer.posX;
+		final double dz = z - mc.thePlayer.posZ;
+		final double distTo = Math.sqrt(dx * dx + dz * dz);
+		return distTo <= MIN_DISTANCE_ERROR;
 	}
 
 	public boolean isJumping() {
@@ -1190,17 +1205,17 @@ public abstract class AIHelper {
 	 * 
 	 * @return
 	 */
-	public ForgeDirection getLookDirection() {
+	public EnumFacing getLookDirection() {
 		switch (MathHelper
 				.floor_double(getMinecraft().thePlayer.rotationYaw / 360 * 4 + .5) & 3) {
 		case 1:
-			return ForgeDirection.WEST;
+			return EnumFacing.WEST;
 		case 2:
-			return ForgeDirection.NORTH;
+			return EnumFacing.NORTH;
 		case 3:
-			return ForgeDirection.EAST;
+			return EnumFacing.EAST;
 		default:
-			return ForgeDirection.SOUTH;
+			return EnumFacing.SOUTH;
 		}
 	}
 
@@ -1222,31 +1237,16 @@ public abstract class AIHelper {
 	}
 
 	/**
-	 * Checks if an item is in the main inventory.
-	 * 
-	 * @param itemFiler
-	 * @return
-	 */
-	public boolean hasItemInInvetory(ItemFilter itemFiler) {
-		for (final ItemStack s : mc.thePlayer.inventory.mainInventory) {
-			if (itemFiler.matches(s)) {
-				return true;
-			}
-		}
-		return false;
-	}
-
-	/**
 	 * Converts an valid x/z pair to a direction if possible.
 	 * 
 	 * @param x
 	 * @param z
 	 * @return
 	 */
-	public static ForgeDirection getDirectionForXZ(int x, int z) {
+	public static EnumFacing getDirectionForXZ(int x, int z) {
 		if (x != 0 || z != 0) {
-			for (final ForgeDirection d : ForgeDirection.VALID_DIRECTIONS) {
-				if (d.offsetX == x && d.offsetZ == z) {
+			for (final EnumFacing d : EnumFacing.values()) {
+				if (d.getFrontOffsetX() == x && d.getFrontOffsetZ() == z) {
 					return d;
 				}
 			}
@@ -1255,34 +1255,27 @@ public abstract class AIHelper {
 				+ " " + z);
 	}
 
-	public static ForgeDirection getDirectionFor(Pos pos) {
-		for (final ForgeDirection d : ForgeDirection.VALID_DIRECTIONS) {
-			if (d.offsetX == pos.x && d.offsetY == pos.y && d.offsetZ == pos.z) {
+	public static EnumFacing getDirectionFor(BlockPos delta) {
+		for (final EnumFacing d : EnumFacing.values()) {
+			if (Pos.fromDir(d).equals(delta)) {
 				return d;
 			}
 		}
 		throw new IllegalArgumentException("Cannot convert to direction: "
-				+ pos);
+				+ delta);
 	}
 
 	public int getLightAt(Pos pos) {
-		final Chunk chunk = mc.theWorld.getChunkFromChunkCoords(pos.x >> 4,
-				pos.z >> 4);
-		final ExtendedBlockStorage storage = chunk.getBlockStorageArray()[pos.y >> 4];
+		final Chunk chunk = mc.theWorld.getChunkFromChunkCoords(
+				pos.getX() >> 4, pos.getZ() >> 4);
+		final ExtendedBlockStorage storage = chunk.getBlockStorageArray()[pos
+				.getY() >> 4];
 		if (storage == null) {
 			return 0;
 		} else {
-			return storage.getExtBlocklightValue(pos.x & 15, pos.y & 15,
-					pos.z & 15);
+			return storage.getExtBlocklightValue(pos.getX() & 15,
+					pos.getY() & 15, pos.getZ() & 15);
 		}
-	}
-
-	public static File getMinebotDir() {
-		File dir = new File(mc.mcDataDir, "minebot");
-		if (!dir.exists()) {
-			dir.mkdir();
-		}
-		return dir;
 	}
 
 }

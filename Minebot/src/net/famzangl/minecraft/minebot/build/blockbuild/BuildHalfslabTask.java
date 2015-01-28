@@ -7,6 +7,7 @@ import net.famzangl.minecraft.minebot.ai.task.BlockSide;
 import net.famzangl.minecraft.minebot.ai.task.place.JumpingPlaceAtHalfTask;
 import net.famzangl.minecraft.minebot.ai.task.place.SneakAndPlaceAtHalfTask;
 import net.minecraft.init.Blocks;
+import net.minecraft.util.BlockPos;
 
 public class BuildHalfslabTask extends CubeBuildTask {
 
@@ -15,23 +16,21 @@ public class BuildHalfslabTask extends CubeBuildTask {
 	private final BlockSide side;
 	private final SlabType slabType;
 
-	public BuildHalfslabTask(Pos forPosition, SlabType slabType, BlockSide up) {
+	public BuildHalfslabTask(BlockPos forPosition, SlabType slabType, BlockSide up) {
 		super(forPosition, new SlabFilter(slabType));
 		this.slabType = slabType;
 		this.side = up;
 	}
 
 	@Override
-	public AITask getPlaceBlockTask(Pos relativeFromPos) {
+	public AITask getPlaceBlockTask(BlockPos relativeFromPos) {
 		if (!isStandablePlace(relativeFromPos)) {
 			throw new IllegalArgumentException("Cannot build standing there: "
 					+ relativeFromPos);
 		} else if (relativeFromPos.equals(FROM_GROUND)) {
-			return new JumpingPlaceAtHalfTask(forPosition.x, forPosition.y + 1,
-					forPosition.z, blockFilter, side);
+			return new JumpingPlaceAtHalfTask(forPosition.add(0,1,0), blockFilter, side);
 		} else {
-			return new SneakAndPlaceAtHalfTask(forPosition.x,
-					forPosition.y + 1, forPosition.z, blockFilter,
+			return new SneakAndPlaceAtHalfTask(forPosition.add(0,1,0), blockFilter,
 					relativeFromPos, getMinHeightToBuild(), side);
 		}
 	}
@@ -48,7 +47,7 @@ public class BuildHalfslabTask extends CubeBuildTask {
 	}
 
 	@Override
-	public BuildTask withPositionAndRotation(Pos add, int rotateSteps,
+	public BuildTask withPositionAndRotation(BlockPos add, int rotateSteps,
 			MirrorDirection mirror) {
 		return new BuildHalfslabTask(add, slabType, side);
 	}

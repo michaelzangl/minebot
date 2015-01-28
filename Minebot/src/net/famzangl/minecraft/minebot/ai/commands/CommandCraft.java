@@ -25,7 +25,7 @@ public class CommandCraft {
 			Blocks.lit_redstone_lamp, Blocks.melon_stem,
 			Blocks.unlit_redstone_torch, Blocks.unpowered_comparator,
 			Blocks.redstone_wire, Blocks.wall_sign, Blocks.unpowered_repeater,
-			Blocks.iron_door, Blocks.wooden_door, Blocks.wool).invert();
+			Blocks.iron_door, Blocks.wool).unionWith(AIHelper.woodenDoors).invert();
 
 	public static final class MyBlockFilter extends BlockFilter {
 		@Override

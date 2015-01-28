@@ -15,8 +15,8 @@ import net.minecraft.init.Blocks;
 public class ForBuildPathFinder extends MovePathFinder {
 
 	private static final int NEIGHBOURS_PER_DIRECTION = 6;
-	private static final BlockWhitelist FENCES = new BlockWhitelist(Blocks.fence,
-			Blocks.cobblestone_wall );
+	private static final BlockWhitelist FENCES = new BlockWhitelist(
+			Blocks.cobblestone_wall ).unionWith(AIHelper.fences);
 	/**
 	 * Task we want to prepare for.
 	 */
@@ -104,7 +104,7 @@ public class ForBuildPathFinder extends MovePathFinder {
 	@Override
 	protected void foundPath(LinkedList<Pos> path) {
 		Pos currentPos = path.removeFirst();
-		addTask(new AlignToGridTask(currentPos.x, currentPos.y, currentPos.z));
+		addTask(new AlignToGridTask(currentPos.getX(), currentPos.getY(), currentPos.getZ()));
 		while (!path.isEmpty()) {
 			final Pos nextPos = path.removeFirst();
 			addTask(new WalkTowardsTask(currentPos, nextPos));

@@ -3,7 +3,7 @@ package net.famzangl.minecraft.minebot.ai.task.move;
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.strategy.TaskOperations;
 import net.famzangl.minecraft.minebot.ai.task.AITask;
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraft.util.EnumFacing;
 
 /**
  * Sneak standing on (x, y - 1, z) towards the direction.
@@ -15,9 +15,9 @@ public class SneakTowardsTask extends AITask {
 	private final int x;
 	private final int y;
 	private final int z;
-	private final ForgeDirection dir;
+	private final EnumFacing dir;
 
-	public SneakTowardsTask(int x, int y, int z, ForgeDirection dir) {
+	public SneakTowardsTask(int x, int y, int z, EnumFacing dir) {
 		this.x = x;
 		this.y = y;
 		this.z = z;

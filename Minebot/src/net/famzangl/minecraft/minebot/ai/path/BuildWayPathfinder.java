@@ -22,7 +22,7 @@ import net.famzangl.minecraft.minebot.build.blockbuild.SlabFilter;
 import net.famzangl.minecraft.minebot.build.blockbuild.SlabType;
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraft.util.EnumFacing;
 
 /**
  * Build a way. it is covered with cobblestone slabs. Bridge profile:
@@ -59,8 +59,9 @@ public class BuildWayPathfinder extends AlongTrackPathFinder {
 		super(dx, dz, cx, cy, cz, -1);
 	}
 
-	public BuildWayPathfinder(ForgeDirection dir, Pos pos) {
-		this(dir.offsetX, dir.offsetZ, pos.x, pos.y + 1, pos.z);
+	public BuildWayPathfinder(EnumFacing dir, Pos pos) {
+		this(dir.getFrontOffsetX(), dir.getFrontOffsetZ(), pos.getX(), pos
+				.getY() + 1, pos.getZ());
 	}
 
 	/**
@@ -171,7 +172,8 @@ public class BuildWayPathfinder extends AlongTrackPathFinder {
 	}
 
 	private class NormalWayType extends WayPiece {
-		private final BlockWhitelist airLike = AIHelper.air.unionWith(AIHelper.walkableBlocks);;
+		private final BlockWhitelist airLike = AIHelper.air
+				.unionWith(AIHelper.walkableBlocks);;
 
 		public NormalWayType(int stepIndex) {
 			super(stepIndex);
@@ -221,12 +223,12 @@ public class BuildWayPathfinder extends AlongTrackPathFinder {
 		protected void addFarSideBuildTasks() {
 			addFarSide();
 			super.addFarSideBuildTasks();
-			addTask(new PlaceBlockTask(getPos(width, -1), ForgeDirection.UP,
+			addTask(new PlaceBlockTask(getPos(width, -1), EnumFacing.UP,
 					BRIDGE_WALL));
 			if (placeTorch) {
 				addTask(new PlaceTorchSomewhereTask(
 						Collections.singletonList(getPos(width, 1)),
-						ForgeDirection.DOWN));
+						EnumFacing.DOWN));
 			}
 		}
 
@@ -234,12 +236,12 @@ public class BuildWayPathfinder extends AlongTrackPathFinder {
 		protected void addNearSideBuildTasks() {
 			addNearSide();
 			super.addNearSideBuildTasks();
-			addTask(new PlaceBlockTask(getPos(-1, -1), ForgeDirection.UP,
+			addTask(new PlaceBlockTask(getPos(-1, -1), EnumFacing.UP,
 					BRIDGE_WALL));
 			if (placeTorch) {
 				addTask(new PlaceTorchSomewhereTask(
 						Collections.singletonList(getPos(-1, 1)),
-						ForgeDirection.DOWN));
+						EnumFacing.DOWN));
 			}
 		}
 
@@ -262,7 +264,7 @@ public class BuildWayPathfinder extends AlongTrackPathFinder {
 			if (placeTorch) {
 				addTask(new PlaceTorchSomewhereTask(Arrays.asList(getPos(0, 1),
 						getPos(0, 0), getPos(-1, 1)), getForwardDirection()
-						.getRotation(ForgeDirection.UP), ForgeDirection.DOWN));
+						.rotateY(), EnumFacing.DOWN));
 			}
 		}
 
@@ -272,8 +274,8 @@ public class BuildWayPathfinder extends AlongTrackPathFinder {
 			if (placeTorch) {
 				addTask(new PlaceTorchSomewhereTask(Arrays.asList(
 						getPos(width - 1, 1), getPos(width - 1, 0),
-						getPos(width, 1)), getForwardDirection().getRotation(
-						ForgeDirection.DOWN), ForgeDirection.DOWN));
+						getPos(width, 1)), getForwardDirection().rotateYCCW(),
+						EnumFacing.DOWN));
 			}
 		}
 	}
@@ -310,7 +312,7 @@ public class BuildWayPathfinder extends AlongTrackPathFinder {
 			if (placeTorch) {
 				addTask(new PlaceTorchSomewhereTask(
 						Collections.singletonList(getPos(width, 0)),
-						ForgeDirection.DOWN));
+						EnumFacing.DOWN));
 			}
 		}
 
@@ -323,7 +325,7 @@ public class BuildWayPathfinder extends AlongTrackPathFinder {
 			if (placeTorch) {
 				addTask(new PlaceTorchSomewhereTask(
 						Collections.singletonList(getPos(-1, 0)),
-						ForgeDirection.DOWN));
+						EnumFacing.DOWN));
 			}
 		}
 	}
@@ -337,10 +339,10 @@ public class BuildWayPathfinder extends AlongTrackPathFinder {
 		return wayTypes.get(progress);
 	}
 
-	public ForgeDirection getForwardDirection() {
+	public EnumFacing getForwardDirection() {
 		return AIHelper.getDirectionForXZ(dx, dz);
 	}
-	
+
 	@Override
 	protected boolean runSearch(Pos playerPosition) {
 		if (!addContinuingTask(playerPosition)) {
@@ -368,8 +370,9 @@ public class BuildWayPathfinder extends AlongTrackPathFinder {
 
 	@Override
 	protected void addTasksForTarget(Pos currentPos) {
-		final int currentStep = getStepNumber(currentPos.x, currentPos.z);
-		if (currentPos.y == cy - 1
+		final int currentStep = getStepNumber(currentPos.getX(),
+				currentPos.getZ());
+		if (currentPos.getY() == cy - 1
 				&& !getSuggestedWayType(currentStep).isDone()) {
 			getSuggestedWayType(currentStep).addConstructionTasksFromInner();
 		}
@@ -379,18 +382,18 @@ public class BuildWayPathfinder extends AlongTrackPathFinder {
 		System.out.println("Seatch at "
 				+ playerPosition
 				+ ", on track: "
-				+ isOnTrack(playerPosition.x, playerPosition.z)
+				+ isOnTrack(playerPosition.getX(), playerPosition.getZ())
 				+ ", cy= "
 				+ (cy - 1)
 				+ " right block: "
-				+ AIHelper.blockIsOneOf(helper.getBlock(playerPosition),
-						FLOOR.slabBlock));
-		if (isOnTrack(playerPosition.x, playerPosition.z)
-				&& playerPosition.y == cy - 1
-				&& AIHelper.blockIsOneOf(helper.getBlock(playerPosition),
-						FLOOR.slabBlock)) {
-			final int currentStep = getStepNumber(playerPosition.x,
-					playerPosition.z);
+				+ new BlockWhitelist(FLOOR.slabBlock).contains(helper
+						.getBlock(playerPosition)));
+		if (isOnTrack(playerPosition.getX(), playerPosition.getZ())
+				&& playerPosition.getY() == cy - 1
+				&& new BlockWhitelist(FLOOR.slabBlock).contains(helper
+						.getBlock(playerPosition))) {
+			final int currentStep = getStepNumber(playerPosition.getX(),
+					playerPosition.getZ());
 			final WayPiece next = getSuggestedWayType(currentStep + 1);
 			if (!next.isDone()) {
 				next.addConstructionTasksFromPrevoius(playerPosition.add(0, 1,

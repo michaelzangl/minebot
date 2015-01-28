@@ -207,7 +207,7 @@ public class CommandRun {
 			final GuiChat chat = new GuiChat();
 			//helper.getMinecraft().displayGuiScreen(chat);
 			chat.mc = helper.getMinecraft();
-			chat.func_146403_a(command);
+			chat.sendChatMessage(command);
 			//helper.getMinecraft().displayGuiScreen((GuiScreen) null);
 		}
 	}

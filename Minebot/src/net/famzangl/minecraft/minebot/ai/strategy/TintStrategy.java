@@ -8,64 +8,68 @@ import net.famzangl.minecraft.minebot.ai.selectors.NotSelector;
 import net.famzangl.minecraft.minebot.ai.selectors.OrSelector;
 import net.famzangl.minecraft.minebot.ai.selectors.OwnTameableSelector;
 import net.famzangl.minecraft.minebot.ai.task.FaceAndInteractTask;
-import net.minecraft.client.entity.EntityClientPlayerMP;
-import net.minecraft.command.IEntitySelector;
+
+import com.google.common.base.Predicate;
+
+import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.passive.EntitySheep;
 import net.minecraft.entity.passive.EntityWolf;
+import net.minecraft.item.EnumDyeColor;
 import net.minecraft.item.ItemDye;
 import net.minecraft.item.ItemStack;
 
 public class TintStrategy extends TaskStrategy {
 	private static final int DISTANCE = 20;
-	private final int color;
-	private final int current;
+	private final EnumDyeColor color;
+	private final EnumDyeColor current;
 	private final TintType type;
 
-	public TintStrategy(int color, TintType type, int current) {
+	public TintStrategy(EnumDyeColor color, TintType type, EnumDyeColor current) {
 		this.color = color;
 		this.type = type;
 		this.current = current;
 	}
 
-	private final class SheepSelector implements IEntitySelector {
+	private final class SheepSelector implements Predicate<Entity> {
 		@Override
-		public boolean isEntityApplicable(Entity var1) {
+		public boolean apply(Entity var1) {
 			return var1 instanceof EntitySheep;
 		}
 	}
 
 	private final class WolfSelector extends OwnTameableSelector {
-		private WolfSelector(EntityClientPlayerMP owner) {
+		private WolfSelector(EntityPlayerSP owner) {
 			super(owner);
 		}
 
 		@Override
-		public boolean isEntityApplicable(Entity var1) {
-			return var1 instanceof EntityWolf && super.isEntityApplicable(var1);
+		public boolean apply(Entity var1) {
+			return var1 instanceof EntityWolf && super.apply(var1);
 		}
 	}
 
 	public static enum TintType {
-		WOLF,
-		SHEEP,
-		ANY;
+		WOLF, SHEEP, ANY;
 
 	}
 
 	private static class DyeItemFilter implements ItemFilter {
 
-		private final int color;
+		private final EnumDyeColor color;
 
-		public DyeItemFilter(int color) {
+		public DyeItemFilter(EnumDyeColor color) {
 			this.color = color;
 		}
 
 		@Override
 		public boolean matches(ItemStack itemStack) {
-			return itemStack != null && itemStack.getItem() != null
+			// FIXME: Color id.
+			return itemStack != null
+					&& itemStack.getItem() != null
 					&& itemStack.getItem() instanceof ItemDye
-					&& (color < 0 || 15 - itemStack.getItemDamage() == color);
+					&& (color == null || 15 - itemStack.getItemDamage() == color
+							.ordinal());
 		}
 
 	}
@@ -76,13 +80,14 @@ public class TintStrategy extends TaskStrategy {
 			return;
 		}
 
-		final EntityClientPlayerMP owner = helper.getMinecraft().thePlayer;
-		final int holdingColor = 15 - owner.inventory.getCurrentItem()
-				.getItemDamage();
-		final IEntitySelector wolfSelector = new WolfSelector(owner);
-		final IEntitySelector sheepSelector = new SheepSelector();
+		final EntityPlayerSP owner = helper.getMinecraft().thePlayer;
+		// FIXME: Check.
+		final EnumDyeColor holdingColor = EnumDyeColor.values()[15 - owner.inventory
+				.getCurrentItem().getItemDamage()];
+		final Predicate<Entity> wolfSelector = new WolfSelector(owner);
+		final Predicate<Entity> sheepSelector = new SheepSelector();
 
-		IEntitySelector selector;
+		Predicate<Entity> selector;
 		switch (type) {
 		case WOLF:
 			selector = wolfSelector;
@@ -93,7 +98,7 @@ public class TintStrategy extends TaskStrategy {
 		default:
 			selector = new OrSelector(sheepSelector, wolfSelector);
 		}
-		if (current >= 0) {
+		if (current != null) {
 			selector = new AndSelector(selector, new ColorSelector(current));
 		}
 		selector = new AndSelector(selector, new NotSelector(new ColorSelector(

@@ -80,8 +80,8 @@ public class MineScript {
 
 	public FoundEntity[] getEntities(Class clazz, double range) {
 		AIHelper helper = waitForTick();
-		Vec3 p = helper.getMinecraft().thePlayer.getPosition(1);
-		AxisAlignedBB box = AxisAlignedBB.getBoundingBox(p.xCoord - range,
+		Vec3 p = helper.getMinecraft().thePlayer.getPositionEyes(1);
+		AxisAlignedBB box = new AxisAlignedBB(p.xCoord - range,
 				p.yCoord - range, p.zCoord - range, p.xCoord + range, p.yCoord
 						+ range, p.zCoord + range);
 		List<Entity> es = helper.getMinecraft().theWorld.getEntitiesWithinAABB(

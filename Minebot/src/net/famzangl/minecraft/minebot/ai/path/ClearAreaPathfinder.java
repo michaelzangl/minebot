@@ -20,7 +20,7 @@ public class ClearAreaPathfinder extends MovePathFinder {
 	public ClearAreaPathfinder(Pos pos1, Pos pos2) {
 		minPos = Pos.minPos(pos1, pos2);
 		maxPos = Pos.maxPos(pos1, pos2);
-		topY = maxPos.y;
+		topY = maxPos.getY();
 	}
 
 	@Override
@@ -57,9 +57,9 @@ public class ClearAreaPathfinder extends MovePathFinder {
 	protected float rateDestination(int distance, int x, int y, int z) {
 		if (isInArea(x, y, z)
 				&& (!isTemporaryCleared(x, y, z) || !isTemporaryCleared(x,
-						y + 1, z) && y < maxPos.y)) {
-			final float bonus = 0.0001f * (x - minPos.x) + 0.001f
-					* (y - minPos.y);
+						y + 1, z) && y < maxPos.getY())) {
+			final float bonus = 0.0001f * (x - minPos.getX()) + 0.001f
+					* (y - minPos.getY());
 			int layerMalus;
 			if (topY <= y) {
 				layerMalus = 5;
@@ -72,7 +72,7 @@ public class ClearAreaPathfinder extends MovePathFinder {
 			} else {
 				layerMalus = 0;
 			}
-			return distance + bonus + layerMalus + (maxPos.y - y) * 2;
+			return distance + bonus + layerMalus + (maxPos.getY() - y) * 2;
 		} else {
 			return -1;
 		}
@@ -84,8 +84,8 @@ public class ClearAreaPathfinder extends MovePathFinder {
 	}
 
 	private boolean isInArea(int x, int y, int z) {
-		return minPos.x <= x && x <= maxPos.x && minPos.y <= y && y <= maxPos.y
-				&& minPos.z <= z && z <= maxPos.z;
+		return minPos.getX() <= x && x <= maxPos.getX() && minPos.getY() <= y && y <= maxPos.getY()
+				&& minPos.getZ() <= z && z <= maxPos.getZ();
 	}
 	
 	private static final BlockWhitelist clearedBlocks = new BlockWhitelist(Blocks.air,
@@ -101,7 +101,7 @@ public class ClearAreaPathfinder extends MovePathFinder {
 		Pos top = currentPos;
 		for (int i = 1; i < 6; i++) {
 			final Pos pos = currentPos.add(0, i, 0);
-			if (pos.y <= maxPos.y) {
+			if (pos.getY() <= maxPos.getY()) {
 				top = pos;
 			}
 		}
@@ -114,16 +114,16 @@ public class ClearAreaPathfinder extends MovePathFinder {
 	}
 
 	public int getAreaSize() {
-		return (maxPos.x - minPos.x + 1) * (maxPos.y - minPos.y + 1)
-				* (maxPos.z - minPos.z + 1);
+		return (maxPos.getX() - minPos.getX() + 1) * (maxPos.getY() - minPos.getY() + 1)
+				* (maxPos.getZ() - minPos.getZ() + 1);
 	}
 
 	public int getToClearCount(AIHelper helper) {
 		int count = 0;
-		int newTopY = minPos.y;
-		for (int y = minPos.y; y <= maxPos.y; y++) {
-			for (int z = minPos.z; z <= maxPos.z; z++) {
-				for (int x = minPos.x; x <= maxPos.x; x++) {
+		int newTopY = minPos.getY();
+		for (int y = minPos.getY(); y <= maxPos.getY(); y++) {
+			for (int z = minPos.getZ(); z <= maxPos.getZ(); z++) {
+				for (int x = minPos.getX(); x <= maxPos.getX(); x++) {
 					if (!isClearedBlock(helper, x, y, z)) {
 						count++;
 						newTopY = Math.max(y, newTopY);

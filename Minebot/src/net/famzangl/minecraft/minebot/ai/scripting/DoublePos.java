@@ -32,7 +32,7 @@ public class DoublePos {
 	}
 
 	public double distance(Pos other) {
-		return Pos.length(other.x - x, other.y - y, other.z - z);
+		return Pos.length(other.getX() - x, other.getY() - y, other.getZ() - z);
 	}
 
 	public double distance(DoublePos other) {

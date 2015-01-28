@@ -12,11 +12,10 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.gameevent.TickEvent.PlayerTickEvent;
 
 import org.apache.commons.lang3.StringEscapeUtils;
-
-import cpw.mods.fml.common.eventhandler.SubscribeEvent;
-import cpw.mods.fml.common.gameevent.TickEvent.PlayerTickEvent;
 
 /**
  * This sends a list of all visible players to a server, e.g. to display it on a
@@ -41,7 +40,7 @@ public class PlayerUpdateHandler {
 			return;
 		}
 		final EntityPlayer player = evt.player;
-		final String name = player.getDisplayName();
+		final String name = player.getDisplayName().getUnformattedText();
 		final Long blocked = blockTimes.get(name);
 		if (blocked != null && blocked > System.currentTimeMillis()) {
 			return;

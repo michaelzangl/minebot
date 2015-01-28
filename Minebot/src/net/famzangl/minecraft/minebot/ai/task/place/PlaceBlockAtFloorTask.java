@@ -4,30 +4,48 @@ import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.ItemFilter;
 import net.famzangl.minecraft.minebot.ai.strategy.TaskOperations;
 import net.famzangl.minecraft.minebot.ai.task.AITask;
+import net.famzangl.minecraft.minebot.ai.task.BlockSide;
 import net.famzangl.minecraft.minebot.ai.task.error.SelectTaskError;
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraft.util.BlockPos;
+import net.minecraft.util.EnumFacing;
 
 public class PlaceBlockAtFloorTask extends AITask {
-	protected int x;
-	protected int y;
-	protected int z;
 	private final ItemFilter filter;
 	private int faceTimer;
+	protected final BlockPos pos;
 
-	public PlaceBlockAtFloorTask(int x, int y, int z, ItemFilter filter) {
-		this.x = x;
-		this.y = y;
-		this.z = z;
+	public PlaceBlockAtFloorTask(BlockPos pos, ItemFilter filter) {
+		this.pos = pos;
 		this.filter = filter;
 	}
 
-	protected int getPlaceAtY() {
-		return y;
+	protected int getRelativePlaceAtY() {
+		return 0;
+	}
+
+	/**
+	 * Check if we face the adjacent block in that direction.
+	 * 
+	 * @param h
+	 * @param dir
+	 * @return
+	 */
+	protected boolean isFacing(AIHelper h, EnumFacing dir) {
+		BlockPos facingBlock = getPlaceAtPos().offset(dir);
+		return h.isFacingBlock(facingBlock, dir.getOpposite(), getSide(dir));
+	}
+
+	protected BlockSide getSide(EnumFacing dir) {
+		return BlockSide.ANY;
+	}
+
+	protected final BlockPos getPlaceAtPos() {
+		return pos.add(0, getRelativePlaceAtY(), 0);
 	}
 
 	@Override
 	public boolean isFinished(AIHelper h) {
-		return !h.isAirBlock(x, getPlaceAtY(), z);
+		return !h.isAirBlock(getPlaceAtPos());
 	}
 
 	@Override
@@ -35,7 +53,7 @@ public class PlaceBlockAtFloorTask extends AITask {
 		if (faceTimer > 0) {
 			faceTimer--;
 		}
-		if (h.isAirBlock(x, getPlaceAtY(), z)) {
+		if (h.isAirBlock(getPlaceAtPos())) {
 			if (!h.selectCurrentItem(filter)) {
 				o.desync(new SelectTaskError(filter));
 			} else {
@@ -50,22 +68,23 @@ public class PlaceBlockAtFloorTask extends AITask {
 	}
 
 	protected void faceBlock(AIHelper h, TaskOperations o) {
-		h.faceSideOf(x, getPlaceAtY() - 1, z, ForgeDirection.UP);
+		h.faceSideOf(getPlaceAtPos().offset(EnumFacing.DOWN), EnumFacing.UP);
 	}
 
 	protected void tryPlaceBlock(AIHelper h) {
-		if (h.getMinecraft().thePlayer.boundingBox.minY >= getPlaceAtY()
-				&& isFacingRightBlock(h)) {
+		if (h.getMinecraft().thePlayer.getEntityBoundingBox().minY >= getPlaceAtPos()
+				.getY() && isFacingRightBlock(h)) {
 			h.overrideUseItem();
 		}
 	}
 
 	protected boolean isFacingRightBlock(AIHelper h) {
-		return h.isFacingBlock(x, getPlaceAtY() - 1, z, ForgeDirection.UP);
+		return isFacing(h, EnumFacing.DOWN);
 	}
 
 	@Override
 	public String toString() {
-		return "UpwardsMoveTask [x=" + x + ", y=" + y + ", z=" + z + "]";
+		return "PlaceBlockAtFloorTask [filter=" + filter + ", pos=" + pos + "]";
 	}
+
 }
