@@ -2,12 +2,9 @@ package net.famzangl.minecraft.minebot.ai.command;
 
 import java.util.ArrayList;
 
-import net.famzangl.minecraft.minebot.Pos;
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.NumberInvalidException;
-import net.minecraft.util.BlockPos;
-import net.minecraft.util.MathHelper;
 
 public class PositionNameBuilder extends ParameterBuilder {
 

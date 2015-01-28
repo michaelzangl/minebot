@@ -4,13 +4,14 @@ import java.util.List;
 import java.util.Random;
 
 import net.famzangl.minecraft.minebot.ai.AIHelper;
-import net.famzangl.minecraft.minebot.ai.strategy.TaskOperations;
 import net.famzangl.minecraft.minebot.ai.task.AITask;
+import net.famzangl.minecraft.minebot.ai.task.TaskOperations;
 import net.minecraft.client.Minecraft;
-import com.google.common.base.Predicate;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.util.AxisAlignedBB;
+
+import com.google.common.base.Predicate;
 
 public class FaceAnyMobTask extends AITask {
 	private final class LivingSelector implements Predicate<Entity> {

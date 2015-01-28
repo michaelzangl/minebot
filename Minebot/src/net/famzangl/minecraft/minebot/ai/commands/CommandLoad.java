@@ -19,8 +19,8 @@ import net.famzangl.minecraft.minebot.ai.strategy.StrategyStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiChat;
 
-@AICommand(helpText = "Run commands from a file.", name = "minebot")
-public class CommandRun {
+@AICommand(helpText = "Run build commands from a file.", name = "minebuild")
+public class CommandLoad {
 	private static final class StrategyReceiver implements IAIControllable {
 		private final IAIControllable controlled;
 		private AIStrategy receivedStrategy;
@@ -51,7 +51,7 @@ public class CommandRun {
 
 	private static final class RunFileStrategy extends AIStrategy {
 
-		private final String fileName;
+		private final File fileName;
 		private LinkedList<String> commands = null;
 		private IOException exception = null;
 		private boolean fileRead;
@@ -61,15 +61,14 @@ public class CommandRun {
 		private int stackMaxLeft = -1;
 		private StrategyStack stack;
 
-		public RunFileStrategy(String fileName) {
+		public RunFileStrategy(File file) {
 			super();
-			this.fileName = fileName;
+			this.fileName = file;
 			new Thread() {
 				@Override
 				public void run() {
 					try {
-						commands = readFile(new File(
-								RunFileStrategy.this.fileName));
+						commands = readFile(RunFileStrategy.this.fileName);
 					} catch (final FileNotFoundException e) {
 						e.printStackTrace();
 						exception = e;
@@ -139,7 +138,9 @@ public class CommandRun {
 						if (receivedStrategy != null) {
 							stack.addStrategy(receivedStrategy);
 						} else {
-							AIChatController.addChatLine("Command is not a strategy: " + command);
+							AIChatController
+									.addChatLine("Command is not a strategy: "
+											+ command);
 							return TickResult.ABORT;
 						}
 						return TickResult.TICK_AGAIN;
@@ -182,7 +183,9 @@ public class CommandRun {
 
 		@Override
 		public String getDescription(AIHelper helper) {
-			return "Running from file..." + (activeStrategy != null ? "\n" + activeStrategy.getDescription(helper): "");
+			return "Running from file..."
+					+ (activeStrategy != null ? "\n"
+							+ activeStrategy.getDescription(helper) : "");
 		}
 
 	}
@@ -191,8 +194,7 @@ public class CommandRun {
 			final String command) {
 		final IAIControllable controlled = AIChatController.getRegistry()
 				.getControlled();
-		final StrategyReceiver tempController = new StrategyReceiver(
-				controlled);
+		final StrategyReceiver tempController = new StrategyReceiver(controlled);
 		try {
 			AIChatController.getRegistry().setControlled(tempController);
 			runCommand(helper, command);
@@ -205,18 +207,18 @@ public class CommandRun {
 	public static void runCommand(AIHelper helper, String command) {
 		if (helper.getMinecraft().ingameGUI.getChatGUI() != null) {
 			final GuiChat chat = new GuiChat();
-			//helper.getMinecraft().displayGuiScreen(chat);
+			// helper.getMinecraft().displayGuiScreen(chat);
 			chat.mc = helper.getMinecraft();
 			chat.sendChatMessage(command);
-			//helper.getMinecraft().displayGuiScreen((GuiScreen) null);
+			// helper.getMinecraft().displayGuiScreen((GuiScreen) null);
 		}
 	}
 
 	@AICommandInvocation()
 	public static AIStrategy run(
 			AIHelper helper,
-			@AICommandParameter(type = ParameterType.FIXED, fixedName = "run", description = "") String nameArg,
-			@AICommandParameter(type = ParameterType.FILE, description = "") String file) {
+			@AICommandParameter(type = ParameterType.FIXED, fixedName = "load", description = "") String nameArg,
+			@AICommandParameter(type = ParameterType.FILE, relativeToSettingsFile = "build", description = "") File file) {
 		return new RunFileStrategy(file);
 	}
 }

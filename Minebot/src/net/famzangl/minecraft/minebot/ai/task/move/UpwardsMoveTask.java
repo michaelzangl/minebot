@@ -3,15 +3,25 @@ package net.famzangl.minecraft.minebot.ai.task.move;
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.BlockWhitelist;
 import net.famzangl.minecraft.minebot.ai.ItemFilter;
-import net.famzangl.minecraft.minebot.ai.strategy.TaskOperations;
+import net.famzangl.minecraft.minebot.ai.task.TaskOperations;
 import net.famzangl.minecraft.minebot.ai.task.error.PositionTaskError;
 import net.famzangl.minecraft.minebot.ai.task.place.JumpingPlaceBlockAtFloorTask;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.BlockPos;
 
+/**
+ * Move upwards by digging one block up and then jumping while placing a block
+ * below the feet.
+ * 
+ * @author michael
+ *
+ */
 public class UpwardsMoveTask extends JumpingPlaceBlockAtFloorTask {
 	private boolean obsidianMining;
 
+	/**
+	 * FIXME: Find a nice, central place for digging times.
+	 */
 	private static final BlockWhitelist hardBlocks = new BlockWhitelist(
 			Blocks.obsidian);
 

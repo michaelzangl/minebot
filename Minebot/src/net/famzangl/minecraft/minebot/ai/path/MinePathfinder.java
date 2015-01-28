@@ -7,6 +7,7 @@ import net.famzangl.minecraft.minebot.Pos;
 import net.famzangl.minecraft.minebot.ai.BlockWhitelist;
 import net.famzangl.minecraft.minebot.ai.task.DestroyInRangeTask;
 import net.minecraft.block.Block;
+import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
 
@@ -73,7 +74,7 @@ public abstract class MinePathfinder extends MovePathFinder {
 	}
 	
 	@Override
-	protected boolean runSearch(Pos playerPosition) {
+	protected boolean runSearch(BlockPos playerPosition) {
 		for (ResourceLocation k : (Set<ResourceLocation>)Block.blockRegistry.getKeys()) {
 			int id = Block.getIdFromBlock((Block) Block.blockRegistry.getObject(k));
 			float f = factors.getForBlock(id);
@@ -152,8 +153,8 @@ public abstract class MinePathfinder extends MovePathFinder {
 	}
 
 	@Override
-	protected void addTasksForTarget(Pos currentPos) {
-		Pos top, bottom;
+	protected void addTasksForTarget(BlockPos currentPos) {
+		BlockPos top, bottom;
 		if (isOreBlock(currentPos.getX(), currentPos.getY() + 1, currentPos.getZ())) {
 			top = currentPos.add(0, 1, 0);
 		} else {

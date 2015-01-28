@@ -5,12 +5,11 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 import net.famzangl.minecraft.minebot.Pos;
 import net.famzangl.minecraft.minebot.ai.AIHelper;
-import net.famzangl.minecraft.minebot.ai.strategy.TaskOperations;
+import net.famzangl.minecraft.minebot.ai.net.MinebotNetHandler;
 import net.minecraft.client.multiplayer.PlayerControllerMP;
 import net.minecraft.client.network.NetHandlerPlayClient;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.projectile.EntityFishHook;
-import net.minecraft.network.EnumConnectionState;
 import net.minecraft.network.INetHandler;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.play.INetHandlerPlayClient;
@@ -88,8 +87,14 @@ import net.minecraft.network.play.server.S49PacketUpdateEntityNBT;
 import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.IChatComponent;
 
+/**
+ * This task right-clicks as soon as a fish bit on the fishing rod. It assumes
+ * the player is already holding the rod in water.
+ * 
+ * @author michael
+ *
+ */
 public class DoFishTask extends AITask {
-	private static final double MAX_DISTANCE = 10;
 
 	private boolean revoked;
 	private int rightMotion = 2;
@@ -108,399 +113,10 @@ public class DoFishTask extends AITask {
 			revoked = true;
 		}
 	}
-	
+
 	@Override
 	public int getGameTickTimeout() {
 		return 1000; // max 900
-	}
-
-	private class MyNetHandler implements INetHandlerPlayClient {
-		INetHandlerPlayClient root;
-		public void handleCombatEvent(S42PacketCombatEvent packetIn) {
-			root.handleCombatEvent(packetIn);
-		}
-
-		public void handleServerDifficulty(S41PacketServerDifficulty packetIn) {
-			root.handleServerDifficulty(packetIn);
-		}
-
-		public void handleCamera(S43PacketCamera packetIn) {
-			root.handleCamera(packetIn);
-		}
-
-		public void handleWorldBorder(S44PacketWorldBorder packetIn) {
-			root.handleWorldBorder(packetIn);
-		}
-
-		public void handleTitle(S45PacketTitle packetIn) {
-			root.handleTitle(packetIn);
-		}
-
-		public void handleSetCompressionLevel(
-				S46PacketSetCompressionLevel packetIn) {
-			root.handleSetCompressionLevel(packetIn);
-		}
-
-		public void handlePlayerListHeaderFooter(
-				S47PacketPlayerListHeaderFooter packetIn) {
-			root.handlePlayerListHeaderFooter(packetIn);
-		}
-
-		public void handleResourcePack(S48PacketResourcePackSend packetIn) {
-			root.handleResourcePack(packetIn);
-		}
-
-		public void handleEntityNBT(S49PacketUpdateEntityNBT packetIn) {
-			root.handleEntityNBT(packetIn);
-		}
-
-		private final ConcurrentLinkedQueue<Pos> foundFishPositions = new ConcurrentLinkedQueue<Pos>();
-
-		public MyNetHandler(INetHandlerPlayClient root) {
-			super();
-			this.root = root;
-		}
-
-		@Override
-		public void onDisconnect(IChatComponent var1) {
-			root.onDisconnect(var1);
-		}
-		
-		@Override
-		public void handleSpawnObject(S0EPacketSpawnObject var1) {
-			root.handleSpawnObject(var1);
-		}
-
-		@Override
-		public void handleSpawnExperienceOrb(S11PacketSpawnExperienceOrb var1) {
-			root.handleSpawnExperienceOrb(var1);
-		}
-
-		@Override
-		public void handleSpawnGlobalEntity(S2CPacketSpawnGlobalEntity var1) {
-			root.handleSpawnGlobalEntity(var1);
-		}
-
-		@Override
-		public void handleSpawnMob(S0FPacketSpawnMob var1) {
-			root.handleSpawnMob(var1);
-		}
-
-		@Override
-		public void handleScoreboardObjective(S3BPacketScoreboardObjective var1) {
-			root.handleScoreboardObjective(var1);
-		}
-
-		@Override
-		public void handleSpawnPainting(S10PacketSpawnPainting var1) {
-			root.handleSpawnPainting(var1);
-		}
-
-		@Override
-		public void handleSpawnPlayer(S0CPacketSpawnPlayer var1) {
-			root.handleSpawnPlayer(var1);
-		}
-
-		@Override
-		public void handleAnimation(S0BPacketAnimation var1) {
-			root.handleAnimation(var1);
-		}
-
-		@Override
-		public void handleStatistics(S37PacketStatistics var1) {
-			root.handleStatistics(var1);
-		}
-
-		@Override
-		public void handleBlockBreakAnim(S25PacketBlockBreakAnim var1) {
-			root.handleBlockBreakAnim(var1);
-		}
-
-		@Override
-		public void handleSignEditorOpen(S36PacketSignEditorOpen var1) {
-			root.handleSignEditorOpen(var1);
-		}
-
-		@Override
-		public void handleUpdateTileEntity(S35PacketUpdateTileEntity var1) {
-			root.handleUpdateTileEntity(var1);
-		}
-
-		@Override
-		public void handleBlockAction(S24PacketBlockAction var1) {
-			root.handleBlockAction(var1);
-		}
-
-		@Override
-		public void handleBlockChange(S23PacketBlockChange var1) {
-			root.handleBlockChange(var1);
-		}
-
-		@Override
-		public void handleChat(S02PacketChat var1) {
-			root.handleChat(var1);
-		}
-
-		@Override
-		public void handleTabComplete(S3APacketTabComplete var1) {
-			root.handleTabComplete(var1);
-		}
-
-		@Override
-		public void handleMultiBlockChange(S22PacketMultiBlockChange var1) {
-			root.handleMultiBlockChange(var1);
-		}
-
-		@Override
-		public void handleMaps(S34PacketMaps var1) {
-			root.handleMaps(var1);
-		}
-
-		@Override
-		public void handleConfirmTransaction(S32PacketConfirmTransaction var1) {
-			root.handleConfirmTransaction(var1);
-		}
-
-		@Override
-		public void handleCloseWindow(S2EPacketCloseWindow var1) {
-			root.handleCloseWindow(var1);
-		}
-
-		@Override
-		public void handleWindowItems(S30PacketWindowItems var1) {
-			root.handleWindowItems(var1);
-		}
-
-		@Override
-		public void handleOpenWindow(S2DPacketOpenWindow var1) {
-			root.handleOpenWindow(var1);
-		}
-
-		@Override
-		public void handleWindowProperty(S31PacketWindowProperty var1) {
-			root.handleWindowProperty(var1);
-		}
-
-		@Override
-		public void handleSetSlot(S2FPacketSetSlot var1) {
-			root.handleSetSlot(var1);
-		}
-
-		@Override
-		public void handleCustomPayload(S3FPacketCustomPayload var1) {
-			root.handleCustomPayload(var1);
-		}
-
-		@Override
-		public void handleDisconnect(S40PacketDisconnect var1) {
-			root.handleDisconnect(var1);
-		}
-
-		@Override
-		public void handleUseBed(S0APacketUseBed var1) {
-			root.handleUseBed(var1);
-		}
-
-		@Override
-		public void handleEntityStatus(S19PacketEntityStatus var1) {
-			root.handleEntityStatus(var1);
-		}
-
-		@Override
-		public void handleEntityAttach(S1BPacketEntityAttach var1) {
-			root.handleEntityAttach(var1);
-		}
-
-		@Override
-		public void handleExplosion(S27PacketExplosion var1) {
-			root.handleExplosion(var1);
-		}
-
-		@Override
-		public void handleChangeGameState(S2BPacketChangeGameState var1) {
-			root.handleChangeGameState(var1);
-		}
-
-		@Override
-		public void handleKeepAlive(S00PacketKeepAlive var1) {
-			root.handleKeepAlive(var1);
-		}
-
-		@Override
-		public void handleChunkData(S21PacketChunkData var1) {
-			root.handleChunkData(var1);
-		}
-
-		@Override
-		public void handleMapChunkBulk(S26PacketMapChunkBulk var1) {
-			root.handleMapChunkBulk(var1);
-		}
-
-		@Override
-		public void handleEffect(S28PacketEffect var1) {
-			root.handleEffect(var1);
-		}
-
-		@Override
-		public void handleJoinGame(S01PacketJoinGame var1) {
-			root.handleJoinGame(var1);
-		}
-
-		@Override
-		public void handleEntityMovement(S14PacketEntity var1) {
-			root.handleEntityMovement(var1);
-		}
-
-		@Override
-		public void handlePlayerPosLook(S08PacketPlayerPosLook var1) {
-			root.handlePlayerPosLook(var1);
-		}
-
-		@Override
-		public void handleParticles(S2APacketParticles var1) {
-			if (var1.func_179749_a() == EnumParticleTypes.WATER_SPLASH) {
-				if (var1.getParticleCount() > 0) {
-					double x = var1.getXCoordinate();
-					double y = var1.getYCoordinate();
-					double z = var1.getZCoordinate();
-					foundFishPositions.add(new Pos((int) Math.floor(x),
-							(int) Math.floor(y), (int) Math.floor(z)));
-				}
-			}
-			root.handleParticles(var1);
-		}
-
-		@Override
-		public void handlePlayerAbilities(S39PacketPlayerAbilities var1) {
-			root.handlePlayerAbilities(var1);
-		}
-
-		@Override
-		public void handlePlayerListItem(S38PacketPlayerListItem var1) {
-			root.handlePlayerListItem(var1);
-		}
-
-		@Override
-		public void handleDestroyEntities(S13PacketDestroyEntities var1) {
-			root.handleDestroyEntities(var1);
-		}
-
-		@Override
-		public void handleRemoveEntityEffect(S1EPacketRemoveEntityEffect var1) {
-			root.handleRemoveEntityEffect(var1);
-		}
-
-		@Override
-		public void handleRespawn(S07PacketRespawn var1) {
-			root.handleRespawn(var1);
-		}
-
-		@Override
-		public void handleEntityHeadLook(S19PacketEntityHeadLook var1) {
-			root.handleEntityHeadLook(var1);
-		}
-
-		@Override
-		public void handleHeldItemChange(S09PacketHeldItemChange var1) {
-			root.handleHeldItemChange(var1);
-		}
-
-		@Override
-		public void handleDisplayScoreboard(S3DPacketDisplayScoreboard var1) {
-			root.handleDisplayScoreboard(var1);
-		}
-
-		@Override
-		public void handleEntityMetadata(S1CPacketEntityMetadata var1) {
-			root.handleEntityMetadata(var1);
-		}
-
-		@Override
-		public void handleEntityVelocity(S12PacketEntityVelocity var1) {
-			root.handleEntityVelocity(var1);
-		}
-
-		@Override
-		public void handleEntityEquipment(S04PacketEntityEquipment var1) {
-			root.handleEntityEquipment(var1);
-		}
-
-		@Override
-		public void handleSetExperience(S1FPacketSetExperience var1) {
-			root.handleSetExperience(var1);
-		}
-
-		@Override
-		public void handleUpdateHealth(S06PacketUpdateHealth var1) {
-			root.handleUpdateHealth(var1);
-		}
-
-		@Override
-		public void handleTeams(S3EPacketTeams var1) {
-			root.handleTeams(var1);
-		}
-
-		@Override
-		public void handleUpdateScore(S3CPacketUpdateScore var1) {
-			root.handleUpdateScore(var1);
-		}
-
-		@Override
-		public void handleSpawnPosition(S05PacketSpawnPosition var1) {
-			root.handleSpawnPosition(var1);
-		}
-
-		@Override
-		public void handleTimeUpdate(S03PacketTimeUpdate var1) {
-			root.handleTimeUpdate(var1);
-		}
-
-		@Override
-		public void handleUpdateSign(S33PacketUpdateSign var1) {
-			root.handleUpdateSign(var1);
-		}
-
-		@Override
-		public void handleSoundEffect(S29PacketSoundEffect var1) {
-			root.handleSoundEffect(var1);
-		}
-
-		@Override
-		public void handleCollectItem(S0DPacketCollectItem var1) {
-			root.handleCollectItem(var1);
-		}
-
-		@Override
-		public void handleEntityTeleport(S18PacketEntityTeleport var1) {
-			root.handleEntityTeleport(var1);
-		}
-
-		@Override
-		public void handleEntityProperties(S20PacketEntityProperties var1) {
-			root.handleEntityProperties(var1);
-		}
-
-		@Override
-		public void handleEntityEffect(S1DPacketEntityEffect var1) {
-			root.handleEntityEffect(var1);
-		}
-
-		public boolean fishIsCaptured(Entity expectedPos) {
-			while (true) {
-				Pos next = foundFishPositions.poll();
-				if (next == null) {
-					return false;
-				} else if (expectedPos.getDistance(next.getX() + 0.5, next.getY() + 0.5, next.getZ() + 0.5) < MAX_DISTANCE) {
-					return true;
-				} else {
-					System.out.println("Found a fish bite at " + next + " but fishing at " + expectedPos + ".");
-				}
-			}
-		}
-
-		public void reset() {
-			foundFishPositions.clear();
-		}
 	}
 
 	private boolean fishIsCaptured(AIHelper helper) {
@@ -522,19 +138,16 @@ public class DoFishTask extends AITask {
 			field.setAccessible(true);
 			final INetHandlerPlayClient oldHandler = (INetHandlerPlayClient) field
 					.get(manager);
-			if (oldHandler instanceof NetHandlerPlayClient) {
-				System.out.println("Injecting new network handler.");
-				final INetHandlerPlayClient newHandler = new MyNetHandler(
-						oldHandler);
-				field.set(manager, newHandler);
-				sendReset = false;
-			} else {
-				final MyNetHandler myHandler = (MyNetHandler) oldHandler;
+			if (oldHandler instanceof MinebotNetHandler) {
+				MinebotNetHandler minebotNetHandler = (MinebotNetHandler) oldHandler;
 				if (sendReset) {
-					myHandler.reset();
+					minebotNetHandler.resetFishState();
 					sendReset = false;
 				}
-				return myHandler.fishIsCaptured(helper.getMinecraft().thePlayer.fishEntity);
+				return minebotNetHandler
+						.fishIsCaptured(helper.getMinecraft().thePlayer.fishEntity);
+			} else {
+				System.out.println("No minebot net handler found.");
 			}
 		} catch (final Throwable e) {
 			for (final Field f : manager.getClass().getDeclaredFields()) {

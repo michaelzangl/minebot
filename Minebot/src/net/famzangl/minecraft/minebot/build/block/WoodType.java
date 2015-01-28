@@ -1,8 +1,15 @@
-package net.famzangl.minecraft.minebot.build;
+package net.famzangl.minecraft.minebot.build.block;
 
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
 
+/**
+ * A type of wood used in the game.
+ * @see LogItemFilter
+ * @see WoodItemFilter
+ * @author michael
+ *
+ */
 public enum WoodType {
 	OAK(Blocks.log, 0),
 	SPRUCE(Blocks.log, 1),

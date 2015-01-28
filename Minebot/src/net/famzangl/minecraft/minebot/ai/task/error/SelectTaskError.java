@@ -3,6 +3,11 @@ package net.famzangl.minecraft.minebot.ai.task.error;
 import net.famzangl.minecraft.minebot.ai.HumanReadableItemFilter;
 import net.famzangl.minecraft.minebot.ai.ItemFilter;
 
+/**
+ * Tells the user that the bot could not select a given item.
+ * @author michael
+ *
+ */
 public final class SelectTaskError extends TaskError {
 	private final ItemFilter filter;
 

@@ -7,6 +7,7 @@ import net.famzangl.minecraft.minebot.ai.command.AICommandInvocation;
 import net.famzangl.minecraft.minebot.ai.command.AICommandParameter;
 import net.famzangl.minecraft.minebot.ai.command.ParameterType;
 import net.famzangl.minecraft.minebot.ai.strategy.AIStrategy;
+import net.minecraft.util.BlockPos;
 
 @AICommand(helpText = "Set bounding position manually.", name = "minebuild")
 public class CommandSetPos {
@@ -31,7 +32,7 @@ public class CommandSetPos {
 	public static AIStrategy run(
 			AIHelper helper,
 			@AICommandParameter(type = ParameterType.FIXED, fixedName = "pos1", description = "") String nameArg,
-			@AICommandParameter(type = ParameterType.POSITION, description = "The position") Pos pos) {
+			@AICommandParameter(type = ParameterType.POSITION, description = "The position") BlockPos pos) {
 		helper.setPosition(pos, false);
 		return null;
 	}

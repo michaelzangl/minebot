@@ -3,8 +3,8 @@ package net.famzangl.minecraft.minebot.ai.enchanting;
 import java.lang.reflect.Field;
 
 import net.famzangl.minecraft.minebot.ai.AIHelper;
-import net.famzangl.minecraft.minebot.ai.strategy.TaskOperations;
 import net.famzangl.minecraft.minebot.ai.task.AITask;
+import net.famzangl.minecraft.minebot.ai.task.TaskOperations;
 import net.famzangl.minecraft.minebot.ai.task.error.StringTaskError;
 import net.minecraft.client.gui.GuiEnchantment;
 import net.minecraft.inventory.ContainerEnchantment;

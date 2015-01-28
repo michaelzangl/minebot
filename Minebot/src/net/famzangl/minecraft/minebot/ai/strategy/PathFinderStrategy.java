@@ -7,12 +7,23 @@ import net.famzangl.minecraft.minebot.ai.render.PosMarkerRenderer;
 import net.famzangl.minecraft.minebot.ai.task.WaitTask;
 import net.minecraftforge.fml.common.gameevent.TickEvent.RenderTickEvent;
 
+/**
+ * This is the base strategy for all strategies that do pathfinding. Most of the
+ * times, it does not need to be extended, it just needs an adjusted
+ * {@link MovePathFinder}
+ * 
+ * @see MovePathFinder
+ * 
+ * @author michael
+ *
+ */
 public class PathFinderStrategy extends TaskStrategy {
 	private final MovePathFinder pathFinder;
 	private final String description;
 	private boolean inShouldTakeOver;
 	private boolean noPathFound;
-	private final PosMarkerRenderer renderer = new PosMarkerRenderer(255, 128, 0);;
+	private final PosMarkerRenderer renderer = new PosMarkerRenderer(255, 128,
+			0);;
 
 	// private final HealthWatcher watcher = new HealthWatcher();
 

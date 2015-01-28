@@ -6,6 +6,12 @@ import net.famzangl.minecraft.minebot.ai.ItemFilter;
 import net.famzangl.minecraft.minebot.ai.command.AIChatController;
 import net.minecraft.item.ItemFood;
 
+/**
+ * Eat as soon as you are hungry.
+ * 
+ * @author michael
+ *
+ */
 public class EatStrategy extends AIStrategy {
 	// TODO: Is this really what we want?
 	private static final ItemFilter FILTER = new ClassItemFilter(ItemFood.class);
@@ -22,7 +28,7 @@ public class EatStrategy extends AIStrategy {
 
 	@Override
 	protected TickResult onGameTick(AIHelper helper) {
-		if (needFood(helper))  {
+		if (needFood(helper)) {
 			if (helper.selectCurrentItem(FILTER)) {
 				helper.overrideSneak();
 				helper.overrideUseItem();
@@ -38,12 +44,12 @@ public class EatStrategy extends AIStrategy {
 			return TickResult.NO_MORE_WORK;
 		}
 	}
-	
+
 	@Override
 	public boolean hasFailed() {
 		return failed;
 	}
-	
+
 	@Override
 	public String getDescription(AIHelper helper) {
 		return "Eat.";

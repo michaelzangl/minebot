@@ -1,5 +1,10 @@
 package net.famzangl.minecraft.minebot.ai.task.error;
 
+/**
+ * Displays a simple error message to the user.
+ * @author michael
+ *
+ */
 public class StringTaskError extends TaskError {
 
 	private final String message;

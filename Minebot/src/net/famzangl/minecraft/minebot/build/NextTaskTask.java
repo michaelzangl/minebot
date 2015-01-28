@@ -1,9 +1,15 @@
 package net.famzangl.minecraft.minebot.build;
 
 import net.famzangl.minecraft.minebot.ai.AIHelper;
-import net.famzangl.minecraft.minebot.ai.strategy.TaskOperations;
 import net.famzangl.minecraft.minebot.ai.task.AITask;
+import net.famzangl.minecraft.minebot.ai.task.TaskOperations;
 
+/**
+ * This task lets you skip one/many build tasks.
+ * 
+ * @author michael
+ *
+ */
 public final class NextTaskTask extends AITask {
 	private int tasksToSkip;
 

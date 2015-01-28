@@ -7,6 +7,34 @@ import java.util.List;
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.strategy.AIStrategy.TickResult;
 
+/**
+ * This is a stack of strategies, ordered by priority. The strategy with the
+ * highest priority that wants to take over gets control. Strategies with higher
+ * priority are asked if they want to take over if either
+ * {@link AIStrategy#takesOverAnyTime()} evaluates to <code>true</code> or the
+ * current strategy signaled that it is in a good state for other strategies to
+ * take over.
+ * <p>
+ * Strategies can give control to other strategies in the stack by returning
+ * different values in their {@link AIStrategy#gameTick(AIHelper)}:
+ * <dl>
+ * <dt> {@link TickResult#NO_MORE_WORK}</dt>
+ * <dd>The current strategy has no more work to do and releases control.
+ * {@link AIStrategy#checkShouldTakeOver(AIHelper)} is called afterwards to
+ * query if the strategy has more work..</dd>
+ * <dt> {@link TickResult#TICK_HANDLED}</dt>
+ * <dd>The bot was controled for this tick.</dd>
+ * <dt> {@link TickResult#TICK_AGAIN}</dt>
+ * <dd>The strategy has more work to do. It did not do any actions that
+ * influenced the bot state. If no higher priority strategies have work (e.g.
+ * eating), this strategy is just called again..</dd>
+ * <dt> {@link TickResult#ABORT}</dt>
+ * <dd>The whole stack should exit.</dd>
+ * </dl>
+ * 
+ * @author michael
+ *
+ */
 public class StrategyStack {
 	/**
 	 * Strategies, ordered from most to least important.
@@ -23,17 +51,18 @@ public class StrategyStack {
 	 * @return <code>true</code> on success.
 	 */
 	public TickResult gameTick(AIHelper helper) {
-			final TickResult result = strategyTick(helper, currentStrategy == null || goodPause);
-			goodPause = false;
-			if (result == null) {
-				return TickResult.NO_MORE_WORK;
-			} else if (result == TickResult.NO_MORE_WORK) {
-				setCurrentStrategy(helper, null);
-				return TickResult.TICK_AGAIN;
-			} else if (result == TickResult.TICK_AGAIN) {
-				goodPause = true;
-			}
-			return result;
+		final TickResult result = strategyTick(helper, currentStrategy == null
+				|| goodPause);
+		goodPause = false;
+		if (result == null) {
+			return TickResult.NO_MORE_WORK;
+		} else if (result == TickResult.NO_MORE_WORK) {
+			setCurrentStrategy(helper, null);
+			return TickResult.TICK_AGAIN;
+		} else if (result == TickResult.TICK_AGAIN) {
+			goodPause = true;
+		}
+		return result;
 	}
 
 	private TickResult strategyTick(AIHelper helper, boolean goodTimeToPause) {
@@ -80,7 +109,7 @@ public class StrategyStack {
 
 	public void shutdown() {
 	}
-	
+
 	public AIStrategy getCurrentStrategy() {
 		return currentStrategy;
 	}

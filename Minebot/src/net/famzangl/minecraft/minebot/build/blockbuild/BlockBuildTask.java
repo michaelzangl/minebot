@@ -1,6 +1,5 @@
 package net.famzangl.minecraft.minebot.build.blockbuild;
 
-import net.famzangl.minecraft.minebot.Pos;
 import net.famzangl.minecraft.minebot.ai.BlockItemFilter;
 import net.famzangl.minecraft.minebot.ai.BlockWhitelist;
 import net.minecraft.block.Block;

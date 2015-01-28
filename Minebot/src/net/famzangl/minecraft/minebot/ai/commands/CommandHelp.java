@@ -16,7 +16,6 @@ import net.famzangl.minecraft.minebot.ai.command.FixedNameBuilder.FixedArgumentD
 import net.famzangl.minecraft.minebot.ai.command.ParameterType;
 import net.famzangl.minecraft.minebot.ai.strategy.AIStrategy;
 import net.minecraft.client.entity.EntityPlayerSP;
-import net.minecraft.entity.Entity;
 import net.minecraft.util.ChatComponentText;
 
 import com.google.common.base.Function;

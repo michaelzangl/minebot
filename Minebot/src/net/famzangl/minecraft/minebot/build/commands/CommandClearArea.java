@@ -11,6 +11,7 @@ import net.famzangl.minecraft.minebot.ai.command.SafeStrategyRule;
 import net.famzangl.minecraft.minebot.ai.path.ClearAreaPathfinder;
 import net.famzangl.minecraft.minebot.ai.strategy.AIStrategy;
 import net.famzangl.minecraft.minebot.ai.strategy.PathFinderStrategy;
+import net.minecraft.util.BlockPos;
 
 @AICommand(helpText = "Clears the selected area.", name = "minebuild")
 public class CommandClearArea {
@@ -53,8 +54,8 @@ public class CommandClearArea {
 	public static AIStrategy run(
 			AIHelper helper,
 			@AICommandParameter(type = ParameterType.FIXED, fixedName = "clear", description = "") String nameArg) {
-		final Pos pos1 = helper.getPos1();
-		final Pos pos2 = helper.getPos2();
+		final BlockPos pos1 = helper.getPos1();
+		final BlockPos pos2 = helper.getPos2();
 		if (pos1 == null || pos2 == null) {
 			AIChatController.addChatLine("Set positions first.");
 			return null;

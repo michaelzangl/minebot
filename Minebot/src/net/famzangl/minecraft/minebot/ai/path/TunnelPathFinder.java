@@ -8,7 +8,7 @@ import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.BlockWhitelist;
 import net.famzangl.minecraft.minebot.ai.task.DestroyInRangeTask;
 import net.famzangl.minecraft.minebot.ai.task.PlaceTorchSomewhereTask;
-import net.minecraft.init.Blocks;
+import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
 
 public class TunnelPathFinder extends AlongTrackPathFinder {
@@ -57,16 +57,14 @@ public class TunnelPathFinder extends AlongTrackPathFinder {
 	}
 
 	@Override
-	protected void addTasksForTarget(Pos currentPos) {
-		Pos p1, p2;
+	protected void addTasksForTarget(BlockPos currentPos) {
+		BlockPos p1, p2;
 		if (dx == 0) {
-			p1 = new Pos(currentPos.getX() + addToSide, currentPos.getY(), currentPos.getZ());
-			p2 = new Pos(currentPos.getX() - addToSide, currentPos.getY() + 1 + addToTop,
-					currentPos.getZ());
+			p1 = currentPos.add(addToSide, 0, 0);
+			p2 = currentPos.add(-addToSide, 1 + addToTop, 0);
 		} else {
-			p1 = new Pos(currentPos.getX(), currentPos.getY(), currentPos.getZ() + addToSide);
-			p2 = new Pos(currentPos.getX(), currentPos.getY() + 1 + addToTop,
-					currentPos.getZ() - addToSide);
+			p1 = currentPos.add(0, 0, addToSide);
+			p2 = currentPos.add(0, 1 + addToTop, -addToSide);
 		}
 		addTask(new DestroyInRangeTask(p1, p2));
 
@@ -83,8 +81,8 @@ public class TunnelPathFinder extends AlongTrackPathFinder {
 		}
 	}
 
-	private void addTorchesTask(Pos currentPos, int dirX, int dirZ) {
-		final ArrayList<Pos> positions = new ArrayList<Pos>();
+	private void addTorchesTask(BlockPos currentPos, int dirX, int dirZ) {
+		final ArrayList<BlockPos> positions = new ArrayList<BlockPos>();
 		positions.add(new Pos(currentPos.getX() + dirX * addToSide,
 				currentPos.getY() + 1, currentPos.getZ() + dirZ * addToSide));
 

@@ -1,7 +1,13 @@
-package net.famzangl.minecraft.minebot.ai.strategy;
+package net.famzangl.minecraft.minebot.ai.task;
 
+import net.famzangl.minecraft.minebot.ai.strategy.TaskStrategy;
 import net.famzangl.minecraft.minebot.ai.task.error.TaskError;
 
+/**
+ * Callbacks for {@link AITask}s to communicate back to the {@link TaskStrategy}
+ * @author michael
+ *
+ */
 public interface TaskOperations {
 
 	/**

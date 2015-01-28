@@ -1,6 +1,5 @@
 package net.famzangl.minecraft.minebot.build.blockbuild;
 
-import net.famzangl.minecraft.minebot.Pos;
 import net.minecraft.util.BlockPos;
 
 public class TaskDescription {

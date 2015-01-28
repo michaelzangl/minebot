@@ -4,6 +4,12 @@ import net.minecraft.block.Block;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 
+/**
+ * An item filter that filters for a given (buildable) block.
+ * 
+ * @author michael
+ *
+ */
 public class BlockItemFilter implements HumanReadableItemFilter {
 
 	private final BlockWhitelist matched;
@@ -31,7 +37,6 @@ public class BlockItemFilter implements HumanReadableItemFilter {
 	public String toString() {
 		return "BlockItemFilter [matched=" + matched + "]";
 	}
-
 
 	@Override
 	public int hashCode() {

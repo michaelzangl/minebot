@@ -1,23 +1,22 @@
 package net.famzangl.minecraft.minebot.ai.scripting;
 
-import net.famzangl.minecraft.minebot.Pos;
-import net.famzangl.minecraft.minebot.ai.ColoredBlockItemFilter;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.item.EntityMinecart;
 import net.minecraft.entity.passive.EntitySheep;
 import net.minecraft.entity.passive.EntityWolf;
 import net.minecraft.item.EnumDyeColor;
+import net.minecraft.util.BlockPos;
 
-public class FoundEntity extends DoublePos {
+public class FoundEntity extends EntityPos {
 	private final Entity entity;
-	private final Pos pos;
+	private final BlockPos pos;
 	private EnumDyeColor color = null;
 	
 	public FoundEntity(Entity entity) {
 		super(entity);
 		this.entity = entity;
-		pos = new Pos((int) Math.floor(entity.posX), (int) Math.floor(entity.posY), (int) Math.floor(entity.posZ));
+		pos = new BlockPos((int) Math.floor(entity.posX), (int) Math.floor(entity.posY), (int) Math.floor(entity.posZ));
 		if (entity instanceof EntitySheep) {
 			color = ((EntitySheep) entity).getFleeceColor();
 		} else if (entity instanceof EntityWolf) {
@@ -25,7 +24,7 @@ public class FoundEntity extends DoublePos {
 		}
 	}
 
-	public Pos getPos() {
+	public BlockPos getPos() {
 		return pos;
 	}
 

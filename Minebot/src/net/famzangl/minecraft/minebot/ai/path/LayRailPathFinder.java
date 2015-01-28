@@ -1,6 +1,5 @@
 package net.famzangl.minecraft.minebot.ai.path;
 
-import net.famzangl.minecraft.minebot.Pos;
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.BlockItemFilter;
 import net.famzangl.minecraft.minebot.ai.task.MineBlockTask;
@@ -9,6 +8,7 @@ import net.famzangl.minecraft.minebot.ai.task.move.UpwardsMoveTask;
 import net.famzangl.minecraft.minebot.ai.task.place.PlaceBlockAtFloorTask;
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
+import net.minecraft.util.BlockPos;
 
 public class LayRailPathFinder extends AlongTrackPathFinder {
 
@@ -49,7 +49,7 @@ public class LayRailPathFinder extends AlongTrackPathFinder {
 	}
 
 	@Override
-	protected void addTasksForTarget(Pos currentPos) {
+	protected void addTasksForTarget(BlockPos currentPos) {
 		if (isRedstoneBlockPosition(currentPos.getX(), currentPos.getY(), currentPos.getZ())) {
 			// For those server lags
 			addTask(new UpwardsMoveTask(currentPos.add(0,1,0), new BlockItemFilter(Blocks.redstone_block)));
@@ -70,7 +70,7 @@ public class LayRailPathFinder extends AlongTrackPathFinder {
 		}
 	}
 
-	private void placeRail(Pos currentPos, Block rail) {
+	private void placeRail(BlockPos currentPos, Block rail) {
 		if (!helper.isAirBlock(currentPos.getX(), currentPos.getY(), currentPos.getZ())) {
 			addTask(new MineBlockTask(currentPos));
 		}

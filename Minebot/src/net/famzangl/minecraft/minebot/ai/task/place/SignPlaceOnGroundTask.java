@@ -2,10 +2,17 @@ package net.famzangl.minecraft.minebot.ai.task.place;
 
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.ClassItemFilter;
-import net.famzangl.minecraft.minebot.ai.strategy.TaskOperations;
+import net.famzangl.minecraft.minebot.ai.task.TaskOperations;
 import net.minecraft.item.ItemSign;
 import net.minecraft.util.BlockPos;
 
+/**
+ * Place a sign on the ground.
+ * Use an {@link SetSignTextTask} afterwards!
+ * 
+ * @author michael
+ *
+ */
 public class SignPlaceOnGroundTask extends PlaceBlockAtFloorTask {
 
 	private final int direction;

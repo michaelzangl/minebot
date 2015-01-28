@@ -5,7 +5,13 @@ import net.famzangl.minecraft.minebot.ai.BlockWhitelist;
 import net.minecraft.block.Block;
 import net.minecraft.util.BlockPos;
 
-public class UseItemOnBlockTask extends UseItemTask {
+
+/**
+ * 
+ * @author michael
+ *
+ */
+public abstract class UseItemOnBlockTask extends UseItemTask {
 
 	private final BlockWhitelist allowedBlocks;
 

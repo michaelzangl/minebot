@@ -6,6 +6,8 @@ import net.minecraftforge.fml.common.gameevent.TickEvent.RenderTickEvent;
 /**
  * Run a whole stack of strategies.
  * 
+ * @see StrategyStack
+ * 
  * @author michael
  * 
  */

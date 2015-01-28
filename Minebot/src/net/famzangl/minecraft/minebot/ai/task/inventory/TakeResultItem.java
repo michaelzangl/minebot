@@ -1,12 +1,18 @@
 package net.famzangl.minecraft.minebot.ai.task.inventory;
 
 import net.famzangl.minecraft.minebot.ai.AIHelper;
-import net.famzangl.minecraft.minebot.ai.strategy.TaskOperations;
 import net.famzangl.minecraft.minebot.ai.task.AITask;
+import net.famzangl.minecraft.minebot.ai.task.TaskOperations;
 import net.famzangl.minecraft.minebot.ai.task.error.StringTaskError;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.item.ItemStack;
 
+/**
+ * Take the resulting items from the crafting/enchanting/... table.
+ * 
+ * @author michael
+ *
+ */
 public class TakeResultItem extends AITask {
 	private final Class<? extends GuiContainer> containerClass;
 	private final int slot;
@@ -32,7 +38,8 @@ public class TakeResultItem extends AITask {
 		}
 		final GuiContainer screen = (GuiContainer) h.getMinecraft().currentScreen;
 		if (screen.inventorySlots.getSlot(slot).getHasStack()
-				&& shouldTakeStack(screen.inventorySlots.getSlot(slot).getStack())) {
+				&& shouldTakeStack(screen.inventorySlots.getSlot(slot)
+						.getStack())) {
 			h.getMinecraft().playerController.windowClick(
 					screen.inventorySlots.windowId, slot, 0, 1,
 					h.getMinecraft().thePlayer);

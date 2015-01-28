@@ -1,5 +1,6 @@
 package net.famzangl.minecraft.minebot.build.reverse;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintStream;
@@ -16,51 +17,61 @@ import net.minecraft.init.Blocks;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
 
+/**
+ * This does the reverse of building: it creates a build script from a given
+ * area.
+ * 
+ * @author michael
+ *
+ */
 public class BuildReverser {
 	private final AIHelper helper;
-	private final Pos pos1;
-	private final Pos pos2;
+	private final BlockPos minPos;
+	private final BlockPos maxPos;
 	private final ReverseBuildField field;
-	private String outFile;
+	private File outFile;
 	private PrintStream out;
 	private int missingBlocks;
 
-	public BuildReverser(AIHelper helper, String outFile) {
+	public BuildReverser(AIHelper helper, File outFile) {
 		this(helper, Pos.minPos(helper.getPos1(), helper.getPos2()), Pos
 				.maxPos(helper.getPos1(), helper.getPos2()), outFile);
 	}
 
-	public BuildReverser(AIHelper helper, Pos pos1, Pos pos2, String outFile) {
+	public BuildReverser(AIHelper helper, BlockPos minPos, BlockPos maxPos,
+			File outFile) {
 		this.helper = helper;
-		this.pos1 = pos1;
-		this.pos2 = pos2;
-		field = new ReverseBuildField(pos2.getX() - pos1.getX() + 1,
-				pos2.getY() - pos1.getY() + 1, pos2.getZ() - pos1.getZ() + 1);
+		this.minPos = minPos;
+		this.maxPos = maxPos;
+		field = new ReverseBuildField(maxPos.getX() - minPos.getX() + 1,
+				maxPos.getY() - minPos.getY() + 1, maxPos.getZ()
+						- minPos.getZ() + 1);
 		this.outFile = outFile;
 	}
 
 	public void run() {
 		try {
-			if (outFile == null || outFile.isEmpty() || "-".equals(outFile)) {
-				this.outFile = "-";
+			if (outFile == null || "-".equals(outFile)) {
+				this.outFile = null;
 				this.out = System.out;
 			} else {
 				this.out = new PrintStream(outFile);
 			}
 			out.println("# Minebot reverse build script "
 					+ MinebotMod.getVersion());
-			out.println("# Pos1: " + pos1);
-			out.println("# Pos2: " + pos2);
+			out.println("# Pos1: " + minPos);
+			out.println("# Pos2: " + maxPos);
 			out.println("");
 			out.println("/minebuild reset");
 			out.println("");
-			for (int y = pos1.getY(); y <= pos2.getY(); y++) {
-				out.println("# Layer " + (y - pos1.getY()));
-				for (int x = pos1.getX(); x <= pos2.getX(); x++) {
-					final boolean row2 = (x - pos1.getX() & 1) == 1;
-					addRow(new Pos(x, y, row2 ? pos2.getZ() : pos1.getZ()),
-							row2 ? EnumFacing.NORTH : EnumFacing.SOUTH,
-							pos2.getZ() - pos1.getZ() + 1);
+			for (int y = minPos.getY(); y <= maxPos.getY(); y++) {
+				out.println("# Layer " + (y - minPos.getY()));
+				for (int x = minPos.getX(); x <= maxPos.getX(); x++) {
+					final boolean row2 = (x - minPos.getX() & 1) == 1;
+					addRow(new BlockPos(x, y, row2 ? maxPos.getZ()
+							: minPos.getZ()), row2 ? EnumFacing.NORTH
+							: EnumFacing.SOUTH, maxPos.getZ() - minPos.getZ()
+							+ 1);
 				}
 				out.println("");
 			}
@@ -70,7 +81,9 @@ public class BuildReverser {
 				AIChatController.addChatLine("Could not convert "
 						+ missingBlocks + "blocks. They will be missing.");
 			}
-			AIChatController.addChatLine("Output written to: " + this.outFile);
+			AIChatController.addChatLine("Output written to: "
+					+ (this.outFile == null ? "Stdout" : this.outFile
+							.getAbsolutePath()));
 		} catch (final FileNotFoundException e) {
 			AIChatController.addChatLine("File/dir does not exist: " + outFile);
 		} catch (final IOException e) {
@@ -83,14 +96,15 @@ public class BuildReverser {
 		}
 	}
 
-	public void addRow(Pos start, EnumFacing direction, int length) {
+	public void addRow(BlockPos start, EnumFacing direction, int length) {
 		for (int i = 0; i < length; i++) {
-			addBuildPlace(start.offset(direction, length));
+			addBuildPlace(start.offset(direction, i));
 		}
 	}
 
 	private void addBuildPlace(BlockPos pos) {
-		BlockPos localPos = pos.subtract(pos1);
+		BlockPos localPos = pos.subtract(minPos);
+		System.out.println("Reconstructing: " + localPos);
 
 		final Block b = helper.getBlock(pos);
 		if (b != Blocks.air) {

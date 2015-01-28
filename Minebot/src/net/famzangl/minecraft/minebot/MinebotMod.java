@@ -24,8 +24,4 @@ public class MinebotMod {
 	public static String getVersion() {
 		return MinebotMod.class.getAnnotation(Mod.class).version();
 	}
-
-	public static void main(String[] args) {
-		System.out.println(6364136223846793005L * 0xc097ef87329e28a5l + "");
-	}
 }

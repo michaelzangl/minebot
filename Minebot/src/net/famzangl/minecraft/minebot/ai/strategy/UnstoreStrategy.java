@@ -19,6 +19,7 @@ import net.famzangl.minecraft.minebot.ai.task.inventory.MoveInInventoryTask;
 import net.minecraft.client.gui.inventory.GuiChest;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.BlockPos;
 
 public class UnstoreStrategy extends PathFinderStrategy {
 
@@ -136,7 +137,7 @@ public class UnstoreStrategy extends PathFinderStrategy {
 		private ChestBlockHandler chestBlockHandler;
 
 		@Override
-		protected BlockRangeScanner constructScanner(Pos playerPosition) {
+		protected BlockRangeScanner constructScanner(BlockPos playerPosition) {
 			BlockRangeScanner scanner = super.constructScanner(playerPosition);
 			chestBlockHandler = new ChestBlockHandler();
 			scanner.addHandler(chestBlockHandler);
@@ -162,7 +163,7 @@ public class UnstoreStrategy extends PathFinderStrategy {
 		}
 
 		@Override
-		protected void addTasksForTarget(Pos currentPos) {
+		protected void addTasksForTarget(BlockPos currentPos) {
 			ArrayList<ChestData> chests = chestBlockHandler
 					.getReachableForPos(currentPos);
 			for (final ChestData c : chests) {

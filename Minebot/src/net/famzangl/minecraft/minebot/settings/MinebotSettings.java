@@ -1,10 +1,8 @@
-package net.famzangl.minecraft.minebot;
+package net.famzangl.minecraft.minebot.settings;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Properties;
@@ -12,8 +10,6 @@ import java.util.Properties;
 import net.famzangl.minecraft.minebot.ai.BlockWhitelist;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
-
-import org.apache.commons.io.IOUtils;
 
 /**
  * This wraps a minebot setting file and provides convenient access to the
@@ -51,44 +47,24 @@ public class MinebotSettings {
 	}
 
 	private File getSettingsFile() {
-		final File settingsFile = new File(Minecraft.getMinecraft().mcDataDir,
-				"minebot.properties");
-		if (!settingsFile.exists()) {
-			System.out.println("Settings file "
-					+ settingsFile.getAbsolutePath()
-					+ " does not exist. Copying default settings.");
+		return getDataDirFile("minebot.properties");
+	}
 
-			InputStream source = null;
-			FileOutputStream destination = null;
+	public static File getDataDirFile(String name) {
+		return new File(getDataDir(), name);
+	}
 
+	public static File getDataDir() {
+		File dir = new File(Minecraft.getMinecraft().mcDataDir, "minebot");
+		if (!dir.isDirectory()) {
 			try {
-				settingsFile.createNewFile();
-				source = this.getClass().getResourceAsStream(
-						"minebot.properties");
-				destination = new FileOutputStream(settingsFile);
-				IOUtils.copy(source, destination);
-			} catch (final IOException e) {
-				System.err.println("Error copying default settings.");
-				settingsFile.delete();
-			} catch (final NullPointerException e) {
-				System.err.println("Could not find default settings.");
-				settingsFile.delete();
-			} finally {
-				if (source != null) {
-					try {
-						source.close();
-					} catch (final IOException e) {
-					}
-				}
-				if (destination != null) {
-					try {
-						destination.close();
-					} catch (final IOException e) {
-					}
-				}
+				return new MinebotDirectoryCreator().createDirectory(dir);
+			} catch (IOException e) {
+				System.err.println("Could not create settings directory.");
+				e.printStackTrace();
 			}
 		}
-		return settingsFile;
+		return dir;
 	}
 
 	public String get(String key, String defaultValue) {
@@ -114,14 +90,20 @@ public class MinebotSettings {
 		}
 	}
 
+	/**
+	 * GEt a list of blocks.
+	 * 
+	 * @param key
+	 * @param defaultValue
+	 * @return
+	 */
 	public BlockWhitelist getBlocks(String key, BlockWhitelist defaultValue) {
 		final String property = getSettings().getProperty(key);
 		if (property == null) {
 			return defaultValue;
 		}
 		ArrayList<Block> blocks = new ArrayList<Block>();
-		for (final String name : property
-				.split("\\s*[\\,\\s\\;]\\s*")) {
+		for (final String name : property.split("\\s*[\\,\\s\\;]\\s*")) {
 			final Block block = (Block) Block.blockRegistry.getObject(name);
 			if (block != null) {
 				blocks.add(block);

@@ -6,6 +6,12 @@ import net.minecraft.client.gui.GuiEnchantment;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 
+/**
+ * Puts an item the table accepts in the enchantment table.
+ * 
+ * @author michael
+ *
+ */
 public class PutItemInTableTask extends PutItemInContainerTask {
 
 	@Override

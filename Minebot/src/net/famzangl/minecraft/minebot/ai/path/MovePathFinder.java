@@ -2,7 +2,6 @@ package net.famzangl.minecraft.minebot.ai.path;
 
 import java.util.LinkedList;
 
-import net.famzangl.minecraft.minebot.MinebotSettings;
 import net.famzangl.minecraft.minebot.Pos;
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.BlockItemFilter;
@@ -15,6 +14,7 @@ import net.famzangl.minecraft.minebot.ai.task.move.HorizontalMoveTask;
 import net.famzangl.minecraft.minebot.ai.task.move.JumpMoveTask;
 import net.famzangl.minecraft.minebot.ai.task.move.UpwardsMoveTask;
 import net.famzangl.minecraft.minebot.ai.task.move.WalkTowardsTask;
+import net.famzangl.minecraft.minebot.settings.MinebotSettings;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
@@ -107,7 +107,7 @@ public class MovePathFinder extends PathFinderField {
 	 * @param playerPosition
 	 * @return <code>false</code> When pathfinding should be given more time.
 	 */
-	protected boolean runSearch(Pos playerPosition) {
+	protected boolean runSearch(BlockPos playerPosition) {
 		return super.searchSomethingAround(playerPosition.getX(), playerPosition.getY(),
 				playerPosition.getZ());
 	}
@@ -238,8 +238,8 @@ public class MovePathFinder extends PathFinderField {
 		if (pos1.getY() != pos2.getY()) {
 			return false;
 		}
-		Pos min = Pos.minPos(pos1, pos2);
-		Pos max = Pos.maxPos(pos1, pos2);
+		BlockPos min = Pos.minPos(pos1, pos2);
+		BlockPos max = Pos.maxPos(pos1, pos2);
 		int y = pos1.getY();
 		for (int x = min.getX(); x <= max.getX(); x++) {
 			for (int z = min.getZ(); z <= max.getZ(); z++) {
@@ -264,7 +264,7 @@ public class MovePathFinder extends PathFinderField {
 		return AIHelper.getDirectionFor(delta);
 	}
 
-	protected void addTasksForTarget(Pos currentPos) {
+	protected void addTasksForTarget(BlockPos currentPos) {
 	}
 
 	@Override

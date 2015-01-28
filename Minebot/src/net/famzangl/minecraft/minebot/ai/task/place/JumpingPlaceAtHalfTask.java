@@ -2,12 +2,20 @@ package net.famzangl.minecraft.minebot.ai.task.place;
 
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.ItemFilter;
-import net.famzangl.minecraft.minebot.ai.strategy.TaskOperations;
 import net.famzangl.minecraft.minebot.ai.task.BlockSide;
+import net.famzangl.minecraft.minebot.ai.task.TaskOperations;
 import net.famzangl.minecraft.minebot.ai.task.error.StringTaskError;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
 
+/**
+ * Place a block at the given upper/lower side of its adjacent blocks by
+ * standing at the place where the block should go, then jumping up and placing
+ * the block while being in the air.
+ * 
+ * @author michael
+ *
+ */
 public class JumpingPlaceAtHalfTask extends JumpingPlaceBlockAtFloorTask {
 
 	public final static EnumFacing[] TRY_FOR_LOWER = new EnumFacing[] {
@@ -54,13 +62,15 @@ public class JumpingPlaceAtHalfTask extends JumpingPlaceBlockAtFloorTask {
 					getSide(dir) == BlockSide.UPPER_HALF ? 0.5 : 0,
 					getSide(dir) == BlockSide.LOWER_HALF ? 0.5 : 1,
 					h.getMinecraft().thePlayer.posX - pos.getX(),
-					h.getMinecraft().thePlayer.posZ - pos.getZ(), lookingDirection);
+					h.getMinecraft().thePlayer.posZ - pos.getZ(),
+					lookingDirection);
 			return true;
 		}
 	}
 
 	protected BlockSide getSide(EnumFacing dir) {
-		return dir == EnumFacing.DOWN ? BlockSide.UPPER_HALF : BlockSide.LOWER_HALF;
+		return dir == EnumFacing.DOWN ? BlockSide.UPPER_HALF
+				: BlockSide.LOWER_HALF;
 	}
 
 	@Override

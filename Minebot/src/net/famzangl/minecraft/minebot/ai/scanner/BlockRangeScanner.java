@@ -2,13 +2,13 @@ package net.famzangl.minecraft.minebot.ai.scanner;
 
 import java.util.ArrayList;
 
-import net.famzangl.minecraft.minebot.Pos;
 import net.famzangl.minecraft.minebot.ai.AIHelper;
+import net.minecraft.util.BlockPos;
 
 public class BlockRangeScanner {
 	private static final int HORIZONTAL_SCAN = 100;
 	private static final int VERTICAL_SCAN = 20;
-	private final Pos center;
+	private final BlockPos center;
 	
 	public interface BlockHandler {
 		int[] getIds();
@@ -25,7 +25,7 @@ public class BlockRangeScanner {
 	
 	private boolean scaningFinished;
 
-	public BlockRangeScanner(Pos center) {
+	public BlockRangeScanner(BlockPos center) {
 		this.center = center;
 	}
 	

@@ -1,8 +1,8 @@
 package net.famzangl.minecraft.minebot.ai.enchanting;
 
 import net.famzangl.minecraft.minebot.ai.AIHelper;
-import net.famzangl.minecraft.minebot.ai.strategy.TaskOperations;
 import net.famzangl.minecraft.minebot.ai.task.AITask;
+import net.famzangl.minecraft.minebot.ai.task.TaskOperations;
 import net.minecraft.util.MovingObjectPosition;
 
 public class KillAnyMobTask extends AITask {

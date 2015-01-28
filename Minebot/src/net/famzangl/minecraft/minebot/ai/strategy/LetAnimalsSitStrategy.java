@@ -12,15 +12,14 @@ import net.famzangl.minecraft.minebot.ai.selectors.IsSittingSelector;
 import net.famzangl.minecraft.minebot.ai.selectors.NotSelector;
 import net.famzangl.minecraft.minebot.ai.selectors.OneOfListSelector;
 import net.famzangl.minecraft.minebot.ai.task.FaceAndInteractTask;
-
-import com.google.common.base.Predicate;
-
 import net.minecraft.entity.Entity;
 import net.minecraft.item.EnumDyeColor;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemDye;
 import net.minecraft.item.ItemFood;
 import net.minecraft.item.ItemStack;
+
+import com.google.common.base.Predicate;
 
 /**
  * Lets all wolves that are owned by the current player either sit or stand.

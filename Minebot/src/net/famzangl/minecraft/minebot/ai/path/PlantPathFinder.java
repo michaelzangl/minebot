@@ -1,6 +1,5 @@
 package net.famzangl.minecraft.minebot.ai.path;
 
-import net.famzangl.minecraft.minebot.Pos;
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.BlockWhitelist;
 import net.famzangl.minecraft.minebot.ai.ClassItemFilter;
@@ -15,6 +14,7 @@ import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemHoe;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.BlockPos;
 
 public class PlantPathFinder extends MovePathFinder {
 	public enum PlantType {
@@ -104,7 +104,7 @@ public class PlantPathFinder extends MovePathFinder {
 	}
 
 	@Override
-	protected void addTasksForTarget(Pos currentPos) {
+	protected void addTasksForTarget(BlockPos currentPos) {
 		if (helper.isAirBlock(currentPos.getX(), currentPos.getY(),
 				currentPos.getZ())) {
 			if (!hasFarmlandBelow(currentPos.getX(), currentPos.getY(),

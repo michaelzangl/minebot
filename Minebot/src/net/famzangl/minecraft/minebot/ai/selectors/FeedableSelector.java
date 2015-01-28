@@ -1,9 +1,10 @@
 package net.famzangl.minecraft.minebot.ai.selectors;
 
 import net.famzangl.minecraft.minebot.ai.AIHelper;
-import com.google.common.base.Predicate;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.passive.EntityAnimal;
+
+import com.google.common.base.Predicate;
 
 public final class FeedableSelector implements Predicate<Entity> {
 	private final AIHelper helper;

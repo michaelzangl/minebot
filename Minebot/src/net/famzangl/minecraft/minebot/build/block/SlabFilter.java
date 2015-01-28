@@ -1,9 +1,15 @@
-package net.famzangl.minecraft.minebot.build.blockbuild;
+package net.famzangl.minecraft.minebot.build.block;
 
 import net.famzangl.minecraft.minebot.ai.BlockItemFilter;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 
+/**
+ * A filter that filters for half slabs.
+ * 
+ * @author michael
+ *
+ */
 public class SlabFilter extends BlockItemFilter {
 	private final SlabType type;
 

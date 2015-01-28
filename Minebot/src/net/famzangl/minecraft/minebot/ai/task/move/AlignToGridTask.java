@@ -2,12 +2,13 @@ package net.famzangl.minecraft.minebot.ai.task.move;
 
 import net.famzangl.minecraft.minebot.Pos;
 import net.famzangl.minecraft.minebot.ai.AIHelper;
-import net.famzangl.minecraft.minebot.ai.strategy.TaskOperations;
 import net.famzangl.minecraft.minebot.ai.task.AITask;
 import net.famzangl.minecraft.minebot.ai.task.SkipWhenSearchingPrefetch;
+import net.famzangl.minecraft.minebot.ai.task.TaskOperations;
 
 /**
- * Ensures that the player is standing on a block.
+ * Ensures that the player is standing on a block. If it is not, it walks to the
+ * nearest block center.
  * 
  * @author michael
  * 

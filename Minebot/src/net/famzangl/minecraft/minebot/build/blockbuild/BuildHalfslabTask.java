@@ -1,11 +1,12 @@
 package net.famzangl.minecraft.minebot.build.blockbuild;
 
-import net.famzangl.minecraft.minebot.Pos;
 import net.famzangl.minecraft.minebot.ai.BlockWhitelist;
 import net.famzangl.minecraft.minebot.ai.task.AITask;
 import net.famzangl.minecraft.minebot.ai.task.BlockSide;
 import net.famzangl.minecraft.minebot.ai.task.place.JumpingPlaceAtHalfTask;
 import net.famzangl.minecraft.minebot.ai.task.place.SneakAndPlaceAtHalfTask;
+import net.famzangl.minecraft.minebot.build.block.SlabFilter;
+import net.famzangl.minecraft.minebot.build.block.SlabType;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.BlockPos;
 

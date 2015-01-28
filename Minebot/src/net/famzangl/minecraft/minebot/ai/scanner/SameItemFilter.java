@@ -3,6 +3,12 @@ package net.famzangl.minecraft.minebot.ai.scanner;
 import net.famzangl.minecraft.minebot.ai.ItemFilter;
 import net.minecraft.item.ItemStack;
 
+/**
+ * Filters for items that have the same type as the given item stack.
+ * 
+ * @author michael
+ *
+ */
 public final class SameItemFilter implements ItemFilter {
 	private final ItemStack displayed;
 
@@ -17,11 +23,9 @@ public final class SameItemFilter implements ItemFilter {
 		} else if (itemStack.getItem() != displayed.getItem()) {
 			return false;
 		} else if (itemStack.getHasSubtypes()
-				&& itemStack.getItemDamage() != displayed
-						.getItemDamage()) {
+				&& itemStack.getItemDamage() != displayed.getItemDamage()) {
 			return false;
-		} else if (!ItemStack.areItemStackTagsEqual(itemStack,
-				displayed)) {
+		} else if (!ItemStack.areItemStackTagsEqual(itemStack, displayed)) {
 			return false;
 		}
 		return true;

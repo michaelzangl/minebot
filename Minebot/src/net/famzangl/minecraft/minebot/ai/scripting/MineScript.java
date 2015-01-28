@@ -11,7 +11,7 @@ import net.famzangl.minecraft.minebot.Pos;
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.command.AIChatController;
 import net.famzangl.minecraft.minebot.ai.command.UnknownCommandException;
-import net.famzangl.minecraft.minebot.ai.commands.CommandRun;
+import net.famzangl.minecraft.minebot.ai.commands.CommandLoad;
 import net.famzangl.minecraft.minebot.ai.scripting.CommandJs.ScriptStrategy;
 import net.famzangl.minecraft.minebot.ai.scripting.CommandJs.TickProvider;
 import net.famzangl.minecraft.minebot.ai.strategy.InventoryDefinition;
@@ -141,7 +141,7 @@ public class MineScript {
 	}
 
 	public void serverCommand(String command) {
-		CommandRun.runCommand(waitForTick(), command);
+		CommandLoad.runCommand(waitForTick(), command);
 		tickProvider.tickDone();
 	}
 

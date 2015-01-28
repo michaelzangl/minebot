@@ -4,10 +4,8 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
-import net.famzangl.minecraft.minebot.Pos;
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.BlockItemFilter;
-import net.famzangl.minecraft.minebot.ai.strategy.TaskOperations;
 import net.famzangl.minecraft.minebot.ai.task.error.SelectTaskError;
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
@@ -17,22 +15,25 @@ import net.minecraft.util.EnumFacing;
 /**
  * Place a torch on one of the given positions. Attempts to place it somewhere
  * 
+ * <p>
+ * TODO: Do a better search for blocks we cannot attach a torch on.
+ * 
  * @author michael
  * 
  */
 @SkipWhenSearchingPrefetch
 public class PlaceTorchSomewhereTask extends AITask {
 	private LinkedList<PosAndDir> attemptOnPositions;
-	private final List<Pos> places;
+	private final List<BlockPos> places;
 	private final EnumFacing[] preferedDirection;
-	private Pos lastAttempt;
+	private BlockPos lastAttempt;
 
 	private static class PosAndDir {
-		public final Pos place;
+		public final BlockPos place;
 		public final EnumFacing dir;
 		public int attemptsLeft = 10;
 
-		public PosAndDir(Pos place, EnumFacing dir) {
+		public PosAndDir(BlockPos place, EnumFacing dir) {
 			super();
 			this.place = place;
 			this.dir = dir;
@@ -57,7 +58,7 @@ public class PlaceTorchSomewhereTask extends AITask {
 	 * @param preferedDirectionThe
 	 *            direction in which the stick of the torch should be mounted.
 	 */
-	public PlaceTorchSomewhereTask(List<Pos> positions,
+	public PlaceTorchSomewhereTask(List<BlockPos> positions,
 			EnumFacing... preferedDirection) {
 		super();
 		this.places = positions;
@@ -74,11 +75,11 @@ public class PlaceTorchSomewhereTask extends AITask {
 	private PosAndDir getNextPlace(AIHelper h) {
 		if (attemptOnPositions == null) {
 			attemptOnPositions = new LinkedList<PlaceTorchSomewhereTask.PosAndDir>();
-			for (final Pos p : places) {
+			for (final BlockPos p : places) {
 				for (final EnumFacing d : preferedDirection) {
 					final PosAndDir current = new PosAndDir(p, d);
 					final BlockPos placeOn = current.getPlaceOn();
-					if (!h.isAirBlock(placeOn.getX(), placeOn.getY(), placeOn.getZ())) {
+					if (!h.isAirBlock(placeOn)) {
 						attemptOnPositions.add(current);
 					}
 				}
@@ -88,7 +89,8 @@ public class PlaceTorchSomewhereTask extends AITask {
 		}
 
 		while (!attemptOnPositions.isEmpty()
-				&& attemptOnPositions.peekFirst().attemptsLeft <= 0) {
+				&& (attemptOnPositions.peekFirst().attemptsLeft <= 0 || !h
+						.isAirBlock(attemptOnPositions.peekFirst().place))) {
 			attemptOnPositions.removeFirst();
 		}
 
@@ -105,8 +107,7 @@ public class PlaceTorchSomewhereTask extends AITask {
 		final PosAndDir next = getNextPlace(h);
 		final BlockPos placeOn = next.getPlaceOn();
 		h.faceSideOf(placeOn, next.dir.getOpposite());
-		if (h.isFacingBlock(placeOn,
-				next.dir.getOpposite())) {
+		if (h.isFacingBlock(placeOn, next.dir.getOpposite())) {
 			h.overrideUseItem();
 		}
 		next.attemptsLeft--;

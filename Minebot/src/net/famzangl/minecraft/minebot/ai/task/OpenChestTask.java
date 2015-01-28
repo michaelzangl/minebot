@@ -4,6 +4,12 @@ import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.minecraft.client.gui.inventory.GuiChest;
 import net.minecraft.util.BlockPos;
 
+/**
+ * Opens a chest at the given position.
+ * 
+ * @author michael
+ *
+ */
 public class OpenChestTask extends UseItemTask {
 
 	private static final double SIDE_DIST = 0.07;
@@ -13,6 +19,11 @@ public class OpenChestTask extends UseItemTask {
 	private final BlockPos p2;
 	private int attempts;
 
+	/**
+	 * Creates a new task to open the chest at p1 or p1/p2 (single/double)
+	 * @param p1 One position for the chest.
+	 * @param p2 The other one, might be <code>null</code>
+	 */
 	public OpenChestTask(BlockPos p1, BlockPos p2) {
 		super();
 		this.p1 = p1;

@@ -1,5 +1,6 @@
 package net.famzangl.minecraft.minebot.ai.scripting;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 
@@ -49,7 +50,7 @@ public class CommandJs {
 
 	public static class ScriptRunner implements Runnable, TickProvider {
 		private String description = "Running script";
-		private final String fileName;
+		private final File fileName;
 		private boolean finished;
 		private AIHelper tickHelper;
 		private final Object tickHelperMutex = new Object();
@@ -62,8 +63,8 @@ public class CommandJs {
 		private AIStrategy activeStrategy;
 		private final Object activeStrategyMutex = new Object();
 
-		public ScriptRunner(String fileName) {
-			this.fileName = fileName;
+		public ScriptRunner(File file) {
+			this.fileName = file;
 		}
 
 		@Override
@@ -187,8 +188,7 @@ public class CommandJs {
 		}
 
 		public String getDescription(AIHelper helper) {
-			int lastSlash = fileName.lastIndexOf("/") + 1;
-			return fileName.substring(lastSlash) + ": " + description;
+			return fileName.getName() + ": " + description;
 		}
 
 		@Override
@@ -207,8 +207,8 @@ public class CommandJs {
 	public static class RunScriptStrategy extends AIStrategy {
 		private final ScriptRunner scriptRunner;
 
-		public RunScriptStrategy(String fileName) {
-			scriptRunner = new ScriptRunner(fileName);
+		public RunScriptStrategy(File file) {
+			scriptRunner = new ScriptRunner(file);
 		}
 
 		@Override
@@ -244,7 +244,7 @@ public class CommandJs {
 	public static AIStrategy run(
 			AIHelper helper,
 			@AICommandParameter(type = ParameterType.FIXED, fixedName = "js", description = "") String nameArg,
-			@AICommandParameter(type = ParameterType.FILE, description = "") String file) {
+			@AICommandParameter(type = ParameterType.FILE, relativeToSettingsFile="scripts", description = "") File file) {
 		return new RunScriptStrategy(file);
 	}
 }

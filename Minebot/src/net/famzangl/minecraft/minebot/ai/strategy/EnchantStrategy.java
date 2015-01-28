@@ -62,14 +62,14 @@ public class EnchantStrategy extends PathFinderStrategy {
 		private SelectEnchantmentTask enchantTask;
 
 		@Override
-		protected BlockRangeScanner constructScanner(Pos playerPosition) {
+		protected BlockRangeScanner constructScanner(BlockPos playerPosition) {
 			BlockRangeScanner scanner = super.constructScanner(playerPosition);
 			scanner.addHandler(h);
 			return scanner;
 		}
 
 		@Override
-		protected boolean runSearch(Pos playerPosition) {
+		protected boolean runSearch(BlockPos playerPosition) {
 			if (helper.getMinecraft().thePlayer.experienceLevel <= 0
 					|| (enchantTask != null && enchantTask.hasFailed())) {
 				return true;
@@ -85,7 +85,7 @@ public class EnchantStrategy extends PathFinderStrategy {
 		}
 
 		@Override
-		protected void addTasksForTarget(Pos currentPos) {
+		protected void addTasksForTarget(BlockPos currentPos) {
 			ArrayList<EnchantingTableData> tables = h
 					.getReachableForPos(currentPos);
 			EnchantingTableData table = tables.get(0);

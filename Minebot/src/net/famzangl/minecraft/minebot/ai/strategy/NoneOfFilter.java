@@ -5,6 +5,12 @@ import java.util.Arrays;
 import net.famzangl.minecraft.minebot.ai.ItemFilter;
 import net.minecraft.item.ItemStack;
 
+/**
+ * An inverted {@link ItemFilter}.
+ * 
+ * @author michael
+ *
+ */
 public class NoneOfFilter implements ItemFilter {
 
 	private final ItemFilter[] filters;
@@ -12,7 +18,7 @@ public class NoneOfFilter implements ItemFilter {
 	public NoneOfFilter(ItemFilter... filters) {
 		this.filters = filters;
 	}
-	
+
 	@Override
 	public boolean matches(ItemStack itemStack) {
 		for (ItemFilter filter : filters) {

@@ -1,7 +1,6 @@
 package net.famzangl.minecraft.minebot.ai.task;
 
 import net.famzangl.minecraft.minebot.ai.AIHelper;
-import net.famzangl.minecraft.minebot.ai.strategy.TaskOperations;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.item.EntityXPOrb;
@@ -11,6 +10,14 @@ import net.minecraft.util.MovingObjectPosition.MovingObjectType;
 
 import com.google.common.base.Predicate;
 
+/**
+ * Try to interact with a given entity. If it is not clickable, the bot attempts
+ * to face it and walk towards it (without any danger checking, jumping it it
+ * fins objects in the way.). Stops as soon as it interacts with ANY entity.
+ * 
+ * @author michael
+ *
+ */
 public class FaceAndInteractTask extends AITask {
 
 	protected boolean interacted = false;
@@ -25,6 +32,19 @@ public class FaceAndInteractTask extends AITask {
 		this(preferedAnimal, alsoAcceptedAnimal, true);
 	}
 
+	/**
+	 * Creates a new {@link FaceAndInteractTask}
+	 * 
+	 * @param preferedAnimal
+	 *            The Animal to walk to and click at or the entity to walk to
+	 *            (if it is not clickable).
+	 * @param alsoAcceptedAnimal
+	 *            A predicate that checks if any other animal the bot might
+	 *            encounter also matches the criteria and should be clicked.
+	 * @param doRightClick
+	 *            <code>true</code> for right click, <code>false</code> for left
+	 *            click (or whatever their actual key bindings are)
+	 */
 	public FaceAndInteractTask(Entity preferedAnimal,
 			Predicate<Entity> alsoAcceptedAnimal, boolean doRightClick) {
 		this.preferedAnimal = preferedAnimal;
@@ -36,14 +56,15 @@ public class FaceAndInteractTask extends AITask {
 	public boolean isFinished(AIHelper h) {
 		final boolean collect = preferedAnimal instanceof EntityItem
 				|| preferedAnimal instanceof EntityXPOrb;
-		return collect ? preferedAnimal.getEntityBoundingBox().intersectsWith(h
-				.getMinecraft().thePlayer.getEntityBoundingBox()) : interacted;
+		return collect ? preferedAnimal.getEntityBoundingBox().intersectsWith(
+				h.getMinecraft().thePlayer.getEntityBoundingBox()) : interacted;
 	}
 
 	@Override
 	public void runTick(AIHelper h, TaskOperations o) {
 		final MovingObjectPosition over = h.getObjectMouseOver();
-		if (ticksRun > 2 && over != null && over.typeOfHit == MovingObjectType.ENTITY
+		if (ticksRun > 2 && over != null
+				&& over.typeOfHit == MovingObjectType.ENTITY
 				&& alsoAcceptedAnimal.apply(over.entityHit)) {
 			doInteractWithCurrent(h);
 		} else {
@@ -54,13 +75,18 @@ public class FaceAndInteractTask extends AITask {
 			h.face(preferedAnimal.posX, preferedAnimal.posY,
 					preferedAnimal.posZ);
 			final MovementInput i = new MovementInput();
-			i.jump =  speed < 0.01 && ticksRun > 8;
+			i.jump = speed < 0.01 && ticksRun > 8;
 			i.moveForward = 1;
 			h.overrideMovement(i);
 		}
 		ticksRun++;
 	}
 
+	/**
+	 * Interacts with the current animal by either right or leftclicking.
+	 * 
+	 * @param h
+	 */
 	protected void doInteractWithCurrent(AIHelper h) {
 		if (doRightClick) {
 			h.overrideUseItem();

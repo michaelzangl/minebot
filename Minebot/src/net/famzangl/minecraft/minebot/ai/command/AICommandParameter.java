@@ -35,4 +35,6 @@ public @interface AICommandParameter {
 	boolean optional() default false;
 
 	Class<? extends BlockFilter> blockFilter() default AnyBlockFilter.class;
+
+	String relativeToSettingsFile() default "";
 }

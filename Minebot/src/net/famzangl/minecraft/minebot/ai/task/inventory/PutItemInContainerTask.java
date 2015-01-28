@@ -1,25 +1,31 @@
 package net.famzangl.minecraft.minebot.ai.task.inventory;
 
 import net.famzangl.minecraft.minebot.ai.AIHelper;
-import net.famzangl.minecraft.minebot.ai.strategy.TaskOperations;
 import net.famzangl.minecraft.minebot.ai.task.AITask;
+import net.famzangl.minecraft.minebot.ai.task.TaskOperations;
 import net.famzangl.minecraft.minebot.ai.task.error.StringTaskError;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.inventory.Slot;
 
+/**
+ * Put items in a currently opened container.
+ * 
+ * @author michael
+ *
+ */
 public abstract class PutItemInContainerTask extends AITask {
 
 	private int slotToPlace = 0;
 	private boolean placed = false;
 	private boolean isFull;
-	
+
 	@Override
 	public boolean isFinished(AIHelper h) {
 		final GuiContainer screen = (GuiContainer) h.getMinecraft().currentScreen;
 		return screen != null
 				&& placed
-				&& (slotToPlace < 0 || isFull || !screen.inventorySlots.getSlot(
-						slotToPlace).getHasStack());
+				&& (slotToPlace < 0 || isFull || !screen.inventorySlots
+						.getSlot(slotToPlace).getHasStack());
 	}
 
 	@Override

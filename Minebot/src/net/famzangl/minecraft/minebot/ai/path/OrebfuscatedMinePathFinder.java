@@ -1,8 +1,8 @@
 package net.famzangl.minecraft.minebot.ai.path;
 
-import net.famzangl.minecraft.minebot.Pos;
 import net.famzangl.minecraft.minebot.ai.BlockWhitelist;
 import net.minecraft.init.Blocks;
+import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
 
 public class OrebfuscatedMinePathFinder extends MineBySettingsPathFinder {
@@ -11,7 +11,7 @@ public class OrebfuscatedMinePathFinder extends MineBySettingsPathFinder {
 		super(preferedDirection, preferedLayer);
 	}
 
-	private Pos searchCenter;
+	private BlockPos searchCenter;
 	// private static final BlockWhitelist targetBlocks = new BlockWhitelist(
 	// Blocks.stone, Blocks.coal_ore, Blocks.diamond_ore, Blocks.iron_ore,
 	// Blocks.emerald_ore, Blocks.redstone_ore);
@@ -24,7 +24,7 @@ public class OrebfuscatedMinePathFinder extends MineBySettingsPathFinder {
 			Blocks.gravel, Blocks.dirt).unionWith(targetBlocks).invert();
 
 	@Override
-	protected boolean runSearch(Pos playerPosition) {
+	protected boolean runSearch(BlockPos playerPosition) {
 		this.searchCenter = playerPosition;
 		return super.runSearch(playerPosition);
 	}

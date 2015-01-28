@@ -4,9 +4,15 @@ import java.util.List;
 
 import net.famzangl.minecraft.minebot.Pos;
 import net.famzangl.minecraft.minebot.ai.AIHelper;
-import net.famzangl.minecraft.minebot.ai.strategy.TaskOperations;
+import net.famzangl.minecraft.minebot.ai.task.TaskOperations;
 import net.minecraft.util.BlockPos;
 
+/**
+ * Digs one block up and one to the side. Then jumps there.
+ * 
+ * @author michael
+ *
+ */
 public class JumpMoveTask extends HorizontalMoveTask {
 
 	private final int oldX;

@@ -1,15 +1,15 @@
 package net.famzangl.minecraft.minebot.ai.task.place;
 
 import net.famzangl.minecraft.minebot.ai.AIHelper;
-import net.famzangl.minecraft.minebot.ai.strategy.TaskOperations;
 import net.famzangl.minecraft.minebot.ai.task.AITask;
+import net.famzangl.minecraft.minebot.ai.task.TaskOperations;
 import net.minecraft.client.gui.inventory.GuiEditSign;
 import net.minecraft.tileentity.TileEntitySign;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.ChatAllowedCharacters;
 
 /**
- * Use an {@link SetSignTextTask} afterwards!
+ * Set the text of the sign, assuming that the GUI is open.
  * 
  * @author michael
  *
@@ -57,18 +57,19 @@ public class SetSignTextTask extends AITask {
 			guiOpened = h.getMinecraft().currentScreen instanceof GuiEditSign;
 		} else {
 			if (timer == 0) {
-				TileEntitySign sign = (TileEntitySign) h
-						.getMinecraft().theWorld.getTileEntity(pos);
-				//sign.signText = text;
+				TileEntitySign sign = (TileEntitySign) h.getMinecraft().theWorld
+						.getTileEntity(pos);
+				// sign.signText = text;
 			} else if (timer == 5) {
-				//GuiEditSign edit = (GuiEditSign) h.getMinecraft().currentScreen;
+				// GuiEditSign edit = (GuiEditSign)
+				// h.getMinecraft().currentScreen;
 				h.getMinecraft().displayGuiScreen(null);
 			}
 			timer++;
 		}
 
 	}
-	
+
 	@Override
 	public int getGameTickTimeout() {
 		return 40;

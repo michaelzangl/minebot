@@ -1,8 +1,8 @@
 package net.famzangl.minecraft.minebot.ai.scanner;
 
-import net.famzangl.minecraft.minebot.Pos;
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.path.MovePathFinder;
+import net.minecraft.util.BlockPos;
 
 public class BlockRangeFinder extends MovePathFinder {
 	protected BlockRangeScanner rangeScanner;
@@ -16,7 +16,7 @@ public class BlockRangeFinder extends MovePathFinder {
 	}
 
 	@Override
-	protected boolean runSearch(Pos playerPosition) {
+	protected boolean runSearch(BlockPos playerPosition) {
 		if (rangeScanner == null) {
 			rangeScanner = constructScanner(playerPosition);
 			rangeScanner.startAsync(helper);
@@ -28,7 +28,7 @@ public class BlockRangeFinder extends MovePathFinder {
 		}
 	}
 
-	protected BlockRangeScanner constructScanner(Pos playerPosition) {
+	protected BlockRangeScanner constructScanner(BlockPos playerPosition) {
 		return new BlockRangeScanner(playerPosition);
 	}
 }

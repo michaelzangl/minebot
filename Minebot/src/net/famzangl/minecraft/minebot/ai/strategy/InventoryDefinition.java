@@ -8,6 +8,12 @@ import net.minecraft.item.ItemStack;
 
 import com.google.gson.Gson;
 
+/**
+ * This is a definition of what the (current) inventory of the player contains.
+ * 
+ * @author michael
+ *
+ */
 public class InventoryDefinition {
 	private final ArrayList<InventorySlot> slots = new ArrayList<InventorySlot>();
 

@@ -6,6 +6,8 @@ import net.minecraft.item.ItemStack;
 /**
  * A simple (itemid, damagevalue) touple.
  * 
+ * TODO: Use this more in the bot.
+ * 
  * @author michael
  *
  */

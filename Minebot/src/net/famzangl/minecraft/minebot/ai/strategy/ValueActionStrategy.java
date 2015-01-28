@@ -1,8 +1,8 @@
 package net.famzangl.minecraft.minebot.ai.strategy;
 
-import net.famzangl.minecraft.minebot.MinebotSettings;
 import net.famzangl.minecraft.minebot.ai.AIHelper;
-import net.famzangl.minecraft.minebot.ai.commands.CommandRun;
+import net.famzangl.minecraft.minebot.ai.commands.CommandLoad;
+import net.famzangl.minecraft.minebot.settings.MinebotSettings;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiMainMenu;
 import net.minecraft.client.multiplayer.WorldClient;
@@ -62,7 +62,7 @@ public abstract class ValueActionStrategy extends AIStrategy {
 	@Override
 	protected TickResult onGameTick(AIHelper helper) {
 		if (shouldRunCommand) {
-			CommandRun.runCommand(helper,
+			CommandLoad.runCommand(helper,
 					settings.get(getSettingPrefix() + "_command", ""));
 			shouldRunCommand = false;
 			return TickResult.TICK_AGAIN;

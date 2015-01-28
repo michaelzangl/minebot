@@ -1,10 +1,15 @@
 package net.famzangl.minecraft.minebot.ai.strategy;
 
-import com.google.common.base.Predicate;
-
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.minecraft.entity.Entity;
 
+import com.google.common.base.Predicate;
+
+/**
+ * Do an action when a given entity approaches.
+ * @author michael
+ *
+ */
 public abstract class CloseEntityActionStrategy extends ValueActionStrategy {
 	@Override
 	protected double getValue(final AIHelper helper) {

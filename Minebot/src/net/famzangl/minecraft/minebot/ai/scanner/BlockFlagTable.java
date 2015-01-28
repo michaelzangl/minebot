@@ -3,6 +3,7 @@ package net.famzangl.minecraft.minebot.ai.scanner;
 import java.util.BitSet;
 
 import net.famzangl.minecraft.minebot.Pos;
+import net.minecraft.util.BlockPos;
 
 /**
  * A simple 3-dimensional Bitset.
@@ -11,10 +12,10 @@ import net.famzangl.minecraft.minebot.Pos;
  */
 public class BlockFlagTable {
 	private final BitSet bits = new BitSet();
-	private final Pos max;
-	private final Pos min;
+	private final BlockPos max;
+	private final BlockPos min;
 
-	public BlockFlagTable(Pos pos1, Pos pos2) {
+	public BlockFlagTable(BlockPos pos1, BlockPos pos2) {
 		this.max = Pos.maxPos(pos1, pos2);
 		this.min = Pos.minPos(pos1, pos2);
 	}

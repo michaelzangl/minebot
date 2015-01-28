@@ -9,6 +9,14 @@ import net.famzangl.minecraft.minebot.Pos;
 import net.famzangl.minecraft.minebot.ai.ItemFilter;
 import net.famzangl.minecraft.minebot.build.blockbuild.BuildTask;
 
+/**
+ * This build manager exists once per AI helper (that means once per game). It
+ * is the state machine for all build tasks and basically hodls a list of things
+ * to build
+ * 
+ * @author michael
+ *
+ */
 public class BuildManager {
 
 	private final ArrayList<Pos> buildArtefactPositions = new ArrayList<Pos>();

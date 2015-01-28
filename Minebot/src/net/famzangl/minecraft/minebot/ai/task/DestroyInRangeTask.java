@@ -7,23 +7,36 @@ import java.util.List;
 
 import net.famzangl.minecraft.minebot.Pos;
 import net.famzangl.minecraft.minebot.ai.AIHelper;
-import net.famzangl.minecraft.minebot.ai.strategy.TaskOperations;
 import net.minecraft.util.BlockPos;
 
+/**
+ * Destroys all Blocks in a given area. Individual blocks can be excluded, see
+ * {@link #blacklist(BlockPos)}
+ * 
+ * @author michael
+ *
+ */
 public class DestroyInRangeTask extends AITask implements CanPrefaceAndDestroy {
-
-	private final Pos minPos;
-	private final Pos maxPos;
+	private final BlockPos minPos;
+	private final BlockPos maxPos;
 	private int facingAttempts;
-	private final ArrayList<Pos> blacklist = new ArrayList<Pos>();
+	private final ArrayList<BlockPos> blacklist = new ArrayList<BlockPos>();
 
-	public DestroyInRangeTask(Pos p1, Pos p2) {
+	/**
+	 * Create a new {@link DestroyInRangeTask}.
+	 * 
+	 * @param p1
+	 *            One corner
+	 * @param p2
+	 *            The other corner
+	 */
+	public DestroyInRangeTask(BlockPos p1, BlockPos p2) {
 		minPos = Pos.minPos(p1, p2);
 		maxPos = Pos.maxPos(p1, p2);
 	}
 
-	private Pos getNextToDestruct(AIHelper h) {
-		Pos next = null;
+	private BlockPos getNextToDestruct(AIHelper h) {
+		BlockPos next = null;
 		double currentMin = Float.POSITIVE_INFINITY;
 
 		for (int x = minPos.getX(); x <= maxPos.getX(); x++) {
@@ -31,7 +44,7 @@ public class DestroyInRangeTask extends AITask implements CanPrefaceAndDestroy {
 				for (int z = minPos.getZ(); z <= maxPos.getZ(); z++) {
 					final double rating = rate(h, x, y, z);
 					if (rating >= 0 && rating < currentMin) {
-						next = new Pos(x, y, z);
+						next = new BlockPos(x, y, z);
 						currentMin = rating;
 					}
 					// System.out.println(String.format("%d, %d, %d: %f", x, y,
@@ -58,8 +71,8 @@ public class DestroyInRangeTask extends AITask implements CanPrefaceAndDestroy {
 		Pos pos = h.getPlayerPosition();
 		return !h.isAirBlock(x, y, z)
 				&& h.hasSafeSides(x, y, z)
-				&& (h.isSafeHeadBlock(x, y + 1, z) || ((x != pos.getX() || y != pos.getY()) && isSafeFallingBlock(
-						h, x, y + 1, z)));
+				&& (h.isSafeHeadBlock(x, y + 1, z) || ((x != pos.getX() || y != pos
+						.getY()) && isSafeFallingBlock(h, x, y + 1, z)));
 	}
 
 	private boolean isSafeFallingBlock(AIHelper h, int x, int y, int z) {
@@ -75,7 +88,7 @@ public class DestroyInRangeTask extends AITask implements CanPrefaceAndDestroy {
 
 	@Override
 	public void runTick(AIHelper h, TaskOperations o) {
-		Pos n = getNextToDestruct(h);
+		BlockPos n = getNextToDestruct(h);
 		if (facingAttempts > 20) {
 			blacklist.add(n);
 			n = getNextToDestruct(h);
@@ -105,7 +118,13 @@ public class DestroyInRangeTask extends AITask implements CanPrefaceAndDestroy {
 				+ blacklist + "]";
 	}
 
-	public void blacklist(Pos pos) {
+	/**
+	 * Add a {@link BlockPos} to the list of blocks that should be excluded from
+	 * this area.
+	 * 
+	 * @param pos
+	 */
+	public void blacklist(BlockPos pos) {
 		blacklist.add(pos);
 	}
 

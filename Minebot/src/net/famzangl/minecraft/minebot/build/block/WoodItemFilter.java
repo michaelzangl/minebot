@@ -1,9 +1,15 @@
-package net.famzangl.minecraft.minebot.build;
+package net.famzangl.minecraft.minebot.build.block;
 
 import net.famzangl.minecraft.minebot.ai.BlockItemFilter;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 
+/**
+ * This item filter filters for wood planks of a given type.
+ * 
+ * @author michael
+ *
+ */
 public class WoodItemFilter extends BlockItemFilter {
 
 	private final WoodType woodType;

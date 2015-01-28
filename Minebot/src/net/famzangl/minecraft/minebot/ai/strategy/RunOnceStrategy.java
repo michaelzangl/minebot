@@ -2,6 +2,12 @@ package net.famzangl.minecraft.minebot.ai.strategy;
 
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 
+/**
+ * A strategy that only needs to be run for exactly one game tick.
+ * 
+ * @author michael
+ *
+ */
 public abstract class RunOnceStrategy extends AIStrategy {
 
 	private boolean wasRun = false;

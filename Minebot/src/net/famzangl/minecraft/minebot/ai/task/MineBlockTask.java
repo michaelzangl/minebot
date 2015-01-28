@@ -1,13 +1,12 @@
 package net.famzangl.minecraft.minebot.ai.task;
 
-import net.famzangl.minecraft.minebot.Pos;
 import net.famzangl.minecraft.minebot.ai.AIHelper;
-import net.famzangl.minecraft.minebot.ai.strategy.TaskOperations;
+import net.minecraft.util.BlockPos;
 
 public class MineBlockTask extends AITask {
-	private Pos pos;
+	private BlockPos pos;
 
-	public MineBlockTask(Pos pos) {
+	public MineBlockTask(BlockPos pos) {
 		this.pos = pos;
 	}
 

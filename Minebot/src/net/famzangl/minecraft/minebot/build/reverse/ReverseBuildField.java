@@ -4,6 +4,12 @@ import net.famzangl.minecraft.minebot.build.blockbuild.TaskDescription;
 import net.minecraft.block.Block;
 import net.minecraft.util.BlockPos;
 
+/**
+ * A field where all tasks from the build reverser are stored.
+ * 
+ * @author michael
+ *
+ */
 public class ReverseBuildField {
 	private final Block[][][] buildBlocks;
 	private final TaskDescription[][][] buildNames;

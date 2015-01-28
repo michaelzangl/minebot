@@ -3,6 +3,12 @@ package net.famzangl.minecraft.minebot.ai.task.inventory;
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.minecraft.client.gui.inventory.GuiChest;
 
+/**
+ * Put one inventory slot in the chest that is currently open.
+ * 
+ * @author michael
+ *
+ */
 public class PutInChestTask extends PutItemInContainerTask {
 	private final int inventorySlot;
 

@@ -2,33 +2,41 @@ package net.famzangl.minecraft.minebot.build;
 
 import java.util.LinkedList;
 
-import net.famzangl.minecraft.minebot.Pos;
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.BlockItemFilter;
 import net.famzangl.minecraft.minebot.ai.BlockWhitelist;
-import net.famzangl.minecraft.minebot.ai.strategy.TaskOperations;
 import net.famzangl.minecraft.minebot.ai.task.AITask;
+import net.famzangl.minecraft.minebot.ai.task.TaskOperations;
 import net.famzangl.minecraft.minebot.ai.task.error.SelectTaskError;
+import net.famzangl.minecraft.minebot.ai.task.move.HorizontalMoveTask;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.MovementInput;
 
+/**
+ * This task lets you walk from one position to an other, adjacent position. In
+ * contrast to the {@link HorizontalMoveTask}, it won't destroy blocks. It can
+ * walk up by placing carpets on the floor and destroying them afterwards.
+ * 
+ * @author michael
+ *
+ */
 public class WalkTowardsTask extends AITask {
 
 	private static final BlockWhitelist CARPETS = new BlockWhitelist(
 			Blocks.carpet);
 
 	private static final BlockItemFilter CARPET = new BlockItemFilter(CARPETS);
-	private final Pos fromPos;
-	private final Pos nextPos;
+	private final BlockPos fromPos;
+	private final BlockPos nextPos;
 
 	private AITask subTask;
 
-	private final LinkedList<Pos> carpets = new LinkedList<Pos>();
+	private final LinkedList<BlockPos> carpets = new LinkedList<BlockPos>();
 	private boolean wasStandingOnDest;
 
-	public WalkTowardsTask(Pos fromPos, Pos nextPos) {
+	public WalkTowardsTask(BlockPos fromPos, BlockPos nextPos) {
 		this.fromPos = fromPos;
 		this.nextPos = nextPos;
 	}
@@ -63,8 +71,8 @@ public class WalkTowardsTask extends AITask {
 				if (h.isFacingBlock(floor, EnumFacing.UP)) {
 					if (h.selectCurrentItem(CARPET)) {
 						h.overrideUseItem();
-						carpets.add(new Pos(fromPos.getX(), floorY + 1, fromPos
-								.getZ()));
+						carpets.add(new BlockPos(fromPos.getX(), floorY + 1,
+								fromPos.getZ()));
 					} else {
 						o.desync(new SelectTaskError(CARPET));
 					}
@@ -80,7 +88,7 @@ public class WalkTowardsTask extends AITask {
 
 				while (!carpets.isEmpty()) {
 					// Clean up carpets we already "lost"
-					final Pos last = carpets.getLast();
+					final BlockPos last = carpets.getLast();
 					if (h.isAirBlock(last.getX(), last.getY(), last.getZ())) {
 						carpets.removeLast();
 					}
@@ -89,7 +97,7 @@ public class WalkTowardsTask extends AITask {
 				final int x = fromPos.getX() - nextPos.getX();
 				final int z = fromPos.getX() - nextPos.getX();
 				if (h.sneakFrom(nextPos, AIHelper.getDirectionForXZ(x, z))) {
-					final Pos last = carpets.getLast();
+					final BlockPos last = carpets.getLast();
 					h.faceAndDestroy(last);
 				}
 

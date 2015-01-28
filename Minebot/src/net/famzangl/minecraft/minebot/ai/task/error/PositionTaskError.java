@@ -1,6 +1,5 @@
 package net.famzangl.minecraft.minebot.ai.task.error;
 
-import net.famzangl.minecraft.minebot.Pos;
 import net.minecraft.util.BlockPos;
 
 public class PositionTaskError extends TaskError {

@@ -2,8 +2,9 @@ package net.famzangl.minecraft.minebot.ai.selectors;
 
 import java.util.List;
 
-import com.google.common.base.Predicate;
 import net.minecraft.entity.Entity;
+
+import com.google.common.base.Predicate;
 
 public class OneOfListSelector implements Predicate<Entity> {
 

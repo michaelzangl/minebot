@@ -2,8 +2,14 @@ package net.famzangl.minecraft.minebot.ai.scripting;
 
 import net.famzangl.minecraft.minebot.Pos;
 import net.minecraft.entity.Entity;
+import net.minecraft.util.BlockPos;
 
-public class DoublePos {
+/**
+ * An entity state.
+ * @author michael
+ *
+ */
+public class EntityPos {
 	public final double x;
 	public final double y;
 	public final double z;
@@ -14,11 +20,11 @@ public class DoublePos {
 	public final double pitch;
 	public final double speed;
 	
-	public DoublePos(Entity e) {
+	public EntityPos(Entity e) {
 		this(e.posX, e.posY, e.posZ, e.motionX, e.motionY, e.motionZ, e.rotationYaw, e.rotationPitch);
 	}
 
-	public DoublePos(double x, double y, double z, double motionX,
+	public EntityPos(double x, double y, double z, double motionX,
 			double motionY, double motionZ, double yaw, double pitch) {
 		this.x = x;
 		this.y = y;
@@ -31,11 +37,11 @@ public class DoublePos {
 		this.speed = Pos.length(motionX, motionY, motionZ);
 	}
 
-	public double distance(Pos other) {
+	public double distance(BlockPos other) {
 		return Pos.length(other.getX() - x, other.getY() - y, other.getZ() - z);
 	}
 
-	public double distance(DoublePos other) {
+	public double distance(EntityPos other) {
 		return Pos.length(other.x - x, other.y - y, other.z - z);
 	}
 }

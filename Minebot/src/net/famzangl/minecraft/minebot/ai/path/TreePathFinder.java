@@ -1,13 +1,13 @@
 package net.famzangl.minecraft.minebot.ai.path;
 
-import net.famzangl.minecraft.minebot.Pos;
 import net.famzangl.minecraft.minebot.ai.BlockWhitelist;
 import net.famzangl.minecraft.minebot.ai.task.MineBlockTask;
 import net.famzangl.minecraft.minebot.ai.task.WaitTask;
-import net.famzangl.minecraft.minebot.ai.task.place.ReplantTask;
-import net.famzangl.minecraft.minebot.build.WoodType;
+import net.famzangl.minecraft.minebot.ai.task.place.PlantSaplingTask;
+import net.famzangl.minecraft.minebot.build.block.WoodType;
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
+import net.minecraft.util.BlockPos;
 
 public class TreePathFinder extends MovePathFinder {
 	private static final BlockWhitelist TREE_STUFF = new BlockWhitelist(Blocks.log, Blocks.log2, Blocks.leaves, Blocks.leaves2);
@@ -57,7 +57,7 @@ public class TreePathFinder extends MovePathFinder {
 	}
 
 	@Override
-	protected void addTasksForTarget(Pos currentPos) {
+	protected void addTasksForTarget(BlockPos currentPos) {
 		int mineAbove = 0;
 
 		for (int i = 2; i < TREE_HEIGHT; i++) {
@@ -78,7 +78,7 @@ public class TreePathFinder extends MovePathFinder {
 			}
 		}
 		if (replant) {
-			addTask(new ReplantTask(currentPos));
+			addTask(new PlantSaplingTask(currentPos));
 		}
 		addTask(new WaitTask(mineAbove * 2));
 	}

@@ -28,13 +28,21 @@ import net.minecraft.util.MathHelper;
 import net.minecraft.util.MovementInput;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.MovingObjectPosition.MovingObjectType;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.storage.ExtendedBlockStorage;
 
 import com.google.common.base.Predicate;
 
 /**
- * Everything needed to control the AI.
+ * Lots and lots of helpful methods to control the current player. This contains
+ * the current marked positions ({@link #pos1}, {@link #pos2}), fast methods to
+ * access/check minecraft blocks ({@link #getBlockId(BlockPos)}), many lists of
+ * different block types/presets useful for filtering, methods to control the
+ * player ({@link #face(double, double, double)}, {@link #overrideUseItem()}),
+ * some methods to get the player state ({@link #isAlive()},
+ * {@link #getPlayerPosition()}) and some to simplify block handling (
+ * {@link #getSignDirection(IBlockState)})
  * 
  * @author michael
  * 
@@ -162,8 +170,8 @@ public abstract class AIHelper {
 	public final BuildManager buildManager = new BuildManager();
 	private boolean objectMouseOverInvalidated;
 
-	protected Pos pos1 = null;
-	protected Pos pos2 = null;
+	protected BlockPos pos1 = null;
+	protected BlockPos pos2 = null;
 
 	private MovementInput resetMovementInput;
 	private KeyBinding resetAttackKey;
@@ -221,7 +229,7 @@ public abstract class AIHelper {
 	 * 
 	 * @return The marker or <code>null</code> if it is unset.
 	 */
-	public Pos getPos1() {
+	public BlockPos getPos1() {
 		return pos1;
 	}
 
@@ -230,7 +238,7 @@ public abstract class AIHelper {
 	 * 
 	 * @return The marker or <code>null</code> if it is unset.
 	 */
-	public Pos getPos2() {
+	public BlockPos getPos2() {
 		return pos2;
 	}
 
@@ -241,7 +249,7 @@ public abstract class AIHelper {
 	 *            The new position.
 	 * @param isPos2
 	 */
-	public void setPosition(Pos pos, boolean isPos2) {
+	public void setPosition(BlockPos pos, boolean isPos2) {
 		int posIndex;
 		if (isPos2) {
 			pos2 = pos;
@@ -481,8 +489,8 @@ public abstract class AIHelper {
 	public boolean isSideTorch(BlockPos pos) {
 		int id = getBlockId(pos);
 		return torches.contains(id)
-				&& getMinecraft().theWorld.getBlockState(pos)
-						.getValue(BlockTorch.FACING) != EnumFacing.UP;
+				&& getMinecraft().theWorld.getBlockState(pos).getValue(
+						BlockTorch.FACING) != EnumFacing.UP;
 	}
 
 	public BlockPos getHaningOnBlock(BlockPos pos) {
@@ -1278,4 +1286,12 @@ public abstract class AIHelper {
 		}
 	}
 
+	public static String getBlockName(Block block) {
+		final ResourceLocation name = ((ResourceLocation) Block.blockRegistry
+				.getNameForObject(block));
+		String domain = name.getResourceDomain().equals("minecraft") ? ""
+				: name.getResourceDomain() + ":";
+		String blockName = domain + name.getResourcePath();
+		return blockName;
+	}
 }

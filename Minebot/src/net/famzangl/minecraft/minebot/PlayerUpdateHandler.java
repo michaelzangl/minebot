@@ -11,6 +11,7 @@ import java.util.Hashtable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import net.famzangl.minecraft.minebot.settings.MinebotSettings;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent.PlayerTickEvent;
@@ -19,12 +20,66 @@ import org.apache.commons.lang3.StringEscapeUtils;
 
 /**
  * This sends a list of all visible players to a server, e.g. to display it on a
- * map.
+ * map. The server is configured in the minebot preferences.
  * 
  * @author michael
  * 
  */
 public class PlayerUpdateHandler {
+	private final class SendToServerTask implements Runnable {
+		private final String json;
+
+		private SendToServerTask(String json) {
+			this.json = json;
+		}
+
+		@Override
+		public void run() {
+			HttpURLConnection connection = null;
+			try {
+				final String urlParameters = "players="
+						+ URLEncoder.encode(json);
+				if (!toLoaded) {
+					to = new MinebotSettings().get("report_position_to",
+							null);
+					toLoaded = true;
+				}
+				if (to == null) {
+					return;
+				}
+				final URL url = new URL(to);
+				connection = (HttpURLConnection) url.openConnection();
+				connection.setRequestMethod("POST");
+				connection.setRequestProperty("Content-Type",
+						"application/x-www-form-urlencoded");
+				connection.setRequestProperty("Content-Length",
+						Integer.toString(urlParameters.getBytes().length));
+				connection.setRequestProperty("Content-Language", "en-US");
+				connection.setUseCaches(false);
+				connection.setDoInput(true);
+				connection.setDoOutput(true);
+
+				final DataOutputStream wr = new DataOutputStream(connection
+						.getOutputStream());
+				wr.writeBytes(urlParameters);
+				wr.flush();
+				wr.close();
+				final InputStream is = connection.getInputStream();
+				final BufferedReader rd = new BufferedReader(
+						new InputStreamReader(is));
+				while (rd.readLine() != null) {
+				}
+				rd.close();
+			} catch (final Throwable t) {
+				t.printStackTrace();
+			} finally {
+				if (connection != null) {
+					connection.disconnect();
+				}
+			}
+		}
+	}
+
 	private final ExecutorService sendThread;
 	private final Hashtable<String, Long> blockTimes = new Hashtable<String, Long>();
 	private boolean toLoaded;
@@ -51,52 +106,6 @@ public class PlayerUpdateHandler {
 				.format("{\"players\":[{\"username\": \"%s\", \"x\": %d, \"y\" : %d, \"z\": %d, \"world\" : \"world\"}]}",
 						StringEscapeUtils.escapeJava(name), (int) player.posX,
 						(int) player.posY, (int) player.posZ);
-		sendThread.execute(new Runnable() {
-			@Override
-			public void run() {
-				HttpURLConnection connection = null;
-				try {
-					final String urlParameters = "players="
-							+ URLEncoder.encode(json);
-					if (!toLoaded) {
-						to = new MinebotSettings().get("report_position_to",
-								null);
-						toLoaded = true;
-					}
-					if (to == null) {
-						return;
-					}
-					final URL url = new URL(to);
-					connection = (HttpURLConnection) url.openConnection();
-					connection.setRequestMethod("POST");
-					connection.setRequestProperty("Content-Type",
-							"application/x-www-form-urlencoded");
-					connection.setRequestProperty("Content-Length",
-							Integer.toString(urlParameters.getBytes().length));
-					connection.setRequestProperty("Content-Language", "en-US");
-					connection.setUseCaches(false);
-					connection.setDoInput(true);
-					connection.setDoOutput(true);
-
-					final DataOutputStream wr = new DataOutputStream(connection
-							.getOutputStream());
-					wr.writeBytes(urlParameters);
-					wr.flush();
-					wr.close();
-					final InputStream is = connection.getInputStream();
-					final BufferedReader rd = new BufferedReader(
-							new InputStreamReader(is));
-					while (rd.readLine() != null) {
-					}
-					rd.close();
-				} catch (final Throwable t) {
-					t.printStackTrace();
-				} finally {
-					if (connection != null) {
-						connection.disconnect();
-					}
-				}
-			}
-		});
+		sendThread.execute(new SendToServerTask(json));
 	}
 }

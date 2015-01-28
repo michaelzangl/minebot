@@ -9,7 +9,7 @@ import net.famzangl.minecraft.minebot.ai.command.SafeStrategyRule;
 import net.famzangl.minecraft.minebot.ai.path.TreePathFinder;
 import net.famzangl.minecraft.minebot.ai.strategy.AIStrategy;
 import net.famzangl.minecraft.minebot.ai.strategy.PathFinderStrategy;
-import net.famzangl.minecraft.minebot.build.WoodType;
+import net.famzangl.minecraft.minebot.build.block.WoodType;
 
 @AICommand(helpText = "Gets wood", name = "minebot")
 public class CommandGetWood {

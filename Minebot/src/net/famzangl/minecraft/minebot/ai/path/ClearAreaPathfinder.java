@@ -8,23 +8,24 @@ import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.BlockWhitelist;
 import net.famzangl.minecraft.minebot.ai.task.DestroyInRangeTask;
 import net.minecraft.init.Blocks;
+import net.minecraft.util.BlockPos;
 
 public class ClearAreaPathfinder extends MovePathFinder {
 
-	private final Pos minPos;
-	private final Pos maxPos;
+	private final BlockPos minPos;
+	private final BlockPos maxPos;
 	private int topY;
-	private final HashSet<Pos> foundPositions = new HashSet<Pos>();
-	private Pos pathEndPosition;
+	private final HashSet<BlockPos> foundPositions = new HashSet<BlockPos>();
+	private BlockPos pathEndPosition;
 
-	public ClearAreaPathfinder(Pos pos1, Pos pos2) {
+	public ClearAreaPathfinder(BlockPos pos1, BlockPos pos2) {
 		minPos = Pos.minPos(pos1, pos2);
 		maxPos = Pos.maxPos(pos1, pos2);
 		topY = maxPos.getY();
 	}
 
 	@Override
-	protected boolean runSearch(Pos playerPosition) {
+	protected boolean runSearch(BlockPos playerPosition) {
 		foundPositions.clear();
 		pathEndPosition = playerPosition;
 		do {
@@ -96,11 +97,11 @@ public class ClearAreaPathfinder extends MovePathFinder {
 	}
 
 	@Override
-	protected void addTasksForTarget(Pos currentPos) {
+	protected void addTasksForTarget(BlockPos currentPos) {
 		super.addTasksForTarget(currentPos);
-		Pos top = currentPos;
+		BlockPos top = currentPos;
 		for (int i = 1; i < 6; i++) {
-			final Pos pos = currentPos.add(0, i, 0);
+			final BlockPos pos = currentPos.add(0, i, 0);
 			if (pos.getY() <= maxPos.getY()) {
 				top = pos;
 			}

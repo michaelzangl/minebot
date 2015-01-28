@@ -1,8 +1,8 @@
 package net.famzangl.minecraft.minebot.ai.path;
 
+import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.minecraft.block.Block;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.ResourceLocation;
 
 public class MineBySettingsPathFinder extends MinePathfinder {
 
@@ -22,14 +22,13 @@ public class MineBySettingsPathFinder extends MinePathfinder {
 
 		@Override
 		public float getFloat(Block block) {
-			final ResourceLocation name = ((ResourceLocation) Block.blockRegistry
-					.getNameForObject(block));
-			String domain = name.getResourceDomain().equals("minecraft") ? "" : name.getResourceDomain() + ":";
-			final float val = settings.getFloat(name_prefix + domain + name.getResourcePath(),
+			String blockName = AIHelper.getBlockName(block);
+			final float val = settings.getFloat(name_prefix + blockName,
 					defaultValue, min, max);
-			System.out.println(name_prefix + name + " -> " + val);
+			System.out.println(name_prefix + blockName + " -> " + val);
 			return val;
 		}
+
 	}
 
 	public MineBySettingsPathFinder(EnumFacing preferedDirection,

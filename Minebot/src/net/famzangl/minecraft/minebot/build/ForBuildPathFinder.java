@@ -11,12 +11,19 @@ import net.famzangl.minecraft.minebot.ai.path.MovePathFinder;
 import net.famzangl.minecraft.minebot.ai.task.move.AlignToGridTask;
 import net.famzangl.minecraft.minebot.build.blockbuild.BuildTask;
 import net.minecraft.init.Blocks;
+import net.minecraft.util.BlockPos;
 
+/**
+ * This path finder finds the way to th next build task.
+ * 
+ * @author michael
+ *
+ */
 public class ForBuildPathFinder extends MovePathFinder {
 
 	private static final int NEIGHBOURS_PER_DIRECTION = 6;
 	private static final BlockWhitelist FENCES = new BlockWhitelist(
-			Blocks.cobblestone_wall ).unionWith(AIHelper.fences);
+			Blocks.cobblestone_wall).unionWith(AIHelper.fences);
 	/**
 	 * Task we want to prepare for.
 	 */
@@ -30,12 +37,14 @@ public class ForBuildPathFinder extends MovePathFinder {
 		allowedGroundForUpwardsBlocks = allowedGroundBlocks;
 		footAllowedBlocks = AIHelper.walkableBlocks;
 		headAllowedBlocks = AIHelper.headWalkableBlocks;
-		footAllowedBlocks = footAllowedBlocks.intersectWith(forbiddenBlocks.invert());
-		headAllowedBlocks = headAllowedBlocks.intersectWith(forbiddenBlocks.invert());
+		footAllowedBlocks = footAllowedBlocks.intersectWith(forbiddenBlocks
+				.invert());
+		headAllowedBlocks = headAllowedBlocks.intersectWith(forbiddenBlocks
+				.invert());
 	}
-	
+
 	@Override
-	protected boolean runSearch(Pos playerPosition) {
+	protected boolean runSearch(BlockPos playerPosition) {
 		canBuildUp = helper.canSelectItem(new BlockItemFilter(Blocks.carpet));
 		return super.runSearch(playerPosition);
 	}
@@ -104,7 +113,8 @@ public class ForBuildPathFinder extends MovePathFinder {
 	@Override
 	protected void foundPath(LinkedList<Pos> path) {
 		Pos currentPos = path.removeFirst();
-		addTask(new AlignToGridTask(currentPos.getX(), currentPos.getY(), currentPos.getZ()));
+		addTask(new AlignToGridTask(currentPos.getX(), currentPos.getY(),
+				currentPos.getZ()));
 		while (!path.isEmpty()) {
 			final Pos nextPos = path.removeFirst();
 			addTask(new WalkTowardsTask(currentPos, nextPos));

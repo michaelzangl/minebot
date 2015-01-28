@@ -11,6 +11,7 @@ import net.famzangl.minecraft.minebot.ai.command.AICommandParameter;
 import net.famzangl.minecraft.minebot.ai.command.ParameterType;
 import net.famzangl.minecraft.minebot.ai.command.SafeStrategyRule;
 import net.famzangl.minecraft.minebot.ai.render.PosMarkerRenderer;
+import net.famzangl.minecraft.minebot.ai.scripting.StrategyFailedException;
 import net.famzangl.minecraft.minebot.ai.strategy.AIStrategy;
 import net.famzangl.minecraft.minebot.ai.strategy.TaskStrategy;
 import net.famzangl.minecraft.minebot.ai.task.WaitTask;
@@ -27,11 +28,37 @@ public class CommandBuild {
 
 	private static final class BuildStrategy extends TaskStrategy {
 		private boolean alignSend;
+		private boolean terrainChecked = false;
 		private ForBuildPathFinder pathFinder;
 
 		private final PosMarkerRenderer renderer = new PosMarkerRenderer(1, 1,
 				0);
-		private final BlockPos[] positions = new Pos[5];
+		private final BlockPos[] positions = new BlockPos[5];
+
+		@Override
+		protected TickResult onGameTick(AIHelper helper) {
+			if (!terrainChecked) {
+				BlockPos p = getBlockInTheWay(helper);
+				if (p != null) {
+					AIChatController
+							.addChatLine("The area is not cleared. Block in the way: "
+									+ p);
+					return TickResult.ABORT;
+				}
+				terrainChecked = true;
+			}
+			return super.onGameTick(helper);
+		}
+
+		private BlockPos getBlockInTheWay(AIHelper helper) {
+			for (BuildTask task : helper.buildManager.getScheduled()) {
+				BlockPos pos = task.getForPosition();
+				if (!helper.isAirBlock(pos)) {
+					return pos;
+				}
+			}
+			return null;
+		}
 
 		@Override
 		public void searchTasks(AIHelper helper) {
@@ -51,7 +78,9 @@ public class CommandBuild {
 					addTask(new WaitTask());
 				} else if (pathFinder.isNoPathFound()) {
 					AIChatController
-							.addChatLine("Cannot navigate to next build task.");
+							.addChatLine("Cannot navigate to build task at "
+									+ task.getForPosition()
+									+ ". Trying to skip it.");
 				}
 			} else {
 				addTask(new GetOnHotBarTask(task.getRequiredItem()));
@@ -86,7 +115,6 @@ public class CommandBuild {
 			AIHelper helper,
 			@AICommandParameter(type = ParameterType.FIXED, fixedName = "build", description = "") String nameArg2) {
 		return new BuildStrategy();
-
 	}
 
 	public static BlockPos isAroundSite(AIHelper helper, BuildTask task) {

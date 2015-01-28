@@ -11,7 +11,8 @@ import net.famzangl.minecraft.minebot.ai.command.CommandEvaluationException;
 import net.famzangl.minecraft.minebot.ai.command.ParameterType;
 import net.famzangl.minecraft.minebot.ai.strategy.AIStrategy;
 import net.famzangl.minecraft.minebot.ai.task.BlockSide;
-import net.famzangl.minecraft.minebot.build.WoodType;
+import net.famzangl.minecraft.minebot.build.block.SlabType;
+import net.famzangl.minecraft.minebot.build.block.WoodType;
 import net.famzangl.minecraft.minebot.build.blockbuild.BlockBuildTask;
 import net.famzangl.minecraft.minebot.build.blockbuild.BuildHalfslabTask;
 import net.famzangl.minecraft.minebot.build.blockbuild.BuildNormalStairsTask;
@@ -20,11 +21,11 @@ import net.famzangl.minecraft.minebot.build.blockbuild.BuildTask;
 import net.famzangl.minecraft.minebot.build.blockbuild.ColoredCubeBuildTask;
 import net.famzangl.minecraft.minebot.build.blockbuild.FenceBuildTask;
 import net.famzangl.minecraft.minebot.build.blockbuild.LogBuildTask;
-import net.famzangl.minecraft.minebot.build.blockbuild.SlabType;
 import net.famzangl.minecraft.minebot.build.blockbuild.StandingSignBuildTask;
 import net.famzangl.minecraft.minebot.build.blockbuild.StandingSignBuildTask.SignDirection;
 import net.famzangl.minecraft.minebot.build.blockbuild.WoodBuildTask;
 import net.minecraft.block.Block;
+import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
 
 @AICommand(helpText = "Schedules a build task.", name = "minebuild")
@@ -44,7 +45,7 @@ public class CommandScheduleBuild {
 	public static AIStrategy runSimple(
 			AIHelper helper,
 			@AICommandParameter(type = ParameterType.FIXED, fixedName = "schedule", description = "") String nameArg,
-			@AICommandParameter(type = ParameterType.POSITION, description = "Where to place it (relative is to your current pos)") Pos forPosition,
+			@AICommandParameter(type = ParameterType.POSITION, description = "Where to place it (relative is to your current pos)") BlockPos forPosition,
 			@AICommandParameter(type = ParameterType.BLOCK_NAME, description = "The block", blockFilter = RunSimpleFilter.class) Block blockToPlace) {
 
 		if (BlockBuildTask.BLOCKS.contains(blockToPlace)) {
@@ -68,7 +69,7 @@ public class CommandScheduleBuild {
 	public static AIStrategy run(
 			AIHelper helper,
 			@AICommandParameter(type = ParameterType.FIXED, fixedName = "schedule", description = "") String nameArg,
-			@AICommandParameter(type = ParameterType.POSITION, description = "Where to place it (relative is to your current pos)") Pos forPosition,
+			@AICommandParameter(type = ParameterType.POSITION, description = "Where to place it (relative is to your current pos)") BlockPos forPosition,
 			@AICommandParameter(type = ParameterType.BLOCK_NAME, description = "The block", blockFilter = RunColoredFilter.class) Block blockToPlace,
 			@AICommandParameter(type = ParameterType.COLOR, description = "The color") int color) {
 		if (ColoredCubeBuildTask.BLOCKS.contains(blockToPlace)) {
@@ -91,7 +92,7 @@ public class CommandScheduleBuild {
 	public static AIStrategy run(
 			AIHelper helper,
 			@AICommandParameter(type = ParameterType.FIXED, fixedName = "schedule", description = "") String nameArg,
-			@AICommandParameter(type = ParameterType.POSITION, description = "Where to place it (relative is to your current pos)") Pos forPosition,
+			@AICommandParameter(type = ParameterType.POSITION, description = "Where to place it (relative is to your current pos)") BlockPos forPosition,
 			@AICommandParameter(type = ParameterType.BLOCK_NAME, description = "The block type to place", blockFilter = WoodBlockFilter.class) Block blockToPlace,
 			@AICommandParameter(type = ParameterType.ENUM, description = "The wood subtype to place") WoodType woodType) {
 		if (WoodBuildTask.BLOCKS.contains(blockToPlace)) {
@@ -113,7 +114,7 @@ public class CommandScheduleBuild {
 	public static AIStrategy run(
 			AIHelper helper,
 			@AICommandParameter(type = ParameterType.FIXED, fixedName = "schedule", description = "") String nameArg,
-			@AICommandParameter(type = ParameterType.POSITION, description = "Where to place it (relative is to your current pos)") Pos forPosition,
+			@AICommandParameter(type = ParameterType.POSITION, description = "Where to place it (relative is to your current pos)") BlockPos forPosition,
 			@AICommandParameter(type = ParameterType.BLOCK_NAME, description = "The block", blockFilter = LogBlockFilter.class) Block blockToPlace,
 			@AICommandParameter(type = ParameterType.ENUM, description = "The type of wood logs") WoodType woodType,
 			@AICommandParameter(type = ParameterType.ENUM, description = "The direction the log is facing") EnumFacing direction) {
@@ -136,7 +137,7 @@ public class CommandScheduleBuild {
 	public static AIStrategy run(
 			AIHelper helper,
 			@AICommandParameter(type = ParameterType.FIXED, fixedName = "schedule", description = "") String nameArg,
-			@AICommandParameter(type = ParameterType.POSITION, description = "Where to place it (relative is to your current pos)") Pos forPosition,
+			@AICommandParameter(type = ParameterType.POSITION, description = "Where to place it (relative is to your current pos)") BlockPos forPosition,
 			@AICommandParameter(type = ParameterType.BLOCK_NAME, description = "The block", blockFilter = StairsBlockFilter.class) Block blockToPlace,
 			@AICommandParameter(type = ParameterType.ENUM, description = "The direction the stairs face") EnumFacing direction,
 			@AICommandParameter(type = ParameterType.ENUM, description = "Upper for inverted stairs", optional = true) Half half) {
@@ -160,7 +161,7 @@ public class CommandScheduleBuild {
 	public static AIStrategy run(
 			AIHelper helper,
 			@AICommandParameter(type = ParameterType.FIXED, fixedName = "schedule", description = "") String nameArg,
-			@AICommandParameter(type = ParameterType.POSITION, description = "Where to place it (relative is to your current pos)") Pos forPosition,
+			@AICommandParameter(type = ParameterType.POSITION, description = "Where to place it (relative is to your current pos)") BlockPos forPosition,
 			@AICommandParameter(type = ParameterType.BLOCK_NAME, description = "The block", blockFilter = SlabBlockFilter.class) Block blockToPlace,
 			@AICommandParameter(type = ParameterType.ENUM, description = "The subtype of slabs to place") SlabType type,
 			@AICommandParameter(type = ParameterType.ENUM, description = "If a upper or lower half should be placed") BlockSide side) {
@@ -183,7 +184,7 @@ public class CommandScheduleBuild {
 	public static AIStrategy run(
 			AIHelper helper,
 			@AICommandParameter(type = ParameterType.FIXED, fixedName = "schedule", description = "") String nameArg,
-			@AICommandParameter(type = ParameterType.POSITION, description = "Where to place it (relative is to your current pos)") Pos forPosition,
+			@AICommandParameter(type = ParameterType.POSITION, description = "Where to place it (relative is to your current pos)") BlockPos forPosition,
 			@AICommandParameter(type = ParameterType.BLOCK_NAME, description = "The block", blockFilter = SignBlockFilter.class) Block blockToPlace,
 			@AICommandParameter(type = ParameterType.ENUM, description = "The direction of the sign") SignDirection direction,
 			@AICommandParameter(type = ParameterType.STRING, description = "The first line. Replace space with §.", optional = true) String text1,

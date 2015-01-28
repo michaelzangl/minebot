@@ -5,6 +5,7 @@ import net.minecraft.item.ItemStack;
 /**
  * An {@link ItemStack} filter that can match item stacks.
  * 
+ * @see HumanReadableItemFilter
  * @author michael
  * 
  */

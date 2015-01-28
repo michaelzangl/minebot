@@ -1,8 +1,13 @@
-package net.famzangl.minecraft.minebot.build.blockbuild;
+package net.famzangl.minecraft.minebot.build.block;
 
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
 
+/**
+ * A half slab type.
+ * @author michael
+ *
+ */
 public enum SlabType {
 	STONE(Blocks.stone_slab, Blocks.double_stone_slab, 0),
 	SANDSTONE(Blocks.stone_slab, Blocks.double_stone_slab, 1),

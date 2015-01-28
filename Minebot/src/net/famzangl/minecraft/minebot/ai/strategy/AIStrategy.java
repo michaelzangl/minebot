@@ -8,6 +8,8 @@ import net.minecraftforge.fml.common.gameevent.TickEvent.RenderTickEvent;
  * any state that might happen while the bot executes.
  * 
  * @author michael
+ * @see RunOnceStrategy
+ * @see StackStrategy
  * 
  */
 public abstract class AIStrategy {

@@ -233,7 +233,7 @@ public class CraftStrategy extends PathFinderStrategy {
 		}
 
 		@Override
-		protected boolean runSearch(Pos playerPosition) {
+		protected boolean runSearch(BlockPos playerPosition) {
 			int missing = getMissing();
 			if (failed || missing <= 0) {
 				return true;
@@ -255,7 +255,7 @@ public class CraftStrategy extends PathFinderStrategy {
 		}
 
 		@Override
-		protected BlockRangeScanner constructScanner(Pos playerPosition) {
+		protected BlockRangeScanner constructScanner(BlockPos playerPosition) {
 			BlockRangeScanner scanner = super.constructScanner(playerPosition);
 			scanner.addHandler(h);
 			return scanner;
@@ -263,14 +263,14 @@ public class CraftStrategy extends PathFinderStrategy {
 
 		@Override
 		protected float rateDestination(int distance, int x, int y, int z) {
-			ArrayList<CraftingTableData> tables = h.getReachableForPos(new Pos(
+			ArrayList<CraftingTableData> tables = h.getReachableForPos(new BlockPos(
 					x, y, z));
 			return !failed && tables != null && tables.size() > 0 ? distance
 					: -1;
 		}
 
 		@Override
-		protected void addTasksForTarget(Pos currentPos) {
+		protected void addTasksForTarget(BlockPos currentPos) {
 			ArrayList<CraftingTableData> tables = h
 					.getReachableForPos(currentPos);
 			CraftingTableData table = tables.get(0);
@@ -281,6 +281,7 @@ public class CraftStrategy extends PathFinderStrategy {
 					possibilities);
 			if (grid == null) {
 				failed = true;
+				//FIXME: Desync. Error.
 				return;
 			}
 

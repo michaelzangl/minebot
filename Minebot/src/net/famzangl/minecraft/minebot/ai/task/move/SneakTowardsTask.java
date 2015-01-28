@@ -1,12 +1,13 @@
 package net.famzangl.minecraft.minebot.ai.task.move;
 
 import net.famzangl.minecraft.minebot.ai.AIHelper;
-import net.famzangl.minecraft.minebot.ai.strategy.TaskOperations;
 import net.famzangl.minecraft.minebot.ai.task.AITask;
+import net.famzangl.minecraft.minebot.ai.task.TaskOperations;
 import net.minecraft.util.EnumFacing;
 
 /**
- * Sneak standing on (x, y - 1, z) towards the direction.
+ * Sneak standing on (x, y - 1, z) towards the direction, so that we are
+ * standing on the edge of the block.
  * 
  * @author michael
  * 

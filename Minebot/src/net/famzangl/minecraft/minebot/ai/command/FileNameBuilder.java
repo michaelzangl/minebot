@@ -2,10 +2,12 @@ package net.famzangl.minecraft.minebot.ai.command;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
 
 import net.famzangl.minecraft.minebot.ai.AIHelper;
+import net.famzangl.minecraft.minebot.settings.MinebotSettings;
 
 public class FileNameBuilder extends ParameterBuilder {
 	public static boolean isFilenameValid(String file) {
@@ -20,8 +22,11 @@ public class FileNameBuilder extends ParameterBuilder {
 
 	private final static class FileArgumentDefinition extends
 			ArgumentDefinition {
-		public FileArgumentDefinition(String description) {
+		private String relativeToSettingsFile;
+
+		public FileArgumentDefinition(String description, String relativeToSettingsFile) {
 			super("File", description);
+			this.relativeToSettingsFile = relativeToSettingsFile;
 		}
 
 		@Override
@@ -40,7 +45,15 @@ public class FileNameBuilder extends ParameterBuilder {
 			if (!isFilenameValid(currentStart)) {
 				return;
 			}
-			File dir = new File(currentStart);
+			File base;
+			if (relativeToSettingsFile.isEmpty()) {
+				base = MinebotSettings.getDataDir();
+			} else {
+				base = MinebotSettings.getDataDirFile(relativeToSettingsFile + "/");
+			}
+			String currentPath = Paths.get(base.getAbsolutePath()).resolve(currentStart).toString();
+			
+			File dir = new File(currentPath);
 			String namePrefix = "";
 			if (!currentStart.endsWith(File.separator)) {
 				namePrefix = dir.getName();
@@ -49,8 +62,12 @@ public class FileNameBuilder extends ParameterBuilder {
 			if (dir != null && dir.isDirectory()) {
 				for (final File f : dir.listFiles()) {
 					if (f.getName().startsWith(namePrefix)) {
-						addTo.add(f.getPath()
-								+ (f.isDirectory() ? File.separator : ""));
+						String path = f.getPath()
+								+ (f.isDirectory() ? File.separator : "");
+						if (path.startsWith(base.getAbsolutePath())) {
+							path = path.substring(base.getAbsolutePath().length() + 1);
+						}
+						addTo.add(path);
 					}
 				}
 			}
@@ -63,12 +80,20 @@ public class FileNameBuilder extends ParameterBuilder {
 
 	@Override
 	public void addArguments(ArrayList<ArgumentDefinition> list) {
-		list.add(new FileArgumentDefinition(annot.description()));
+		list.add(new FileArgumentDefinition(annot.description(), annot.relativeToSettingsFile()));
 	}
 
 	@Override
 	public Object getParameter(AIHelper helper, String[] arguments) {
-		return arguments[0];
+		String relativeToSettingsFile = annot.relativeToSettingsFile();
+		File base;
+		if (relativeToSettingsFile.isEmpty()) {
+			base = MinebotSettings.getDataDir();
+		} else {
+			base = MinebotSettings.getDataDirFile(relativeToSettingsFile);
+		}
+		String currentPath = Paths.get(base.getAbsolutePath()).resolve(arguments[0]).toString();
+		return new File(currentPath);
 	}
 
 }

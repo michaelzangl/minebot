@@ -1,6 +1,6 @@
 package net.famzangl.minecraft.minebot;
 
-import net.famzangl.minecraft.minebot.ai.scripting.DoublePos;
+import net.famzangl.minecraft.minebot.ai.scripting.EntityPos;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
 
@@ -23,10 +23,6 @@ public class Pos extends BlockPos {
 		return ZERO.offset(dir);
 	}
 
-	public Pos add(int x, int y, int z) {
-		return new Pos(this.getX() + x, this.getY() + y, this.getZ() + z);
-	}
-
 	public static BlockPos[] fromDir(EnumFacing[] standable) {
 		final BlockPos[] res = new BlockPos[standable.length];
 		for (int i = 0; i < res.length; i++) {
@@ -35,13 +31,13 @@ public class Pos extends BlockPos {
 		return res;
 	}
 
-	public static Pos minPos(Pos p1, Pos p2) {
-		return new Pos(Math.min(p1.getX(), p2.getX()), Math.min(p1.getY(), p2.getY()), Math.min(
+	public static BlockPos minPos(BlockPos p1, BlockPos p2) {
+		return new BlockPos(Math.min(p1.getX(), p2.getX()), Math.min(p1.getY(), p2.getY()), Math.min(
 				p1.getZ(), p2.getZ()));
 	}
 
-	public static Pos maxPos(Pos p1, Pos p2) {
-		return new Pos(Math.max(p1.getX(), p2.getX()), Math.max(p1.getY(), p2.getY()), Math.max(
+	public static BlockPos maxPos(BlockPos p1, BlockPos p2) {
+		return new BlockPos(Math.max(p1.getX(), p2.getX()), Math.max(p1.getY(), p2.getY()), Math.max(
 				p1.getZ(), p2.getZ()));
 	}
 
@@ -53,7 +49,7 @@ public class Pos extends BlockPos {
 		return Math.sqrt(dx * dx + dy * dy + dz * dz);
 	}
 
-	public double distance(DoublePos other) {
+	public double distance(EntityPos other) {
 		return other.distance(this);
 	}
 }

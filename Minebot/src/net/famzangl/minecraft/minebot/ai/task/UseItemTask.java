@@ -2,11 +2,16 @@ package net.famzangl.minecraft.minebot.ai.task;
 
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.ItemFilter;
-import net.famzangl.minecraft.minebot.ai.strategy.TaskOperations;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.MovingObjectPosition;
 
-public class UseItemTask extends AITask {
+/**
+ * Uses an item on something. Use subclases to define what to use it for.
+ * 
+ * @author michael
+ *
+ */
+public abstract class UseItemTask extends AITask {
 	private boolean clicked;
 	private final ItemFilter filter;
 

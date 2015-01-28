@@ -14,6 +14,7 @@ import net.famzangl.minecraft.minebot.ai.task.WaitTask;
 import net.famzangl.minecraft.minebot.ai.task.inventory.PutInChestTask;
 import net.minecraft.client.gui.inventory.GuiChest;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.BlockPos;
 
 /**
  * Store whatever you are holding in a chest.
@@ -28,7 +29,7 @@ public class StoreStrategy extends PathFinderStrategy {
 		private ChestBlockHandler chestBlockHandler;
 
 		@Override
-		protected BlockRangeScanner constructScanner(Pos playerPosition) {
+		protected BlockRangeScanner constructScanner(BlockPos playerPosition) {
 			BlockRangeScanner scanner = super.constructScanner(playerPosition);
 			chestBlockHandler = new ChestBlockHandler();
 			scanner.addHandler(chestBlockHandler);
@@ -52,7 +53,7 @@ public class StoreStrategy extends PathFinderStrategy {
 		}
 
 		@Override
-		protected void addTasksForTarget(Pos currentPos) {
+		protected void addTasksForTarget(BlockPos currentPos) {
 			ArrayList<ChestData> chests = chestBlockHandler
 					.getReachableForPos(currentPos);
 			for (final ChestData c : chests) {

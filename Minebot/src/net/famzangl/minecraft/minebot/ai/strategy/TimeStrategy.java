@@ -2,6 +2,12 @@ package net.famzangl.minecraft.minebot.ai.strategy;
 
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 
+/**
+ * A strategy that needs to measure time.
+ * 
+ * @author michael
+ *
+ */
 public abstract class TimeStrategy extends AIStrategy {
 
 	private long startTime = -1;

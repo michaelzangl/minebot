@@ -2,7 +2,6 @@ package net.famzangl.minecraft.minebot.build.blockbuild;
 
 import java.util.Arrays;
 
-import net.famzangl.minecraft.minebot.Pos;
 import net.famzangl.minecraft.minebot.ai.BlockWhitelist;
 import net.famzangl.minecraft.minebot.ai.ClassItemFilter;
 import net.famzangl.minecraft.minebot.ai.ItemFilter;

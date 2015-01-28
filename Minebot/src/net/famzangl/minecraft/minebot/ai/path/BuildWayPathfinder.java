@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 
-import net.famzangl.minecraft.minebot.Pos;
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.BlockItemFilter;
 import net.famzangl.minecraft.minebot.ai.BlockWhitelist;
@@ -15,13 +14,14 @@ import net.famzangl.minecraft.minebot.ai.task.PlaceBlockTask;
 import net.famzangl.minecraft.minebot.ai.task.PlaceTorchSomewhereTask;
 import net.famzangl.minecraft.minebot.ai.task.inventory.GetOnHotBarTask;
 import net.famzangl.minecraft.minebot.build.WalkTowardsTask;
+import net.famzangl.minecraft.minebot.build.block.SlabFilter;
+import net.famzangl.minecraft.minebot.build.block.SlabType;
 import net.famzangl.minecraft.minebot.build.blockbuild.BlockBuildTask;
 import net.famzangl.minecraft.minebot.build.blockbuild.BuildHalfslabTask;
 import net.famzangl.minecraft.minebot.build.blockbuild.CubeBuildTask;
-import net.famzangl.minecraft.minebot.build.blockbuild.SlabFilter;
-import net.famzangl.minecraft.minebot.build.blockbuild.SlabType;
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
+import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
 
 /**
@@ -59,7 +59,7 @@ public class BuildWayPathfinder extends AlongTrackPathFinder {
 		super(dx, dz, cx, cy, cz, -1);
 	}
 
-	public BuildWayPathfinder(EnumFacing dir, Pos pos) {
+	public BuildWayPathfinder(EnumFacing dir, BlockPos pos) {
 		this(dir.getFrontOffsetX(), dir.getFrontOffsetZ(), pos.getX(), pos
 				.getY() + 1, pos.getZ());
 	}
@@ -82,8 +82,8 @@ public class BuildWayPathfinder extends AlongTrackPathFinder {
 			this.stepIndex = stepIndex;
 		}
 
-		protected Pos getPos(int u, int dy) {
-			return new Pos(cx + dx * stepIndex + dz * u, cy + dy, cz + dz
+		protected BlockPos getPos(int u, int dy) {
+			return new BlockPos(cx + dx * stepIndex + dz * u, cy + dy, cz + dz
 					* stepIndex - dx * u);
 		}
 
@@ -96,13 +96,13 @@ public class BuildWayPathfinder extends AlongTrackPathFinder {
 		 * 
 		 * @param currentPos
 		 */
-		public void addConstructionTasks(Pos currentPos) {
+		public void addConstructionTasks(BlockPos currentPos) {
 			addTask(new GetOnHotBarTask(new SlabFilter(FLOOR)));
 			if (placeTorch) {
 				addTask(new GetOnHotBarTask(new BlockItemFilter(Blocks.torch)));
 			}
 
-			final Pos first = getPos(0, -1);
+			final BlockPos first = getPos(0, -1);
 			final AITask placeTask = new BuildHalfslabTask(first, FLOOR,
 					BlockSide.LOWER_HALF).getPlaceBlockTask(currentPos
 					.subtract(first));
@@ -113,7 +113,7 @@ public class BuildWayPathfinder extends AlongTrackPathFinder {
 			addTask(clearTask);
 
 			for (int i = 1; i < width; i++) {
-				final Pos current = getPos(i, -1);
+				final BlockPos current = getPos(i, -1);
 				addTask(new BuildHalfslabTask(current, FLOOR,
 						BlockSide.LOWER_HALF)
 						.getPlaceBlockTask(getPos(i - 1, 0).subtract(current)));
@@ -145,8 +145,8 @@ public class BuildWayPathfinder extends AlongTrackPathFinder {
 			addConstructionTasks(getPos(0, -1));
 		}
 
-		public void addConstructionTasksFromPrevoius(Pos current) {
-			final Pos floorPos = getPos(0, -1);
+		public void addConstructionTasksFromPrevoius(BlockPos current) {
+			final BlockPos floorPos = getPos(0, -1);
 			final Block floor = helper.getBlock(floorPos);
 			addTask(new DestroyInRangeTask(floorPos, getPos(0, 1)));
 			// helper.addTask(new SneakAndPlaceAtHalfTask(floorPos.x,
@@ -213,7 +213,7 @@ public class BuildWayPathfinder extends AlongTrackPathFinder {
 		}
 
 		@Override
-		public void addConstructionTasks(Pos currentPos) {
+		public void addConstructionTasks(BlockPos currentPos) {
 			addTask(new GetOnHotBarTask(new BlockItemFilter(BRIDGE_WALL)));
 			addTask(new GetOnHotBarTask(new BlockItemFilter(BRIDGE_SIDE)));
 			super.addConstructionTasks(currentPos);
@@ -287,7 +287,7 @@ public class BuildWayPathfinder extends AlongTrackPathFinder {
 		}
 
 		@Override
-		public void addConstructionTasks(Pos currentPos) {
+		public void addConstructionTasks(BlockPos currentPos) {
 			if (placeTorch) {
 				addTask(new GetOnHotBarTask(new BlockItemFilter(BRIDGE_SIDE)));
 			}
@@ -344,7 +344,7 @@ public class BuildWayPathfinder extends AlongTrackPathFinder {
 	}
 
 	@Override
-	protected boolean runSearch(Pos playerPosition) {
+	protected boolean runSearch(BlockPos playerPosition) {
 		if (!addContinuingTask(playerPosition)) {
 			return super.runSearch(playerPosition);
 		} else {
@@ -369,7 +369,7 @@ public class BuildWayPathfinder extends AlongTrackPathFinder {
 	}
 
 	@Override
-	protected void addTasksForTarget(Pos currentPos) {
+	protected void addTasksForTarget(BlockPos currentPos) {
 		final int currentStep = getStepNumber(currentPos.getX(),
 				currentPos.getZ());
 		if (currentPos.getY() == cy - 1
@@ -378,7 +378,7 @@ public class BuildWayPathfinder extends AlongTrackPathFinder {
 		}
 	}
 
-	public boolean addContinuingTask(Pos playerPosition) {
+	public boolean addContinuingTask(BlockPos playerPosition) {
 		System.out.println("Seatch at "
 				+ playerPosition
 				+ ", on track: "

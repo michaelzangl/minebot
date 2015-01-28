@@ -44,7 +44,7 @@ public class CommandMove {
 		protected TickResult onGameTick(AIHelper helper) {
 			if (!moved) {
 				final ArrayList<BuildTask> tasks = new ArrayList<BuildTask>();
-				final Pos center = getCenter(helper.buildManager.getScheduled());
+				final BlockPos center = getCenter(helper.buildManager.getScheduled());
 				while (helper.buildManager.peekNextTask() != null) {
 					final BuildTask next = helper.buildManager.popNextTask();
 					BlockPos nextPos = next.getForPosition().add(relative);
@@ -74,7 +74,7 @@ public class CommandMove {
 			return TickResult.NO_MORE_WORK;
 		}
 
-		private Pos getCenter(List<BuildTask> scheduled) {
+		private BlockPos getCenter(List<BuildTask> scheduled) {
 			double x = 0, y = 0, z = 0;
 			for (final BuildTask s : scheduled) {
 				final BlockPos pos = s.getForPosition();
@@ -83,7 +83,7 @@ public class CommandMove {
 				z += pos.getZ();
 			}
 			final int c = Math.max(1, scheduled.size());
-			return new Pos((int) (x / c), (int) (y / c), (int) (z / c));
+			return new BlockPos((int) (x / c), (int) (y / c), (int) (z / c));
 		}
 
 		@Override
@@ -138,7 +138,7 @@ public class CommandMove {
 			AIHelper helper,
 			@AICommandParameter(type = ParameterType.FIXED, fixedName = "mirror", description = "") String nameArg,
 			@AICommandParameter(type = ParameterType.ENUM, fixedName = "", description = "Direction") final MirrorDirection dir) {
-		return new MoveStrategy(new Pos(0, 0, 0), null, dir);
+		return new MoveStrategy(Pos.ZERO, null, dir);
 	}
 
 	@AICommandInvocation()
@@ -146,6 +146,6 @@ public class CommandMove {
 			AIHelper helper,
 			@AICommandParameter(type = ParameterType.FIXED, fixedName = "rotate", description = "") String nameArg,
 			@AICommandParameter(type = ParameterType.ENUM, fixedName = "", description = "Direction") final Rotate dir) {
-		return new MoveStrategy(new Pos(0, 0, 0), dir, null);
+		return new MoveStrategy(Pos.ZERO, dir, null);
 	}
 }

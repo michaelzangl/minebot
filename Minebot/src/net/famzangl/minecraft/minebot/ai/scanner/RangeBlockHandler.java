@@ -66,7 +66,7 @@ public abstract class RangeBlockHandler<ReachData> implements BlockHandler {
 		list.add(c);
 	}
 
-	public ArrayList<ReachData> getReachableForPos(Pos pos) {
+	public ArrayList<ReachData> getReachableForPos(BlockPos pos) {
 		return reachable.get(pos);
 	}
 

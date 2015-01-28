@@ -6,6 +6,7 @@ import net.minecraft.entity.passive.EntityChicken;
 import net.minecraft.entity.passive.EntityCow;
 import net.minecraft.entity.passive.EntityOcelot;
 import net.minecraft.entity.passive.EntityPig;
+import net.minecraft.entity.passive.EntityRabbit;
 import net.minecraft.entity.passive.EntitySheep;
 import net.minecraft.entity.passive.EntityWolf;
 
@@ -22,7 +23,8 @@ public enum AnimalyType {
 	PIG(EntityPig.class),
 	SHEEP(EntitySheep.class),
 	WOLF(EntityWolf.class),
-	OCELOT(EntityOcelot.class);
+	OCELOT(EntityOcelot.class),
+	RABBIT(EntityRabbit.class);
 
 	private Class<?> animalClass;
 

@@ -6,7 +6,8 @@ import net.famzangl.minecraft.minebot.ai.ColoredBlockItemFilter;
 import net.famzangl.minecraft.minebot.ai.ItemFilter;
 import net.famzangl.minecraft.minebot.ai.task.AITask;
 import net.famzangl.minecraft.minebot.ai.task.place.JumpingPlaceAtHalfTask;
-import net.famzangl.minecraft.minebot.build.WoodType;
+import net.famzangl.minecraft.minebot.build.block.SlabType;
+import net.famzangl.minecraft.minebot.build.block.WoodType;
 import net.famzangl.minecraft.minebot.build.blockbuild.BuildNormalStairsTask.Half;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
@@ -23,8 +24,7 @@ public abstract class BuildTask {
 
 	public static TaskDescription getTaskDescription(Block b, AIHelper h,
 			BlockPos worldPos) throws UnknownBlockException {
-		final String name = ((String) (Block.blockRegistry.getNameForObject(b)))
-				.replaceFirst("minecraft:", "");
+		final String name = AIHelper.getBlockName(b);
 		final IBlockState blockState = h.getMinecraft().theWorld.getBlockState(worldPos);
 		final int blockMetadata = h.getBlockIdWithMeta(worldPos) & 0xf;
 		if (BlockBuildTask.BLOCKS.contains(b)) {

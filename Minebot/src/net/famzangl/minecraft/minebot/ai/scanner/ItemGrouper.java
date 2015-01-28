@@ -6,6 +6,7 @@ import net.minecraft.item.Item;
 
 /**
  * Helper utility to group blocks.
+ * TODO: Implement a strategy for this.
  * @author michael
  *
  */
