@@ -237,11 +237,15 @@ public class PathFinderField implements Comparator<Integer> {
 				if (n < 0) {
 					continue;
 				}
-				if (isVisited(n)) {
-					continue;
-				}
 				final int distance = distanceFor(currentNode, n)
 						+ currentDistance;
+				if (isVisited(n)) {
+					if (distance < getDistance(n)) {
+						System.out.println("Warning: Found shorter path to: "
+								+ n);
+					}
+					continue;
+				}
 				if (!isInQueue(n)) {
 					setDistance(n, distance);
 					setMoveFrom(n, currentNode);
@@ -355,6 +359,7 @@ public class PathFinderField implements Comparator<Integer> {
 	}
 
 	private final int[] res = new int[10];
+
 	protected int[] getNeighbours(int currentNode) {
 		final int cx = getX(currentNode);
 		final int cz = getZ(currentNode);
@@ -402,24 +407,31 @@ public class PathFinderField implements Comparator<Integer> {
 		return pq.isEmpty() && pqMinDistance < 0;
 	}
 
-
 	private void pqUpdate(int n, int oldDistance, int distance) {
 		pqRemove(n, oldDistance);
 		pqAdd(n, distance);
 	}
 
 	private void pqRemove(int n, int oldDistance) {
-		if (pqMinDistance >= 0 && oldDistance < pqMinDistance + FAST_DISTANCE_ACCESS) {
+		if (pqMinDistance >= 0
+				&& oldDistance < pqMinDistance + FAST_DISTANCE_ACCESS) {
 			int slot = pqSlotFor(oldDistance);
 			int[] slotArray = pqByDistance[slot];
 			int fill = pqByDistanceFill[slot];
 			pqByDistanceFill[slot] = fill - 1;
+			boolean found = false;
 			for (int i = 0; i < fill - 1; i++) {
 				if (slotArray[i] == n) {
 					slotArray[i] = slotArray[fill - 1];
+					found = true;
 					break;
 				}
 			}
+			if (!found) {
+				System.out.println("Warning: Trying to remove " + n
+						+ " which is not in this list (d=" + oldDistance + ")");
+			}
+
 			if (fill == 1 && oldDistance == pqMinDistance) {
 				pqFindNextMin();
 			}
@@ -429,17 +441,24 @@ public class PathFinderField implements Comparator<Integer> {
 	}
 
 	private void pqAdd(int node, int distance) {
-		// pqSize++;
-		// if (pqSize >= pqArray.length) {
-		// pqArray = Arrays.copyOf(pqArray, pqArray.length * 2);
-		// }
-		// pqArray[pqSize - 1] = node;
 		if (getDistance(node) != distance) {
-			throw new IllegalArgumentException("Got: " + distance + " but real distance is " + getDistance(node));
+			throw new IllegalArgumentException("Got: " + distance
+					+ " but real distance is " + getDistance(node));
 		}
 		if (pqMinDistance < 0) {
 			pqMinDistance = distance;
 		}
+		while (distance < pqMinDistance) {
+			// Does not happen often, but we need to handle it.
+			pqMinDistance--;
+
+			int slotToEmpty = pqSlotFor(pqMinDistance);
+			for (int i = 0; i < pqByDistanceFill[slotToEmpty]; i++) {
+				pq.offer(pqByDistance[slotToEmpty][i]);
+			}
+			pqByDistanceFill[slotToEmpty] = 0;
+		}
+
 		if (distance < pqMinDistance + FAST_DISTANCE_ACCESS) {
 			int slot = pqSlotFor(distance);
 			int[] slotArray = pqByDistance[slot];
