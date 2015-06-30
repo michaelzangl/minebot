@@ -29,36 +29,24 @@ import net.minecraft.util.BlockPos;
 public class CommandSetPos {
 
 	@AICommandInvocation()
-	public static AIStrategy run(
-			AIHelper helper,
-			@AICommandParameter(type = ParameterType.FIXED, fixedName = "pos1", description = "") String nameArg) {
-		helper.setPosition(helper.getPlayerPosition(), false);
-		return null;
-	}
-
-	@AICommandInvocation()
-	public static AIStrategy run(
-			@AICommandParameter(type = ParameterType.FIXED, fixedName = "pos2", description = "") String nameArg,
-			AIHelper helper) {
-		helper.setPosition(helper.getPlayerPosition(), true);
-		return null;
-	}
-
-	@AICommandInvocation()
-	public static AIStrategy run(
+	public static AIStrategy run1(
 			AIHelper helper,
 			@AICommandParameter(type = ParameterType.FIXED, fixedName = "pos1", description = "") String nameArg,
-			@AICommandParameter(type = ParameterType.POSITION, description = "The position") BlockPos pos) {
-		helper.setPosition(pos, false);
+			@AICommandParameter(type = ParameterType.POSITION, description = "The position", optional = true) BlockPos pos) {
+		setPos(helper, pos, false);
 		return null;
 	}
 
 	@AICommandInvocation()
-	public static AIStrategy run(
-			@AICommandParameter(type = ParameterType.FIXED, fixedName = "pos2", description = "") String nameArg,
+	public static AIStrategy run2(
 			AIHelper helper,
-			@AICommandParameter(type = ParameterType.POSITION, description = "The position") Pos pos) {
-		helper.setPosition(pos, true);
+			@AICommandParameter(type = ParameterType.FIXED, fixedName = "pos2", description = "") String nameArg,
+			@AICommandParameter(type = ParameterType.POSITION, description = "The position", optional = true) Pos pos) {
+		setPos(helper, pos, true);
 		return null;
+	}
+
+	private static void setPos(AIHelper helper, BlockPos pos, boolean b) {
+		helper.setPosition(pos == null ? helper.getPlayerPosition() : pos, b);
 	}
 }

@@ -17,6 +17,7 @@
 package net.famzangl.minecraft.minebot.ai;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
@@ -24,6 +25,7 @@ import net.famzangl.minecraft.minebot.Pos;
 import net.famzangl.minecraft.minebot.ai.command.AIChatController;
 import net.famzangl.minecraft.minebot.ai.task.BlockSide;
 import net.famzangl.minecraft.minebot.build.BuildManager;
+import net.famzangl.minecraft.minebot.map.MapReader;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockFence;
 import net.minecraft.block.BlockFenceGate;
@@ -197,9 +199,13 @@ public abstract class AIHelper {
 	protected boolean doUngrab;
 	private KeyBinding resetSneakKey;
 	private boolean sneakKeyJustPressed;
+	private KeyBinding resetSprintKey;
+	private boolean sprintKeyJustPressed;
 
 	private int chunkHitCounter = 0;
 	private int chunkMissCounter = 0;
+
+	protected MapReader activeMapReader;
 
 	/**
 	 * A random number in a range, that does not exactly hit the sides.
@@ -563,14 +569,19 @@ public abstract class AIHelper {
 	 * @return the position or <code>null</code> if it was not found.
 	 */
 	public BlockPos findBlock(Block blockType) {
+		List<BlockPos> pos = findBlocks(blockType, 2);
+		return pos.isEmpty() ? null : pos.get(0);
+	}
+
+	public List<BlockPos> findBlocks(Block blockType, int radius) {
 		final BlockPos current = getPlayerPosition();
-		BlockPos pos = null;
-		for (int x = current.getX() - 2; x <= current.getX() + 2; x++) {
-			for (int z = current.getZ() - 2; z <= current.getZ() + 2; z++) {
-				for (int y = current.getY() - 1; y <= current.getY() + 2; y++) {
+		ArrayList<BlockPos> pos = new ArrayList<BlockPos>();
+		for (int x = current.getX() - radius; x <= current.getX() + radius; x++) {
+			for (int z = current.getZ() - radius; z <= current.getZ() + radius; z++) {
+				for (int y = current.getY() - radius; y <= current.getY() + radius; y++) {
 					final Block block = getBlock(x, y, z);
 					if (Block.isEqualTo(block, blockType)) {
-						pos = new BlockPos(x, y, z);
+						pos.add(new BlockPos(x, y, z));
 					}
 				}
 			}
@@ -586,6 +597,9 @@ public abstract class AIHelper {
 	 * @param z
 	 */
 	public void face(double x, double y, double z) {
+		face(x, y, z, 1, 1);
+	}
+	private void face(double x, double y, double z, float yawInfluence, float pitchInfluence) {
 		final double d0 = x - mc.thePlayer.posX;
 		final double d1 = z - mc.thePlayer.posZ;
 		final double d2 = y - mc.thePlayer.posY - mc.thePlayer.getEyeHeight();
@@ -598,10 +612,15 @@ public abstract class AIHelper {
 			final float yaw = (float) (Math.atan2(d1, d0) * 180.0D / Math.PI) - 90.0F;
 			final float pitch = (float) -(Math.atan2(d2,
 					Math.sqrt(d0 * d0 + d1 * d1)) * 180.0D / Math.PI);
-			mc.thePlayer.setAngles((yaw - rotationYaw) / 0.15f,
-					-(pitch - rotationPitch) / 0.15f);
+			float rotations = fullRotations(yaw - rotationYaw);
+			mc.thePlayer.setAngles(rotations / .15f + (yaw - rotationYaw - rotations) / 0.15f * yawInfluence,
+					-(pitch - rotationPitch) / 0.15f * pitchInfluence);
 			invalidateObjectMouseOver();
 		}
+	}
+	
+	private float fullRotations(float yaw) {
+		return (float) (((int)(yaw / (Math.PI * 2) )) * Math.PI * 2);
 	}
 
 	/*
@@ -807,9 +826,7 @@ public abstract class AIHelper {
 	/**
 	 * Faces a block and destroys it if possible.
 	 * 
-	 * @param x
-	 * @param y
-	 * @param z
+	 * @param pos the Position of that block.
 	 */
 	public void faceAndDestroy(final BlockPos pos) {
 		if (!isFacingBlock(pos)) {
@@ -1048,6 +1065,20 @@ public abstract class AIHelper {
 	}
 
 	/**
+	 * Presses the sneak key in the next game step.
+	 */
+	public void overrideSprint() {
+		if (resetSprintKey == null) {
+			resetSprintKey = mc.gameSettings.keyBindSprint;
+			// sneakKeyJustPressed |= resetSneakKey.getIsKeyPressed();
+		}
+		mc.gameSettings.keyBindSprint = new InteractAlways(
+				mc.gameSettings.keyBindSprint.getKeyDescription(), 504,
+				mc.gameSettings.keyBindSprint.getKeyCategory(),
+				!sprintKeyJustPressed);
+	}
+
+	/**
 	 * Restore all inputs to the default minecraft inputs.
 	 */
 	protected void resetAllInputs() {
@@ -1069,6 +1100,11 @@ public abstract class AIHelper {
 		if (resetSneakKey != null) {
 			mc.gameSettings.keyBindSneak = resetSneakKey;
 			resetSneakKey = null;
+		}
+		sprintKeyJustPressed = resetSprintKey != null;
+		if (resetSprintKey != null) {
+			mc.gameSettings.keyBindSprint = resetSprintKey;
+			resetSprintKey = null;
 		}
 	}
 
@@ -1185,7 +1221,7 @@ public abstract class AIHelper {
 		boolean arrived = distTo > MIN_DISTANCE_ERROR;
 		if (arrived) {
 			if (face) {
-				face(x, mc.thePlayer.getEyeHeight() + mc.thePlayer.posY, z);
+				face(x, mc.thePlayer.getEyeHeight() + mc.thePlayer.posY, z, 1, .1f);
 			}
 			double speed = 1;
 			if (distTo < 4 * WALK_PER_STEP) {
@@ -1204,8 +1240,10 @@ public abstract class AIHelper {
 			movement.moveStrafe = (float) (speed * strafe);
 			movement.jump = jump;
 			overrideMovement(movement);
-			if (distTo < 0.5) {
+			if (distTo < 0.5 || mc.thePlayer.isSprinting() && distTo < 0.8) {
 				overrideSneak();
+			} else if (distTo > 6) {
+				overrideSprint();
 			}
 			return false;
 		} else {
@@ -1310,4 +1348,12 @@ public abstract class AIHelper {
 		String blockName = domain + name.getResourcePath();
 		return blockName;
 	}
+	
+	public void setActiveMapReader(MapReader activeMapReader) {
+		if (this.activeMapReader != null) {
+			this.activeMapReader.onStop();
+		}
+		this.activeMapReader = activeMapReader;
+	}
+
 }

@@ -16,8 +16,10 @@
  *******************************************************************************/
 package net.famzangl.minecraft.minebot.ai.task.inventory;
 
+import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.ResourceLocation;
 
 /**
  * A simple (itemid, damagevalue) touple.
@@ -80,5 +82,32 @@ public class ItemWithSubtype {
 
 	public ItemWithSubtype withSubtype(int subtype) {
 		return new ItemWithSubtype(itemId, subtype);
+	}
+
+	public ItemWithSubtype withSubtype(String string) {
+		
+		int subtype;
+		if (string.matches("\\d{1,3}")) {
+			subtype = Integer.parseInt(string);
+			if (subtype >= 64) {
+				throw new IllegalArgumentException("Subtype " + subtype + " too big.");
+			}
+		} else {
+			throw new IllegalArgumentException("Could not parse subtype: " + string);
+		}
+		return withSubtype(subtype);
+	}
+	
+	/**
+	 * Convert a name to an item id. Always sets the subtype to 0.
+	 * @param name
+	 * @return
+	 */
+	public static ItemWithSubtype fromTypeName(String name) {
+		Item item = Item.getByNameOrId(name);
+		if (item == null) {
+			return null;
+		}
+		return new ItemWithSubtype(Item.getIdFromItem(item), 0);
 	}
 }

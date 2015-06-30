@@ -41,4 +41,8 @@ public class StringNameBuilder extends ParameterBuilder {
 		return arguments[0];
 	}
 
+	@Override
+	protected Class<?> getRequiredParameterClass() {
+		return String.class;
+	}
 }

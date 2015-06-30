@@ -46,4 +46,12 @@ public abstract class ParameterBuilder {
 	boolean isOptional() {
 		return annot != null && annot.optional();
 	}
+
+	public boolean isTypeValid(Class<?> class1) {
+		return class1.isAssignableFrom(getRequiredParameterClass());
+	}
+
+	protected Class<?> getRequiredParameterClass() {
+		throw new UnsupportedOperationException("No parameter class registered for " + getClass().getCanonicalName());
+	}
 }

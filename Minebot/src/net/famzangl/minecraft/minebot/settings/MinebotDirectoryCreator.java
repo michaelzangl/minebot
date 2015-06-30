@@ -52,7 +52,8 @@ public class MinebotDirectoryCreator {
 				.getCodeSource();
 		if (src != null) {
 			URL jar = src.getLocation();
-			if (jar.getFile().endsWith("class")) {
+			if (jar.getFile().endsWith("class") && !jar.getFile().contains(".jar!")) {
+				System.out.println("WARNING: Using the dev directory for settings.");
 				// We are in a dev enviroment.
 				return new File(new File(jar.getFile()).getParentFile(), "minebot");
 			}
@@ -91,7 +92,7 @@ public class MinebotDirectoryCreator {
 
 	private void extract(ZipInputStream zip, File copyTo) {
 		if (!copyTo.exists()) {
-			System.out.println("Extracting " + copyTo.getAbsolutePath());
+			System.out.println("Extracting minebot settings: " + copyTo.getAbsolutePath());
 
 			InputStream source = zip;
 			FileOutputStream destination = null;

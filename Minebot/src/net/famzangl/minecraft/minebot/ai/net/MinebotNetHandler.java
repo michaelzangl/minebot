@@ -18,6 +18,7 @@ package net.famzangl.minecraft.minebot.ai.net;
 
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+import scala.actors.threadpool.Arrays;
 import net.famzangl.minecraft.minebot.Pos;
 import net.famzangl.minecraft.minebot.ai.AIController;
 import net.famzangl.minecraft.minebot.ai.command.AIChatController;
@@ -32,6 +33,8 @@ import net.minecraft.network.Packet;
 import net.minecraft.network.play.INetHandlerPlayClient;
 import net.minecraft.network.play.client.C01PacketChatMessage;
 import net.minecraft.network.play.client.C14PacketTabComplete;
+import net.minecraft.network.play.server.S28PacketEffect;
+import net.minecraft.network.play.server.S29PacketSoundEffect;
 import net.minecraft.network.play.server.S2APacketParticles;
 import net.minecraft.network.play.server.S3APacketTabComplete;
 import net.minecraft.util.BlockPos;
@@ -102,10 +105,29 @@ public class MinebotNetHandler extends NetHandlerPlayClient {
 				double x = packetIn.getXCoordinate();
 				double y = packetIn.getYCoordinate();
 				double z = packetIn.getZCoordinate();
-				foundFishPositions.add(new BlockPos(x, y, z));
+				//foundFishPositions.add(new BlockPos(x, y, z));
+				//System.out.println("NetHandler: fish at " + new BlockPos(x, y, z) + ", packet: " + Arrays.toString(packetIn.getParticleArgs()) + "; " + packetIn.getParticleCount()+ "; " + packetIn.getXOffset()+ "; " + packetIn.getYOffset()+ "; " + packetIn.getZOffset());
 			}
 		}
 		super.handleParticles(packetIn);
+	}
+	
+	@Override
+	public void handleEffect(S28PacketEffect packetIn) {
+		super.handleEffect(packetIn);
+	}
+	
+	@Override
+	public void handleSoundEffect(S29PacketSoundEffect packetIn) {
+	    String name = packetIn.func_149212_c();
+		if ("random.splash".equals(name)) {
+			double x = packetIn.func_149207_d();
+			double y = packetIn.func_149211_e();
+			double z = packetIn.func_149210_f();
+			foundFishPositions.add(new BlockPos(x,y,z));
+			System.out.println("NetHandler: fish at " + new BlockPos(x,y,z));
+	}
+		super.handleSoundEffect(packetIn);
 	}
 
 	public boolean fishIsCaptured(Entity expectedPos) {
@@ -124,6 +146,7 @@ public class MinebotNetHandler extends NetHandlerPlayClient {
 	}
 
 	public void resetFishState() {
+		System.out.println("NetHandler: reset");
 		foundFishPositions.clear();
 	}
 }

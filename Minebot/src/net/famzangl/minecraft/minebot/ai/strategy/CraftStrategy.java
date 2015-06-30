@@ -78,28 +78,27 @@ public class CraftStrategy extends PathFinderStrategy {
 						}
 					}
 				}
-			} /*
-			 * else if (r instanceof ShapedOreRecipe) { ShapedOreRecipe
-			 * shapedRecipes = (ShapedOreRecipe) r; try { Field widthFiled =
-			 * ShapedOreRecipe.class .getDeclaredField("width");
-			 * widthFiled.setAccessible(true); int width =
-			 * widthFiled.getInt(shapedRecipes); for (int x = 0; x < width; x++)
-			 * { int height = shapedRecipes.getRecipeSize() / width; for (int y
-			 * = 0; y < height; y++) { Object itemStack =
-			 * shapedRecipes.getInput()[x + y width]; if (itemStack instanceof
-			 * ItemStack) { this.slots[x][y] = new ItemWithSubtype( (ItemStack)
-			 * itemStack); } else if (itemStack instanceof ArrayList) {
-			 * ArrayList list = (ArrayList) itemStack; this.slots[x][y] = new
-			 * ItemWithSubtype( (ItemStack) list.get(0)); } } } } catch
-			 * (NoSuchFieldException e) { throw new
-			 * IllegalArgumentException("Cannot access " + r); } catch
-			 * (SecurityException e) { throw new
-			 * IllegalArgumentException("Cannot access " + r); } catch
-			 * (IllegalAccessException e) { throw new
-			 * IllegalArgumentException("Cannot access " + r); }
-			 * 
-			 * }
-			 */else {
+			}
+//			  else if (r instanceof ShapedOreRecipe) { ShapedOreRecipe
+//			  shapedRecipes = (ShapedOreRecipe) r; try { Field widthFiled =
+//			  ShapedOreRecipe.class .getDeclaredField("width");
+//			  widthFiled.setAccessible(true); int width =
+//			  widthFiled.getInt(shapedRecipes); for (int x = 0; x < width; x++)
+//			  { int height = shapedRecipes.getRecipeSize() / width; for (int y
+//			  = 0; y < height; y++) { Object itemStack =
+//			  shapedRecipes.getInput()[x + y width]; if (itemStack instanceof
+//			  ItemStack) { this.slots[x][y] = new ItemWithSubtype( (ItemStack)
+//			  itemStack); } else if (itemStack instanceof ArrayList) {
+//			  ArrayList list = (ArrayList) itemStack; this.slots[x][y] = new
+//			  ItemWithSubtype( (ItemStack) list.get(0)); } } } } catch
+//			  (NoSuchFieldException e) { throw new
+//			  IllegalArgumentException("Cannot access " + r); } catch
+//			  (SecurityException e) { throw new
+//			  IllegalArgumentException("Cannot access " + r); } catch
+//			  (IllegalAccessException e) { throw new
+//			  IllegalArgumentException("Cannot access " + r); }
+//			  }
+			 else {
 				throw new IllegalArgumentException("Cannot (yet) craft " + r);
 			}
 		}
@@ -188,7 +187,7 @@ public class CraftStrategy extends PathFinderStrategy {
 					try {
 						possible.add(new CraftingPossibility(r));
 					} catch (IllegalArgumentException e) {
-						System.err.println("Cannot craft:" + r);
+						System.err.println("Cannot craft:" + e.getMessage());
 					}
 				}
 			}
@@ -297,6 +296,7 @@ public class CraftStrategy extends PathFinderStrategy {
 					possibilities);
 			if (grid == null) {
 				failed = true;
+				System.err.println("Could not find any way to craft this.");
 				//FIXME: Desync. Error.
 				return;
 			}

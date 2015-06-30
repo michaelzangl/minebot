@@ -29,7 +29,7 @@ import net.famzangl.minecraft.minebot.build.block.WoodType;
 
 @AICommand(helpText = "Gets wood", name = "minebot")
 public class CommandGetWood {
-	@AICommandInvocation(safeRule = SafeStrategyRule.DEFEND)
+	@AICommandInvocation(safeRule = SafeStrategyRule.DEFEND_MINING)
 	public static AIStrategy run(
 			AIHelper helper,
 			@AICommandParameter(type = ParameterType.FIXED, fixedName = "lumberjack", description = "") String nameArg,

@@ -85,11 +85,12 @@ public class ForBuildPathFinder extends MovePathFinder {
 			int z) {
 		final int cy = getY(currentNode);
 		final int max = canBuildUp ? 3 : 1;
+		int offsetAdd = 0;
 		for (int y = cy + 1; y <= cy + max; y++) {
 			if (!helper.isAirBlock(getX(currentNode), y + 1, getZ(currentNode))) {
 				break;
 			}
-			fill[offset++] = getNeighbour(currentNode, x, y, z);
+			fill[offset + offsetAdd++] = getNeighbour(currentNode, x, y, z);
 		}
 
 		if (helper.isAirBlock(x, cy + 1, z)) {
@@ -97,7 +98,7 @@ public class ForBuildPathFinder extends MovePathFinder {
 				if (!helper.isAirBlock(x, y, z)) {
 					break;
 				}
-				fill[offset++] = getNeighbour(currentNode, x, y, z);
+				fill[offset + offsetAdd++] = getNeighbour(currentNode, x, y, z);
 			}
 		}
 	}

@@ -36,4 +36,8 @@ public class AIHelperBuilder extends ParameterBuilder {
 		return helper;
 	}
 
+	@Override
+	protected Class<?> getRequiredParameterClass() {
+		return AIHelper.class;
+	}
 }

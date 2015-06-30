@@ -24,6 +24,7 @@ import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.BlockItemFilter;
 import net.famzangl.minecraft.minebot.ai.task.PlaceTorchSomewhereTask;
 import net.famzangl.minecraft.minebot.ai.task.SkipWhenSearchingPrefetch;
+import net.famzangl.minecraft.minebot.ai.task.TaskOperations;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.EnumFacing;
 
@@ -34,6 +35,7 @@ public class PlaceTorchIfLightBelowTask extends PlaceTorchSomewhereTask {
 			Blocks.torch);
 	private final Pos currentPos;
 	private final float torchLightLevel;
+	private boolean attempted;
 
 	public PlaceTorchIfLightBelowTask(Pos currentPos,
 			EnumFacing doNotPlaceAt, float torchLightLevel) {
@@ -55,8 +57,16 @@ public class PlaceTorchIfLightBelowTask extends PlaceTorchSomewhereTask {
 
 	@Override
 	public boolean isFinished(AIHelper h) {
-		return h.getLightAt(currentPos) > torchLightLevel
-				|| !h.canSelectItem(TORCH_FILTER) || super.isFinished(h);
+		return (!attempted && (h.getLightAt(currentPos) > torchLightLevel
+				|| !h.canSelectItem(TORCH_FILTER))) || super.isFinished(h);
 	}
+	
+	@Override
+	public void runTick(AIHelper h, TaskOperations o) {
+		attempted  = true;
+		super.runTick(h, o);
+	}
+	
+	
 
 }

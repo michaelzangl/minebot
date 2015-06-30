@@ -36,9 +36,10 @@ public class CommandTunnel {
 			AIHelper helper,
 			@AICommandParameter(type = ParameterType.FIXED, fixedName = "tunnel", description = "") String nameArg,
 			@AICommandParameter(type = ParameterType.ENUM, description = "direction", optional = true) EnumFacing inDirection,
+			@AICommandParameter(type = ParameterType.FIXED, fixedName = "branches", description = "add sideward branches", optional = true) String sidewardBranches,
 			@AICommandParameter(type = ParameterType.ENUM, description = "torch side", optional = true) TorchSide torches,
-			@AICommandParameter(type = ParameterType.NUMBER, description = "max length", optional = true) int length) {
-		return run(helper, nameArg, inDirection, 0, 0, torches, length);
+			@AICommandParameter(type = ParameterType.NUMBER, description = "max length", optional = true) Integer length) {
+		return run(helper, nameArg, inDirection, sidewardBranches != null ? -1 : 0, 0, torches, length);
 	}
 
 	@AICommandInvocation(safeRule = SafeStrategyRule.DEFEND_MINING)

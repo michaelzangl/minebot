@@ -64,10 +64,10 @@ public class MineScript {
 	 * @param commandLine
 	 * @throws UnknownCommandException
 	 */
-	public ScriptStrategy safeStrategy(String command, String... arguments)
+	public ScriptStrategy safeStrategy(String command, Object... arguments)
 			throws UnknownCommandException {
 		return new ScriptStrategy(AIChatController.getRegistry()
-				.evaluateCommandWithSaferule(waitForTick(), command, arguments));
+				.evaluateCommandWithSaferule(waitForTick(), command, toStringArray(arguments)));
 	}
 
 	/**
@@ -76,12 +76,21 @@ public class MineScript {
 	 * @param commandLine
 	 * @throws UnknownCommandException
 	 */
-	public ScriptStrategy strategy(String command, String... arguments)
+	public ScriptStrategy strategy(String command, Object... arguments)
 			throws UnknownCommandException {
 		return new ScriptStrategy(AIChatController.getRegistry()
-				.evaluateCommand(waitForTick(), command, arguments));
+				.evaluateCommand(waitForTick(), command, toStringArray(arguments)));
 	}
 	
+	private String[] toStringArray(Object[] arguments) {
+		String[] strs = new String[arguments.length];
+		for (int i = 0; i < arguments.length; i++) {
+			Object a = arguments[i];
+			strs[i] = a.toString();
+		}
+		return strs;
+	}
+
 	public ScriptStrategy strategyWalkTowards(double x, double z) {
 		return new ScriptStrategy(new WalkTowardsStrategy(x, z));
 	}

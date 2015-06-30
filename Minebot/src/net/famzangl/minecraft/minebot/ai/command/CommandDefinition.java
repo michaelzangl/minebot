@@ -115,11 +115,25 @@ public class CommandDefinition {
 		ArrayList<ParameterBuilder> builders = new ArrayList<ParameterBuilder>();
 		ArrayList<ArgumentDefinition> arguments = new ArrayList<ArgumentDefinition>();
 		ArrayList<Integer> parameterStarts = new ArrayList<Integer>();
+		
+		checkParameters(m, types, parameterAnnotations);
 
 		addParametersFromTo(list, m, types, parameterAnnotations, builders,
 				arguments, parameterStarts, 0);
 
 		return list;
+	}
+
+	private static void checkParameters(Method m, Class<?>[] types,
+			Annotation[][] parameterAnnotations) {
+		for (int i = 0; i < types.length; i++) {
+			ParameterBuilder param = getParameter(m, types, parameterAnnotations, i);
+			try {
+			param.isTypeValid(types[i]);}
+			catch (UnsupportedOperationException e) {
+				System.err.println("Cannot check parameters for " + m.getName() + ": " + e.getMessage());
+			}
+		}
 	}
 
 	private static void addParametersFromTo(ArrayList<CommandDefinition> list,
@@ -218,12 +232,21 @@ public class CommandDefinition {
 		} catch (final IllegalAccessException e) {
 			doThrow(e);
 		} catch (final IllegalArgumentException e) {
+			dumIAE(e, params);
 			doThrow(e);
 		} catch (final InvocationTargetException e) {
 			final Throwable exception = e.getTargetException();
 			doThrow(exception);
 		}
 		return null;
+	}
+
+	private void dumIAE(IllegalArgumentException e, Object[] params) {
+		System.err.println("There was an argument mismatch. This is what i attempted to use:");
+		for (Object p : params) {
+			System.out.println("   - " + p);
+		}
+		System.err.println("This is the method i attempted to use: " + method.toGenericString());
 	}
 
 	private void doThrow(Throwable exception) {

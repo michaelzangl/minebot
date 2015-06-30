@@ -43,6 +43,8 @@ public class PlaceTorchSomewhereTask extends AITask {
 	private final List<BlockPos> places;
 	private final EnumFacing[] preferedDirection;
 	private BlockPos lastAttempt;
+	
+	private int delayAfter;
 
 	private static class PosAndDir {
 		public final BlockPos place;
@@ -83,9 +85,23 @@ public class PlaceTorchSomewhereTask extends AITask {
 
 	@Override
 	public boolean isFinished(AIHelper h) {
+		return isImpossible(h) || (placeWasSuccessful(h) && delayAfter == 0);
+	}
+
+	private boolean isImpossible(AIHelper h) {
+		for (BlockPos p : places) {
+			if (h.isAirBlock(p)) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	private boolean placeWasSuccessful(AIHelper h) {
 		final PosAndDir place = getNextPlace(h);
-		return place == null || lastAttempt != null
+		boolean success = place == null || lastAttempt != null
 				&& Block.isEqualTo(h.getBlock(lastAttempt), Blocks.torch);
+		return success;
 	}
 
 	private PosAndDir getNextPlace(AIHelper h) {
@@ -115,6 +131,11 @@ public class PlaceTorchSomewhereTask extends AITask {
 
 	@Override
 	public void runTick(AIHelper h, TaskOperations o) {
+		if (delayAfter > 0) {
+			delayAfter--;
+			return;
+		}
+
 		final BlockItemFilter f = new BlockItemFilter(Blocks.torch);
 		if (!h.selectCurrentItem(f)) {
 			o.desync(new SelectTaskError(f));
@@ -125,6 +146,7 @@ public class PlaceTorchSomewhereTask extends AITask {
 		h.faceSideOf(placeOn, next.dir.getOpposite());
 		if (h.isFacingBlock(placeOn, next.dir.getOpposite())) {
 			h.overrideUseItem();
+			delayAfter = 10;
 		}
 		next.attemptsLeft--;
 		lastAttempt = next.place;

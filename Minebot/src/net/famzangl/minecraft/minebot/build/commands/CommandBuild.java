@@ -85,6 +85,12 @@ public class CommandBuild {
 			} else if (!alignSend) {
 				addTask(new AlignToGridTask(helper.getPlayerPosition()));
 				alignSend = true;
+			} else if (!task.isReadyForBuild(helper)) {
+				AIChatController
+				.addChatLine("There already is something at " + task.getForPosition() + ", skipping it.");
+				addTask(new NextTaskTask());
+				alignSend = false;
+				pathFinder = null;
 			} else if ((pos = isAroundSite(helper, task)) == null) {
 				if (pathFinder == null) {
 					pathFinder = new ForBuildPathFinder(task);
@@ -94,7 +100,7 @@ public class CommandBuild {
 					addTask(new WaitTask());
 				} else if (pathFinder.isNoPathFound()) {
 					AIChatController
-							.addChatLine("Cannot navigate to build task at "
+							.addChatLine("Cannot find a path to build task at "
 									+ task.getForPosition()
 									+ ". Trying to skip it.");
 				}

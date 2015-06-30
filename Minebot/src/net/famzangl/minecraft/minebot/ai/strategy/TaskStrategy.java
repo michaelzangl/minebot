@@ -48,6 +48,12 @@ public abstract class TaskStrategy extends AIStrategy implements
 
 	private final LinkedList<TaskError> lastErrors = new LinkedList<TaskError>();
 	private int taskTimeout;
+	
+	@Override
+	protected void onDeactivate(AIHelper helper) {
+		desync(new StringTaskError("An other strategy took over."));
+		super.onDeactivate(helper);
+	}
 
 	@Override
 	public void addTask(AITask task) {

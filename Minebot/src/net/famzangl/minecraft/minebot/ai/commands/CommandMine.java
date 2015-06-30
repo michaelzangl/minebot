@@ -25,6 +25,7 @@ import net.famzangl.minecraft.minebot.ai.command.AICommandParameter.BlockFilter;
 import net.famzangl.minecraft.minebot.ai.command.ParameterType;
 import net.famzangl.minecraft.minebot.ai.command.SafeStrategyRule;
 import net.famzangl.minecraft.minebot.ai.path.MineBySettingsPathFinder;
+import net.famzangl.minecraft.minebot.ai.path.MineNerbyPathFinder;
 import net.famzangl.minecraft.minebot.ai.path.MineSinglePathFinder;
 import net.famzangl.minecraft.minebot.ai.path.OrebfuscatedMinePathFinder;
 import net.famzangl.minecraft.minebot.ai.strategy.AIStrategy;
@@ -74,7 +75,18 @@ public class CommandMine {
 			@AICommandParameter(type = ParameterType.FIXED, fixedName = "orebfuscated", description = "") String orebfuscated) {
 		return new PathFinderStrategy(new OrebfuscatedMinePathFinder(
 				helper.getLookDirection(), helper.getPlayerPosition().getY()),
-				"Mining ores");
+				"Mining ores (orebfuscated)");
+	}
+
+
+	@AICommandInvocation(safeRule = SafeStrategyRule.DEFEND_MINING)
+	public static AIStrategy runNearby(
+			AIHelper helper,
+			@AICommandParameter(type = ParameterType.FIXED, fixedName = "mine", description = "") String nameArg,
+			@AICommandParameter(type = ParameterType.FIXED, fixedName = "nearby", description = "") String orebfuscated) {
+		return new PathFinderStrategy(new MineNerbyPathFinder(
+				helper.getLookDirection()),
+				"Mining nearby ores");
 	}
 
 }

@@ -17,6 +17,7 @@
 package net.famzangl.minecraft.minebot.ai.path;
 
 import net.famzangl.minecraft.minebot.ai.BlockWhitelist;
+import net.famzangl.minecraft.minebot.ai.task.DestroyInRangeTask;
 import net.famzangl.minecraft.minebot.ai.task.MineBlockTask;
 import net.famzangl.minecraft.minebot.ai.task.WaitTask;
 import net.famzangl.minecraft.minebot.ai.task.place.PlantSaplingTask;
@@ -81,6 +82,7 @@ public class TreePathFinder extends MovePathFinder {
 				mineAbove = i;
 			}
 		}
+		int max = 0;
 		for (int i = 2; i <= mineAbove; i++) {
 			if (!helper.hasSafeSides(currentPos.getX(), currentPos.getY() + i,
 					currentPos.getZ())
@@ -90,11 +92,15 @@ public class TreePathFinder extends MovePathFinder {
 			}
 			if (!helper
 					.isAirBlock(currentPos.getX(), currentPos.getY() + i, currentPos.getZ())) {
-				addTask(new MineBlockTask(currentPos.add(0,i,0)));
+				max = i;
 			}
 		}
+		if (max > 0) {
+			addTask(new DestroyInRangeTask(currentPos.add(0,2,0), currentPos.add(0,max,0)));
+		}
+		
 		if (replant) {
-			addTask(new PlantSaplingTask(currentPos));
+			addTask(new PlantSaplingTask(currentPos, type));
 		}
 		addTask(new WaitTask(mineAbove * 2));
 	}

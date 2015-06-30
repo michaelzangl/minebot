@@ -17,6 +17,7 @@
 package net.famzangl.minecraft.minebot.build.block;
 
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockPlanks.EnumType;
 import net.minecraft.init.Blocks;
 
 /**
@@ -27,19 +28,20 @@ import net.minecraft.init.Blocks;
  *
  */
 public enum WoodType {
-	OAK(Blocks.log, 0),
-	SPRUCE(Blocks.log, 1),
-	BIRCH(Blocks.log, 2),
-	JUNGLE(Blocks.log, 3),
-	ACACIA(Blocks.log2, 0),
-	DARK_OAK(Blocks.log2, 1);
+	OAK(Blocks.log, 0, EnumType.OAK),
+	SPRUCE(Blocks.log, 1, EnumType.SPRUCE),
+	BIRCH(Blocks.log, 2, EnumType.BIRCH),
+	JUNGLE(Blocks.log, 3, EnumType.JUNGLE),
+	ACACIA(Blocks.log2, 0, EnumType.ACACIA),
+	DARK_OAK(Blocks.log2, 1, EnumType.DARK_OAK);
 
 	public final Block block;
 	public final int lowerBits;
+	public final EnumType plankType;
 
-	private WoodType(Block block, int lowerBits) {
+	private WoodType(Block block, int lowerBits, EnumType plankType) {
 		this.block = block;
 		this.lowerBits = lowerBits;
-
+		this.plankType = plankType;
 	}
 }

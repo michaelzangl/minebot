@@ -17,6 +17,7 @@
 package net.famzangl.minecraft.minebot.ai.utils;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 
 import net.minecraft.item.ItemStack;
 
@@ -44,8 +45,14 @@ public final class PrivateFieldUtils {
 	 */
 	public static <T> T getFieldValue(Object o, Class<?> baseClass,
 			Class<T> fieldType) {
+		if (o == null) {
+			throw new NullPointerException();
+		}
+		if (!baseClass.isAssignableFrom(o.getClass())) {
+			throw new IllegalArgumentException("Got a " + o.getClass().getName() + " but expected a " + baseClass.getName());
+		}
 		for (Field f : baseClass.getDeclaredFields()) {
-			if (typeEquals(f.getType(), fieldType)) {
+			if (typeEquals(f.getType(), fieldType) && !Modifier.isStatic(f.getModifiers())) {
 				f.setAccessible(true);
 				try {
 					return (T) f.get(o);

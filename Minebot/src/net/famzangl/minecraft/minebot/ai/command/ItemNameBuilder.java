@@ -23,41 +23,40 @@ import java.util.Set;
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.command.AICommandParameter.AnyBlockFilter;
 import net.famzangl.minecraft.minebot.ai.command.AICommandParameter.BlockFilter;
+import net.famzangl.minecraft.minebot.ai.task.inventory.ItemWithSubtype;
 import net.minecraft.block.Block;
+import net.minecraft.item.Item;
+import net.minecraft.util.RegistryNamespaced;
 import net.minecraft.util.ResourceLocation;
 
-public class BlockNameBuilder extends ParameterBuilder {
+/**
+ * Builds the name for an item.
+ * <p>
+ * The following names are recognized:
+ * <ul>
+ * <li>wool : Any dirt block.
+ * <li>35 : Any dirt block.
+ * <li>wool:red : Red wool block
+ * <li>wool:14 : Red wool block
+ * <li>35:14 : Red wool block
+ * </ul>
+ * 
+ * @author michael
+ *
+ */
+public class ItemNameBuilder extends ParameterBuilder {
 
-	public static String toString(ResourceLocation l) {
-		return l.getResourceDomain() + ":" + l.getResourcePath();
-	}
-
-	private final static class BlockArgumentDefinition extends
+	private final static class ItemArgumentDefinition extends
 			ArgumentDefinition {
 
-		private final BlockFilter blockFilter;
-
-		public BlockArgumentDefinition(String description,
-				Class<? extends BlockFilter> blockFilterClass) {
-			super("Block", description);
-			BlockFilter blockFilter;
-			try {
-				blockFilter = blockFilterClass.newInstance();
-			} catch (InstantiationException e) {
-				e.printStackTrace();
-				blockFilter = new AnyBlockFilter();
-			} catch (IllegalAccessException e) {
-				e.printStackTrace();
-				blockFilter = new AnyBlockFilter();
-			}
-			this.blockFilter = blockFilter;
+		public ItemArgumentDefinition(String description) {
+			super("Item", description);
 		}
 
 		@Override
 		public boolean couldEvaluateAgainst(String string) {
-			final Object block = Block.blockRegistry
-					.getObject(new ResourceLocation(string));
-			return block != null && blockFilter.matches((Block) block);
+			final ItemWithSubtype item = parse(string);
+			return item != null;
 		}
 
 		@Override
@@ -65,17 +64,14 @@ public class BlockNameBuilder extends ParameterBuilder {
 				Collection<String> addTo) {
 			super.getTabCompleteOptions(currentStart, addTo);
 			@SuppressWarnings("unchecked")
-			final Set<ResourceLocation> keys = Block.blockRegistry.getKeys();
+			final Set<ResourceLocation> keys = Item.itemRegistry.getKeys();
 			for (final ResourceLocation k : keys) {
-				final Object block = Block.blockRegistry.getObject(k);
-				if (blockFilter.matches((Block) block)) {
-					if (k.getResourceDomain().equals(MINECRAFT_PREFIX)) {
-						final String subKey = k.getResourcePath();
-						addKey(currentStart, addTo, subKey);
-					} else {
-						addKey(currentStart, addTo,
-								BlockNameBuilder.toString(k));
-					}
+				final Object block = Item.itemRegistry.getObject(k);
+				if (k.getResourceDomain().equals(MINECRAFT_PREFIX)) {
+					final String subKey = k.getResourcePath();
+					addKey(currentStart, addTo, subKey);
+				} else {
+					addKey(currentStart, addTo, BlockNameBuilder.toString(k));
 				}
 			}
 		}
@@ -90,29 +86,60 @@ public class BlockNameBuilder extends ParameterBuilder {
 
 	private static final String MINECRAFT_PREFIX = "minecraft";
 
-	public BlockNameBuilder(AICommandParameter annot) {
+	public ItemNameBuilder(AICommandParameter annot) {
 		super(annot);
 	}
 
 	@Override
 	public void addArguments(ArrayList<ArgumentDefinition> list) {
-		list.add(new BlockArgumentDefinition(annot.description(), annot
-				.blockFilter()));
+		list.add(new ItemArgumentDefinition(annot.description()));
 	}
 
 	@Override
 	public Object getParameter(AIHelper helper, String[] arguments) {
-		final Object block = Block.blockRegistry.getObject(arguments[0]);
+		final Object block = parse(arguments[0]);
 		if (block == null) {
-			throw new CommandEvaluationException("Block " + arguments[0]
+			throw new CommandEvaluationException("Item " + arguments[0]
 					+ " is unknown");
 		}
 		return block;
 	}
 
-	@Override
-	protected Class<?> getRequiredParameterClass() {
-		return Block.class;
+	public static ItemWithSubtype parse(String string) {
+		String[] parts = string.split(":");
+
+		ItemWithSubtype item;
+		// if (parts[0].matches("\\d{1,4}")) {
+		// item = new ItemWithSubtype(Integer.parseInt(parts[0]), 0);
+		// } else {
+		item = ItemWithSubtype.fromTypeName(parts[0]);
+		if (item == null) {
+			if (parts.length == 2) {
+				parts = new String[] { parts[0] + ":" + parts[1] };
+			} else if (parts.length == 3) {
+				parts = new String[] { parts[0] + ":" + parts[1], parts[2] };
+			} else {
+				return null;
+			}
+			item = ItemWithSubtype.fromTypeName(parts[0]);
+			if (item == null) {
+				return null;
+			}
+		}
+		// }
+
+		if (parts.length > 2) {
+			return null;
+		} else if (parts.length > 1) {
+			// Subtype
+			return item.withSubtype(parts[1]);
+		} else {
+			return item;
+		}
 	}
 
+	@Override
+	protected Class<?> getRequiredParameterClass() {
+		return ItemWithSubtype.class;
+	}
 }

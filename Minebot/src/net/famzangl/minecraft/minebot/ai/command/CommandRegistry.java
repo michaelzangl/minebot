@@ -115,7 +115,7 @@ public class CommandRegistry {
 	private void checkCommandClass(Class<?> commandClass) {
 		if (!commandClass.isAnnotationPresent(AICommand.class)) {
 			throw new IllegalArgumentException(
-					"AICommand is not set for this class.");
+					"AICommand is not set for the class " + commandClass.getName() + ".");
 		}
 	}
 

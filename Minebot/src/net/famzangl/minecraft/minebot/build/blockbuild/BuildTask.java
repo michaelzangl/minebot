@@ -185,4 +185,8 @@ public abstract class BuildTask {
 	public abstract BuildTask withPositionAndRotation(BlockPos add, int rotateSteps,
 			MirrorDirection mirror);
 
+	public boolean isReadyForBuild(AIHelper helper) {
+		return helper.isAirBlock(getForPosition());
+	}
+
 }

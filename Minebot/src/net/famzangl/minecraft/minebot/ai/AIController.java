@@ -29,6 +29,7 @@ import net.famzangl.minecraft.minebot.ai.render.BuildMarkerRenderer;
 import net.famzangl.minecraft.minebot.ai.render.PosMarkerRenderer;
 import net.famzangl.minecraft.minebot.ai.strategy.AIStrategy;
 import net.famzangl.minecraft.minebot.ai.strategy.AIStrategy.TickResult;
+import net.famzangl.minecraft.minebot.map.MapReader;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.gui.ScaledResolution;
@@ -38,7 +39,10 @@ import net.minecraft.init.Items;
 import net.minecraft.util.MouseHelper;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.common.FMLCommonHandler;
+import net.minecraftforge.fml.common.eventhandler.Event;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerChangedDimensionEvent;
+import net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerRespawnEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent.Phase;
 import net.minecraftforge.fml.common.gameevent.TickEvent.RenderTickEvent;
@@ -102,7 +106,7 @@ public class AIController extends AIHelper implements IAIControllable {
 	private MouseHelper oldMouseHelper;
 
 	private BuildMarkerRenderer buildMarkerRenderer;
-
+	
 	public AIController() {
 		AIChatController.getRegistry().setControlled(this);
 	}
@@ -166,8 +170,12 @@ public class AIController extends AIHelper implements IAIControllable {
 				strategyDescr = "";
 			}
 		}
+		
+		if (activeMapReader != null) {
+			activeMapReader.tick(this);
+		}
 	}
-
+	
 	private void deactivateCurrentStrategy() {
 		if (currentStrategy != null) {
 			currentStrategy.setActive(false, this);
@@ -255,16 +263,19 @@ public class AIController extends AIHelper implements IAIControllable {
 		}
 	}
 
-	// FIXME: Find alternative
-	// @SubscribeEvent
-	// public void resetOnGameEnd(GuiOpenEvent unload) {
-	// if (unload.gui instanceof GuiMainMenu) {
-	// System.out.println("Unloading world.");
-	// dead = true;
-	// buildManager.reset();
-	// }
-	// }
+	@SubscribeEvent
+	public void resetOnGameEnd(PlayerChangedDimensionEvent unload) {
+		System.out.println("Unloading world.");
+		dead = true;
+		buildManager.reset();
+		setActiveMapReader(null);
+	}
 
+	@SubscribeEvent
+	public void resetOnGameEnd2(PlayerRespawnEvent unload) {
+		resetOnGameEnd(null);
+	}
+	
 	/**
 	 * Draws the position markers.
 	 * 
@@ -346,6 +357,7 @@ public class AIController extends AIHelper implements IAIControllable {
 	// }
 	// }
 	// }
+	
 	public void initialize() {
 		FMLCommonHandler.instance().bus().register(this);
 

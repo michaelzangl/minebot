@@ -16,6 +16,7 @@
  *******************************************************************************/
 package net.famzangl.minecraft.minebot.ai.command;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 
 import net.famzangl.minecraft.minebot.ai.AIHelper;
@@ -46,5 +47,14 @@ public class NumberNameBuilder extends ParameterBuilder {
 	public Object getParameter(AIHelper helper, String[] arguments) {
 		return Integer.parseInt(arguments[0]);
 	}
+	
+	@Override
+	public boolean isTypeValid(Class<?> class1) {
+		return super.isTypeValid(class1) || (class1 == Integer.TYPE && !isOptional());
+	}
 
+	@Override
+	protected Class<?> getRequiredParameterClass() {
+		return Integer.class;
+	}
 }

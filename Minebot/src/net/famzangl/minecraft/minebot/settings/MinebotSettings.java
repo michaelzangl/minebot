@@ -72,6 +72,7 @@ public class MinebotSettings {
 
 	public static File getDataDir() {
 		File dir = new File(Minecraft.getMinecraft().mcDataDir, "minebot");
+		System.out.println("Data directory: " + dir);
 		if (!dir.isDirectory()) {
 			try {
 				return new MinebotDirectoryCreator().createDirectory(dir);

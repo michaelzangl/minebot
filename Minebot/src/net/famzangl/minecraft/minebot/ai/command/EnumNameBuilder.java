@@ -73,5 +73,10 @@ public class EnumNameBuilder<T extends Enum<T>> extends ParameterBuilder {
 	public Object getParameter(AIHelper helper, String[] arguments) {
 		return Enum.valueOf(enumClass, arguments[0].toUpperCase());
 	}
+	
+	@Override
+	protected Class<?> getRequiredParameterClass() {
+		return enumClass;
+	}
 
 }

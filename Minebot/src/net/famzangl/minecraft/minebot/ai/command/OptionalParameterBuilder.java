@@ -34,5 +34,4 @@ public class OptionalParameterBuilder extends ParameterBuilder {
 	public Object getParameter(AIHelper helper, String[] arguments) {
 		return null;
 	}
-
 }

@@ -164,7 +164,7 @@ public abstract class MinePathfinder extends MovePathFinder {
 		}
 	}
 
-	private boolean isOreBlock(int x, int y, int z) {
+	protected final boolean isOreBlock(int x, int y, int z) {
 		return factors.getForBlock(helper.getBlockId(x, y, z)) > 0;
 	}
 

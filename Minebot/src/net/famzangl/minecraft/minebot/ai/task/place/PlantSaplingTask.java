@@ -19,7 +19,11 @@ package net.famzangl.minecraft.minebot.ai.task.place;
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.BlockItemFilter;
 import net.famzangl.minecraft.minebot.ai.BlockWhitelist;
+import net.famzangl.minecraft.minebot.build.block.WoodType;
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockSapling;
 import net.minecraft.init.Blocks;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.BlockPos;
 
 /**
@@ -30,11 +34,29 @@ import net.minecraft.util.BlockPos;
  */
 public class PlantSaplingTask extends PlaceBlockAtFloorTask {
 
+	private static final class SaplingFilter extends BlockItemFilter {
+		private WoodType type;
+
+		private SaplingFilter(WoodType type) {
+			super(Blocks.sapling);
+			this.type = type;
+		}
+		
+		@Override
+		public boolean matches(ItemStack itemStack) {
+			return super.matches(itemStack) && isOfWood(itemStack);
+		}
+
+		private boolean isOfWood(ItemStack itemStack) {
+			return type == null || itemStack.getItemDamage() == type.plankType.getMetadata();
+		}
+	}
+
 	private final static BlockWhitelist PLANTABLE = new BlockWhitelist(
 			Blocks.dirt, Blocks.grass);
 
-	public PlantSaplingTask(BlockPos pos) {
-		super(pos, new BlockItemFilter(Blocks.sapling));
+	public PlantSaplingTask(BlockPos pos, WoodType type) {
+		super(pos, new SaplingFilter(type));
 	}
 
 	@Override
@@ -46,4 +68,8 @@ public class PlantSaplingTask extends PlaceBlockAtFloorTask {
 		return super.isFinished(h);
 	}
 
+	@Override
+	public String toString() {
+		return "PlantSaplingTask []";
+	}
 }

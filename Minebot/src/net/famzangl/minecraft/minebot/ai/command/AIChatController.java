@@ -18,8 +18,11 @@ package net.famzangl.minecraft.minebot.ai.command;
 
 import java.util.List;
 
+import javax.activation.CommandMap;
+
 import net.famzangl.minecraft.minebot.ai.commands.CommandBuildWay;
 import net.famzangl.minecraft.minebot.ai.commands.CommandCraft;
+import net.famzangl.minecraft.minebot.ai.commands.CommandDumpSigns;
 import net.famzangl.minecraft.minebot.ai.commands.CommandEat;
 import net.famzangl.minecraft.minebot.ai.commands.CommandEnchant;
 import net.famzangl.minecraft.minebot.ai.commands.CommandFeed;
@@ -31,6 +34,7 @@ import net.famzangl.minecraft.minebot.ai.commands.CommandKill;
 import net.famzangl.minecraft.minebot.ai.commands.CommandMine;
 import net.famzangl.minecraft.minebot.ai.commands.CommandPause;
 import net.famzangl.minecraft.minebot.ai.commands.CommandPlant;
+import net.famzangl.minecraft.minebot.ai.commands.CommandRenderMap;
 import net.famzangl.minecraft.minebot.ai.commands.CommandRespawn;
 import net.famzangl.minecraft.minebot.ai.commands.CommandLoad;
 import net.famzangl.minecraft.minebot.ai.commands.CommandShear;
@@ -96,6 +100,10 @@ public class AIChatController {
 		registerCommand(CommandFish.class);
 		registerCommand(CommandSit.class);
 		registerCommand(CommandFeed.class);
+		
+		registerCommand(CommandDumpSigns.class);
+		registerCommand(CommandRenderMap.class);
+
 
 		registerCommand(CommandBuild.class);
 		registerCommand(CommandClearArea.class);
