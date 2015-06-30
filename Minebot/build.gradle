@@ -16,6 +16,9 @@ buildscript {
 }
 
 apply plugin: 'fml'
+apply plugin 'java'
+compileJava.options.encoding = 'UTF-8'
+
 
 minecraft {
     version = "1.8-8.0.16.1021-1.8"
