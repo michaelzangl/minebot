@@ -16,7 +16,7 @@ buildscript {
 }
 
 apply plugin: 'fml'
-apply plugin 'java'
+apply plugin: 'java'
 compileJava.options.encoding = 'UTF-8'
 
 
