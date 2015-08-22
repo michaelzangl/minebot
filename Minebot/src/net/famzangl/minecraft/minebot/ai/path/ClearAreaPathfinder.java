@@ -22,6 +22,7 @@ import java.util.LinkedList;
 import net.famzangl.minecraft.minebot.Pos;
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSet;
+import net.famzangl.minecraft.minebot.ai.path.world.BlockSets;
 import net.famzangl.minecraft.minebot.ai.path.world.WorldData;
 import net.famzangl.minecraft.minebot.ai.task.DestroyInRangeTask;
 import net.minecraft.init.Blocks;
@@ -122,6 +123,10 @@ public class ClearAreaPathfinder extends MovePathFinder {
 			if (pos.getY() <= maxPos.getY()) {
 				top = pos;
 			}
+		}
+		// avoid gravel/...
+		while (!BlockSets.SAFE_CEILING.isAt(world, top) && top.getY() > currentPos.getY() + 1) {
+			top = top.add(0, -1, 0);
 		}
 		addTask(new DestroyInRangeTask(currentPos, top));
 	}
