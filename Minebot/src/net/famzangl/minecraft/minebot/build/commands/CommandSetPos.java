@@ -41,7 +41,7 @@ public class CommandSetPos {
 	public static AIStrategy run2(
 			AIHelper helper,
 			@AICommandParameter(type = ParameterType.FIXED, fixedName = "pos2", description = "") String nameArg,
-			@AICommandParameter(type = ParameterType.POSITION, description = "The position", optional = true) Pos pos) {
+			@AICommandParameter(type = ParameterType.POSITION, description = "The position", optional = true) BlockPos pos) {
 		setPos(helper, pos, true);
 		return null;
 	}
