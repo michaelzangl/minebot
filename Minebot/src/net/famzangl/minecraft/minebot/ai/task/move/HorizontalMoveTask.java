@@ -20,11 +20,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.famzangl.minecraft.minebot.ai.AIHelper;
-import net.famzangl.minecraft.minebot.ai.BlockWhitelist;
+import net.famzangl.minecraft.minebot.ai.path.world.BlockSet;
+import net.famzangl.minecraft.minebot.ai.path.world.BlockSets;
+import net.famzangl.minecraft.minebot.ai.path.world.WorldData;
+import net.famzangl.minecraft.minebot.ai.path.world.WorldWithDelta;
 import net.famzangl.minecraft.minebot.ai.task.AITask;
 import net.famzangl.minecraft.minebot.ai.task.CanPrefaceAndDestroy;
 import net.famzangl.minecraft.minebot.ai.task.TaskOperations;
-import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.BlockPos;
 
@@ -35,8 +37,7 @@ import net.minecraft.util.BlockPos;
  *
  */
 public class HorizontalMoveTask extends AITask implements CanPrefaceAndDestroy {
-	private static final BlockWhitelist hardBlocks = new BlockWhitelist(
-			Blocks.obsidian);
+	private static final BlockSet hardBlocks = new BlockSet(Blocks.obsidian);
 	static final int OBSIDIAN_TIME = 10 * 20;
 	protected final BlockPos pos;
 	private boolean hasObsidianLower;
@@ -53,16 +54,15 @@ public class HorizontalMoveTask extends AITask implements CanPrefaceAndDestroy {
 
 	@Override
 	public void runTick(AIHelper h, TaskOperations o) {
-		Block upper = h.getBlock(pos.add(0, 1, 0));
-		if (!h.canWalkThrough(upper)) {
-			if (hardBlocks.contains(upper)) {
+		if (needDestroyHead(h.getWorld())) {
+			BlockPos upper = pos.add(0, 1, 0);
+			if (hardBlocks.isAt(h.getWorld(), upper)) {
 				hasObsidianUpper = true;
 			}
 			h.faceAndDestroyWithHangingBlock(pos.add(0, 1, 0));
 		} else {
-			Block lower = h.getBlock(pos);
-			if (!h.canWalkOn(lower)) {
-				if (hardBlocks.contains(lower)) {
+			if (needDestroyFoot(h.getWorld())) {
+				if (hardBlocks.isAt(h.getWorld(), pos)) {
 					hasObsidianLower = true;
 				}
 				h.faceAndDestroyWithHangingBlock(pos);
@@ -74,12 +74,12 @@ public class HorizontalMoveTask extends AITask implements CanPrefaceAndDestroy {
 		}
 	}
 
-	@Override
-	public int getGameTickTimeout() {
-		return super.getGameTickTimeout()
-				+ (hasObsidianLower ? OBSIDIAN_TIME : 0)
-				+ (hasObsidianUpper ? OBSIDIAN_TIME : 0);
-	}
+//	@Override
+//	public int getGameTickTimeout(AIHelper helper) {
+//		return super.getGameTickTimeout(helper)
+//				+ (hasObsidianLower ? OBSIDIAN_TIME : 0)
+//				+ (hasObsidianUpper ? OBSIDIAN_TIME : 0);
+//	}
 
 	protected boolean doJump(AIHelper h) {
 		return false;
@@ -93,12 +93,33 @@ public class HorizontalMoveTask extends AITask implements CanPrefaceAndDestroy {
 	@Override
 	public List<BlockPos> getPredestroyPositions(AIHelper helper) {
 		final ArrayList<BlockPos> arrayList = new ArrayList<BlockPos>();
-		if (!helper.canWalkThrough(helper.getBlock(pos.add(0, 1, 0)))) {
+		WorldData world = helper.getWorld();
+		if (needDestroyHead(world)) {
 			arrayList.add(pos.add(0, 1, 0));
 		}
-		if (!helper.canWalkOn(helper.getBlock(pos))) {
+		if (needDestroyFoot(world)) {
 			arrayList.add(pos);
 		}
 		return arrayList;
+	}
+
+	private boolean needDestroyFoot(WorldData world) {
+		return !BlockSets.FEET_CAN_WALK_THROUGH.isAt(world, pos);
+	}
+
+	private boolean needDestroyHead(WorldData world) {
+		return !BlockSets.HEAD_CAN_WALK_TRHOUGH.isAt(world, pos.add(0, 1, 0));
+	}
+
+	@Override
+	public boolean applyToDelta(WorldWithDelta world) {
+		if (needDestroyHead(world)) {
+			world.setBlock(pos.add(0, 1, 0), Blocks.air);
+		}
+		if (needDestroyFoot(world)) {
+			world.setBlock(pos, Blocks.air);
+		}
+		world.setPlayerPosition(pos);
+		return true;
 	}
 }

@@ -40,7 +40,7 @@ public class ThrowFishingRodTask extends AITask {
 	}
 	
 	@Override
-	public int getGameTickTimeout() {
+	public int getGameTickTimeout(AIHelper helper) {
 		return 950;
 	}
 

@@ -17,9 +17,8 @@
 package net.famzangl.minecraft.minebot.ai.net;
 
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.CopyOnWriteArrayList;
 
-import scala.actors.threadpool.Arrays;
-import net.famzangl.minecraft.minebot.Pos;
 import net.famzangl.minecraft.minebot.ai.AIController;
 import net.famzangl.minecraft.minebot.ai.command.AIChatController;
 import net.famzangl.minecraft.minebot.ai.utils.PrivateFieldUtils;
@@ -33,20 +32,27 @@ import net.minecraft.network.Packet;
 import net.minecraft.network.play.INetHandlerPlayClient;
 import net.minecraft.network.play.client.C01PacketChatMessage;
 import net.minecraft.network.play.client.C14PacketTabComplete;
+import net.minecraft.network.play.server.S21PacketChunkData;
+import net.minecraft.network.play.server.S23PacketBlockChange;
+import net.minecraft.network.play.server.S24PacketBlockAction;
+import net.minecraft.network.play.server.S26PacketMapChunkBulk;
 import net.minecraft.network.play.server.S28PacketEffect;
 import net.minecraft.network.play.server.S29PacketSoundEffect;
 import net.minecraft.network.play.server.S2APacketParticles;
 import net.minecraft.network.play.server.S3APacketTabComplete;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumParticleTypes;
+import net.minecraft.world.ChunkCoordIntPair;
 
 import com.mojang.authlib.GameProfile;
 
-public class MinebotNetHandler extends NetHandlerPlayClient {
+public class MinebotNetHandler extends NetHandlerPlayClient implements NetworkHelper {
 	private static final double MAX_FISH_DISTANCE = 10;
 
 	private final ConcurrentLinkedQueue<BlockPos> foundFishPositions = new ConcurrentLinkedQueue<BlockPos>();
 
+	private final CopyOnWriteArrayList<ChunkListener> listeners = new CopyOnWriteArrayList<ChunkListener>();
+	
 	public MinebotNetHandler(Minecraft mcIn, GuiScreen p_i46300_2_,
 			NetworkManager p_i46300_3_, GameProfile p_i46300_4_) {
 		super(mcIn, p_i46300_2_, p_i46300_3_, p_i46300_4_);
@@ -82,19 +88,25 @@ public class MinebotNetHandler extends NetHandlerPlayClient {
 		super.handleTabComplete(packetIn);
 	}
 
-	public static void inject(AIController aiController,
+	public static NetworkHelper inject(AIController aiController,
 			NetworkManager manager, INetHandlerPlayClient oldHandler) {
 		NetHandlerPlayClient netHandler = (NetHandlerPlayClient) oldHandler;
-		if (netHandler != null && netHandler instanceof NetHandlerPlayClient
-				&& !(netHandler instanceof MinebotNetHandler)) {
+		if (netHandler != null && netHandler instanceof NetHandlerPlayClient) {
+			
+			if(!(netHandler instanceof MinebotNetHandler)) {
 			GuiScreen screen = PrivateFieldUtils.getFieldValue(netHandler,
 					NetHandlerPlayClient.class, GuiScreen.class);
-			INetHandler handler = new MinebotNetHandler(
+			MinebotNetHandler handler = new MinebotNetHandler(
 					aiController.getMinecraft(), screen,
 					netHandler.getNetworkManager(), netHandler.getGameProfile());
 			netHandler.getNetworkManager().setNetHandler(handler);
 			System.out.println("Minebot network handler injected.");
+			return handler;
+			} else {
+				return (NetworkHelper) netHandler;
+			}
 		}
+		return null;
 	}
 
 	@Override
@@ -148,5 +160,58 @@ public class MinebotNetHandler extends NetHandlerPlayClient {
 	public void resetFishState() {
 		System.out.println("NetHandler: reset");
 		foundFishPositions.clear();
+	}
+	
+	@Override
+	public void handleChunkData(S21PacketChunkData packetIn) {
+		int x = packetIn.func_149273_e();
+		int z  = packetIn.func_149276_g();
+		fireChunkChange(x, z);
+		super.handleChunkData(packetIn);
+	}
+	
+	@Override
+	public void handleMapChunkBulk(S26PacketMapChunkBulk packetIn) {
+	    for (int i = 0; i < packetIn.func_149254_d(); ++i)
+	    {
+	        int x = packetIn.func_149255_a(i);
+	        int y = packetIn.func_149253_b(i);
+	        fireChunkChange(x, y);
+	    }
+		super.handleMapChunkBulk(packetIn);
+	}
+
+	@Override
+	public void handleBlockChange(S23PacketBlockChange packetIn) {
+		blockChange(packetIn.func_179827_b());
+		super.handleBlockChange(packetIn);
+	}
+	
+	@Override
+	public void handleBlockAction(S24PacketBlockAction packetIn) {
+		blockChange(packetIn.func_179825_a());
+		super.handleBlockAction(packetIn);
+	}
+
+	private void blockChange(BlockPos pos) {
+		int chunkPosX = pos.getX() >> 4;
+		int chunkPosZ = pos.getZ() >> 4;
+		fireChunkChange(chunkPosX, chunkPosZ);
+	}
+
+	private void fireChunkChange(int chunkPosX, int chunkPosZ) {
+		for (ChunkListener l : listeners) {
+			l.chunkChanged(chunkPosX, chunkPosZ);
+		}
+	}
+
+	@Override
+	public void addChunkChangeListener(ChunkListener l) {
+		listeners.add(l);
+	}
+
+	@Override
+	public void removeChunkChangeListener(ChunkListener l) {
+		listeners.remove(l);
 	}
 }

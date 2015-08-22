@@ -25,11 +25,11 @@ import net.famzangl.minecraft.minebot.Pos;
 import net.famzangl.minecraft.minebot.ai.command.AIChatController;
 import net.famzangl.minecraft.minebot.ai.command.IAIControllable;
 import net.famzangl.minecraft.minebot.ai.net.MinebotNetHandler;
+import net.famzangl.minecraft.minebot.ai.net.NetworkHelper;
 import net.famzangl.minecraft.minebot.ai.render.BuildMarkerRenderer;
 import net.famzangl.minecraft.minebot.ai.render.PosMarkerRenderer;
 import net.famzangl.minecraft.minebot.ai.strategy.AIStrategy;
 import net.famzangl.minecraft.minebot.ai.strategy.AIStrategy.TickResult;
-import net.famzangl.minecraft.minebot.map.MapReader;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.gui.ScaledResolution;
@@ -39,7 +39,6 @@ import net.minecraft.init.Items;
 import net.minecraft.util.MouseHelper;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.common.FMLCommonHandler;
-import net.minecraftforge.fml.common.eventhandler.Event;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerChangedDimensionEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerRespawnEvent;
@@ -92,6 +91,8 @@ public class AIController extends AIHelper implements IAIControllable {
 	private boolean dead;
 	private AIStrategy currentStrategy;
 
+	private AIStrategy deactivatedStrategy;
+
 	private String strategyDescr = "";
 	private final Object strategyDescrMutex = new Object();
 
@@ -106,14 +107,15 @@ public class AIController extends AIHelper implements IAIControllable {
 	private MouseHelper oldMouseHelper;
 
 	private BuildMarkerRenderer buildMarkerRenderer;
-	
+	private NetworkHelper networkHelper;
+
 	public AIController() {
 		AIChatController.getRegistry().setControlled(this);
 	}
 
 	@SubscribeEvent
 	public void connect(ClientConnectedToServerEvent e) {
-		MinebotNetHandler.inject(this, e.manager, e.handler);
+		networkHelper = MinebotNetHandler.inject(this, e.manager, e.handler);
 	}
 	
 	/**
@@ -142,11 +144,15 @@ public class AIController extends AIHelper implements IAIControllable {
 
 		AIStrategy newStrat;
 		if (dead || stop.isPressed() || stop.isKeyDown()) {
+			if (deactivatedStrategy == null) {
+				deactivatedStrategy = currentStrategy;
+			}
 			deactivateCurrentStrategy();
 			dead = false;
 		} else if ((newStrat = findNewStrategy()) != null) {
 			deactivateCurrentStrategy();
 			currentStrategy = newStrat;
+			deactivatedStrategy = null;
 			System.out.println("Using new root strategy: " + newStrat);
 			currentStrategy.setActive(true, this);
 		}
@@ -362,6 +368,16 @@ public class AIController extends AIHelper implements IAIControllable {
 		FMLCommonHandler.instance().bus().register(this);
 
 		// registerAxe();
+	}
+	
+	@Override
+	public AIStrategy getResumeStrategy() {
+		return deactivatedStrategy;
+	}
+	
+	@Override
+	public NetworkHelper getNetworkHelper() {
+		return networkHelper;
 	}
 
 }

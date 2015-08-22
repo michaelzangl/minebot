@@ -16,15 +16,14 @@
  *******************************************************************************/
 package net.famzangl.minecraft.minebot.build.commands;
 
-import net.famzangl.minecraft.minebot.Pos;
 import net.famzangl.minecraft.minebot.ai.AIHelper;
-import net.famzangl.minecraft.minebot.ai.BlockWhitelist;
 import net.famzangl.minecraft.minebot.ai.command.AICommand;
 import net.famzangl.minecraft.minebot.ai.command.AICommandInvocation;
 import net.famzangl.minecraft.minebot.ai.command.AICommandParameter;
 import net.famzangl.minecraft.minebot.ai.command.AICommandParameter.BlockFilter;
 import net.famzangl.minecraft.minebot.ai.command.CommandEvaluationException;
 import net.famzangl.minecraft.minebot.ai.command.ParameterType;
+import net.famzangl.minecraft.minebot.ai.path.world.BlockSet;
 import net.famzangl.minecraft.minebot.ai.strategy.AIStrategy;
 import net.famzangl.minecraft.minebot.ai.task.BlockSide;
 import net.famzangl.minecraft.minebot.build.block.SlabType;
@@ -47,7 +46,7 @@ import net.minecraft.util.EnumFacing;
 @AICommand(helpText = "Schedules a build task.", name = "minebuild")
 public class CommandScheduleBuild {
 
-	public static final BlockWhitelist SIMPLE_WHITELIST = BlockBuildTask.BLOCKS
+	public static final BlockSet SIMPLE_WHITELIST = BlockBuildTask.BLOCKS
 			.unionWith(FenceBuildTask.BLOCKS);
 
 	public static final class RunSimpleFilter extends BlockFilter {

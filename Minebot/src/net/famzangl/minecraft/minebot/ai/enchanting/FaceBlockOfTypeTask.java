@@ -16,7 +16,10 @@
  *******************************************************************************/
 package net.famzangl.minecraft.minebot.ai.enchanting;
 
+import java.util.List;
+
 import net.famzangl.minecraft.minebot.ai.AIHelper;
+import net.famzangl.minecraft.minebot.ai.path.world.BlockSet;
 import net.famzangl.minecraft.minebot.ai.task.AITask;
 import net.famzangl.minecraft.minebot.ai.task.TaskOperations;
 import net.minecraft.init.Blocks;
@@ -26,13 +29,19 @@ public class FaceBlockOfTypeTask extends AITask {
 
 	@Override
 	public boolean isFinished(AIHelper h) {
-		final BlockPos pos = h.findBlock(Blocks.enchanting_table);
+		final BlockPos pos = getPos(h);
 		return pos != null && h.isFacingBlock(pos.getX(), pos.getY(), pos.getZ());
+	}
+
+	private BlockPos getPos(AIHelper h) {
+		List<BlockPos> positions = new BlockSet(Blocks.enchanting_table).findBlocks(h.getWorld(), h.getPlayerPosition(), 2);
+		final BlockPos pos = positions.isEmpty() ? null : positions.get(1);
+		return pos;
 	}
 
 	@Override
 	public void runTick(AIHelper h, TaskOperations o) {
-		final BlockPos pos = h.findBlock(Blocks.enchanting_table);
+		final BlockPos pos = getPos(h);
 		if (pos == null) {
 			System.out.println("Could not find block around player.");
 		}

@@ -87,7 +87,7 @@ public class SetSignTextTask extends AITask {
 	}
 
 	@Override
-	public int getGameTickTimeout() {
+	public int getGameTickTimeout(AIHelper helper) {
 		return 40;
 	}
 }

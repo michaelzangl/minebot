@@ -16,7 +16,7 @@
  *******************************************************************************/
 package net.famzangl.minecraft.minebot.ai.path;
 
-import net.famzangl.minecraft.minebot.ai.BlockWhitelist;
+import net.famzangl.minecraft.minebot.ai.path.world.BlockSet;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
@@ -33,10 +33,9 @@ public class OrebfuscatedMinePathFinder extends MineBySettingsPathFinder {
 	// Blocks.emerald_ore, Blocks.redstone_ore);
 	// See
 	// https://github.com/lishid/Orebfuscator/blob/master/src/com/lishid/orebfuscator/OrebfuscatorConfig.java
-	private static final BlockWhitelist targetBlocks = new BlockWhitelist(1, 4,
-			5, 14, 15, 16, 21, 46, 48, 49, 56, 73, 82, 129, 13, 87, 88, 112,
-			153);
-	private static final BlockWhitelist visibleMakingBlocks = new BlockWhitelist(
+	private static final BlockSet targetBlocks = new BlockSet(1, 4, 5, 14, 15,
+			16, 21, 46, 48, 49, 56, 73, 82, 129, 13, 87, 88, 112, 153);
+	private static final BlockSet visibleMakingBlocks = new BlockSet(
 			Blocks.gravel, Blocks.dirt).unionWith(targetBlocks).invert();
 
 	@Override
@@ -48,10 +47,14 @@ public class OrebfuscatedMinePathFinder extends MineBySettingsPathFinder {
 	@Override
 	protected float rateDestination(int distance, int x, int y, int z) {
 		if (y == preferedLayer && isGoodForOrebufscator(x, y, z)) {
-			int d = ignoredAbs(x - searchCenter.getX(), preferedDirection.getFrontOffsetX()) + ignoredAbs(z - searchCenter.getZ(), preferedDirection.getFrontOffsetZ());
+			int d = ignoredAbs(x - searchCenter.getX(),
+					preferedDirection.getFrontOffsetX())
+					+ ignoredAbs(z - searchCenter.getZ(),
+							preferedDirection.getFrontOffsetZ());
 			return distance + maxDistancePoints + 10 + d * 5;
-		} else if (/*searchCenter.distance(new Pos(x, y, z)) < 10
-				&& */isVisible(x, y, z) || isVisible(x, y + 1, z)) {
+		} else if (/*
+					 * searchCenter.distance(new Pos(x, y, z)) < 10 &&
+					 */isVisible(x, y, z) || isVisible(x, y + 1, z)) {
 			System.out.println("Parent is rating: " + x + ", " + y + ", " + z);
 			return super.rateDestination(distance, x, y, z);
 		} else {
@@ -73,16 +76,15 @@ public class OrebfuscatedMinePathFinder extends MineBySettingsPathFinder {
 	}
 
 	private boolean isInvisibleTarget(int x, int y, int z) {
-		return targetBlocks.contains(helper.getBlockId(x, y, z))
-				&& !isVisible(x, y, z);
+		return targetBlocks.isAt(world, x, y, z) && !isVisible(x, y, z);
 	}
 
 	private boolean isVisible(int x, int y, int z) {
-		return visibleMakingBlocks.contains(helper.getBlockId(x, y, z + 1))
-				|| visibleMakingBlocks.contains(helper.getBlockId(x, y, z - 1))
-				|| visibleMakingBlocks.contains(helper.getBlockId(x + 1, y, z))
-				|| visibleMakingBlocks.contains(helper.getBlockId(x - 1, y, z))
-				|| visibleMakingBlocks.contains(helper.getBlockId(x, y + 1, z))
-				|| visibleMakingBlocks.contains(helper.getBlockId(x, y - 1, z));
+		return visibleMakingBlocks.isAt(world, x, y, z + 1)
+				|| visibleMakingBlocks.isAt(world, x, y, z - 1)
+				|| visibleMakingBlocks.isAt(world, x + 1, y, z)
+				|| visibleMakingBlocks.isAt(world, x - 1, y, z)
+				|| visibleMakingBlocks.isAt(world, x, y + 1, z)
+				|| visibleMakingBlocks.isAt(world, x, y - 1, z);
 	}
 }

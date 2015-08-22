@@ -16,9 +16,9 @@
  *******************************************************************************/
 package net.famzangl.minecraft.minebot.ai.path;
 
-import net.famzangl.minecraft.minebot.ai.BlockWhitelist;
+import net.famzangl.minecraft.minebot.ai.path.world.BlockSet;
+import net.famzangl.minecraft.minebot.ai.path.world.BlockSets;
 import net.famzangl.minecraft.minebot.ai.task.DestroyInRangeTask;
-import net.famzangl.minecraft.minebot.ai.task.MineBlockTask;
 import net.famzangl.minecraft.minebot.ai.task.WaitTask;
 import net.famzangl.minecraft.minebot.ai.task.place.PlantSaplingTask;
 import net.famzangl.minecraft.minebot.build.block.WoodType;
@@ -27,7 +27,7 @@ import net.minecraft.init.Blocks;
 import net.minecraft.util.BlockPos;
 
 public class TreePathFinder extends MovePathFinder {
-	private static final BlockWhitelist TREE_STUFF = new BlockWhitelist(Blocks.log, Blocks.log2, Blocks.leaves, Blocks.leaves2);
+	private static final BlockSet TREE_STUFF = new BlockSet(Blocks.log, Blocks.log2, Blocks.leaves, Blocks.leaves2);
 	private final WoodType type;
 	private final boolean replant;
 
@@ -50,8 +50,7 @@ public class TreePathFinder extends MovePathFinder {
 			points++;
 		}
 		for (int i = 2; i < TREE_HEIGHT; i++) {
-			if (!(helper.hasSafeSides(x, y + i, z) && helper.isSafeHeadBlock(x,
-					y + i + 1, z))) {
+			if (!BlockSets.safeSideAndCeilingAround(world, x, y + i, z)) {
 				break;
 			} else if (isTree(x, y + i, z)) {
 				points++;
@@ -68,7 +67,7 @@ public class TreePathFinder extends MovePathFinder {
 					|| Block.isEqualTo(block, Blocks.log2);
 		} else {
 			return Block.isEqualTo(block, type.block)
-					&& (0x3 & helper.getBlockIdWithMeta(
+					&& (0x3 & world.getBlockIdWithMeta(
 							x, y, z) & 0xf) == type.lowerBits;
 		}
 	}
@@ -84,14 +83,11 @@ public class TreePathFinder extends MovePathFinder {
 		}
 		int max = 0;
 		for (int i = 2; i <= mineAbove; i++) {
-			if (!helper.hasSafeSides(currentPos.getX(), currentPos.getY() + i,
-					currentPos.getZ())
-					|| !helper.isSafeHeadBlock(currentPos.getX(), currentPos.getY() + i
-							+ 1, currentPos.getZ())) {
+			BlockPos pos = currentPos.add(0,i,0);
+			if (!BlockSets.safeSideAndCeilingAround(world, pos)) {
 				break;
 			}
-			if (!helper
-					.isAirBlock(currentPos.getX(), currentPos.getY() + i, currentPos.getZ())) {
+			if (!BlockSets.AIR.isAt(world, pos)) {
 				max = i;
 			}
 		}

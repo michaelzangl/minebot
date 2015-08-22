@@ -20,7 +20,8 @@ import java.util.LinkedList;
 
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.BlockItemFilter;
-import net.famzangl.minecraft.minebot.ai.BlockWhitelist;
+import net.famzangl.minecraft.minebot.ai.path.world.BlockSet;
+import net.famzangl.minecraft.minebot.ai.path.world.BlockSets;
 import net.famzangl.minecraft.minebot.ai.task.AITask;
 import net.famzangl.minecraft.minebot.ai.task.TaskOperations;
 import net.famzangl.minecraft.minebot.ai.task.error.SelectTaskError;
@@ -40,7 +41,7 @@ import net.minecraft.util.MovementInput;
  */
 public class WalkTowardsTask extends AITask {
 
-	private static final BlockWhitelist CARPETS = new BlockWhitelist(
+	private static final BlockSet CARPETS = new BlockSet(
 			Blocks.carpet);
 
 	private static final BlockItemFilter CARPET = new BlockItemFilter(CARPETS);
@@ -105,7 +106,7 @@ public class WalkTowardsTask extends AITask {
 				while (!carpets.isEmpty()) {
 					// Clean up carpets we already "lost"
 					final BlockPos last = carpets.getLast();
-					if (h.isAirBlock(last.getX(), last.getY(), last.getZ())) {
+					if (BlockSets.AIR.isAt(h.getWorld(), last)) {
 						carpets.removeLast();
 					}
 				}
@@ -133,8 +134,8 @@ public class WalkTowardsTask extends AITask {
 	 */
 	private int getUpperCarpetY(AIHelper h) {
 		int upperCarpet = -1;
-		for (int y = AIHelper.air.unionWith(CARPETS).contains(
-				h.getBlock(fromPos)) ? fromPos.getY() : fromPos.getY() + 1; y < nextPos
+		for (int y = BlockSets.AIR.unionWith(CARPETS).isAt(h.getWorld(), 
+				fromPos) ? fromPos.getY() : fromPos.getY() + 1; y < nextPos
 				.getY(); y++) {
 			if (CARPETS.contains(h.getBlock(fromPos.getX(), y, fromPos.getZ()))) {
 				upperCarpet = y;

@@ -20,6 +20,7 @@ import java.util.Arrays;
 
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.BlockItemFilter;
+import net.famzangl.minecraft.minebot.ai.path.world.BlockSets;
 import net.famzangl.minecraft.minebot.ai.task.BlockSide;
 import net.famzangl.minecraft.minebot.ai.task.TaskOperations;
 import net.famzangl.minecraft.minebot.ai.task.error.StringTaskError;
@@ -54,7 +55,7 @@ public class SneakAndPlaceAtHalfTask extends SneakAndPlaceTask {
 		attempts++;
 		for (int i = 0; i < dirs.length; i++) {
 			final EnumFacing useSide = dirs[attempts / 10 % dirs.length];
-			if (!h.isAirBlock(getFromPos())) {
+			if (!BlockSets.AIR.isAt(h.getWorld(), getFromPos())) {
 				faceSideBlock(h, useSide);
 				return;
 			} else {

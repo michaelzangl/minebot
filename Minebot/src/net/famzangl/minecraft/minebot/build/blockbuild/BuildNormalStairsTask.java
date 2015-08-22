@@ -17,7 +17,7 @@
 package net.famzangl.minecraft.minebot.build.blockbuild;
 
 import net.famzangl.minecraft.minebot.ai.BlockItemFilter;
-import net.famzangl.minecraft.minebot.ai.BlockWhitelist;
+import net.famzangl.minecraft.minebot.ai.path.world.BlockSet;
 import net.famzangl.minecraft.minebot.ai.task.AITask;
 import net.famzangl.minecraft.minebot.ai.task.BlockSide;
 import net.famzangl.minecraft.minebot.ai.task.place.JumpingPlaceBlockAtSideTask;
@@ -29,7 +29,7 @@ import net.minecraft.util.EnumFacing;
 
 public class BuildNormalStairsTask extends CubeBuildTask {
 
-	public static final BlockWhitelist BLOCKS = new BlockWhitelist( Blocks.acacia_stairs,
+	public static final BlockSet BLOCKS = new BlockSet( Blocks.acacia_stairs,
 			Blocks.birch_stairs, Blocks.brick_stairs, Blocks.dark_oak_stairs,
 			Blocks.jungle_stairs, Blocks.nether_brick_stairs,
 			Blocks.oak_stairs, Blocks.sandstone_stairs, Blocks.spruce_stairs,

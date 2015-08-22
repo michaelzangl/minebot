@@ -18,7 +18,7 @@ package net.famzangl.minecraft.minebot.build.blockbuild;
 
 import net.famzangl.minecraft.minebot.Pos;
 import net.famzangl.minecraft.minebot.ai.BlockItemFilter;
-import net.famzangl.minecraft.minebot.ai.BlockWhitelist;
+import net.famzangl.minecraft.minebot.ai.path.world.BlockSet;
 import net.famzangl.minecraft.minebot.build.block.LogItemFilter;
 import net.famzangl.minecraft.minebot.build.block.WoodType;
 import net.minecraft.init.Blocks;
@@ -33,7 +33,7 @@ import net.minecraft.util.EnumFacing;
  */
 public class LogBuildTask extends CubeBuildTask {
 
-	public static final BlockWhitelist BLOCKS = new BlockWhitelist(Blocks.log,
+	public static final BlockSet BLOCKS = new BlockSet(Blocks.log,
 			Blocks.log2);
 	public static final BlockPos[] UP_DOWN_POS = new BlockPos[] { Pos.ZERO };
 	public static final BlockPos[] NORTH_SOUTH_POS = new BlockPos[] {

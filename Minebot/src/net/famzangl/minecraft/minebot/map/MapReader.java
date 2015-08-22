@@ -2,22 +2,27 @@ package net.famzangl.minecraft.minebot.map;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Component;
-import java.awt.Dimension;
+import java.awt.Frame;
 import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
-import java.awt.image.WritableRaster;
-import java.beans.PropertyChangeListener;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.ConcurrentModificationException;
+import java.util.Date;
+import java.util.HashSet;
 import java.util.Hashtable;
+import java.util.LinkedList;
 import java.util.List;
-import java.util.Map.Entry;
+import java.util.Set;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
@@ -25,27 +30,33 @@ import java.util.concurrent.TimeUnit;
 import javax.imageio.ImageIO;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSeparator;
 import javax.swing.JToolBar;
 
-import net.famzangl.minecraft.minebot.Pos;
+import com.google.gson.Gson;
+import com.google.gson.JsonIOException;
+import com.google.gson.JsonSyntaxException;
+import com.google.gson.stream.JsonReader;
+
 import net.famzangl.minecraft.minebot.ai.AIHelper;
-import net.famzangl.minecraft.minebot.ai.BlockWhitelist;
+import net.famzangl.minecraft.minebot.ai.net.ChunkListener;
+import net.famzangl.minecraft.minebot.ai.path.world.WorldData;
+import net.famzangl.minecraft.minebot.ai.path.world.WorldData.ChunkAccessorUnmodified;
 import net.famzangl.minecraft.minebot.ai.utils.PrivateFieldUtils;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockSapling;
-import net.minecraft.block.material.MapColor;
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.multiplayer.ChunkProviderClient;
 import net.minecraft.client.multiplayer.WorldClient;
-import net.minecraft.init.Blocks;
 import net.minecraft.util.BlockPos;
+import net.minecraft.world.ChunkCoordIntPair;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.IChunkProvider;
+import net.minecraft.world.chunk.storage.ExtendedBlockStorage;
 
 /**
  * Reads the map that is sent to the user,
@@ -53,191 +64,27 @@ import net.minecraft.world.chunk.IChunkProvider;
  * @author michael
  *
  */
-public class MapReader {
+public class MapReader implements ChunkListener {
+	private static final boolean DO_USE_HASHES = false;
+
+	private static final int ALL_CHUNKS_LOAD_INTERVALL = 30 * 20;
+
 	private static final int BLOCK_SIZE = 1024;
 
 	private final File baseFile;
 
-	private final MapReaderTask task = new MapReaderTask();
-	private final MapWriterTask writer = new MapWriterTask();
 	private BlockingQueue<Chunk> chunksToProcess = new LinkedBlockingQueue<Chunk>();
 	private BlockingQueue<WriteableImage> imagesToWrite = new LinkedBlockingQueue<WriteableImage>();
 
-	private MapDisplayDialog mapDialog;
+	private MapDisplay mapDisplay = new MapDisplay();
+	private MapDisplayDialog mapDialog = new MapDisplayDialog(mapDisplay);
 
-	private enum RenderMode {
-		UNDERGROUND(new UndergroundRenderer(), "-underground"), MAP(
-				new MapRenderer(), ""), BIOME(new BiomeRenderer(), "-biome");
+	private WorldChangeManager wcm = new WorldChangeManager(mapDialog);
 
-		private interface IRenderer {
+	private ChunkQueue chunkQueue = new ChunkQueue();
 
-			int getColor(Chunk chunk, int dx, int dz);
-		}
-
-		private static class UndergroundRenderer implements IRenderer {
-			private static final BlockWhitelist IGNORED_COVER_BLOCKS = new BlockWhitelist(
-					Blocks.air, Blocks.leaves, Blocks.leaves2, Blocks.log,
-					Blocks.log2, Blocks.torch, Blocks.water,
-					Blocks.flowing_water, Blocks.waterlily, Blocks.lava,
-					Blocks.flowing_lava);
-			private static final BlockWhitelist UNDERGROUND_BLOCKS = new BlockWhitelist(
-					Blocks.air, Blocks.torch);
-			private static final BlockWhitelist STRUCTURE_BLOCKS = new BlockWhitelist(
-					Blocks.oak_fence, Blocks.end_portal_frame,
-					Blocks.end_stone, Blocks.bookshelf, Blocks.prismarine,
-					Blocks.planks, Blocks.nether_brick, Blocks.nether_wart,
-					Blocks.torch);
-			private static final BlockWhitelist INTERESTING_BLOCKS = new BlockWhitelist(
-					Blocks.chest, Blocks.mob_spawner, Blocks.gold_block);
-
-			@Override
-			public int getColor(Chunk chunk, int dx, int dz) {
-				int h = chunk.getHeight(dx, dz) + 1;
-				while (h > 3
-						&& IGNORED_COVER_BLOCKS.contains(chunk.getBlock(dx, h,
-								dz))) {
-					h--;
-				}
-				int underground = 0;
-				int structure = 0;
-				int interesting = 0;
-				for (int i = 0; i < h; i++) {
-					Block block = chunk.getBlock(dx, i, dz);
-					if (UNDERGROUND_BLOCKS.contains(block)) {
-						underground++;
-					}
-					if (STRUCTURE_BLOCKS.contains(block)) {
-						structure++;
-					}
-					if (INTERESTING_BLOCKS.contains(block)) {
-						interesting++;
-					}
-				}
-				int r = Math.min((int) (structure / 6.0 * 0xff), 0xff);
-				int g = Math.min((int) (interesting / 2.0 * 0xff), 0xff);
-				int b = Math.min((int) (Math.sqrt(underground) / 6.0 * 0xff),
-						0xff);
-				return 0xff000000 | (r << 16) | (g << 8) | b;
-			}
-		}
-
-		private static class MapRenderer implements IRenderer {
-			@Override
-			public int getColor(Chunk chunk, int dx, int dz) {
-				int h = chunk.getHeight(dx, dz) + 1;
-				IBlockState state;
-				do {
-					--h;
-					state = chunk.getBlockState(new BlockPos(dx, h, dz));
-				} while (state.getBlock().getMapColor(state) == MapColor.airColor
-						&& h > 0);
-
-				MapColor color = (state.getBlock().getMapColor(state));
-				return getColor(color);
-			}
-
-			private int getColor(MapColor color) {
-				return 0xff000000 | color.colorValue;
-			}
-		}
-
-		private static class BiomeRenderer implements IRenderer {
-			private static final Hashtable<Integer, Integer> COLORS = new Hashtable<Integer, Integer>();
-			private static final Integer DEFAULT_COLOR = 0xff000000;
-
-			static {
-				COLORS.put(0, 0xff0036ff); // Ocean
-				COLORS.put(1, 0xff5fd15c); // Plains
-				COLORS.put(2, 0xffe8e874); // Desert
-				COLORS.put(3, 0xff8b6d50); // Extreme Hills
-				COLORS.put(4, 0xff1ea31a); // Forest
-				COLORS.put(5, 0xff004d24); // Taiga
-				COLORS.put(6, 0xff008340); // Swampland
-				COLORS.put(7, 0xff315dff); // River
-				COLORS.put(8, 0xffba4627); // Hell (Nether)
-				COLORS.put(9, 0xff31ffa3); // Sky (End)
-				COLORS.put(10, 0xff6686ff); // Frozen Ocean
-				COLORS.put(11, 0xff86a0ff); // Frozen River
-				COLORS.put(12, 0xffe9eeff); // Ice Plains
-				COLORS.put(13, 0xffe9eeff); // Ice Mountains
-				COLORS.put(14, 0xffff0000);// 0xffcdbaba); // Mushroom Island
-				COLORS.put(15, 0xffff0000);// 0xffcdbaba); // Mushroom Island
-											// Shore
-				COLORS.put(16, 0xffe0e02d); // Beach
-				COLORS.put(17, 0xffe8e874); // Desert Hills
-				COLORS.put(18, 0xff1ea31a); // Forest Hills
-				COLORS.put(19, 0xff004d24); // Taiga Hills
-				COLORS.put(20, 0xff8b6d50); // Extreme Hills Edge
-				COLORS.put(21, 0xff47bd21); // Jungle
-				COLORS.put(22, 0xff47bd21); // Jungle Hills
-				COLORS.put(23, 0xff47bd21); // Jungle Edge
-				COLORS.put(24, 0xff002098); // Deep Ocean
-				COLORS.put(25, 0xff989898); // Stone Beach
-				COLORS.put(26, 0xffe0e069); // Cold Beach
-				COLORS.put(27, 0xff31a32d); // Birch Forest
-				COLORS.put(28, 0xff31a32d); // Birch Forest Hills
-				COLORS.put(29, 0xff125d16); // Roofed Forest
-				COLORS.put(30, 0xff69c594); // Cold Taiga
-				COLORS.put(31, 0xff69c594); // Cold Taiga Hills
-				COLORS.put(32, 0xff00391a); // Mega Taiga
-				COLORS.put(33, 0xff00391a); // Mega Taiga Hills
-				COLORS.put(34, 0xff8b6d50); // Extreme Hills+
-				COLORS.put(35, 0xffa0ba00); // Savanna
-				COLORS.put(36, 0xffa0ba00); // Savanna Plateau
-				COLORS.put(37, 0xffe8822e); // Mesa
-				COLORS.put(38, 0xffe8822e); // Mesa Plateau F
-				COLORS.put(39, 0xffe8822e); // Mesa Plateau
-				COLORS.put(129, 0xff5fd15c); // Sunflower Plains
-				COLORS.put(130, 0xffe8e874); // Desert M
-				COLORS.put(131, 0xff8b6d50); // Extreme Hills M
-				COLORS.put(132, 0xff1ea31a); // Flower Forest
-				COLORS.put(133, 0xff004d24); // Taiga M
-				COLORS.put(134, 0xff008340); // Swampland M
-				COLORS.put(140, 0xff89d9e8); // Ice Plains Spikes
-				COLORS.put(149, 0xff47bd21); // Jungle M
-				COLORS.put(151, 0xff47bd21); // JungleEdge M
-				COLORS.put(155, 0xff31a32d); // Birch Forest M
-				COLORS.put(156, 0xff31a32d); // Birch Forest Hills M
-				COLORS.put(157, 0xff125d16); // Roofed Forest M
-				COLORS.put(158, 0xff69c594); // Cold Taiga M
-				COLORS.put(160, 0xff00391a); // Mega Spruce Taiga
-				COLORS.put(161, 0xff00391a); // Mega Spruce Taiga Hills
-				COLORS.put(162, 0xff8b6d50); // Extreme Hills+ M
-				COLORS.put(163, 0xffa0ba00); // Savanna M
-				COLORS.put(164, 0xffa0ba00); // Savanna Plateau M
-				COLORS.put(165, 0xffe8822e); // Mesa (Bryce)
-				COLORS.put(166, 0xffe8822e); // Mesa Plateau F M
-				COLORS.put(167, 0xffe8822e); // Mesa Plateau M
-			}
-
-			@Override
-			public int getColor(Chunk chunk, int dx, int dz) {
-				int i = dx & 15;
-				int j = dz & 15;
-				int k = chunk.getBiomeArray()[j << 4 | i] & 255;
-				// assume it is already loaded. If not, we ignore it.
-				Integer color = COLORS.get(k);
-				return color != null ? color : DEFAULT_COLOR;
-			}
-
-		}
-
-		private IRenderer renderer;
-		private String ext;
-
-		private RenderMode(IRenderer renderer, String ext) {
-			this.renderer = renderer;
-			this.ext = ext;
-		}
-
-		public String getExt() {
-			return ext;
-		}
-
-		public int getColor(Chunk chunk, int dx, int dz) {
-			return renderer.getColor(chunk, dx, dz);
-		}
-	}
+	private final MapReaderTask task = new MapReaderTask();
+	private final MapWriterTask writer = new MapWriterTask();
 
 	private final class WriteableImage {
 
@@ -429,14 +276,153 @@ public class MapReader {
 
 	}
 
+	private static class WorldChangeManager {
+
+		private Frame baseFrame;
+
+		private long ignoreUntil = 0;
+
+		public WorldChangeManager(Frame baseFrame) {
+			this.baseFrame = baseFrame;
+		}
+
+		private boolean displayWorldWarning() {
+			Object[] options = new Object[] { "Skip rendering this chunk",
+					"Replace this chunk",
+					"Replace all new chunks the next 2 Minutes." };
+			int res = JOptionPane
+					.showOptionDialog(
+							baseFrame,
+							"<html>The world seems to have changed. What should I do?<p>You can either replace the recorded chunks with the new world your are in now or you can pause map recording until you are back in your old world.<p>You should select to skip if you went back to the old world.</html>",
+							"World changed", JOptionPane.DEFAULT_OPTION,
+							JOptionPane.QUESTION_MESSAGE, null, options,
+							options[0]);
+			if (res == 0) {
+			} else if (res == 1) {
+				return true;
+			} else if (res == 2) {
+				ignoreUntil = System.currentTimeMillis() + 2 * 60 * 1000;
+				return true;
+			}
+			return false;
+		}
+
+		public synchronized boolean shouldStillRender() {
+			// / for now, just use synchronized to delay.
+			return true;
+		}
+
+		/**
+		 * 
+		 * @param chunkX
+		 * @param chunZ
+		 * @return If we should render any ways.
+		 */
+		public synchronized boolean chunkHashChanged(int chunkX, int chunZ) {
+			if (!DO_USE_HASHES) {
+				return true;
+			} else if (System.currentTimeMillis() < ignoreUntil) {
+				// ignored.
+				return true;
+			} else {
+				return displayWorldWarning();
+			}
+		}
+	}
+
+	private static final class SettingsContainer {
+		private Hashtable<String, Integer> hashes = new Hashtable<String, Integer>();
+
+		private List<IconDefinition> icons = new LinkedList<IconDefinition>();
+	}
+
+	private static class WriteableSetting {
+
+		private final ImagePos pos;
+		private SettingsContainer settings = null;
+		private boolean read;
+		private final File baseFile;
+
+		public WriteableSetting(File baseFile, ImagePos pos) {
+			this.baseFile = baseFile;
+			this.pos = pos;
+		}
+
+		private File getFile() {
+			return new File(baseFile.getAbsolutePath() + "." + pos.topLeftX
+					+ "." + pos.topLeftZ + "." + "json");
+		}
+
+		public synchronized Integer getChunkHash(int x, int z) {
+			attemptRead();
+			return settings.hashes.get(x + "," + z);
+		}
+
+		public synchronized void setChunkHash(int x, int z, int hash) {
+			settings.hashes.put(x + "," + z, hash);
+			write();
+		}
+
+		private void attemptRead() {
+			if (settings == null) {
+				Gson gson = new Gson();
+				try {
+					settings = gson.fromJson(new FileReader(getFile()),
+							SettingsContainer.class);
+				} catch (JsonSyntaxException e) {
+					e.printStackTrace();
+				} catch (JsonIOException e) {
+					e.printStackTrace();
+				} catch (FileNotFoundException e) {
+					// use defaults..
+				}
+				if (settings == null) {
+					settings = new SettingsContainer();
+				}
+				if (settings.hashes == null) {
+					settings.hashes = new Hashtable<String, Integer>();
+				}
+				if (settings.icons == null) {
+					settings.icons = new LinkedList<IconDefinition>();
+				}
+			}
+		}
+
+		private void write() {
+			Gson gson = new Gson();
+			try {
+				gson.toJson(settings, new FileWriter(getFile()));
+			} catch (JsonIOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
+		}
+
+		public List<IconDefinition> getIcons() {
+			attemptRead();
+			return settings.icons;
+		}
+
+		public void addIcon(IconDefinition icon) {
+			settings.icons.add(icon);
+			write();
+		}
+	}
+
 	private class MultiModeImage {
 		private WriteableImage[] images = new WriteableImage[RenderMode
 				.values().length];
+		private WriteableSetting setting;
 
 		public MultiModeImage(ImagePos pos) {
 			for (int i = 0; i < images.length; i++) {
 				images[i] = new WriteableImage(pos, RenderMode.values()[i]);
 			}
+			setting = new WriteableSetting(baseFile, pos);
 		}
 
 		public WriteableImage getForRenderMode(RenderMode mode) {
@@ -461,7 +447,59 @@ public class MapReader {
 			for (WriteableImage i : images) {
 				i.markChanged();
 			}
+			mapDisplay.repaint();
 		}
+
+		public boolean isValidForChunkHash(int x, int z, int hash) {
+			Integer h = setting.getChunkHash(x, z);
+			// System.out.println("Old hash(" + x + "," + z + "): " + h
+			// + ", new hash: " + hash);
+			return h == null || h == hash;
+		}
+
+		public void setChunkHash(int x, int z, int hash) {
+			setting.setChunkHash(x, z, hash);
+			// System.out.println("Store hash(" + x + "," + z + ") = " + hash);
+		}
+	}
+
+	/**
+	 * A (hopefully) unique hash that identifies the world the chunk is in.
+	 * 
+	 * @param chunk
+	 * @return
+	 */
+	protected static int getChunkHash(Chunk chunk) {
+		ExtendedBlockStorage[] a = chunk.getBlockStorageArray();
+		if (a.length == 0) {
+			return 0;
+		}
+		ChunkAccessorUnmodified data = new WorldData.ChunkAccessorUnmodified(
+				chunk);
+
+		int y = 1;
+		int prime = 31;
+		int hash = 1;
+		for (int x = 1; x < 15; x++) {
+			for (int z = 1; z < 15; z++) {
+				if (isBedrock(data, x - 1, y, z)
+						&& isBedrock(data, x + 1, y, z)
+						&& isBedrock(data, x, y, z - 1)
+						&& isBedrock(data, x, y, z + 1)
+						&& isBedrock(data, x, y + 1, z + 1)) {
+					hash += data.getBlockIdWithMeta(x, y, z);
+				}
+				hash *= prime;
+			}
+		}
+		return hash;
+	}
+
+	private static final int BEDROCK_ID = 7;
+
+	protected static boolean isBedrock(ChunkAccessorUnmodified data, int x,
+			int y, int z) {
+		return data.getBlockIdWithMeta(x, y, z) >> 4 == BEDROCK_ID;
 	}
 
 	private final class MapReaderTask implements Runnable {
@@ -471,6 +509,9 @@ public class MapReader {
 
 		private Hashtable<ImagePos, MultiModeImage> images = new Hashtable<ImagePos, MultiModeImage>();
 		private final Object imagesMutex = new Object();
+
+		public MapReaderTask() {
+		}
 
 		@Override
 		public void run() {
@@ -513,10 +554,22 @@ public class MapReader {
 		}
 
 		private void renderChunk(Chunk chunk) {
+			if (!wcm.shouldStillRender()) {
+				return;
+			}
 			ImagePos pos = new ImagePos(chunk.xPosition * 16,
 					chunk.zPosition * 16);
 
 			MultiModeImage image = getImage(pos);
+			int hash = getChunkHash(chunk);
+			if (!image.isValidForChunkHash(chunk.xPosition, chunk.zPosition,
+					hash)) {
+				System.err.println("Abort rendering: Chunk hash has changed.");
+				if (!wcm.chunkHashChanged(chunk.xPosition, chunk.zPosition)) {
+					return;
+				}
+			}
+			image.setChunkHash(chunk.xPosition, chunk.zPosition, hash);
 
 			for (int dz = 0; dz < 16; dz++) {
 				for (int dx = 0; dx < 16; dx++) {
@@ -545,9 +598,14 @@ public class MapReader {
 	}
 
 	private class MapDisplay extends JPanel {
-		private int blocksPerPixel = 4;
+		private static final int BLOCKS_PER_BASE_PIXEL_MAX = 256;
+
+		private int BASE_PIXEL = 16;
+
+		private int blocksPerBasePixel = 32;
 
 		private BlockPos playerPos = null;
+		private int playerLook;
 
 		private RenderMode mode = RenderMode.MAP;
 
@@ -564,28 +622,35 @@ public class MapReader {
 			}
 		};
 
+		private PlayerPositionLabel playerPositionLabel = new PlayerPositionLabel();
+
 		@Override
 		public void paint(Graphics g) {
 			super.paint(g);
-			int scaledSize = BLOCK_SIZE / blocksPerPixel;
+			int scaledSize = BLOCK_SIZE * BASE_PIXEL / blocksPerBasePixel;
 			if (player == null) {
 				return;
 			}
 			playerPos = player;
+			playerLook = look;
 			g.setColor(Color.RED);
-			System.out.println("Redraw at " + playerPos);
+			ArrayList<IconDefinition> icons = new ArrayList<IconDefinition>();
+			// System.out.println("Redraw at " + playerPos);
 			int minPosX = ImagePos.round(player.getX() - getWidth()
-					* blocksPerPixel / 2);
+					* blocksPerBasePixel / BASE_PIXEL / 2);
 			int maxPosX = ImagePos.round(player.getX() + getWidth()
-					* blocksPerPixel / 2);
+					* blocksPerBasePixel / BASE_PIXEL / 2);
 			int minPosZ = ImagePos.round(player.getZ() - getHeight()
-					* blocksPerPixel / 2);
+					* blocksPerBasePixel / BASE_PIXEL / 2);
 			int maxPosZ = ImagePos.round(player.getZ() + getHeight()
-					* blocksPerPixel / 2);
+					* blocksPerBasePixel / BASE_PIXEL / 2);
 			for (int x = minPosX; x <= maxPosX; x += BLOCK_SIZE) {
 				for (int z = minPosZ; z <= maxPosZ; z += BLOCK_SIZE) {
-					WriteableImage im = task.getImage(new ImagePos(x, z))
-							.getForRenderMode(mode);
+					ImagePos pos = new ImagePos(x, z);
+					MultiModeImage imageChunk = task.getImage(pos);
+					WriteableImage im = imageChunk.getForRenderMode(mode);
+					icons.addAll(imageChunk.setting.getIcons());
+
 					BufferedImage draw = im.getPaintingImage();
 
 					g.drawImage(draw, blockToPanelX(x), blockToPanelY(z),
@@ -596,39 +661,65 @@ public class MapReader {
 							blockToPanelY(z));
 				}
 			}
-			g.drawArc(blockToPanelX(playerPos.getX()) - 5,
-					blockToPanelY(playerPos.getZ()) - 5, 10, 10, 0, 360);
+
+			for (IconDefinition icon : icons) {
+				BufferedImage img = icon.getIcon(mode);
+				int x = blockToPanelX(icon.getPosition().getX())
+						- img.getWidth() / 2;
+				int y = blockToPanelY(icon.getPosition().getZ())
+						- img.getHeight() / 2;
+				g.drawImage(img, x, y, null);
+			}
+
+			drawPlayer(g);
+		}
+
+		private void drawPlayer(Graphics g) {
+			int x = blockToPanelX(playerPos.getX());
+			int y = blockToPanelY(playerPos.getZ());
+			int offset = BASE_PIXEL / blocksPerBasePixel / 2;
+			x += offset;
+			y += offset;
+			g.setColor(Color.RED);
+			g.drawArc(x - 5, y - 5, 10, 10, 0, 360);
+			g.setColor(new Color(1, 0, 0, .4f));
+			g.fillArc(x - 10, y - 10, 20, 20,
+					niceDegrees(-playerLook - 90 - 20), 40);
 		}
 
 		private int blockToPanelX(int blockX) {
-			return (blockX - playerPos.getX()) / blocksPerPixel + getWidth()
-					/ 2;
+			return (blockX - playerPos.getX()) * BASE_PIXEL
+					/ blocksPerBasePixel + getWidth() / 2;
 		}
 
 		private int blockToPanelY(int blockZ) {
-			return (blockZ - playerPos.getZ()) / blocksPerPixel + getHeight()
-					/ 2;
+			return (blockZ - playerPos.getZ()) * BASE_PIXEL
+					/ blocksPerBasePixel + getHeight() / 2;
 		}
 
 		private BlockPos getBlockPosition(Point panelPosition) {
 			int blockX = (int) ((panelPosition.getX() - getWidth() / 2.0)
-					* blocksPerPixel + playerPos.getX());
+					* blocksPerBasePixel / BASE_PIXEL + playerPos.getX());
 			int blockZ = (int) ((panelPosition.getY() - getHeight() / 2.0)
-					* blocksPerPixel + playerPos.getZ());
+					* blocksPerBasePixel / BASE_PIXEL + playerPos.getZ());
 			return new BlockPos(blockX, 64, blockZ);
 		}
 
 		public void blocksPerPixelMultiply(double d) {
-			blocksPerPixel = Math.min(
-					Math.max((int) Math.round(blocksPerPixel * d), 1), 32);
+			blocksPerBasePixel = Math.min(
+					Math.max((int) Math.round(blocksPerBasePixel * d), 1),
+					BLOCKS_PER_BASE_PIXEL_MAX);
 
-			minusAction.setEnabled(blocksPerPixel < 32);
-			plusAction.setEnabled(blocksPerPixel > 1);
+			minusAction
+					.setEnabled(blocksPerBasePixel < BLOCKS_PER_BASE_PIXEL_MAX);
+			plusAction.setEnabled(blocksPerBasePixel > 1);
+			invalidateMap();
+			mapDialog.updateTitle();
 		}
 
 		public void setMode(RenderMode mode) {
 			this.mode = mode;
-			repaint();
+			invalidateMap();
 		}
 
 		public Action createChangeModeAction(final RenderMode myMode) {
@@ -653,11 +744,33 @@ public class MapReader {
 			BlockPos pos = getBlockPosition(event.getPoint());
 			return pos.getX() + "," + pos.getZ();
 		}
+
+		public JComponent getPlayerPosition() {
+			return playerPositionLabel;
+		}
+
+		public void invalidateMap() {
+			repaint();
+		}
+
+		public void setPosition(BlockPos newPlayer, int newLook) {
+			if ((newPlayer == null && player != null)
+					|| (newPlayer != null && !newPlayer.equals(player))
+					|| newLook != look) {
+				playerPositionLabel.setPosition(newPlayer);
+				player = newPlayer;
+				look = newLook;
+				repaint();
+			}
+		}
 	}
 
 	private static final class MapDisplayDialog extends JFrame {
 
+		private MapDisplay d;
+
 		public MapDisplayDialog(MapDisplay d) {
+			this.d = d;
 			setLayout(new BorderLayout());
 			JToolBar toolbar = new JToolBar();
 			for (RenderMode v : RenderMode.values()) {
@@ -665,14 +778,20 @@ public class MapReader {
 			}
 
 			toolbar.add(new JSeparator(JSeparator.VERTICAL));
+			toolbar.add(d.getPlayerPosition());
 			toolbar.add(d.getMinusAction());
 			toolbar.add(d.getPlusAction());
 			add(toolbar, BorderLayout.NORTH);
 			add(d);
-			setTitle("Map view. Scale: " + d.blocksPerPixel);
+			updateTitle();
 			pack();
 			setSize(1500, 800);
 			setVisible(true);
+		}
+
+		private void updateTitle() {
+			setTitle("Map view. Scale: "
+					+ ((float) d.blocksPerBasePixel / d.BASE_PIXEL));
 		}
 	}
 
@@ -683,56 +802,162 @@ public class MapReader {
 		new Thread(task, "Map reader").start();
 		new Thread(writer, "Map writer").start();
 
-		mapDisplay = new MapDisplay();
-		mapDialog = new MapDisplayDialog(mapDisplay);
+	}
+
+	private class ChunkQueue {
+		/**
+		 * How long to dely chunks. In game ticks.
+		 */
+		private static final int OFFER_TIME = 40;
+
+		/**
+		 * All chunks we handle.
+		 * <p>
+		 * The integer states in how many ticks they will be collected for
+		 * rendering.
+		 */
+		private Hashtable<ChunkCoordIntPair, Integer> dirtyChunks = new Hashtable<ChunkCoordIntPair, Integer>();
+
+		/**
+		 * 
+		 */
+		private Hashtable<ChunkCoordIntPair, Integer> cooldownForLastUsed = new Hashtable<ChunkCoordIntPair, Integer>();
+
+		public synchronized void offer(ChunkCoordIntPair pos) {
+			if (!dirtyChunks.containsKey(pos)) {
+				Integer coolDown = cooldownForLastUsed.get(pos);
+				int time = coolDown == null ? 0 : coolDown;
+				dirtyChunks.put(pos, time);
+			}
+		}
+
+		public synchronized ArrayList<ChunkCoordIntPair> tickAndGet() {
+			ArrayList<ChunkCoordIntPair> ret = new ArrayList<ChunkCoordIntPair>();
+			ArrayList<ChunkCoordIntPair> keys = new ArrayList<ChunkCoordIntPair>(
+					dirtyChunks.keySet());
+			for (ChunkCoordIntPair k : keys) {
+				Integer counter = dirtyChunks.get(k);
+				if (counter <= 0) {
+					dirtyChunks.remove(k);
+					ret.add(k);
+					cooldownForLastUsed.put(k, OFFER_TIME);
+				} else {
+					dirtyChunks.put(k, counter - 1);
+				}
+			}
+			ArrayList<ChunkCoordIntPair> keys2 = new ArrayList<ChunkCoordIntPair>(
+					dirtyChunks.keySet());
+			for (ChunkCoordIntPair k : keys2) {
+				Integer time = cooldownForLastUsed.get(k);
+				if (time <= 0) {
+					cooldownForLastUsed.remove(k);
+				} else {
+					cooldownForLastUsed.put(k, time - 1);
+				}
+			}
+			return ret;
+		}
 	}
 
 	int currentIndex = 0;
 
-	private Pos player;
+	private BlockPos player;
 
-	private MapDisplay mapDisplay;
+	private int look;
+
+	private AIHelper registeredHelper;
+
+	private boolean wasAlive;
 
 	public void tick(AIHelper helper) {
-		WorldClient theWorld = helper.getMinecraft().theWorld;
-		if (theWorld == null) {
-			return;
+		if (registeredHelper == null) {
+			registeredHelper = helper;
+			helper.getNetworkHelper().addChunkChangeListener(this);
 		}
-		IChunkProvider provider = PrivateFieldUtils.getFieldValue(
-				theWorld, World.class,
-				IChunkProvider.class);
-		if (!(provider instanceof ChunkProviderClient)) {
-			return;
-		}
-		List<Chunk> list;
-			list = PrivateFieldUtils.getFieldValue(
-					(ChunkProviderClient) provider, ChunkProviderClient.class,
-					List.class);
 		if (currentIndex == 0) {
-			try {
-				for (Chunk chunk : list) {
-					chunksToProcess.offer(chunk);
-				}
-			} catch (IndexOutOfBoundsException e) {
-			} catch (ConcurrentModificationException e) {
+			loadAllChunks(helper);
+		}
+
+		for (ChunkCoordIntPair d : chunkQueue.tickAndGet()) {
+			Chunk chunkFromChunkCoords = helper.getMinecraft().theWorld
+					.getChunkFromChunkCoords(d.chunkXPos, d.chunkZPos);
+			if (chunkFromChunkCoords != null) {
+				chunksToProcess.offer(chunkFromChunkCoords);
 			}
 		}
 
 		currentIndex++;
-		if (currentIndex > 10 * 20 && chunksToProcess.isEmpty()) {
+		if (currentIndex > ALL_CHUNKS_LOAD_INTERVALL
+				&& chunksToProcess.isEmpty()) {
 			// TODO: mark to save here.
 			currentIndex = 0;
 		}
 
-		player = helper.getPlayerPosition();
-		mapDisplay.repaint();
+		checkIsAlive(helper);
+		EntityPlayerSP playerSP = helper.getMinecraft().thePlayer;
+		BlockPos newPlayer = playerSP == null ? null : helper
+				.getPlayerPosition();
+		int newLook = niceDegrees(playerSP == null ? null
+				: (int) playerSP.rotationYaw);
+		mapDisplay.setPosition(newPlayer, newLook);
+
+		// TODO: Draw minx/maxx and highlighted blocks.
+	}
+
+	private void checkIsAlive(AIHelper helper) {
+		boolean isAlive = helper.isAlive();
+		if (!isAlive && wasAlive) {
+			addIcon(new IconDefinition(helper.getPlayerPosition(), "Death: "
+					+ new Date().toLocaleString(), IconType.DEATH));
+		}
+		wasAlive = isAlive;
+	}
+
+	private void loadAllChunks(AIHelper helper) {
+		try {
+			WorldClient theWorld = helper.getMinecraft().theWorld;
+			if (theWorld == null) {
+				return;
+			}
+			IChunkProvider provider = PrivateFieldUtils.getFieldValue(theWorld,
+					World.class, IChunkProvider.class);
+			if (!(provider instanceof ChunkProviderClient)) {
+				return;
+			}
+			List<Chunk> list;
+			list = PrivateFieldUtils.getFieldValue(
+					(ChunkProviderClient) provider, ChunkProviderClient.class,
+					List.class);
+			for (Chunk chunk : list) {
+				chunkQueue.offer(chunk.getChunkCoordIntPair());
+			}
+		} catch (IndexOutOfBoundsException e) {
+		} catch (ConcurrentModificationException e) {
+		}
+	}
+
+	@Override
+	public void chunkChanged(int chunkX, int chunkZ) {
+		chunkQueue.offer(new ChunkCoordIntPair(chunkX, chunkZ));
+	}
+
+	private int niceDegrees(int cameraYaw) {
+		return ((cameraYaw % 360 + 360) % 360);
 	}
 
 	public void onStop() {
+		registeredHelper.getNetworkHelper().removeChunkChangeListener(this);
 		task.stop();
 		writer.stop();
 		chunksToProcess.clear();
 		mapDialog.setVisible(false);
 		mapDialog.dispose();
+	}
+
+	public void addIcon(IconDefinition iconDefinition) {
+		ImagePos pos = new ImagePos(iconDefinition.getPosition().getX(),
+				iconDefinition.getPosition().getZ());
+		MultiModeImage image = task.getImage(pos);
+		image.setting.addIcon(iconDefinition);
 	}
 }

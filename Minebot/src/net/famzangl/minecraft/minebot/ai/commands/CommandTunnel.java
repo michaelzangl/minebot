@@ -16,7 +16,6 @@
  *******************************************************************************/
 package net.famzangl.minecraft.minebot.ai.commands;
 
-import net.famzangl.minecraft.minebot.Pos;
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.command.AICommand;
 import net.famzangl.minecraft.minebot.ai.command.AICommandInvocation;
@@ -27,6 +26,7 @@ import net.famzangl.minecraft.minebot.ai.path.TunnelPathFinder;
 import net.famzangl.minecraft.minebot.ai.path.TunnelPathFinder.TorchSide;
 import net.famzangl.minecraft.minebot.ai.strategy.AIStrategy;
 import net.famzangl.minecraft.minebot.ai.strategy.PathFinderStrategy;
+import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
 
 @AICommand(helpText = "Build a tunnel with the given profile", name = "minebot")
@@ -63,7 +63,7 @@ public class CommandTunnel {
 			length = -1;
 		}
 
-		final Pos pos = helper.getPlayerPosition();
+		final BlockPos pos = helper.getPlayerPosition();
 		return new PathFinderStrategy(new TunnelPathFinder(inDirection.getFrontOffsetX(),
 				inDirection.getFrontOffsetZ(), pos.getX(), pos.getY(), pos.getZ(), addToSide, addToTop,
 				torches, length), "Tunneling");

@@ -23,6 +23,7 @@ import net.famzangl.minecraft.minebot.ai.command.AICommandInvocation;
 import net.famzangl.minecraft.minebot.ai.command.AICommandParameter;
 import net.famzangl.minecraft.minebot.ai.command.ParameterType;
 import net.famzangl.minecraft.minebot.ai.command.SafeStrategyRule;
+import net.famzangl.minecraft.minebot.ai.path.world.BlockSets;
 import net.famzangl.minecraft.minebot.ai.strategy.AIStrategy;
 import net.famzangl.minecraft.minebot.ai.strategy.TaskStrategy;
 import net.famzangl.minecraft.minebot.ai.task.AITask;
@@ -54,8 +55,8 @@ public class CommandStepPlace {
 				final BlockPos fromPos = getFromPos(helper, task, forPosition);
 				if (fromPos == null) {
 					AIChatController.addChatLine("Not at starting position.");
-				} else if (helper.isAirBlock(task.getForPosition().getX(),
-						task.getForPosition().getY(), task.getForPosition().getZ())) {
+				} else if (BlockSets.AIR.isAt(helper.getWorld(),
+						task.getForPosition())) {
 					final AITask t = task.getPlaceBlockTask(fromPos);
 					if (t != null) {
 						addTask(t);

@@ -23,7 +23,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Properties;
 
-import net.famzangl.minecraft.minebot.ai.BlockWhitelist;
+import net.famzangl.minecraft.minebot.ai.path.world.BlockSet;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 
@@ -114,7 +114,7 @@ public class MinebotSettings {
 	 * @param defaultValue
 	 * @return
 	 */
-	public BlockWhitelist getBlocks(String key, BlockWhitelist defaultValue) {
+	public BlockSet getBlocks(String key, BlockSet defaultValue) {
 		final String property = getSettings().getProperty(key);
 		if (property == null) {
 			return defaultValue;
@@ -128,7 +128,7 @@ public class MinebotSettings {
 				System.out.println("Invalid block name: " + name);
 			}
 		}
-		return new BlockWhitelist(blocks.toArray(new Block[blocks.size()]));
+		return new BlockSet(blocks.toArray(new Block[blocks.size()]));
 	}
 
 	public float getFloat(String string, float defaultValue, float min,

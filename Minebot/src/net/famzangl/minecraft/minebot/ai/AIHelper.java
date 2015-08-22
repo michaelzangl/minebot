@@ -17,12 +17,15 @@
 package net.famzangl.minecraft.minebot.ai;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
 import net.famzangl.minecraft.minebot.Pos;
 import net.famzangl.minecraft.minebot.ai.command.AIChatController;
+import net.famzangl.minecraft.minebot.ai.net.MinebotNetHandler;
+import net.famzangl.minecraft.minebot.ai.net.NetworkHelper;
+import net.famzangl.minecraft.minebot.ai.path.world.WorldData;
+import net.famzangl.minecraft.minebot.ai.strategy.AIStrategy;
 import net.famzangl.minecraft.minebot.ai.task.BlockSide;
 import net.famzangl.minecraft.minebot.build.BuildManager;
 import net.famzangl.minecraft.minebot.map.MapReader;
@@ -31,9 +34,7 @@ import net.minecraft.block.BlockFence;
 import net.minecraft.block.BlockFenceGate;
 import net.minecraft.block.BlockSlab;
 import net.minecraft.block.BlockStairs;
-import net.minecraft.block.BlockTorch;
 import net.minecraft.block.BlockWall;
-import net.minecraft.block.BlockWallSign;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.settings.KeyBinding;
@@ -66,124 +67,17 @@ import com.google.common.base.Predicate;
  * 
  */
 public abstract class AIHelper {
-	private static final int BEDROCK_ID = Block.getIdFromBlock(Blocks.bedrock);
 	private static final double SNEAK_OFFSET = .2;
 	private static final double WALK_PER_STEP = 4.3 / 20;
 	private static final double MIN_DISTANCE_ERROR = 0.05;
+	private static final float MAX_PITCH_CHANGE = 20.0f;
+	private static final float MAX_YAW_CHANGE = (float) (Math.PI / 6);
 	private static Minecraft mc = Minecraft.getMinecraft();
+	/**
+	 * A world that never gets a delta applied to it.
+	 */
+	private static WorldData minecraftWorld;
 	private final Random rand = new Random();
-
-	private Chunk chunkCache1 = null;
-	private Chunk chunkCache2 = null;
-	private boolean chunkCacheReplaceCounter = false;
-
-	/**
-	 * Blocks we can just walk over/next to without problems.
-	 */
-	public static final BlockWhitelist normalBlocks = new BlockWhitelist(
-			Blocks.bedrock, Blocks.bookshelf, Blocks.brick_block,
-			Blocks.brown_mushroom_block, Blocks.cake, Blocks.clay,
-			Blocks.coal_block, Blocks.coal_ore, Blocks.cobblestone,
-			Blocks.crafting_table, Blocks.diamond_block, Blocks.diamond_ore,
-			Blocks.dirt, Blocks.double_stone_slab, Blocks.double_wooden_slab,
-			Blocks.emerald_block, Blocks.emerald_ore, Blocks.farmland,
-			Blocks.furnace, Blocks.glass, Blocks.glowstone, Blocks.grass,
-			Blocks.gold_block, Blocks.gold_ore, Blocks.hardened_clay,
-			Blocks.iron_block, Blocks.iron_ore, Blocks.lapis_block,
-			Blocks.lapis_ore, Blocks.leaves, Blocks.leaves2,
-			Blocks.lit_pumpkin, Blocks.lit_furnace, Blocks.lit_redstone_lamp,
-			Blocks.lit_redstone_ore, Blocks.log,
-			Blocks.log2,
-			Blocks.melon_block,
-			Blocks.mossy_cobblestone,
-			Blocks.mycelium,
-			Blocks.nether_brick,
-			Blocks.netherrack,
-			// Watch out, this cannot be broken easily !
-			Blocks.obsidian, Blocks.packed_ice, Blocks.planks, Blocks.pumpkin,
-			Blocks.quartz_block, Blocks.quartz_ore, Blocks.red_mushroom_block,
-			Blocks.redstone_block, Blocks.redstone_lamp, Blocks.redstone_ore,
-			Blocks.sandstone, Blocks.snow, Blocks.soul_sand,
-			Blocks.stained_glass, Blocks.stained_hardened_clay, Blocks.stone,
-			Blocks.stonebrick, Blocks.wool);
-
-	public static final BlockWhitelist fallingBlocks = new BlockWhitelist(
-			Blocks.gravel, Blocks.sand);
-
-	public static final BlockWhitelist air = new BlockWhitelist(Blocks.air);
-	/**
-	 * All stairs. It is no problem to walk on them.
-	 */
-	public static final BlockWhitelist stairBlocks = new BlockWhitelist(
-			Blocks.acacia_stairs, Blocks.birch_stairs, Blocks.brick_stairs,
-			Blocks.dark_oak_stairs, Blocks.jungle_stairs,
-			Blocks.nether_brick_stairs, Blocks.oak_stairs,
-			Blocks.sandstone_stairs, Blocks.spruce_stairs,
-			Blocks.stone_brick_stairs, Blocks.stone_stairs, Blocks.stone_slab,
-			Blocks.wooden_slab, Blocks.quartz_stairs);
-
-	public static final BlockWhitelist railBlocks = new BlockWhitelist(
-			Blocks.golden_rail, Blocks.detector_rail, Blocks.rail,
-			Blocks.activator_rail);
-
-	/**
-	 * Flowers and stuff like that
-	 */
-	private static final BlockWhitelist explicitFootWalkableBlocks = new BlockWhitelist(
-			Blocks.tallgrass, Blocks.yellow_flower, Blocks.red_flower,
-			Blocks.wheat, Blocks.carrots, Blocks.potatoes, Blocks.pumpkin_stem,
-			Blocks.melon_stem, Blocks.carpet, Blocks.double_plant,
-			Blocks.red_mushroom, Blocks.brown_mushroom, Blocks.redstone_wire,
-			Blocks.sapling, Blocks.snow_layer, Blocks.nether_wart,
-			Blocks.standing_sign, Blocks.wall_sign).unionWith(railBlocks);
-
-	public static final BlockWhitelist torches = new BlockWhitelist(
-			Blocks.torch, Blocks.redstone_torch);
-
-	public static final BlockWhitelist headWalkableBlocks = new BlockWhitelist(
-			Blocks.air, Blocks.double_plant, Blocks.cocoa).unionWith(torches);
-
-	public static final BlockWhitelist walkableBlocks = explicitFootWalkableBlocks
-			.unionWith(headWalkableBlocks);
-
-	public static final BlockWhitelist fences = new BlockWhitelist(
-			Blocks.oak_fence, Blocks.spruce_fence, Blocks.birch_fence,
-			Blocks.jungle_fence, Blocks.dark_oak_fence, Blocks.acacia_fence,
-			Blocks.nether_brick_fence);
-
-	public static final BlockWhitelist woodenDoors = new BlockWhitelist(
-			Blocks.oak_door, Blocks.spruce_door, Blocks.birch_door,
-			Blocks.jungle_door, Blocks.dark_oak_door, Blocks.acacia_door);
-
-	public static final BlockWhitelist fenceGates = new BlockWhitelist(
-			Blocks.oak_fence_gate, Blocks.spruce_fence_gate,
-			Blocks.birch_fence_gate, Blocks.jungle_fence_gate,
-			Blocks.dark_oak_fence_gate, Blocks.acacia_fence_gate);
-
-	public static final BlockWhitelist explicitSafeSideBlocks = new BlockWhitelist(
-			Blocks.anvil, Blocks.cobblestone_wall, Blocks.cactus, Blocks.reeds,
-			Blocks.web, Blocks.glass_pane, Blocks.bed, Blocks.enchanting_table,
-			Blocks.waterlily, Blocks.brewing_stand, Blocks.vine, Blocks.chest)
-			.unionWith(fences).unionWith(fenceGates);
-
-	/**
-	 * Blocks that form a solid ground.
-	 */
-	public static final BlockWhitelist safeStandableBlocks = normalBlocks
-			.unionWith(fallingBlocks).unionWith(stairBlocks);
-
-	public static final BlockWhitelist safeSideBlocks = explicitSafeSideBlocks
-			.unionWith(safeStandableBlocks).unionWith(walkableBlocks)
-			.unionWith(air);
-
-	public static final BlockWhitelist safeCeilingBlocks = stairBlocks
-			.unionWith(walkableBlocks).unionWith(normalBlocks).unionWith(air);
-
-	/**
-	 * Blocks you need to destroy but that are then safe.
-	 */
-	public static final BlockWhitelist safeDestructableBlocks = new BlockWhitelist(
-			Blocks.vine);
 
 	public final BuildManager buildManager = new BuildManager();
 	private boolean objectMouseOverInvalidated;
@@ -201,9 +95,6 @@ public abstract class AIHelper {
 	private boolean sneakKeyJustPressed;
 	private KeyBinding resetSprintKey;
 	private boolean sprintKeyJustPressed;
-
-	private int chunkHitCounter = 0;
-	private int chunkMissCounter = 0;
 
 	protected MapReader activeMapReader;
 
@@ -224,14 +115,12 @@ public abstract class AIHelper {
 	}
 
 	protected void invalidateChunkCache() {
-		if (chunkHitCounter > 0 || chunkMissCounter > 0) {
-			System.out.println("Last chunk cache hit: " + chunkHitCounter
-					+ " but missed " + chunkMissCounter);
-			chunkHitCounter = 0;
-			chunkMissCounter = 0;
+		if (minecraftWorld == null || mc.theWorld != minecraftWorld.getBackingWorld()) {
+			minecraftWorld = mc.theWorld == null ? null : new WorldData(mc.theWorld, mc.thePlayer); 
 		}
-		chunkCache1 = null;
-		chunkCache2 = null;
+		if (minecraftWorld != null) {
+			minecraftWorld.invalidateChunkCache();
+		}
 	}
 
 	public Minecraft getMinecraft() {
@@ -313,6 +202,7 @@ public abstract class AIHelper {
 	 * @return
 	 */
 	public Block getBlock(BlockPos pos) {
+		//TODO: Warn that no delta is used.
 		return getBlock(pos.getX(), pos.getY(), pos.getZ());
 	}
 
@@ -325,146 +215,14 @@ public abstract class AIHelper {
 	 * @return The block.
 	 */
 	public Block getBlock(int x, int y, int z) {
+		//TODO: Warn that no delta is used.
 		return mc.theWorld.getBlockState(new BlockPos(x, y, z)).getBlock();
 	}
 
-	public int getBlockId(BlockPos pos) {
-		return getBlockId(pos.getX(), pos.getY(), pos.getZ());
+	public WorldData getWorld() {
+		return minecraftWorld;
 	}
-
-	public int getBlockId(int x, int y, int z) {
-		return getBlockIdWithMeta(x, y, z) >> 4;
-	}
-
-	public int getBlockIdWithMeta(BlockPos pos) {
-		return getBlockIdWithMeta(pos.getX(), pos.getY(), pos.getZ());
-	}
-
-	/**
-	 * A fast method that gets a block id for a given position. Use it if you
-	 * need to scan many blocks, since the default minecraft block lookup is
-	 * slow. For x<0 or x>= 256 it returns bedrock, to make routing easy.
-	 * 
-	 * @param x
-	 * @param y
-	 * @param z
-	 * @return
-	 */
-	public int getBlockIdWithMeta(int x, int y, int z) {
-		if (y < 0 || y >= 256) {
-			return BEDROCK_ID;
-		}
-
-		int chunkX = x >> 4;
-		int chunkZ = z >> 4;
-		final Chunk chunk;
-		if (chunkCache1 != null && chunkCache1.xPosition == chunkX
-				&& chunkCache1.zPosition == chunkZ) {
-			chunk = chunkCache1;
-			chunkHitCounter++;
-		} else if (chunkCache2 != null && chunkCache2.xPosition == chunkX
-				&& chunkCache2.zPosition == chunkZ) {
-			chunk = chunkCache2;
-			chunkHitCounter++;
-		} else {
-			chunk = mc.theWorld.getChunkFromChunkCoords(chunkX, chunkZ);
-			if (chunkCacheReplaceCounter) {
-				chunkCache1 = chunk;
-			} else {
-				chunkCache2 = chunk;
-			}
-			chunkCacheReplaceCounter = !chunkCacheReplaceCounter;
-			chunkMissCounter++;
-		}
-
-		// chunk.getBlock(x & 15, y, z & 15);
-
-		int blockId = 0;
-
-		final ExtendedBlockStorage[] sa = chunk.getBlockStorageArray();
-		if (y >> 4 < sa.length) {
-			final ExtendedBlockStorage extendedblockstorage = sa[y >> 4];
-
-			if (extendedblockstorage != null) {
-				final int lx = x & 15;
-				final int ly = y & 15;
-				final int lz = z & 15;
-				blockId = extendedblockstorage.getData()[ly << 8 | lz << 4 | lx] & 0xffff;
-			}
-		}
-
-		return blockId;
-	}
-
-	public boolean isAirBlock(BlockPos pos) {
-		return isAirBlock(pos.getX(), pos.getY(), pos.getZ());
-	}
-
-	/**
-	 * Check if this block is air
-	 * 
-	 * @param x
-	 * @param y
-	 * @param z
-	 * @return
-	 */
-	public boolean isAirBlock(int x, int y, int z) {
-		final int block = getBlockId(x, y, z);
-		return air.contains(block);
-	}
-
-	/**
-	 * Check if this block is safe to stand on it on a path.
-	 * 
-	 * @param x
-	 * @param y
-	 * @param z
-	 * @return
-	 */
-	public boolean isSafeGroundBlock(int x, int y, int z) {
-		final int block = getBlockId(x, y, z);
-		return safeStandableBlocks.contains(block);
-	}
-
-	/**
-	 * Check if we would want this block over our head.
-	 * 
-	 * @param x
-	 * @param y
-	 * @param z
-	 * @return
-	 */
-	public boolean isSafeHeadBlock(int x, int y, int z) {
-		final int block = getBlockId(x, y, z);
-		return safeCeilingBlocks.contains(block);
-	}
-
-	public boolean isFallingBlock(int x, int y, int z) {
-		final int block = getBlockId(x, y, z);
-		return fallingBlocks.contains(block);
-	}
-
-	/**
-	 * Check if all sides of this block are considered safe.
-	 * 
-	 * @see AIHelper#isSafeSideBlock(int, int, int)
-	 * @param cx
-	 * @param cy
-	 * @param cz
-	 * @return
-	 */
-	public final boolean hasSafeSides(int cx, int cy, int cz) {
-		return isSafeSideBlock(cx - 1, cy, cz)
-				&& isSafeSideBlock(cx + 1, cy, cz)
-				&& isSafeSideBlock(cx, cy, cz + 1)
-				&& isSafeSideBlock(cx, cy, cz - 1);
-	}
-
-	public final boolean isSafeSideBlock(int x, int y, int z) {
-		final int block = getBlockId(x, y, z);
-		return safeSideBlocks.contains(block);
-	}
-
+	
 	/**
 	 * Check if this is basically a block that cannot harm us if it is next to
 	 * us.
@@ -483,9 +241,9 @@ public abstract class AIHelper {
 	 * @param block
 	 * @return
 	 */
-	public boolean canWalkThrough(Block block) {
-		return headWalkableBlocks.contains(block);
-	}
+//	public boolean canWalkThrough(Block block) {
+//		return HEAD_CAN_WALK_TRHOUGH.contains(block);
+//	}
 
 	/**
 	 * Check if the block is a block that we could walk on as if it was air.
@@ -494,9 +252,9 @@ public abstract class AIHelper {
 	 * @param block
 	 * @return
 	 */
-	public boolean canWalkOn(Block block) {
-		return walkableBlocks.contains(block);
-	}
+//	public boolean canWalkOn(Block block) {
+//		return FEET_CAN_WALK_THROUGH.contains(block);
+//	}
 
 	/**
 	 * Check if we can stand on the block.
@@ -504,52 +262,10 @@ public abstract class AIHelper {
 	 * @param block
 	 * @return
 	 */
-	public boolean isSafeStandableBlock(Block block) {
-		return safeStandableBlocks.contains(block);
-	}
+//	public boolean isSafeStandableBlock(Block block) {
+//		return SAFE_GROUND.contains(block);
+//	}
 
-	public boolean isSideTorch(BlockPos pos) {
-		int id = getBlockId(pos);
-		return torches.contains(id)
-				&& getMinecraft().theWorld.getBlockState(pos).getValue(
-						BlockTorch.FACING) != EnumFacing.UP;
-	}
-
-	public BlockPos getHaningOnBlock(BlockPos pos) {
-		IBlockState meta = mc.theWorld.getBlockState(pos);
-		EnumFacing facing = null;
-		if (torches.contains(meta.getBlock())) {
-			facing = getTorchDirection(meta);
-		} else if (meta.getBlock().equals(Blocks.wall_sign)) {
-			facing = getSignDirection(meta);
-			// TODO Ladder and other hanging blocks.
-		} else if (walkableBlocks.contains(meta)) {
-			facing = EnumFacing.UP;
-		}
-		return facing == null ? null : pos.offset(facing, -1);
-	}
-
-	/**
-	 * Get the sign/ladder/dispenser/dropper direction
-	 * 
-	 * @param meta
-	 * @return
-	 */
-	private EnumFacing getSignDirection(IBlockState metaValue) {
-		return (EnumFacing) metaValue.getValue(BlockWallSign.FACING);
-
-	}
-
-	// TODO: Move somewhere else.
-	/**
-	 * The direction the torch is facing. Default would be up.
-	 * 
-	 * @param metaValue
-	 * @return
-	 */
-	public EnumFacing getTorchDirection(IBlockState metaValue) {
-		return (EnumFacing) metaValue.getValue(BlockTorch.FACING);
-	}
 
 	private Block getBoundsBlock(BlockPos pos) {
 		Block block = getBlock(pos);
@@ -562,34 +278,6 @@ public abstract class AIHelper {
 	}
 
 	/**
-	 * Finds any Block of that type directly around the player.
-	 * 
-	 * @param blockType
-	 *            The block to search.
-	 * @return the position or <code>null</code> if it was not found.
-	 */
-	public BlockPos findBlock(Block blockType) {
-		List<BlockPos> pos = findBlocks(blockType, 2);
-		return pos.isEmpty() ? null : pos.get(0);
-	}
-
-	public List<BlockPos> findBlocks(Block blockType, int radius) {
-		final BlockPos current = getPlayerPosition();
-		ArrayList<BlockPos> pos = new ArrayList<BlockPos>();
-		for (int x = current.getX() - radius; x <= current.getX() + radius; x++) {
-			for (int z = current.getZ() - radius; z <= current.getZ() + radius; z++) {
-				for (int y = current.getY() - radius; y <= current.getY() + radius; y++) {
-					final Block block = getBlock(x, y, z);
-					if (Block.isEqualTo(block, blockType)) {
-						pos.add(new BlockPos(x, y, z));
-					}
-				}
-			}
-		}
-		return pos;
-	}
-
-	/**
 	 * Faces an exact position in space.
 	 * 
 	 * @param x
@@ -599,6 +287,7 @@ public abstract class AIHelper {
 	public void face(double x, double y, double z) {
 		face(x, y, z, 1, 1);
 	}
+
 	private void face(double x, double y, double z, float yawInfluence, float pitchInfluence) {
 		final double d0 = x - mc.thePlayer.posX;
 		final double d1 = z - mc.thePlayer.posZ;
@@ -613,8 +302,14 @@ public abstract class AIHelper {
 			final float pitch = (float) -(Math.atan2(d2,
 					Math.sqrt(d0 * d0 + d1 * d1)) * 180.0D / Math.PI);
 			float rotations = fullRotations(yaw - rotationYaw);
-			mc.thePlayer.setAngles(rotations / .15f + (yaw - rotationYaw - rotations) / 0.15f * yawInfluence,
-					-(pitch - rotationPitch) / 0.15f * pitchInfluence);
+			float yawChange = yaw - rotationYaw - rotations;
+			float pitchChange = pitch - rotationPitch;
+			yawInfluence = Math.min(yawInfluence, Math.min(Math.abs(MAX_YAW_CHANGE / yawChange), 1));
+			pitchInfluence = Math.min(pitchInfluence, Math.min(Math.abs(MAX_PITCH_CHANGE / pitchChange), 1));
+			System.out.println("Change: " + yawChange + "," + pitchChange +" => " + yawInfluence + "," + pitchInfluence );
+
+			mc.thePlayer.setAngles(rotations / .15f + yawChange / 0.15f * yawInfluence,
+					-pitchChange / 0.15f * pitchInfluence);
 			invalidateObjectMouseOver();
 		}
 	}
@@ -740,7 +435,7 @@ public abstract class AIHelper {
 				|| block instanceof BlockWall) {
 			maxY = 1.5;
 		} else if (block instanceof BlockSlab) {
-			final int blockMetadata = getBlockIdWithMeta(x, y, z) & 0xf;
+			final int blockMetadata = getWorld().getBlockIdWithMeta(x, y, z) & 0xf;
 			maxY = (blockMetadata & 0x8) == 0 ? 0.5 : 1;
 		} else {
 			maxY = block.getBlockBoundsMaxY();
@@ -754,12 +449,8 @@ public abstract class AIHelper {
 	 * 
 	 * @return The position.
 	 */
-	public Pos getPlayerPosition() {
-		final int x = (int) Math.floor(getMinecraft().thePlayer.posX);
-		final int y = (int) Math.floor(getMinecraft().thePlayer
-				.getEntityBoundingBox().minY + 0.05);
-		final int z = (int) Math.floor(getMinecraft().thePlayer.posZ);
-		return new Pos(x, y, z);
+	public BlockPos getPlayerPosition() {
+		return getWorld().getPlayerPosition();
 	}
 
 	/*
@@ -846,7 +537,7 @@ public abstract class AIHelper {
 			for (EnumFacing d : EnumFacing.values()) {
 				BlockPos offseted = pos.offset(d);
 				if (isFacingBlock(offseted)) {
-					BlockPos hanging = getHaningOnBlock(offseted);
+					BlockPos hanging = getWorld().getHangingOnBlock(offseted);
 					if (hanging != null && hanging.equals(pos)) {
 						overrideAttack();
 					}
@@ -1327,7 +1018,8 @@ public abstract class AIHelper {
 				+ delta);
 	}
 
-	public int getLightAt(Pos pos) {
+	//TODO: Move this to WorldData
+	public int getLightAt(BlockPos pos) {
 		final Chunk chunk = mc.theWorld.getChunkFromChunkCoords(
 				pos.getX() >> 4, pos.getZ() >> 4);
 		final ExtendedBlockStorage storage = chunk.getBlockStorageArray()[pos
@@ -1356,4 +1048,11 @@ public abstract class AIHelper {
 		this.activeMapReader = activeMapReader;
 	}
 
+	public abstract AIStrategy getResumeStrategy();
+
+	public abstract NetworkHelper getNetworkHelper();
+
+	public MapReader getActiveMapReader() {
+		return activeMapReader;
+	}
 }

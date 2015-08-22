@@ -16,7 +16,6 @@
  *******************************************************************************/
 package net.famzangl.minecraft.minebot.ai.command;
 
-import java.lang.reflect.Type;
 import java.util.ArrayList;
 
 import net.famzangl.minecraft.minebot.ai.AIHelper;

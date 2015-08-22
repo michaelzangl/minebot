@@ -17,8 +17,11 @@
 package net.famzangl.minecraft.minebot.ai.task.place;
 
 import net.famzangl.minecraft.minebot.ai.AIHelper;
+import net.famzangl.minecraft.minebot.ai.path.world.BlockSets;
+import net.famzangl.minecraft.minebot.ai.path.world.WorldWithDelta;
 import net.famzangl.minecraft.minebot.ai.task.AITask;
 import net.famzangl.minecraft.minebot.ai.task.TaskOperations;
+import net.minecraft.init.Blocks;
 import net.minecraft.util.BlockPos;
 
 /**
@@ -36,7 +39,7 @@ public class DestroyBlockTask extends AITask {
 
 	@Override
 	public boolean isFinished(AIHelper h) {
-		return h.isAirBlock(pos);
+		return BlockSets.AIR.isAt(h.getWorld(), pos);
 	}
 
 	@Override
@@ -44,4 +47,9 @@ public class DestroyBlockTask extends AITask {
 		h.faceAndDestroy(pos);
 	}
 
+	@Override
+	public boolean applyToDelta(WorldWithDelta world) {
+		world.setBlock(pos, Blocks.air);
+		return true;
+	}
 }

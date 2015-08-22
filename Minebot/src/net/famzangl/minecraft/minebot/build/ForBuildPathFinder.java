@@ -20,10 +20,10 @@ import java.util.Arrays;
 import java.util.LinkedList;
 
 import net.famzangl.minecraft.minebot.Pos;
-import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.BlockItemFilter;
-import net.famzangl.minecraft.minebot.ai.BlockWhitelist;
 import net.famzangl.minecraft.minebot.ai.path.MovePathFinder;
+import net.famzangl.minecraft.minebot.ai.path.world.BlockSet;
+import net.famzangl.minecraft.minebot.ai.path.world.BlockSets;
 import net.famzangl.minecraft.minebot.ai.task.move.AlignToGridTask;
 import net.famzangl.minecraft.minebot.build.blockbuild.BuildTask;
 import net.minecraft.init.Blocks;
@@ -38,8 +38,8 @@ import net.minecraft.util.BlockPos;
 public class ForBuildPathFinder extends MovePathFinder {
 
 	private static final int NEIGHBOURS_PER_DIRECTION = 6;
-	private static final BlockWhitelist FENCES = new BlockWhitelist(
-			Blocks.cobblestone_wall).unionWith(AIHelper.fences);
+	private static final BlockSet FENCES = new BlockSet(
+			Blocks.cobblestone_wall).unionWith(BlockSets.FENCE);
 	/**
 	 * Task we want to prepare for.
 	 */
@@ -51,8 +51,8 @@ public class ForBuildPathFinder extends MovePathFinder {
 	public ForBuildPathFinder(BuildTask task) {
 		this.task = task;
 		allowedGroundForUpwardsBlocks = allowedGroundBlocks;
-		footAllowedBlocks = AIHelper.walkableBlocks;
-		headAllowedBlocks = AIHelper.headWalkableBlocks;
+		footAllowedBlocks = BlockSets.FEET_CAN_WALK_THROUGH;
+		headAllowedBlocks = BlockSets.HEAD_CAN_WALK_TRHOUGH;
 		footAllowedBlocks = footAllowedBlocks.intersectWith(forbiddenBlocks
 				.invert());
 		headAllowedBlocks = headAllowedBlocks.intersectWith(forbiddenBlocks
@@ -87,15 +87,15 @@ public class ForBuildPathFinder extends MovePathFinder {
 		final int max = canBuildUp ? 3 : 1;
 		int offsetAdd = 0;
 		for (int y = cy + 1; y <= cy + max; y++) {
-			if (!helper.isAirBlock(getX(currentNode), y + 1, getZ(currentNode))) {
+			if (!BlockSets.AIR.isAt(world, getX(currentNode), y + 1, getZ(currentNode))) {
 				break;
 			}
 			fill[offset + offsetAdd++] = getNeighbour(currentNode, x, y, z);
 		}
 
-		if (helper.isAirBlock(x, cy + 1, z)) {
+		if (BlockSets.AIR.isAt(world, x, cy + 1, z)) {
 			for (int y = cy; y > cy - 3; y--) {
-				if (!helper.isAirBlock(x, y, z)) {
+				if (!BlockSets.AIR.isAt(world, x, y, z)) {
 					break;
 				}
 				fill[offset + offsetAdd++] = getNeighbour(currentNode, x, y, z);
@@ -105,9 +105,9 @@ public class ForBuildPathFinder extends MovePathFinder {
 
 	@Override
 	protected boolean checkGroundBlock(int currentNode, int cx, int cy, int cz) {
-		return helper.isSafeGroundBlock(cx, cy - 1, cz)
-				|| helper.isAirBlock(cx, cy - 1, cz)
-				&& FENCES.contains(helper.getBlockId(cx, cy - 2, cz));
+		return BlockSets.SAFE_GROUND.isAt(world, cx, cy - 1, cz)
+				|| BlockSets.AIR.isAt(world, cx, cy - 1, cz)
+				&& FENCES.isAt(world, cx, cy - 2, cz);
 	}
 
 	@Override

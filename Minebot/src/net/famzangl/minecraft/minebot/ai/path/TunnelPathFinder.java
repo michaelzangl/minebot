@@ -17,21 +17,28 @@
 package net.famzangl.minecraft.minebot.ai.path;
 
 import java.util.ArrayList;
+import java.util.BitSet;
 import java.util.Collections;
 
 import net.famzangl.minecraft.minebot.Pos;
 import net.famzangl.minecraft.minebot.ai.AIHelper;
-import net.famzangl.minecraft.minebot.ai.BlockWhitelist;
+import net.famzangl.minecraft.minebot.ai.path.world.BlockSet;
+import net.famzangl.minecraft.minebot.ai.path.world.BlockSets;
+import net.famzangl.minecraft.minebot.ai.path.world.WorldWithDelta;
 import net.famzangl.minecraft.minebot.ai.task.AITask;
 import net.famzangl.minecraft.minebot.ai.task.DestroyInRangeTask;
 import net.famzangl.minecraft.minebot.ai.task.PlaceTorchSomewhereTask;
+import net.famzangl.minecraft.minebot.ai.task.SkipWhenSearchingPrefetch;
+import net.famzangl.minecraft.minebot.ai.task.TaskOperations;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
 
 public class TunnelPathFinder extends AlongTrackPathFinder {
 
-	private final static BlockWhitelist tunneled = AIHelper.air
-			.unionWith(AIHelper.torches);
+	private final static BlockSet tunneled = BlockSets.AIR
+			.unionWith(BlockSets.TORCH);
+
+	private BitSet finishedTunnels = new BitSet();
 
 	/**
 	 * How much more to tunnel to the side.
@@ -41,6 +48,32 @@ public class TunnelPathFinder extends AlongTrackPathFinder {
 	private final TorchSide torches;
 
 	private final boolean addBranches;
+
+	@SkipWhenSearchingPrefetch
+	private final class MarkAsDoneTask extends AITask {
+		private final int stepNumber;
+		private boolean done = false;
+
+		private MarkAsDoneTask(int stepNumber) {
+			this.stepNumber = stepNumber;
+		}
+
+		@Override
+		public void runTick(AIHelper h, TaskOperations o) {
+			finishedTunnels.set(stepNumber);
+			done = true;
+		}
+
+		@Override
+		public boolean isFinished(AIHelper h) {
+			return done;
+		}
+
+		@Override
+		public boolean applyToDelta(WorldWithDelta world) {
+			return true;
+		}
+	}
 
 	public static enum TorchSide {
 		NONE(false, false, false), LEFT(true, false, false), RIGHT(false, true,
@@ -68,8 +101,8 @@ public class TunnelPathFinder extends AlongTrackPathFinder {
 
 	@Override
 	protected float rateDestination(int distance, int x, int y, int z) {
-		if (isOnTrack(x, z) && y == cy
-				&& !tunneled.contains(helper.getBlockId(x, y, z))) {
+		if (isOnTrack(x, z) && y == cy && !tunneled.isAt(world, x, y, z)
+				&& !finishedTunnels.get(getStepNumber(x, z))) {
 			return distance + 1;
 		} else {
 			return -1;
@@ -88,7 +121,8 @@ public class TunnelPathFinder extends AlongTrackPathFinder {
 		}
 		addTask(new DestroyInRangeTask(p1, p2));
 
-		int stepNumber = getStepNumber(currentPos.getX(), currentPos.getZ());
+		final int stepNumber = getStepNumber(currentPos.getX(),
+				currentPos.getZ());
 		final boolean isTorchStep = stepNumber % 8 == 0;
 		if (torches.right && isTorchStep) {
 			addTorchesTask(currentPos, -dz, dx);
@@ -105,6 +139,7 @@ public class TunnelPathFinder extends AlongTrackPathFinder {
 			addBranchTask(currentPos, -dz, dx);
 			addBranchTask(currentPos, dz, -dx);
 		}
+		addTask(new MarkAsDoneTask(stepNumber));
 	}
 
 	private void addBranchTask(BlockPos currentPos, int dx, int dz) {
@@ -115,16 +150,14 @@ public class TunnelPathFinder extends AlongTrackPathFinder {
 			branchMax = i;
 		}
 		if (branchMax > 0) {
-			addTask(new DestroyInRangeTask(currentPos.add(dx * 1, 1, dz * 1), currentPos.add(dx * branchMax, 1, dz * branchMax)));
+			addTask(new DestroyInRangeTask(currentPos.add(dx * 1, 1, dz * 1),
+					currentPos.add(dx * branchMax, 1, dz * branchMax)));
 		}
 	}
 
-	private boolean isSafeBranchPos(BlockPos add) {
-		return helper.hasSafeSides(add.getX(), add.getY(), add.getZ())
-				&& helper.isSafeHeadBlock(add.getX(), add.getY() + 1,
-						add.getZ())
-				&& helper.isSafeSideBlock(add.getX(), add.getY() - 1,
-						add.getZ());
+	private boolean isSafeBranchPos(BlockPos pos) {
+		return BlockSets.safeSideAndCeilingAround(world, pos)
+				&& BlockSets.SAFE_SIDE.isAt(world, pos.add(0, -1, 0));
 	}
 
 	private void addTorchesTask(BlockPos currentPos, int dirX, int dirZ) {

@@ -19,8 +19,8 @@ package net.famzangl.minecraft.minebot.ai.path;
 import java.util.Random;
 import java.util.Set;
 
-import net.famzangl.minecraft.minebot.Pos;
-import net.famzangl.minecraft.minebot.ai.BlockWhitelist;
+import net.famzangl.minecraft.minebot.ai.path.world.BlockSet;
+import net.famzangl.minecraft.minebot.ai.path.world.BlockSets;
 import net.famzangl.minecraft.minebot.ai.task.DestroyInRangeTask;
 import net.minecraft.block.Block;
 import net.minecraft.util.BlockPos;
@@ -88,15 +88,17 @@ public abstract class MinePathfinder extends MovePathFinder {
 		points = new FloatBlockCache(getPointsProvider());
 		factors = new FloatBlockCache(getFactorProvider());
 	}
-	
+
 	@Override
 	protected boolean runSearch(BlockPos playerPosition) {
-		for (ResourceLocation k : (Set<ResourceLocation>)Block.blockRegistry.getKeys()) {
-			int id = Block.getIdFromBlock((Block) Block.blockRegistry.getObject(k));
+		for (ResourceLocation k : (Set<ResourceLocation>) Block.blockRegistry
+				.getKeys()) {
+			int id = Block.getIdFromBlock((Block) Block.blockRegistry
+					.getObject(k));
 			float f = factors.getForBlock(id);
 			if (f > 0) {
-				headAllowedBlocks.intersectWith(new BlockWhitelist(id));
-				footAllowedBlocks.intersectWith(new BlockWhitelist(id));
+				headAllowedBlocks.intersectWith(new BlockSet(id));
+				footAllowedBlocks.intersectWith(new BlockSet(id));
 			}
 		}
 		return super.runSearch(playerPosition);
@@ -124,8 +126,9 @@ public abstract class MinePathfinder extends MovePathFinder {
 			return -1;
 		} else {
 			float badDirectionMalus = 0;
-			final Pos current = helper.getPlayerPosition();
-			if (preferedDirection != null && preferedDirection.getFrontOffsetX() != 0) {
+			final BlockPos current = world.getPlayerPosition();
+			if (preferedDirection != null
+					&& preferedDirection.getFrontOffsetX() != 0) {
 				final int dx = x - current.getX();
 				if (Math.signum(dx) != preferedDirection.getFrontOffsetX()) {
 					badDirectionMalus = dx * preferedDirectionInfluence;
@@ -150,46 +153,46 @@ public abstract class MinePathfinder extends MovePathFinder {
 				* rand.nextFloat();
 		return f * (1 - r);
 	}
-	
+
 	private float rateOreBlockDistance(int distance, int x, int y, int z) {
-		final int id = helper.getBlockId(x, y, z);
+		final int id = world.getBlockId(x, y, z);
 		final float point = points.getForBlock(id);
 
 		final float factor = factors.getForBlock(id);
 		if (factor == 0) {
 			return Float.POSITIVE_INFINITY;
 		} else {
-			return distance / factor
-					* maxDistanceFactor + maxDistancePoints - point;
+			return distance / factor * maxDistanceFactor + maxDistancePoints
+					- point;
 		}
 	}
 
-	protected final boolean isOreBlock(int x, int y, int z) {
-		return factors.getForBlock(helper.getBlockId(x, y, z)) > 0;
+	protected boolean isOreBlock(int x, int y, int z) {
+		return factors.getForBlock(world.getBlockId(x, y, z)) > 0;
 	}
 
 	@Override
 	protected void addTasksForTarget(BlockPos currentPos) {
 		BlockPos top, bottom;
-		if (isOreBlock(currentPos.getX(), currentPos.getY() + 1, currentPos.getZ())) {
+		int x = currentPos.getX();
+		int y = currentPos.getY();
+		int z = currentPos.getZ();
+		if (isOreBlock(x, y + 1, z)) {
 			top = currentPos.add(0, 1, 0);
 		} else {
 			top = currentPos;
 		}
-		if (isOreBlock(currentPos.getX(), currentPos.getY(), currentPos.getZ())) {
+		if (isOreBlock(x, y, z)) {
 			bottom = currentPos;
 		} else {
 			bottom = currentPos.add(0, 1, 0);
 		}
 
 		for (int i = 2; i < 5; i++) {
-			if (!helper.hasSafeSides(currentPos.getX(), currentPos.getY() + i,
-					currentPos.getZ())
-					|| !helper.isSafeHeadBlock(currentPos.getX(), currentPos.getY() + i
-							+ 1, currentPos.getZ())) {
+			if (!BlockSets.safeSideAndCeilingAround(world, x, y + i, z)) {
 				break;
 			}
-			if (isOreBlock(currentPos.getX(), currentPos.getY() + i, currentPos.getZ())) {
+			if (isOreBlock(x, y + i, z)) {
 				top = currentPos.add(0, i, 0);
 			} else {
 				break;

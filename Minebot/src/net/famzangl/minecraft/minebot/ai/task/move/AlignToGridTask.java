@@ -16,11 +16,12 @@
  *******************************************************************************/
 package net.famzangl.minecraft.minebot.ai.task.move;
 
-import net.famzangl.minecraft.minebot.Pos;
 import net.famzangl.minecraft.minebot.ai.AIHelper;
+import net.famzangl.minecraft.minebot.ai.path.world.WorldWithDelta;
 import net.famzangl.minecraft.minebot.ai.task.AITask;
 import net.famzangl.minecraft.minebot.ai.task.SkipWhenSearchingPrefetch;
 import net.famzangl.minecraft.minebot.ai.task.TaskOperations;
+import net.minecraft.util.BlockPos;
 
 /**
  * Ensures that the player is standing on a block. If it is not, it walks to the
@@ -41,7 +42,7 @@ public class AlignToGridTask extends AITask {
 		this.z = z;
 	}
 
-	public AlignToGridTask(Pos p) {
+	public AlignToGridTask(BlockPos p) {
 		this(p.getX(), p.getY(), p.getZ());
 	}
 
@@ -58,5 +59,11 @@ public class AlignToGridTask extends AITask {
 	@Override
 	public String toString() {
 		return "AlignToGridTask [x=" + x + ", y=" + y + ", z=" + z + "]";
+	}
+	
+	@Override
+	public boolean applyToDelta(WorldWithDelta world) {
+		world.setPlayerPosition(new BlockPos(x, y, z));
+		return true;
 	}
 }

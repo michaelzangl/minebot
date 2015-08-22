@@ -22,6 +22,7 @@ import java.util.List;
 
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.BlockItemFilter;
+import net.famzangl.minecraft.minebot.ai.path.world.BlockSets;
 import net.famzangl.minecraft.minebot.ai.task.error.SelectTaskError;
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
@@ -43,7 +44,7 @@ public class PlaceTorchSomewhereTask extends AITask {
 	private final List<BlockPos> places;
 	private final EnumFacing[] preferedDirection;
 	private BlockPos lastAttempt;
-	
+
 	private int delayAfter;
 
 	private static class PosAndDir {
@@ -90,7 +91,7 @@ public class PlaceTorchSomewhereTask extends AITask {
 
 	private boolean isImpossible(AIHelper h) {
 		for (BlockPos p : places) {
-			if (h.isAirBlock(p)) {
+			if (BlockSets.AIR.isAt(h.getWorld(), p)) {
 				return false;
 			}
 		}
@@ -111,7 +112,7 @@ public class PlaceTorchSomewhereTask extends AITask {
 				for (final EnumFacing d : preferedDirection) {
 					final PosAndDir current = new PosAndDir(p, d);
 					final BlockPos placeOn = current.getPlaceOn();
-					if (!h.isAirBlock(placeOn)) {
+					if (!BlockSets.AIR.isAt(h.getWorld(), placeOn)) {
 						attemptOnPositions.add(current);
 					}
 				}
@@ -121,8 +122,9 @@ public class PlaceTorchSomewhereTask extends AITask {
 		}
 
 		while (!attemptOnPositions.isEmpty()
-				&& (attemptOnPositions.peekFirst().attemptsLeft <= 0 || !h
-						.isAirBlock(attemptOnPositions.peekFirst().place))) {
+				&& (attemptOnPositions.peekFirst().attemptsLeft <= 0 || !BlockSets.AIR
+						.isAt(h.getWorld(),
+								attemptOnPositions.peekFirst().place))) {
 			attemptOnPositions.removeFirst();
 		}
 
@@ -153,8 +155,8 @@ public class PlaceTorchSomewhereTask extends AITask {
 	}
 
 	@Override
-	public int getGameTickTimeout() {
-		return super.getGameTickTimeout() * 3;
+	public int getGameTickTimeout(AIHelper helper) {
+		return super.getGameTickTimeout(helper) * 3;
 	}
 
 	@Override

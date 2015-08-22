@@ -18,6 +18,7 @@ package net.famzangl.minecraft.minebot.ai.task.place;
 
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.ItemFilter;
+import net.famzangl.minecraft.minebot.ai.path.world.BlockSets;
 import net.famzangl.minecraft.minebot.ai.task.BlockSide;
 import net.famzangl.minecraft.minebot.ai.task.TaskOperations;
 import net.famzangl.minecraft.minebot.ai.task.error.StringTaskError;
@@ -71,7 +72,7 @@ public class JumpingPlaceAtHalfTask extends JumpingPlaceBlockAtFloorTask {
 	protected boolean faceSideBlock(AIHelper h, EnumFacing dir) {
 		System.out.println("Facing side " + dir);
 		BlockPos facingBlock = getPlaceAtPos().offset(dir);
-		if (h.isAirBlock(facingBlock)) {
+		if (BlockSets.AIR.isAt(h.getWorld(), facingBlock)) {
 			return false;
 		} else {
 			h.faceSideOf(facingBlock, dir.getOpposite(),

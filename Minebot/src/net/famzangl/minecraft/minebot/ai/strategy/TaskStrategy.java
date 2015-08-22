@@ -22,6 +22,7 @@ import java.util.List;
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.command.AIChatController;
 import net.famzangl.minecraft.minebot.ai.path.TaskReceiver;
+import net.famzangl.minecraft.minebot.ai.path.world.BlockSets;
 import net.famzangl.minecraft.minebot.ai.task.AITask;
 import net.famzangl.minecraft.minebot.ai.task.CanPrefaceAndDestroy;
 import net.famzangl.minecraft.minebot.ai.task.SkipWhenSearchingPrefetch;
@@ -39,16 +40,20 @@ import net.minecraft.util.BlockPos;
  */
 public abstract class TaskStrategy extends AIStrategy implements
 		TaskOperations, TaskReceiver {
-	private static final int MAX_LOOKAHEAD = 5;
-	private final LinkedList<AITask> tasks = new LinkedList<AITask>();
+	private static final int MAX_LOOKAHEAD = 9;
+	private static final int DESYNC_TIME = 5;
+	// Maximum distance for aiming at blocks to destroy.
+	private static final int MAX_PREDESTROY_DISTANCE = 4;
+	private static final boolean LESS_ERRORS = false;
+	protected final LinkedList<AITask> tasks = new LinkedList<AITask>();
 
-	private boolean desync;
+	private int desyncTimer = 0;
 	private boolean searchNewTasks = true;
 	private AIHelper temporaryHelper;
 
 	private final LinkedList<TaskError> lastErrors = new LinkedList<TaskError>();
 	private int taskTimeout;
-	
+
 	@Override
 	protected void onDeactivate(AIHelper helper) {
 		desync(new StringTaskError("An other strategy took over."));
@@ -69,14 +74,14 @@ public abstract class TaskStrategy extends AIStrategy implements
 		System.out.println("Error: " + error);
 		Thread.dumpStack();
 
-		if (!lastErrors.contains(error)) {
+		if (!LESS_ERRORS || !lastErrors.contains(error)) {
 			AIChatController.addChatLine("Error: " + error.getMessage());
 		}
 		if (lastErrors.size() > 2) {
 			lastErrors.removeFirst();
 		}
 		lastErrors.addLast(error);
-		desync = true;
+		desyncTimer = DESYNC_TIME;
 	}
 
 	@Override
@@ -84,7 +89,7 @@ public abstract class TaskStrategy extends AIStrategy implements
 		boolean found = false;
 		for (int i = 1; i < MAX_LOOKAHEAD && i < tasks.size() && !found; i++) {
 			final AITask task = tasks.get(i);
-//			System.out.println("Prefetching with: " + task);
+			// System.out.println("Prefetching with: " + task);
 			if (tasks.get(i).getClass()
 					.isAnnotationPresent(SkipWhenSearchingPrefetch.class)) {
 				continue;
@@ -93,24 +98,28 @@ public abstract class TaskStrategy extends AIStrategy implements
 				final List<BlockPos> positions = dTask
 						.getPredestroyPositions(temporaryHelper);
 				for (final BlockPos pos : positions) {
-					if (!temporaryHelper.isAirBlock(pos)) {
+					if (!BlockSets.AIR.isAt(temporaryHelper.getWorld(), pos)
+							&& pos.distanceSq(temporaryHelper
+									.getPlayerPosition()) < MAX_PREDESTROY_DISTANCE
+									* MAX_PREDESTROY_DISTANCE) {
 						temporaryHelper.faceAndDestroy(pos);
 						found = true;
 						break;
 					}
 				}
-//				System.out.println("Prefacing: " + found + " for " + positions);
+				// System.out.println("Prefacing: " + found + " for " +
+				// positions);
 			} else {
-//				System.out.println("Prefetching showstopper: " + task);
+				// System.out.println("Prefetching showstopper: " + task);
 				break;
 			}
 		}
-//		if (!found) {
-//			System.out.println("Could not prefetch anything. " + tasks.size());
-//		}
+		// if (!found) {
+		// System.out.println("Could not prefetch anything. " + tasks.size());
+		// }
 		return found;
 	}
-	
+
 	@Override
 	public boolean checkShouldTakeOver(AIHelper helper) {
 		if (tasks.isEmpty()) {
@@ -122,9 +131,10 @@ public abstract class TaskStrategy extends AIStrategy implements
 
 	@Override
 	protected TickResult onGameTick(AIHelper helper) {
-		if (desync) {
+		if (desyncTimer > 0) {
 			tasks.clear();
-			desync = false;
+			System.out.println("Waiting because of desync... " + desyncTimer);
+			desyncTimer--;
 			// pause for a tick, to reset all buttons, jump, ...
 			return TickResult.TICK_HANDLED;
 		}
@@ -149,25 +159,31 @@ public abstract class TaskStrategy extends AIStrategy implements
 			System.out.println("Next will be: " + tasks.peekFirst());
 			taskTimeout = 0;
 			return TickResult.TICK_AGAIN;
-		} else if (taskTimeout > task.getGameTickTimeout()) {
-			desync(new StringTaskError("Task timed out."));
-			return TickResult.TICK_AGAIN;
 		} else {
-			temporaryHelper = helper;
-			task.runTick(helper, this);
-			temporaryHelper = null;
-			taskTimeout++;
-			return TickResult.TICK_HANDLED;
+			int tickTimeout = task.getGameTickTimeout(helper);
+			if (taskTimeout > tickTimeout) {
+				desync(new StringTaskError(
+						"Task timed out. It should have been completed in "
+								+ (tickTimeout / 20f) + "s"));
+				return TickResult.TICK_HANDLED;
+			} else {
+				temporaryHelper = helper;
+				task.runTick(helper, this);
+				temporaryHelper = null;
+				taskTimeout++;
+				return TickResult.TICK_HANDLED;
+			}
 		}
 	}
 
 	private void searchAndPrintTasks(AIHelper helper) {
 		searchTasks(helper);
 		if (!tasks.isEmpty()) {
-			System.out.println("Found " + tasks.size() + " tasks, first task: " + tasks.peekFirst());
+			System.out.println("Found " + tasks.size() + " tasks, first task: "
+					+ tasks.peekFirst());
 		}
 	}
-	
+
 	protected boolean hasMoreTasks() {
 		return !tasks.isEmpty();
 	}
@@ -184,4 +200,12 @@ public abstract class TaskStrategy extends AIStrategy implements
 	 *            The helper that can be used.
 	 */
 	protected abstract void searchTasks(AIHelper helper);
+
+	/**
+	 * @return the desync flag
+	 */
+	public boolean isDesync() {
+		return desyncTimer > 0;
+	}
+
 }

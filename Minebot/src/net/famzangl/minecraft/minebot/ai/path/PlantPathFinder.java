@@ -16,10 +16,11 @@
  *******************************************************************************/
 package net.famzangl.minecraft.minebot.ai.path;
 
-import net.famzangl.minecraft.minebot.ai.AIHelper;
-import net.famzangl.minecraft.minebot.ai.BlockWhitelist;
 import net.famzangl.minecraft.minebot.ai.ClassItemFilter;
 import net.famzangl.minecraft.minebot.ai.ItemFilter;
+import net.famzangl.minecraft.minebot.ai.path.world.BlockSet;
+import net.famzangl.minecraft.minebot.ai.path.world.BlockSets;
+import net.famzangl.minecraft.minebot.ai.path.world.WorldData;
 import net.famzangl.minecraft.minebot.ai.task.UseItemOnBlockAtTask;
 import net.famzangl.minecraft.minebot.ai.task.place.DestroyBlockTask;
 import net.famzangl.minecraft.minebot.ai.task.place.PlaceBlockAtFloorTask;
@@ -74,14 +75,16 @@ public class PlantPathFinder extends MovePathFinder {
 
 	private final PlantType type;
 
-	private static final BlockWhitelist farmlandable = new BlockWhitelist(
+	private static final BlockSet farmlandable = new BlockSet(
 			Blocks.dirt, Blocks.grass);
+	private static final BlockSet farmland = new BlockSet(
+			Blocks.farmland);
 
 	public PlantPathFinder(PlantType type) {
 		this.type = type;
 		allowedGroundForUpwardsBlocks = allowedGroundBlocks;
-		footAllowedBlocks = AIHelper.walkableBlocks;
-		headAllowedBlocks = AIHelper.headWalkableBlocks;
+		footAllowedBlocks = BlockSets.FEET_CAN_WALK_THROUGH;
+		headAllowedBlocks = BlockSets.HEAD_CAN_WALK_TRHOUGH;
 		footAllowedBlocks = footAllowedBlocks.intersectWith(forbiddenBlocks
 				.invert());
 		headAllowedBlocks = headAllowedBlocks.intersectWith(forbiddenBlocks
@@ -90,13 +93,13 @@ public class PlantPathFinder extends MovePathFinder {
 
 	@Override
 	protected float rateDestination(int distance, int x, int y, int z) {
-		if (isGrown(helper, x, y, z)) {
+		if (isGrown(world, x, y, z)) {
 			return distance + 1;
-		} else if (helper.isAirBlock(x, y, z) && hasFarmlandBelow(x, y, z)
+		} else if (BlockSets.AIR.isAt(world, x, y, z) && farmland.isAt(world, x, y - 1, z)
 				&& helper.canSelectItem(new SeedFilter(type))) {
 			return distance + 1;
 		} else if (type.farmland == Blocks.farmland
-				&& helper.isAirBlock(x, y, z)
+				&& BlockSets.AIR.isAt(world, x, y, z)
 				&& farmlandable.contains(helper.getBlock(x, y - 1, z))
 				&& helper.canSelectItem(new SeedFilter(type))
 				&& helper.canSelectItem(new ClassItemFilter(ItemHoe.class))) {
@@ -106,27 +109,22 @@ public class PlantPathFinder extends MovePathFinder {
 		}
 	}
 
-	private boolean isGrown(AIHelper helper, int x, int y, int z) {
-		final Block block = helper.getBlock(x, y, z);
-		if (block instanceof BlockCrops) {
-			final int metadata = helper.getBlockIdWithMeta(x, y, z) & 0xf;
+	private boolean isGrown(WorldData world, int x, int y, int z) {
+		final int blockWithMeta = world.getBlockIdWithMeta(x, y, z);
+		if (Block.getBlockById(blockWithMeta >> 4) instanceof BlockCrops) {
+			final int metadata = blockWithMeta & 0xf;
 			return metadata >= 7;
 		}
 		return false;
 	}
 
-	private boolean hasFarmlandBelow(int x, int y, int z) {
-		return Block.isEqualTo(helper.getBlock(x, y - 1, z), type.farmland);
-	}
-
 	@Override
 	protected void addTasksForTarget(BlockPos currentPos) {
-		if (helper.isAirBlock(currentPos.getX(), currentPos.getY(),
-				currentPos.getZ())) {
-			if (!hasFarmlandBelow(currentPos.getX(), currentPos.getY(),
-					currentPos.getZ())) {
+		if (BlockSets.AIR.isAt(world, currentPos)) {
+			BlockPos farmlandPos = currentPos.add(0, -1, 0);
+			if (!farmland.isAt(world, farmlandPos)) {
 				addTask(new UseItemOnBlockAtTask(new ClassItemFilter(
-						ItemHoe.class), currentPos.add(0, -1, 0)));
+						ItemHoe.class), farmlandPos));
 			}
 			addTask(new PlaceBlockAtFloorTask(currentPos, new SeedFilter(type)));
 		} else {

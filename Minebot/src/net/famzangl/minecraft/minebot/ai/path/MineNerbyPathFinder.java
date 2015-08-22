@@ -2,6 +2,7 @@ package net.famzangl.minecraft.minebot.ai.path;
 
 import java.util.BitSet;
 
+import net.famzangl.minecraft.minebot.ai.path.world.BlockSets;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
 
@@ -15,12 +16,15 @@ public class MineNerbyPathFinder extends MineBySettingsPathFinder {
 
 	private static final int RADIUS_HORIZONTAL = 10;
 	private static final int RADIUS_VERTICAL = 6;
+	private static final int ACTIVATE_RADIUS_HORIZONTAL = 30;
+	private static final int ACTIVATE_RADIUS_VERTICAL = 15;
 	private static final int WIDTH = RADIUS_HORIZONTAL * 2 + 1;
 
 	private int playerX, playerY, playerZ;
 
 	private final BitSet possiblePositions = new BitSet();
 	private final BitSet alreadyScanned = new BitSet();
+	private BlockPos activationPosition;
 
 	public MineNerbyPathFinder(EnumFacing preferedDirection) {
 		super(preferedDirection, 0);
@@ -49,23 +53,23 @@ public class MineNerbyPathFinder extends MineBySettingsPathFinder {
 		}
 		alreadyScanned.set(getIndex(add));
 
-		if (isOreBlock(add.getX(), add.getY(), add.getZ())) {
+		if (super.isOreBlock(add.getX(), add.getY(), add.getZ())) {
 			possiblePositions.set(getIndex(add));
 		}
 
 		// TODO: Use some sort of visible block list.
-		if (helper.canWalkOn(helper.getBlock(add))) {
+		// We need to use the current server state now.
+		if (BlockSets.FEET_CAN_WALK_THROUGH.isAt(world.getCurrentState(), add)) {
 			for (EnumFacing d : EnumFacing.values()) {
 				findPossiblePositionsAround(add.offset(d));
 			}
 		}
 	}
-	
+
 	@Override
 	protected int materialDistance(int x, int y, int z, boolean onFloor) {
-		final int block = helper.getBlockId(x, y, z);
-		if (onFloor && shortFootBlocks.contains(block) || !onFloor
-				&& shortHeadBlocks.contains(block)) {
+		if (onFloor && shortFootBlocks.isAt(world, x, y, z) || !onFloor
+				&& shortHeadBlocks.isAt(world, x, y, z)) {
 			return 0;
 		} else {
 			return 1;
@@ -81,7 +85,12 @@ public class MineNerbyPathFinder extends MineBySettingsPathFinder {
 	private boolean isNearbyArea(int cx, int cy, int cz) {
 		return Math.abs(playerX - cx) <= RADIUS_HORIZONTAL
 				&& Math.abs(playerY - cy) <= RADIUS_VERTICAL
-				&& Math.abs(playerZ - cz) <= RADIUS_HORIZONTAL;
+				&& Math.abs(playerZ - cz) <= RADIUS_HORIZONTAL
+				&& (activationPosition == null || (Math.abs(activationPosition
+						.getX() - cx) <= ACTIVATE_RADIUS_HORIZONTAL
+						&& Math.abs(activationPosition.getY() - cy) <= ACTIVATE_RADIUS_VERTICAL && Math
+						.abs(activationPosition.getZ() - cz) <= ACTIVATE_RADIUS_HORIZONTAL
+				));
 	}
 
 	private final int getIndex(BlockPos p) {
@@ -97,11 +106,22 @@ public class MineNerbyPathFinder extends MineBySettingsPathFinder {
 	}
 
 	@Override
+	protected boolean isOreBlock(int x, int y, int z) {
+		return possiblePositions.get(getIndex(x, y, z));
+	}
+
+	@Override
 	protected float rateDestination(int distance, int x, int y, int z) {
-		if (possiblePositions.get(getIndex(x, y, z)) || possiblePositions.get(getIndex(x, y + 1, z))) {
+		if (possiblePositions.get(getIndex(x, y, z))
+				|| possiblePositions.get(getIndex(x, y + 1, z))) {
+			// TODO: Do not rate hidden blocks.
 			return super.rateDestination(distance, x, y, z);
 		} else {
 			return -1;
 		}
+	}
+
+	public void setActivationPoint(BlockPos activationPosition) {
+		this.activationPosition = activationPosition;
 	}
 }

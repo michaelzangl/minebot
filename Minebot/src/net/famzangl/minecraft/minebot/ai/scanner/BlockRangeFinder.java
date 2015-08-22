@@ -16,8 +16,8 @@
  *******************************************************************************/
 package net.famzangl.minecraft.minebot.ai.scanner;
 
-import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.path.MovePathFinder;
+import net.famzangl.minecraft.minebot.ai.path.world.BlockSets;
 import net.minecraft.util.BlockPos;
 
 public class BlockRangeFinder extends MovePathFinder {
@@ -25,8 +25,8 @@ public class BlockRangeFinder extends MovePathFinder {
 	
 	public BlockRangeFinder() {
 		allowedGroundForUpwardsBlocks = allowedGroundBlocks;
-		footAllowedBlocks = AIHelper.walkableBlocks;
-		headAllowedBlocks = AIHelper.headWalkableBlocks;
+		footAllowedBlocks = BlockSets.FEET_CAN_WALK_THROUGH;
+		headAllowedBlocks = BlockSets.HEAD_CAN_WALK_TRHOUGH;
 		footAllowedBlocks = footAllowedBlocks.intersectWith(forbiddenBlocks.invert());
 		headAllowedBlocks = headAllowedBlocks.intersectWith(forbiddenBlocks.invert());
 	}
@@ -35,7 +35,8 @@ public class BlockRangeFinder extends MovePathFinder {
 	protected boolean runSearch(BlockPos playerPosition) {
 		if (rangeScanner == null) {
 			rangeScanner = constructScanner(playerPosition);
-			rangeScanner.startAsync(helper);
+			//TODO: Pass on a synchronized world instance...
+			rangeScanner.startAsync(world);
 			return false;
 		} else if (!rangeScanner.isScaningFinished()) {
 			return false;

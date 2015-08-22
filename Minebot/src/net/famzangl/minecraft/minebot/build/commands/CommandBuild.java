@@ -18,7 +18,6 @@ package net.famzangl.minecraft.minebot.build.commands;
 
 import java.util.List;
 
-import net.famzangl.minecraft.minebot.Pos;
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.command.AIChatController;
 import net.famzangl.minecraft.minebot.ai.command.AICommand;
@@ -26,8 +25,8 @@ import net.famzangl.minecraft.minebot.ai.command.AICommandInvocation;
 import net.famzangl.minecraft.minebot.ai.command.AICommandParameter;
 import net.famzangl.minecraft.minebot.ai.command.ParameterType;
 import net.famzangl.minecraft.minebot.ai.command.SafeStrategyRule;
+import net.famzangl.minecraft.minebot.ai.path.world.BlockSets;
 import net.famzangl.minecraft.minebot.ai.render.PosMarkerRenderer;
-import net.famzangl.minecraft.minebot.ai.scripting.StrategyFailedException;
 import net.famzangl.minecraft.minebot.ai.strategy.AIStrategy;
 import net.famzangl.minecraft.minebot.ai.strategy.TaskStrategy;
 import net.famzangl.minecraft.minebot.ai.task.WaitTask;
@@ -69,7 +68,7 @@ public class CommandBuild {
 		private BlockPos getBlockInTheWay(AIHelper helper) {
 			for (BuildTask task : helper.buildManager.getScheduled()) {
 				BlockPos pos = task.getForPosition();
-				if (!helper.isAirBlock(pos)) {
+				if (!BlockSets.AIR.isAt(helper.getWorld(), pos)) {
 					return pos;
 				}
 			}
@@ -96,7 +95,7 @@ public class CommandBuild {
 					pathFinder = new ForBuildPathFinder(task);
 				}
 				if (!pathFinder.searchSomethingAround(
-						helper.getPlayerPosition(), helper, this)) {
+						helper.getPlayerPosition(), helper, helper.getWorld(), this)) {
 					addTask(new WaitTask());
 				} else if (pathFinder.isNoPathFound()) {
 					AIChatController
@@ -130,6 +129,7 @@ public class CommandBuild {
 		public void drawMarkers(RenderTickEvent event, AIHelper helper) {
 			renderer.render(event, helper, positions);
 		}
+
 	}
 
 	@AICommandInvocation(safeRule = SafeStrategyRule.DEFEND)

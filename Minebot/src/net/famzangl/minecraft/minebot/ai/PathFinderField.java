@@ -301,6 +301,10 @@ public class PathFinderField implements Comparator<Integer> {
 		pqClear();
 		currentDest = null;
 	}
+	
+	public void abort() {
+		terminated();
+	}
 
 	protected int distanceFor(int from, int to) {
 		return 1;
@@ -427,9 +431,18 @@ public class PathFinderField implements Comparator<Integer> {
 					break;
 				}
 			}
-			if (!found) {
+			if (!found && slotArray[fill - 1] != n) {
 				System.out.println("Warning: Trying to remove " + n
 						+ " which is not in this list (d=" + oldDistance + ")");
+				// search it in other lists...
+				for (int list = 0; list < FAST_DISTANCE_ACCESS; list++) {
+					int distance = list + pqMinDistance;
+					for (int i = 0; i < pqByDistanceFill[pqSlotFor(distance)]; i++) {
+						if (pqByDistance[pqSlotFor(distance)][i] == n) {
+							System.out.println("    -> Found it for d=" + distance);
+						}
+					}
+				}
 			}
 
 			if (fill == 1 && oldDistance == pqMinDistance) {
@@ -500,7 +513,16 @@ public class PathFinderField implements Comparator<Integer> {
 
 	private void pqFindNextMin() {
 		int nextMin = -1;
-		for (int d = pqMinDistance; d < pqMinDistance + FAST_DISTANCE_ACCESS; d++) {
+		int max = pqMinDistance + FAST_DISTANCE_ACCESS;
+		if (!pq.isEmpty()) {
+			max = Math.max(max, pq.poll());
+		}
+		for (int d = pqMinDistance; d < max ; d++) {
+			pqMinDistance = d;
+			while (!pq.isEmpty() && getDistance(pq.peek()) == d) {
+				pqAdd(pq.poll(), d);
+			}
+			
 			if (pqByDistanceFill[pqSlotFor(d)] > 0) {
 				nextMin = d;
 				break;

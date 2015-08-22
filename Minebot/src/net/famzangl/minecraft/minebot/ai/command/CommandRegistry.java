@@ -32,6 +32,8 @@ import net.famzangl.minecraft.minebot.ai.strategy.AbortOnDeathStrategy;
 import net.famzangl.minecraft.minebot.ai.strategy.CreeperComesActionStrategy;
 import net.famzangl.minecraft.minebot.ai.strategy.DamageTakenStrategy;
 import net.famzangl.minecraft.minebot.ai.strategy.DoNotSuffocateStrategy;
+import net.famzangl.minecraft.minebot.ai.strategy.EatStrategy;
+import net.famzangl.minecraft.minebot.ai.strategy.PlaceTorchStrategy;
 import net.famzangl.minecraft.minebot.ai.strategy.PlayerComesActionStrategy;
 import net.famzangl.minecraft.minebot.ai.strategy.StackStrategy;
 import net.famzangl.minecraft.minebot.ai.strategy.StrategyStack;
@@ -164,6 +166,10 @@ public class CommandRegistry {
 		stack.addStrategy(new DamageTakenStrategy());
 		stack.addStrategy(new PlayerComesActionStrategy());
 		stack.addStrategy(new CreeperComesActionStrategy());
+		stack.addStrategy(new EatStrategy());
+		if (safeRule == SafeStrategyRule.DEFEND_MINING) {
+			stack.addStrategy(new PlaceTorchStrategy());
+		}
 		stack.addStrategy(strategy);
 		return new StackStrategy(stack);
 	}

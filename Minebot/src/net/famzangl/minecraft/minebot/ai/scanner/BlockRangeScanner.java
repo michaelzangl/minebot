@@ -18,7 +18,8 @@ package net.famzangl.minecraft.minebot.ai.scanner;
 
 import java.util.ArrayList;
 
-import net.famzangl.minecraft.minebot.ai.AIHelper;
+import net.famzangl.minecraft.minebot.ai.path.world.BlockSet;
+import net.famzangl.minecraft.minebot.ai.path.world.WorldData;
 import net.minecraft.util.BlockPos;
 
 public class BlockRangeScanner {
@@ -27,11 +28,11 @@ public class BlockRangeScanner {
 	private final BlockPos center;
 	
 	public interface BlockHandler {
-		int[] getIds();
+		BlockSet getIds();
 
-		void scanningDone(AIHelper helper);
+		void scanningDone(WorldData world);
 
-		void scanBlock(AIHelper helper, int id, int x, int y, int z);
+		void scanBlock(WorldData world, int id, int x, int y, int z);
 		
 	}
 	
@@ -47,39 +48,41 @@ public class BlockRangeScanner {
 	
 	public void addHandler(BlockHandler h) {
 		handlers.add(h);
-		for (int i : h.getIds()) {
-			handlersCache[i] = h;
+		for (int i = 0; i < BlockSet.MAX_BLOCKIDS; i++) {
+			if (h.getIds().contains(i)) {
+				handlersCache[i] = h;
+			}
 		}
 	}
 
-	public void scanArea(AIHelper helper) {
+	public void scanArea(WorldData world) {
 		for (int y = center.getY() - VERTICAL_SCAN; y <= center.getY() + VERTICAL_SCAN; y++) {
 			for (int z = center.getZ() - HORIZONTAL_SCAN; z <= center.getZ()
 					+ HORIZONTAL_SCAN; z++) {
 				for (int x = center.getX() - HORIZONTAL_SCAN; x <= center.getX()
 						+ HORIZONTAL_SCAN; x++) {
-					int id = helper.getBlockId(x, y, z);					
+					int id = world.getBlockId(x, y, z);					
 					BlockHandler handler = handlersCache[id];
 					if (handler != null) {
-						handler.scanBlock(helper, id, x, y, z);
+						handler.scanBlock(world, id, x, y, z);
 					}
 				}
 			}
 		}
 		for (BlockHandler handler : handlers) {
-			handler.scanningDone(helper);
+			handler.scanningDone(world);
 		}
 		
 		scaningFinished = true;
 	}
 
 
-	public void startAsync(final AIHelper helper) {
+	public void startAsync(final WorldData world) {
 		new Thread("Block range finder") {
 			@Override
 			public void run() {
 				try {
-				scanArea(helper);
+					scanArea(world);
 				} catch (Throwable t) {
 					t.printStackTrace();
 					scaningFinished = true;

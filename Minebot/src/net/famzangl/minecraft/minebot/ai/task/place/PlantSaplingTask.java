@@ -18,10 +18,8 @@ package net.famzangl.minecraft.minebot.ai.task.place;
 
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.BlockItemFilter;
-import net.famzangl.minecraft.minebot.ai.BlockWhitelist;
+import net.famzangl.minecraft.minebot.ai.path.world.BlockSet;
 import net.famzangl.minecraft.minebot.build.block.WoodType;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockSapling;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.BlockPos;
@@ -52,7 +50,7 @@ public class PlantSaplingTask extends PlaceBlockAtFloorTask {
 		}
 	}
 
-	private final static BlockWhitelist PLANTABLE = new BlockWhitelist(
+	private final static BlockSet PLANTABLE = new BlockSet(
 			Blocks.dirt, Blocks.grass);
 
 	public PlantSaplingTask(BlockPos pos, WoodType type) {

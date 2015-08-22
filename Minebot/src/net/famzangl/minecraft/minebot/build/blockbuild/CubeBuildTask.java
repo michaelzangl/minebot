@@ -20,6 +20,7 @@ import net.famzangl.minecraft.minebot.Pos;
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.BlockItemFilter;
 import net.famzangl.minecraft.minebot.ai.ItemFilter;
+import net.famzangl.minecraft.minebot.ai.path.world.BlockSets;
 import net.famzangl.minecraft.minebot.ai.task.AITask;
 import net.famzangl.minecraft.minebot.ai.task.move.UpwardsMoveTask;
 import net.famzangl.minecraft.minebot.ai.task.place.SneakAndPlaceTask;
@@ -69,7 +70,7 @@ public abstract class CubeBuildTask extends BuildTask {
 		if (!super.couldBuildFrom(helper, x, y, z)) {
 			return false;
 		} else {
-			return !helper.isAirBlock(x, y - 1, z);
+			return !BlockSets.AIR.isAt(helper.getWorld(), x, y - 1, z);
 		}
 	}
 

@@ -21,12 +21,8 @@ import java.util.Collection;
 import java.util.Set;
 
 import net.famzangl.minecraft.minebot.ai.AIHelper;
-import net.famzangl.minecraft.minebot.ai.command.AICommandParameter.AnyBlockFilter;
-import net.famzangl.minecraft.minebot.ai.command.AICommandParameter.BlockFilter;
 import net.famzangl.minecraft.minebot.ai.task.inventory.ItemWithSubtype;
-import net.minecraft.block.Block;
 import net.minecraft.item.Item;
-import net.minecraft.util.RegistryNamespaced;
 import net.minecraft.util.ResourceLocation;
 
 /**

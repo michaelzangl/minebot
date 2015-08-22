@@ -17,6 +17,7 @@
 package net.famzangl.minecraft.minebot.ai.task;
 
 import net.famzangl.minecraft.minebot.ai.AIHelper;
+import net.famzangl.minecraft.minebot.ai.path.world.WorldWithDelta;
 
 /**
  * Waits a given number of game ticks.
@@ -50,6 +51,11 @@ public class WaitTask extends AITask {
 	@Override
 	public String toString() {
 		return "WaitTask [ticks=" + ticks + "]";
+	}
+	
+	@Override
+	public boolean applyToDelta(WorldWithDelta world) {
+		return true;
 	}
 
 }

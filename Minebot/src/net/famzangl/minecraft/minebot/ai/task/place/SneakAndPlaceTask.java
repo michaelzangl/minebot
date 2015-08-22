@@ -18,6 +18,7 @@ package net.famzangl.minecraft.minebot.ai.task.place;
 
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.BlockItemFilter;
+import net.famzangl.minecraft.minebot.ai.path.world.BlockSets;
 import net.famzangl.minecraft.minebot.ai.task.AITask;
 import net.famzangl.minecraft.minebot.ai.task.TaskOperations;
 import net.famzangl.minecraft.minebot.ai.task.error.SelectTaskError;
@@ -69,7 +70,7 @@ public class SneakAndPlaceTask extends AITask {
 
 	@Override
 	public boolean isFinished(AIHelper h) {
-		return !h.isAirBlock(pos.add(0, -1, 0)) && !h.isJumping();
+		return !BlockSets.AIR.isAt(h.getWorld(), pos.add(0, -1, 0)) && !h.isJumping();
 	}
 
 	@Override

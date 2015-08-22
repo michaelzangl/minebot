@@ -16,6 +16,7 @@
  *******************************************************************************/
 package net.famzangl.minecraft.minebot.ai;
 
+import net.famzangl.minecraft.minebot.ai.path.world.BlockSet;
 import net.minecraft.block.Block;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
@@ -28,13 +29,13 @@ import net.minecraft.item.ItemStack;
  */
 public class BlockItemFilter implements HumanReadableItemFilter {
 
-	private final BlockWhitelist matched;
+	private final BlockSet matched;
 
 	public BlockItemFilter(Block... matched) {
-		this.matched = new BlockWhitelist(matched);
+		this.matched = new BlockSet(matched);
 	}
 
-	public BlockItemFilter(BlockWhitelist matched) {
+	public BlockItemFilter(BlockSet matched) {
 		this.matched = matched;
 	}
 

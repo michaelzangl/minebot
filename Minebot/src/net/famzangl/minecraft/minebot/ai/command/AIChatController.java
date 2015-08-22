@@ -18,8 +18,6 @@ package net.famzangl.minecraft.minebot.ai.command;
 
 import java.util.List;
 
-import javax.activation.CommandMap;
-
 import net.famzangl.minecraft.minebot.ai.commands.CommandBuildWay;
 import net.famzangl.minecraft.minebot.ai.commands.CommandCraft;
 import net.famzangl.minecraft.minebot.ai.commands.CommandDumpSigns;
@@ -31,12 +29,13 @@ import net.famzangl.minecraft.minebot.ai.commands.CommandGet;
 import net.famzangl.minecraft.minebot.ai.commands.CommandGetWood;
 import net.famzangl.minecraft.minebot.ai.commands.CommandHelp;
 import net.famzangl.minecraft.minebot.ai.commands.CommandKill;
+import net.famzangl.minecraft.minebot.ai.commands.CommandLoad;
 import net.famzangl.minecraft.minebot.ai.commands.CommandMine;
 import net.famzangl.minecraft.minebot.ai.commands.CommandPause;
 import net.famzangl.minecraft.minebot.ai.commands.CommandPlant;
 import net.famzangl.minecraft.minebot.ai.commands.CommandRenderMap;
 import net.famzangl.minecraft.minebot.ai.commands.CommandRespawn;
-import net.famzangl.minecraft.minebot.ai.commands.CommandLoad;
+import net.famzangl.minecraft.minebot.ai.commands.CommandResume;
 import net.famzangl.minecraft.minebot.ai.commands.CommandShear;
 import net.famzangl.minecraft.minebot.ai.commands.CommandSit;
 import net.famzangl.minecraft.minebot.ai.commands.CommandStop;
@@ -44,6 +43,7 @@ import net.famzangl.minecraft.minebot.ai.commands.CommandStore;
 import net.famzangl.minecraft.minebot.ai.commands.CommandTint;
 import net.famzangl.minecraft.minebot.ai.commands.CommandTunnel;
 import net.famzangl.minecraft.minebot.ai.commands.CommandUngrab;
+import net.famzangl.minecraft.minebot.ai.commands.CommandWalk;
 import net.famzangl.minecraft.minebot.ai.commands.CommandXPFarm;
 import net.famzangl.minecraft.minebot.ai.scripting.CommandJs;
 import net.famzangl.minecraft.minebot.build.commands.CommandBuild;
@@ -79,6 +79,7 @@ public class AIChatController {
 		registerCommand(CommandMine.class);
 		registerCommand(CommandTunnel.class);
 		registerCommand(CommandStop.class);
+		registerCommand(CommandResume.class);
 		registerCommand(CommandUngrab.class);
 		registerCommand(CommandLoad.class);
 		registerCommand(CommandJs.class);
@@ -95,6 +96,7 @@ public class AIChatController {
 		registerCommand(CommandGet.class);
 		registerCommand(CommandCraft.class);
 		registerCommand(CommandXPFarm.class);
+		registerCommand(CommandWalk.class);
 
 		registerCommand(CommandKill.class);
 		registerCommand(CommandFish.class);

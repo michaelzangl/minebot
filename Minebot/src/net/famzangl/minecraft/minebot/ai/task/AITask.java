@@ -16,8 +16,15 @@
  *******************************************************************************/
 package net.famzangl.minecraft.minebot.ai.task;
 
+import java.util.Collections;
+import java.util.List;
+
 import net.famzangl.minecraft.minebot.ai.AIHelper;
+import net.famzangl.minecraft.minebot.ai.path.world.RecordingWorld;
+import net.famzangl.minecraft.minebot.ai.path.world.WorldData;
+import net.famzangl.minecraft.minebot.ai.path.world.WorldWithDelta;
 import net.famzangl.minecraft.minebot.ai.strategy.TaskStrategy;
+import net.minecraft.util.BlockPos;
 
 /**
  * This is a specific task that the {@link TaskStrategy} should work on.
@@ -26,6 +33,8 @@ import net.famzangl.minecraft.minebot.ai.strategy.TaskStrategy;
  *
  */
 public abstract class AITask {
+
+	private int gameTickTimeoutByBlockDestruction = -1;
 
 	/**
 	 * Returns <code>true</code> as soon as the task is finished. This gets
@@ -48,13 +57,78 @@ public abstract class AITask {
 	/**
 	 * How many game ticks this task should take. After this time, the task is
 	 * considered to have failed and a search for new tasks is started. This is
-	 * useful if e.g. the server laged. TODO: Automatically compute time needed
-	 * to mine, ...
+	 * useful if e.g. the server laged.
+	 * <p>
+	 * The timeout returned by this method may be changed while the task is
+	 * running.
+	 * <p>
+	 * The default timeout for tasks is 5 seconds. The timeout for tasks that
+	 * specify a list of blocks to destroy is less.
 	 * 
-	 * @return
+	 * @param helper
+	 *            The AI helper to compute the time.
+	 * 
+	 * @return The timeout for this task in game ticks.
 	 */
-	public int getGameTickTimeout() {
-		return 20 * 5;
+	public int getGameTickTimeout(AIHelper helper) {
+		if (gameTickTimeoutByBlockDestruction < 0) {
+			gameTickTimeoutByBlockDestruction = Math.max(
+					computeGameTickTimeout(helper), 5);
+		}
+
+		return gameTickTimeoutByBlockDestruction;
+	}
+
+	/**
+	 * This computes the game tick timeout once.
+	 * <p>
+	 * The default value is the time to destroy all blocks given with
+	 * {@link #getBlocksToDestory(WorldData)}
+	 * <p>
+	 * If that list is empty, the timeout is 5 seconds.
+	 * 
+	 * @return The expected game tick timeout.
+	 */
+	protected int computeGameTickTimeout(AIHelper helper) {
+		// List<BlockPos> blocks = getBlocksToDestory(helper.getWorld());
+		// if (blocks.isEmpty()) {
+		// return 20 * 5;
+		// } else {
+		// int time = 5;
+		// for (BlockPos b : blocks) {
+		// time += getTimeToMine(helper.getWorld(), b);
+		// }
+		// }
+		RecordingWorld world = new RecordingWorld(helper.getWorld(),
+				helper.getMinecraft().thePlayer);
+		if (applyToDelta(world)) {
+			return (int) (world.getTimeInTicks() * 1.3f);
+		} else {
+			return 5 * 20;
+		}
+	}
+
+	// /**
+	// * Computes the list of blocks that this task destroys to compute the time
+	// needed for it.
+	// * @param world
+	// * @return
+	// */
+	// protected List<BlockPos> getBlocksToDestory(WorldData world) {
+	// return Collections.emptyList();
+	// }
+
+	/**
+	 * Attempts to apply this task to the world. The task needs to fail if that
+	 * delta was not reached.
+	 * 
+	 * @param world
+	 *            The world.
+	 * @return true if the delta was successfully applied.
+	 */
+	public boolean applyToDelta(WorldWithDelta world) {
+		// default is unsupported.
+		return false;
 	}
 
 }

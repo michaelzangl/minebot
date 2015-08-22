@@ -18,6 +18,7 @@ package net.famzangl.minecraft.minebot.ai.task.place;
 
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.ItemFilter;
+import net.famzangl.minecraft.minebot.ai.path.world.BlockSets;
 import net.famzangl.minecraft.minebot.ai.task.AITask;
 import net.famzangl.minecraft.minebot.ai.task.BlockSide;
 import net.famzangl.minecraft.minebot.ai.task.TaskOperations;
@@ -61,7 +62,7 @@ public class PlaceBlockAtFloorTask extends AITask {
 
 	@Override
 	public boolean isFinished(AIHelper h) {
-		return !h.isAirBlock(getPlaceAtPos());
+		return !BlockSets.AIR.isAt(h.getWorld(), getPlaceAtPos());
 	}
 
 	@Override
@@ -69,7 +70,7 @@ public class PlaceBlockAtFloorTask extends AITask {
 		if (faceTimer > 0) {
 			faceTimer--;
 		}
-		if (h.isAirBlock(getPlaceAtPos())) {
+		if (BlockSets.AIR.isAt(h.getWorld(), getPlaceAtPos())) {
 			if (!h.selectCurrentItem(filter)) {
 				o.desync(new SelectTaskError(filter));
 			} else {

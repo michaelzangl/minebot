@@ -17,7 +17,10 @@
 package net.famzangl.minecraft.minebot.ai.task.move;
 
 import net.famzangl.minecraft.minebot.ai.AIHelper;
-import net.famzangl.minecraft.minebot.ai.BlockWhitelist;
+import net.famzangl.minecraft.minebot.ai.path.world.BlockSet;
+import net.famzangl.minecraft.minebot.ai.path.world.BlockSets;
+import net.famzangl.minecraft.minebot.ai.path.world.WorldData;
+import net.famzangl.minecraft.minebot.ai.path.world.WorldWithDelta;
 import net.famzangl.minecraft.minebot.ai.task.AITask;
 import net.famzangl.minecraft.minebot.ai.task.TaskOperations;
 import net.famzangl.minecraft.minebot.ai.task.error.PositionTaskError;
@@ -32,8 +35,7 @@ import net.minecraft.util.BlockPos;
  */
 public class DownwardsMoveTask extends AITask {
 
-	private static final BlockWhitelist hardBlocks = new BlockWhitelist(
-			Blocks.obsidian);
+	private static final BlockSet hardBlocks = new BlockSet(Blocks.obsidian);
 
 	private boolean obsidianMining;
 	private BlockPos pos;
@@ -49,15 +51,16 @@ public class DownwardsMoveTask extends AITask {
 
 	@Override
 	public void runTick(AIHelper h, TaskOperations o) {
-		if (!h.isAirBlock(pos.add(0, 1, 0)) && !h.isSideTorch(pos.add(0, 1, 0))) {
-			// grass, ...
+		WorldData world = h.getWorld();
+		if (needsToClearFootBlock(world)) {
+			// tallgrass, ...
 			h.faceAndDestroy(pos.add(0, 1, 0));
-		} else if (!h.isAirBlock(pos)) {
+		} else if (!BlockSets.AIR.isAt(world, pos)) {
 			if (!h.isStandingOn(pos.add(0, 1, 0))) {
 				System.out.println("Not standing on the right block.");
 				o.desync(new PositionTaskError(pos.add(0, 1, 0)));
 			}
-			if (hardBlocks.contains(h.getBlock(pos))) {
+			if (hardBlocks.isAt(world, pos)) {
 				obsidianMining = true;
 			}
 
@@ -65,9 +68,14 @@ public class DownwardsMoveTask extends AITask {
 		}
 	}
 
+	private boolean needsToClearFootBlock(WorldData world) {
+		return !BlockSets.AIR.isAt(world, pos.add(0, 1, 0))
+				&& !world.isSideTorch(pos.add(0, 1, 0));
+	}
+
 	@Override
-	public int getGameTickTimeout() {
-		return super.getGameTickTimeout()
+	public int getGameTickTimeout(AIHelper helper) {
+		return super.getGameTickTimeout(helper)
 				+ (obsidianMining ? HorizontalMoveTask.OBSIDIAN_TIME : 0);
 	}
 
@@ -75,5 +83,15 @@ public class DownwardsMoveTask extends AITask {
 	public String toString() {
 		return "DownwardsMoveTask [obsidianMining=" + obsidianMining + ", pos="
 				+ pos + "]";
+	}
+
+	@Override
+	public boolean applyToDelta(WorldWithDelta world) {
+		if (needsToClearFootBlock(world)) {
+			world.setBlock(pos.add(0, 1, 0), Blocks.air);
+		}
+		world.setBlock(pos, Blocks.air);
+		world.setPlayerPosition(pos);
+		return true;
 	}
 }

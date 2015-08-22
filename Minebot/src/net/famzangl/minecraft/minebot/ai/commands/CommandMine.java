@@ -17,7 +17,6 @@
 package net.famzangl.minecraft.minebot.ai.commands;
 
 import net.famzangl.minecraft.minebot.ai.AIHelper;
-import net.famzangl.minecraft.minebot.ai.BlockWhitelist;
 import net.famzangl.minecraft.minebot.ai.command.AICommand;
 import net.famzangl.minecraft.minebot.ai.command.AICommandInvocation;
 import net.famzangl.minecraft.minebot.ai.command.AICommandParameter;
@@ -27,7 +26,9 @@ import net.famzangl.minecraft.minebot.ai.command.SafeStrategyRule;
 import net.famzangl.minecraft.minebot.ai.path.MineBySettingsPathFinder;
 import net.famzangl.minecraft.minebot.ai.path.MineNerbyPathFinder;
 import net.famzangl.minecraft.minebot.ai.path.MineSinglePathFinder;
+import net.famzangl.minecraft.minebot.ai.path.MovePathFinder;
 import net.famzangl.minecraft.minebot.ai.path.OrebfuscatedMinePathFinder;
+import net.famzangl.minecraft.minebot.ai.path.world.BlockSet;
 import net.famzangl.minecraft.minebot.ai.strategy.AIStrategy;
 import net.famzangl.minecraft.minebot.ai.strategy.PathFinderStrategy;
 import net.minecraft.block.Block;
@@ -38,7 +39,7 @@ import net.minecraft.init.Blocks;
 		+ "If blockName is given, only the block that is given is searched for.", name = "minebot")
 public class CommandMine {
 
-	public static BlockWhitelist MINEABLE = new BlockWhitelist(Blocks.air,
+	public static BlockSet MINEABLE = new BlockSet(Blocks.air,
 			Blocks.lava, Blocks.flowing_lava, Blocks.water,
 			Blocks.flowing_water, Blocks.waterlily, Blocks.bedrock).invert();
 
@@ -50,6 +51,30 @@ public class CommandMine {
 				helper.getLookDirection(), helper.getPlayerPosition().getY()),
 				"Mining ores");
 	}
+
+	private static final class MineNearbyStrategy extends
+			PathFinderStrategy {
+		private MineNerbyPathFinder nearby;
+
+		private MineNearbyStrategy(MineNerbyPathFinder pathFinder,
+				String description) {
+			super(pathFinder, description);
+			nearby = pathFinder;
+		}
+		
+		@Override
+		protected void onActivate(AIHelper helper) {
+			nearby.setActivationPoint(helper.getPlayerPosition());
+			super.onActivate(helper);
+		}
+		
+		@Override
+		protected void onDeactivate(AIHelper helper) {
+			nearby.setActivationPoint(null);
+			super.onDeactivate(helper);
+		}
+	}
+
 
 	public static final class MineBlockFilter extends BlockFilter {
 		@Override
@@ -84,9 +109,8 @@ public class CommandMine {
 			AIHelper helper,
 			@AICommandParameter(type = ParameterType.FIXED, fixedName = "mine", description = "") String nameArg,
 			@AICommandParameter(type = ParameterType.FIXED, fixedName = "nearby", description = "") String orebfuscated) {
-		return new PathFinderStrategy(new MineNerbyPathFinder(
-				helper.getLookDirection()),
-				"Mining nearby ores");
+		return new MineNearbyStrategy(new MineNerbyPathFinder(
+				helper.getLookDirection()), "Mining nearby ores");
 	}
 
 }

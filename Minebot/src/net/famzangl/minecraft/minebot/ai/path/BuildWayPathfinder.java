@@ -22,7 +22,8 @@ import java.util.Collections;
 
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.BlockItemFilter;
-import net.famzangl.minecraft.minebot.ai.BlockWhitelist;
+import net.famzangl.minecraft.minebot.ai.path.world.BlockSet;
+import net.famzangl.minecraft.minebot.ai.path.world.BlockSets;
 import net.famzangl.minecraft.minebot.ai.task.AITask;
 import net.famzangl.minecraft.minebot.ai.task.BlockSide;
 import net.famzangl.minecraft.minebot.ai.task.DestroyInRangeTask;
@@ -188,8 +189,10 @@ public class BuildWayPathfinder extends AlongTrackPathFinder {
 	}
 
 	private class NormalWayType extends WayPiece {
-		private final BlockWhitelist airLike = AIHelper.air
-				.unionWith(AIHelper.walkableBlocks);;
+		private final BlockSet airLike = BlockSets.AIR
+				.unionWith(BlockSets.FEET_CAN_WALK_THROUGH);;
+		private final BlockSet COVERED = BlockSets.SIMPLE_CUBE
+				.unionWith(BlockSets.FALLING);
 
 		public NormalWayType(int stepIndex) {
 			super(stepIndex);
@@ -199,9 +202,7 @@ public class BuildWayPathfinder extends AlongTrackPathFinder {
 			int covered = 0;
 			for (int y = 2; y <= 3; y++) {
 				for (int u = -1; u <= width + 1; u++) {
-					final Block block = helper.getBlock(getPos(u, y));
-					if (AIHelper.normalBlocks.contains(block)
-							|| AIHelper.fallingBlocks.contains(block)) {
+					if (COVERED.isAt(world, getPos(u, y))) {
 						covered++;
 					}
 				}
@@ -395,19 +396,13 @@ public class BuildWayPathfinder extends AlongTrackPathFinder {
 	}
 
 	public boolean addContinuingTask(BlockPos playerPosition) {
-		System.out.println("Seatch at "
-				+ playerPosition
-				+ ", on track: "
+		System.out.println("Seatch at " + playerPosition + ", on track: "
 				+ isOnTrack(playerPosition.getX(), playerPosition.getZ())
-				+ ", cy= "
-				+ (cy - 1)
-				+ " right block: "
-				+ new BlockWhitelist(FLOOR.slabBlock).contains(helper
-						.getBlock(playerPosition)));
+				+ ", cy= " + (cy - 1) + " right block: "
+				+ new BlockSet(FLOOR.slabBlock).isAt(world, playerPosition));
 		if (isOnTrack(playerPosition.getX(), playerPosition.getZ())
 				&& playerPosition.getY() == cy - 1
-				&& new BlockWhitelist(FLOOR.slabBlock).contains(helper
-						.getBlock(playerPosition))) {
+				&& new BlockSet(FLOOR.slabBlock).isAt(world, playerPosition)) {
 			final int currentStep = getStepNumber(playerPosition.getX(),
 					playerPosition.getZ());
 			final WayPiece next = getSuggestedWayType(currentStep + 1);

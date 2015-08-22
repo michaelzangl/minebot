@@ -17,7 +17,7 @@
 package net.famzangl.minecraft.minebot.ai.task;
 
 import net.famzangl.minecraft.minebot.ai.AIHelper;
-import net.famzangl.minecraft.minebot.ai.BlockWhitelist;
+import net.famzangl.minecraft.minebot.ai.path.world.BlockSet;
 import net.minecraft.block.Block;
 import net.minecraft.util.BlockPos;
 
@@ -29,9 +29,9 @@ import net.minecraft.util.BlockPos;
  */
 public abstract class UseItemOnBlockTask extends UseItemTask {
 
-	private final BlockWhitelist allowedBlocks;
+	private final BlockSet allowedBlocks;
 
-	public UseItemOnBlockTask(BlockWhitelist allowedBlocks) {
+	public UseItemOnBlockTask(BlockSet allowedBlocks) {
 		this.allowedBlocks = allowedBlocks;
 	}
 

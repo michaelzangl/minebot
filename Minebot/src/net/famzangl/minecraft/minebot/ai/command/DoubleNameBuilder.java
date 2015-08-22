@@ -14,31 +14,40 @@
  * You should have received a copy of the GNU General Public License
  * along with Minebot.  If not, see <http://www.gnu.org/licenses/>.
  *******************************************************************************/
-package net.famzangl.minecraft.minebot.ai.task;
+package net.famzangl.minecraft.minebot.ai.command;
+
+import java.util.ArrayList;
 
 import net.famzangl.minecraft.minebot.ai.AIHelper;
-import net.minecraft.util.BlockPos;
 
-public class MineBlockTask extends AITask {
-	private BlockPos pos;
+public class DoubleNameBuilder extends ParameterBuilder {
 
-	public MineBlockTask(BlockPos pos) {
-		this.pos = pos;
+	public DoubleNameBuilder(AICommandParameter annot) {
+		super(annot);
 	}
 
 	@Override
-	public boolean isFinished(AIHelper h) {
-		return h.isAirBlock(pos);
+	public void addArguments(ArrayList<ArgumentDefinition> list) {
+		list.add(new ArgumentDefinition("Number", annot.description()) {
+			@Override
+			public boolean couldEvaluateAgainst(String string) {
+				return string.matches("^[+-]?(\\d+\\.?\\d*|\\.\\d+)$");
+			}
+		});
 	}
 
 	@Override
-	public void runTick(AIHelper h, TaskOperations o) {
-		h.faceAndDestroy(pos);
+	public Object getParameter(AIHelper helper, String[] arguments) {
+		return Double.parseDouble(arguments[0]);
+	}
+	
+	@Override
+	public boolean isTypeValid(Class<?> class1) {
+		return super.isTypeValid(class1) || (class1 == Double.TYPE && !isOptional());
 	}
 
 	@Override
-	public String toString() {
-		return "MineBlockTask [pos=" + pos + "]";
+	protected Class<?> getRequiredParameterClass() {
+		return Double.class;
 	}
-
 }

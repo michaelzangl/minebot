@@ -23,6 +23,9 @@ import java.util.List;
 
 import net.famzangl.minecraft.minebot.Pos;
 import net.famzangl.minecraft.minebot.ai.AIHelper;
+import net.famzangl.minecraft.minebot.ai.path.world.BlockSets;
+import net.famzangl.minecraft.minebot.ai.path.world.WorldData;
+import net.famzangl.minecraft.minebot.ai.path.world.WorldWithDelta;
 import net.minecraft.util.BlockPos;
 
 /**
@@ -74,8 +77,7 @@ public class DestroyInRangeTask extends AITask implements CanPrefaceAndDestroy {
 	}
 
 	private double rate(AIHelper h, int x, int y, int z) {
-		if (!isSafeToDestroy(h, x, y, z)
-				|| blacklist.contains(new Pos(x, y, z))) {
+		if (noDestructionRequired(h.getWorld(), x, y, z)) {
 			return -1;
 		} else {
 			return h.getMinecraft().thePlayer.getDistanceSq(x + .5, y + .5,
@@ -83,18 +85,24 @@ public class DestroyInRangeTask extends AITask implements CanPrefaceAndDestroy {
 		}
 	}
 
-	private boolean isSafeToDestroy(AIHelper h, int x, int y, int z) {
-		Pos pos = h.getPlayerPosition();
-		return !h.isAirBlock(x, y, z)
-				&& h.hasSafeSides(x, y, z)
-				&& (h.isSafeHeadBlock(x, y + 1, z) || ((x != pos.getX() || y != pos
-						.getY()) && isSafeFallingBlock(h, x, y + 1, z)));
+	private boolean noDestructionRequired(WorldData world, int x, int y, int z) {
+		return !isSafeToDestroy(world, x, y, z)
+				|| blacklist.contains(new Pos(x, y, z));
 	}
 
-	private boolean isSafeFallingBlock(AIHelper h, int x, int y, int z) {
-		return AIHelper.fallingBlocks.contains(h.getBlock(x, y, z))
-				&& isSafeToDestroy(h, x, y, z)
-				|| AIHelper.walkableBlocks.contains(h.getBlock(x, y, z));
+	private boolean isSafeToDestroy(WorldData world, int x, int y, int z) {
+		BlockPos pos = world.getPlayerPosition();
+		return !BlockSets.AIR.isAt(world, x, y, z)
+				&& BlockSets.safeSideAround(world, x, y, z)
+				&& (BlockSets.SAFE_CEILING.isAt(world, x, y + 1, z) || ((x != pos
+						.getX() || y != pos.getY()) && isSafeFallingBlock(
+						world, x, y + 1, z)));
+	}
+
+	private boolean isSafeFallingBlock(WorldData world, int x, int y, int z) {
+		return BlockSets.FALLING.isAt(world, x, y, z)
+				&& (BlockSets.FEET_CAN_WALK_THROUGH.isAt(world, x, y + 1, z) || isSafeToDestroy(
+						world, x, y + 1, z));
 	}
 
 	@Override
@@ -121,7 +129,7 @@ public class DestroyInRangeTask extends AITask implements CanPrefaceAndDestroy {
 	}
 
 	@Override
-	public int getGameTickTimeout() {
+	public int getGameTickTimeout(AIHelper helper) {
 		return 100 * (Math.abs(minPos.getX() - maxPos.getX()) + 1)
 				* (Math.abs(minPos.getY() - maxPos.getY()) + 1)
 				* (Math.abs(minPos.getZ() - maxPos.getZ()) + 1);
@@ -149,5 +157,22 @@ public class DestroyInRangeTask extends AITask implements CanPrefaceAndDestroy {
 		final BlockPos next = getNextToDestruct(helper);
 		return next != null ? Arrays.asList(next) : Collections
 				.<BlockPos> emptyList();
+	}
+
+	@Override
+	public boolean applyToDelta(WorldWithDelta world) {
+		// TODO Check which blocks are really destroyed / fail if they are not.
+		for (int x = minPos.getX(); x <= maxPos.getX(); x++) {
+			for (int y = minPos.getY(); y <= maxPos.getY(); y++) {
+				for (int z = minPos.getZ(); z <= maxPos.getZ(); z++) {
+					if (!noDestructionRequired(world, x, y, z)) {
+						world.setBlock(x, y, z, 0, 0);
+					} else {
+						System.out.println("No destruction for " + x + "," + y + "," + z + ", block is: " + world.getBlockId(x, y, z));
+					}
+				}
+			}
+		}
+		return true;
 	}
 }

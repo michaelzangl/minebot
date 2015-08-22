@@ -82,6 +82,9 @@ public class CommandDefinition {
 			case NUMBER:
 				b = new NumberNameBuilder(annot);
 				break;
+			case DOUBLE:
+				b = new DoubleNameBuilder(annot);
+				break;
 			case COMMAND:
 				b = new CommandNameBuilder(annot);
 				break;

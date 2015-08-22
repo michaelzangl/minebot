@@ -28,8 +28,9 @@ import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import net.famzangl.minecraft.minebot.ai.AIHelper;
-import net.famzangl.minecraft.minebot.ai.BlockWhitelist;
 import net.famzangl.minecraft.minebot.ai.PathFinderField;
+import net.famzangl.minecraft.minebot.ai.path.world.BlockSet;
+import net.famzangl.minecraft.minebot.ai.path.world.BlockSets;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.monster.EntityCreeper;
 import net.minecraft.entity.monster.EntitySkeleton;
@@ -571,11 +572,11 @@ public class MoveScanner {
 	 */
 	public class ScannerPolicy {
 
-		private final BlockWhitelist safeCeiling = AIHelper.safeCeilingBlocks;
-		private final BlockWhitelist safeHead = AIHelper.headWalkableBlocks;
-		private final BlockWhitelist safeFoot = AIHelper.walkableBlocks;
-		private final BlockWhitelist safeFloor = AIHelper.safeStandableBlocks;
-		private final BlockWhitelist safeSide = AIHelper.safeSideBlocks;
+		private final BlockSet safeCeiling = BlockSets.SAFE_CEILING;
+		private final BlockSet safeHead = BlockSets.HEAD_CAN_WALK_TRHOUGH;
+		private final BlockSet safeFoot = BlockSets.FEET_CAN_WALK_THROUGH;
+		private final BlockSet safeFloor = BlockSets.SAFE_GROUND;
+		private final BlockSet safeSide = BlockSets.SAFE_SIDE;
 
 		/**
 		 * Gets all flags (except safe_to_go) for the given block.

@@ -23,12 +23,11 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
 
-import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.ItemFilter;
+import net.famzangl.minecraft.minebot.ai.path.world.BlockSet;
+import net.famzangl.minecraft.minebot.ai.path.world.WorldData;
 import net.famzangl.minecraft.minebot.ai.scanner.ChestBlockHandler.ChestData;
 import net.famzangl.minecraft.minebot.ai.utils.PrivateFieldUtils;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockChest;
 import net.minecraft.entity.EntityHanging;
 import net.minecraft.entity.item.EntityItemFrame;
 import net.minecraft.init.Blocks;
@@ -39,8 +38,7 @@ import net.minecraft.util.EnumFacing;
 
 public class ChestBlockHandler extends RangeBlockHandler<ChestData> {
 
-	private static final int[] IDS = new int[] { Block
-			.getIdFromBlock(Blocks.chest) };
+	private static final BlockSet CHEST = new BlockSet(Blocks.chest, Blocks.trapped_chest);
 
 	public static class ChestData {
 		private final BlockPos pos;
@@ -152,15 +150,15 @@ public class ChestBlockHandler extends RangeBlockHandler<ChestData> {
 	private final Hashtable<BlockPos, ChestData> chests = new Hashtable<BlockPos, ChestData>();
 
 	@Override
-	public int[] getIds() {
-		return IDS;
+	public BlockSet getIds() {
+		return CHEST;
 	}
 
 	@Override
-	protected void addPositionToCache(AIHelper helper, BlockPos pos, ChestData c) {
-		super.addPositionToCache(helper, pos, c);
+	protected void addPositionToCache(WorldData world, BlockPos pos, ChestData c) {
+		super.addPositionToCache(world, pos, c);
 		if (c.secondaryPos != null) {
-			super.addPositionToCache(helper, c.secondaryPos, c);
+			super.addPositionToCache(world, c.secondaryPos, c);
 		}
 	}
 
@@ -170,11 +168,11 @@ public class ChestBlockHandler extends RangeBlockHandler<ChestData> {
 	}
 	
 	@Override
-	public void scanBlock(AIHelper helper, int id, int x, int y, int z) {
-		if (helper.getBlock(x, y, z) instanceof BlockChest) {
+	public void scanBlock(WorldData world, int id, int x, int y, int z) {
+		if (CHEST.isAt(world, x, y, z)) {
 			AxisAlignedBB abb = new AxisAlignedBB(x - 1, y, z - 1,
 					x + 2, y + 1, z + 2);
-			List<EntityItemFrame> frames = helper.getMinecraft().theWorld
+			List<EntityItemFrame> frames = world.getBackingWorld()
 					.getEntitiesWithinAABB(EntityItemFrame.class, abb);
 			for (EntityItemFrame f : frames) {
 				EnumFacing direction = getDirection(f);

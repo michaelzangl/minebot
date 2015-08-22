@@ -18,9 +18,11 @@ package net.famzangl.minecraft.minebot.ai.task.move;
 
 import java.util.List;
 
-import net.famzangl.minecraft.minebot.Pos;
 import net.famzangl.minecraft.minebot.ai.AIHelper;
+import net.famzangl.minecraft.minebot.ai.path.world.BlockSets;
+import net.famzangl.minecraft.minebot.ai.path.world.WorldWithDelta;
 import net.famzangl.minecraft.minebot.ai.task.TaskOperations;
+import net.minecraft.init.Blocks;
 import net.minecraft.util.BlockPos;
 
 /**
@@ -42,14 +44,14 @@ public class JumpMoveTask extends HorizontalMoveTask {
 
 	@Override
 	protected boolean doJump(AIHelper h) {
-		Pos player = h.getPlayerPosition();
+		BlockPos player = h.getPlayerPosition();
 		return player.getX() != pos.getX() || player.getZ() != pos.getZ();
 	}
 
 	@Override
 	public void runTick(AIHelper h, TaskOperations o) {
-		if (!h.canWalkThrough(h.getBlock(oldX, pos.getY() + 1, oldZ))) {
-			h.faceAndDestroy(new BlockPos(oldX, pos.getY() + 1, oldZ));
+		if (!BlockSets.HEAD_CAN_WALK_TRHOUGH.isAt(h.getWorld(), oldX, pos.getY() + 1, oldZ)) {
+			h.faceAndDestroy(toDestroyForJump());
 		} else {
 			super.runTick(h, o);
 		}
@@ -64,7 +66,16 @@ public class JumpMoveTask extends HorizontalMoveTask {
 	@Override
 	public List<BlockPos> getPredestroyPositions(AIHelper helper) {
 		final List<BlockPos> list = super.getPredestroyPositions(helper);
-		list.add(0, new BlockPos(oldX, pos.getY() + 1, oldZ));
+		list.add(0, toDestroyForJump());
 		return list;
+	}
+
+	private BlockPos toDestroyForJump() {
+		return new BlockPos(oldX, pos.getY() + 1, oldZ);
+	}
+	@Override
+	public boolean applyToDelta(WorldWithDelta world) {
+		world.setBlock(toDestroyForJump(), Blocks.air);
+		return super.applyToDelta(world);
 	}
 }

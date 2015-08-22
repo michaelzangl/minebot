@@ -24,9 +24,10 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Map.Entry;
 
-import net.famzangl.minecraft.minebot.Pos;
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.enchanting.CloseScreenTask;
+import net.famzangl.minecraft.minebot.ai.path.world.BlockSet;
+import net.famzangl.minecraft.minebot.ai.path.world.WorldData;
 import net.famzangl.minecraft.minebot.ai.scanner.BlockRangeFinder;
 import net.famzangl.minecraft.minebot.ai.scanner.BlockRangeScanner;
 import net.famzangl.minecraft.minebot.ai.scanner.RangeBlockHandler;
@@ -38,7 +39,6 @@ import net.famzangl.minecraft.minebot.ai.task.inventory.ItemWithSubtype;
 import net.famzangl.minecraft.minebot.ai.task.inventory.PutOnCraftingTableTask;
 import net.famzangl.minecraft.minebot.ai.task.inventory.TakeResultItem;
 import net.famzangl.minecraft.minebot.ai.utils.PrivateFieldUtils;
-import net.minecraft.block.Block;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.gui.inventory.GuiCrafting;
 import net.minecraft.init.Blocks;
@@ -206,18 +206,17 @@ public class CraftStrategy extends PathFinderStrategy {
 
 	public final static class CraftingTableHandler extends
 			RangeBlockHandler<CraftingTableData> {
-		private static final int[] IDS = new int[] { Block
-				.getIdFromBlock(Blocks.crafting_table) };
+		private static final BlockSet IDS = new BlockSet(Blocks.crafting_table);
 
 		private final Hashtable<BlockPos, CraftingTableData> found = new Hashtable<BlockPos, CraftingTableData>();
 
 		@Override
-		public int[] getIds() {
+		public BlockSet getIds() {
 			return IDS;
 		}
 
 		@Override
-		public void scanBlock(AIHelper helper, int id, int x, int y, int z) {
+		public void scanBlock(WorldData world, int id, int x, int y, int z) {
 			BlockPos pos = new BlockPos(x, y, z);
 			found.put(pos, new CraftingTableData(pos));
 		}

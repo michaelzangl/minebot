@@ -27,12 +27,13 @@ import net.famzangl.minecraft.minebot.ai.enchanting.CloseScreenTask;
 import net.famzangl.minecraft.minebot.ai.enchanting.PutItemInTableTask;
 import net.famzangl.minecraft.minebot.ai.enchanting.SelectEnchantmentTask;
 import net.famzangl.minecraft.minebot.ai.enchanting.TakeEnchantedItemTask;
+import net.famzangl.minecraft.minebot.ai.path.world.BlockSet;
+import net.famzangl.minecraft.minebot.ai.path.world.WorldData;
 import net.famzangl.minecraft.minebot.ai.scanner.BlockRangeFinder;
 import net.famzangl.minecraft.minebot.ai.scanner.BlockRangeScanner;
 import net.famzangl.minecraft.minebot.ai.scanner.RangeBlockHandler;
 import net.famzangl.minecraft.minebot.ai.task.UseItemOnBlockAtTask;
 import net.famzangl.minecraft.minebot.ai.task.inventory.ItemWithSubtype;
-import net.minecraft.block.Block;
 import net.minecraft.client.gui.GuiEnchantment;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.BlockPos;
@@ -51,18 +52,17 @@ public class EnchantStrategy extends PathFinderStrategy {
 
 	public final static class EnchantingTableHandler extends
 			RangeBlockHandler<EnchantingTableData> {
-		private static final int[] IDS = new int[] { Block
-				.getIdFromBlock(Blocks.enchanting_table) };
+		private static final BlockSet IDS = new BlockSet(Blocks.enchanting_table);
 
 		private final Hashtable<BlockPos, EnchantingTableData> found = new Hashtable<BlockPos, EnchantingTableData>();
 
 		@Override
-		public int[] getIds() {
+		public BlockSet getIds() {
 			return IDS;
 		}
 
 		@Override
-		public void scanBlock(AIHelper helper, int id, int x, int y, int z) {
+		public void scanBlock(WorldData world, int id, int x, int y, int z) {
 			BlockPos pos = new BlockPos(x, y, z);
 			found.put(pos, new EnchantingTableData(pos));
 		}

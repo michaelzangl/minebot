@@ -20,6 +20,7 @@ import net.famzangl.minecraft.minebot.Pos;
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.ColoredBlockItemFilter;
 import net.famzangl.minecraft.minebot.ai.ItemFilter;
+import net.famzangl.minecraft.minebot.ai.path.world.BlockSets;
 import net.famzangl.minecraft.minebot.ai.task.AITask;
 import net.famzangl.minecraft.minebot.ai.task.place.JumpingPlaceAtHalfTask;
 import net.famzangl.minecraft.minebot.build.block.SlabType;
@@ -42,7 +43,7 @@ public abstract class BuildTask {
 			BlockPos worldPos) throws UnknownBlockException {
 		final String name = AIHelper.getBlockName(b);
 		final IBlockState blockState = h.getMinecraft().theWorld.getBlockState(worldPos);
-		final int blockMetadata = h.getBlockIdWithMeta(worldPos) & 0xf;
+		final int blockMetadata = h.getWorld().getBlockIdWithMeta(worldPos) & 0xf;
 		if (BlockBuildTask.BLOCKS.contains(b)) {
 			return new TaskDescription(name, CubeBuildTask.STANDABLE);
 		} else if (ColoredCubeBuildTask.BLOCKS.contains(b)) {
@@ -186,7 +187,7 @@ public abstract class BuildTask {
 			MirrorDirection mirror);
 
 	public boolean isReadyForBuild(AIHelper helper) {
-		return helper.isAirBlock(getForPosition());
+		return BlockSets.AIR.isAt(helper.getWorld(), getForPosition());
 	}
 
 }

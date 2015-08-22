@@ -16,8 +16,9 @@
  *******************************************************************************/
 package net.famzangl.minecraft.minebot.ai.strategy;
 
-import net.famzangl.minecraft.minebot.Pos;
 import net.famzangl.minecraft.minebot.ai.AIHelper;
+import net.famzangl.minecraft.minebot.ai.path.world.BlockSets;
+import net.minecraft.util.BlockPos;
 
 /**
  * Prevents a suffocation in walls because of server lags.
@@ -31,34 +32,34 @@ public class DoNotSuffocateStrategy extends AIStrategy {
 	public boolean takesOverAnyTime() {
 		return true;
 	}
-	
+
 	@Override
 	public boolean checkShouldTakeOver(AIHelper helper) {
-		Pos p = helper.getPlayerPosition();
-		return (!safeGround(helper, p) || !safeHead(helper, p));
+		BlockPos p = helper.getPlayerPosition();
+		return (!safeFeet(helper, p) || !safeHead(helper, p));
 	}
-	
+
 	@Override
 	protected TickResult onGameTick(AIHelper helper) {
-		Pos p = helper.getPlayerPosition();
-		if (!safeGround(helper, p)) {
+		BlockPos p = helper.getPlayerPosition();
+		if (!safeFeet(helper, p)) {
 			helper.faceAndDestroy(p);
 			return TickResult.TICK_HANDLED;
 		} else if (!safeHead(helper, p)) {
-			helper.faceAndDestroy(p.add(0,1,0));
+			helper.faceAndDestroy(p.add(0, 1, 0));
 			return TickResult.TICK_HANDLED;
 		}
 		return TickResult.NO_MORE_WORK;
 	}
 
-	private boolean safeHead(AIHelper helper, Pos p) {
-		return helper.canWalkThrough(helper.getBlock(p.getX(), p.getY() + 1, p.getZ()));
+	private boolean safeHead(AIHelper helper, BlockPos p) {
+		return BlockSets.HEAD_CAN_WALK_TRHOUGH.isAt(helper.getWorld(), p.add(0, 1, 0));
 	}
 
-	private boolean safeGround(AIHelper helper, Pos p) {
-		return helper.canWalkOn(helper.getBlock(p.getX(), p.getY(), p.getZ()));
+	private boolean safeFeet(AIHelper helper, BlockPos p) {
+		return BlockSets.FEET_CAN_WALK_THROUGH.isAt(helper.getWorld(), p);
 	}
-	
+
 	@Override
 	public String getDescription(AIHelper helper) {
 		return "Do not suffocate in walls.";

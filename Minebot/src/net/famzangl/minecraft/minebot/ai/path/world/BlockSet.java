@@ -14,57 +14,58 @@
  * You should have received a copy of the GNU General Public License
  * along with Minebot.  If not, see <http://www.gnu.org/licenses/>.
  *******************************************************************************/
-package net.famzangl.minecraft.minebot.ai;
+package net.famzangl.minecraft.minebot.ai.path.world;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.util.BlockPos;
 
 /**
  * A set of blocks, identified by Id.
+ * 
  * @author michael
  *
  */
-public class BlockWhitelist {
+public class BlockSet {
 
-	//private final BigInteger set;
-	
 	public static int MAX_BLOCKIDS = 4096;
-	
+
 	private final long[] set = new long[MAX_BLOCKIDS / 64];
-	
-	
-	public BlockWhitelist(int... ids) {
+
+	public BlockSet(int... ids) {
 		for (int i : ids) {
 			setBlock(i);
 		}
 	}
 
-	public BlockWhitelist(Block... blocks) {
+	public BlockSet(Block... blocks) {
 		for (Block b : blocks) {
 			setBlock(Block.getIdFromBlock(b));
 		}
 	}
-	
-	private BlockWhitelist() {
+
+	private BlockSet() {
 	}
-	
+
 	private void setBlock(int i) {
 		set[i / 64] |= 1l << i;
 		if (contains(9)) {
 			System.out.println("Water for " + i);
 		}
 	}
-	
-//	private void clearBlock(int i) {
-//		set[i / 64] &= ~(1 << (i & 63));
-//	}
-	
+
+	// private void clearBlock(int i) {
+	// set[i / 64] &= ~(1 << (i & 63));
+	// }
+
 	public boolean contains(int blockId) {
 		return (set[blockId / 64] & (1l << blockId)) != 0;
 	}
-	
+
 	public boolean contains(Block block) {
 		return contains(Block.getIdFromBlock(block));
 	}
@@ -72,30 +73,75 @@ public class BlockWhitelist {
 	public boolean contains(IBlockState meta) {
 		return contains(meta.getBlock());
 	}
-	
-	public BlockWhitelist intersectWith(BlockWhitelist wl2) {
-		BlockWhitelist res = new BlockWhitelist();
+
+	public BlockSet intersectWith(BlockSet wl2) {
+		BlockSet res = new BlockSet();
 		for (int i = 0; i < res.set.length; i++) {
 			res.set[i] = set[i] & wl2.set[i];
 		}
 		return res;
 	}
-	
-	public BlockWhitelist unionWith(BlockWhitelist wl2) {
-		BlockWhitelist res = new BlockWhitelist();
+
+	public BlockSet unionWith(BlockSet wl2) {
+		BlockSet res = new BlockSet();
 		for (int i = 0; i < res.set.length; i++) {
 			res.set[i] = set[i] | wl2.set[i];
 		}
 		return res;
 	}
 
-	public BlockWhitelist invert() {
-		BlockWhitelist res = new BlockWhitelist();
+	public BlockSet invert() {
+		BlockSet res = new BlockSet();
 		for (int i = 0; i < res.set.length; i++) {
 			res.set[i] = ~set[i];
 		}
 		return res;
 	}
+
+	/**
+	 * Checks if one of these blocks is at the given position in the world.
+	 * 
+	 * @param world
+	 *            The world.
+	 * @param pos
+	 *            The position in the world.
+	 * @return
+	 */
+	public boolean isAt(WorldData world, BlockPos pos) {
+		return contains(world.getBlockId(pos));
+	}
+
+	/**
+	 * Checks if one of these blocks is at the given position in the world.
+	 * 
+	 * @param world
+	 *            The world.
+	 * @param x
+	 *            The position in the world.
+	 * @param y
+	 *            The position in the world.
+	 * @param z
+	 *            The position in the world.
+	 * @return
+	 */
+	public boolean isAt(WorldData world, int x, int y, int z) {
+		return contains(world.getBlockId(x, y, z));
+	}
+	
+	public List<BlockPos> findBlocks(WorldData world, BlockPos around, int radius) {
+		ArrayList<BlockPos> pos = new ArrayList<BlockPos>();
+		for (int x = around .getX() - radius; x <= around.getX() + radius; x++) {
+			for (int z = around.getZ() - radius; z <= around.getZ() + radius; z++) {
+				for (int y = around.getY() - radius; y <= around.getY() + radius; y++) {
+					if (isAt(world, x, y, z)) {
+						pos.add(new BlockPos(x, y, z));
+					}
+				}
+			}
+		}
+		return pos;
+	}
+
 
 	@Override
 	public int hashCode() {
@@ -113,7 +159,7 @@ public class BlockWhitelist {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		BlockWhitelist other = (BlockWhitelist) obj;
+		BlockSet other = (BlockSet) obj;
 		if (!Arrays.equals(set, other.set))
 			return false;
 		return true;
@@ -144,6 +190,4 @@ public class BlockWhitelist {
 			}
 		}
 	}
-	
-	
 }

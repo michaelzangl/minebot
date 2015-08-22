@@ -23,7 +23,6 @@ import java.io.UnsupportedEncodingException;
 import java.util.List;
 import java.util.Scanner;
 
-import net.famzangl.minecraft.minebot.Pos;
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.command.AIChatController;
 import net.famzangl.minecraft.minebot.ai.command.UnknownCommandException;
@@ -36,6 +35,7 @@ import net.famzangl.minecraft.minebot.ai.strategy.StrategyStack;
 import net.famzangl.minecraft.minebot.ai.strategy.WalkTowardsStrategy;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.AxisAlignedBB;
+import net.minecraft.util.BlockPos;
 import net.minecraft.util.Vec3;
 
 /**
@@ -95,7 +95,7 @@ public class MineScript {
 		return new ScriptStrategy(new WalkTowardsStrategy(x, z));
 	}
 
-	public Pos getPlayerPosition() {
+	public BlockPos getPlayerPosition() {
 		return waitForTick().getPlayerPosition();
 	}
 	

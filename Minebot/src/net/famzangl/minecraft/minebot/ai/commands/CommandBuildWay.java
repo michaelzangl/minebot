@@ -16,7 +16,6 @@
  *******************************************************************************/
 package net.famzangl.minecraft.minebot.ai.commands;
 
-import net.famzangl.minecraft.minebot.Pos;
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.command.AICommand;
 import net.famzangl.minecraft.minebot.ai.command.AICommandInvocation;
@@ -26,6 +25,7 @@ import net.famzangl.minecraft.minebot.ai.command.SafeStrategyRule;
 import net.famzangl.minecraft.minebot.ai.path.BuildWayPathfinder;
 import net.famzangl.minecraft.minebot.ai.strategy.AIStrategy;
 import net.famzangl.minecraft.minebot.ai.strategy.BuildWayStrategy;
+import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
 
 @AICommand(helpText = "Build a nice way", name = "minebot")
@@ -36,7 +36,7 @@ public class CommandBuildWay {
 			AIHelper helper,
 			@AICommandParameter(type = ParameterType.FIXED, fixedName = "way", description = "") String nameArg) {
 		final EnumFacing dir = helper.getLookDirection();
-		final Pos pos = helper.getPlayerPosition();
+		final BlockPos pos = helper.getPlayerPosition();
 
 		return new BuildWayStrategy(new BuildWayPathfinder(dir, pos));
 	}

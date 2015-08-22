@@ -17,12 +17,13 @@
 package net.famzangl.minecraft.minebot.ai.commands;
 
 import net.famzangl.minecraft.minebot.ai.AIHelper;
-import net.famzangl.minecraft.minebot.ai.BlockWhitelist;
 import net.famzangl.minecraft.minebot.ai.command.AICommand;
 import net.famzangl.minecraft.minebot.ai.command.AICommandInvocation;
 import net.famzangl.minecraft.minebot.ai.command.AICommandParameter;
 import net.famzangl.minecraft.minebot.ai.command.AICommandParameter.BlockFilter;
 import net.famzangl.minecraft.minebot.ai.command.ParameterType;
+import net.famzangl.minecraft.minebot.ai.path.world.BlockSet;
+import net.famzangl.minecraft.minebot.ai.path.world.BlockSets;
 import net.famzangl.minecraft.minebot.ai.strategy.AIStrategy;
 import net.famzangl.minecraft.minebot.ai.strategy.CraftStrategy;
 import net.minecraft.block.Block;
@@ -31,7 +32,7 @@ import net.minecraft.init.Blocks;
 @AICommand(helpText = "Crafts items of the given type.", name = "minebot")
 public class CommandCraft {
 
-	private static final BlockWhitelist simpleBlocks = new BlockWhitelist(
+	private static final BlockSet simpleBlocks = new BlockSet(
 			Blocks.air, Blocks.brewing_stand, Blocks.bed, Blocks.nether_wart,
 			Blocks.cauldron, Blocks.flower_pot, Blocks.wheat, Blocks.reeds,
 			Blocks.cake, Blocks.skull, Blocks.piston_head,
@@ -41,7 +42,7 @@ public class CommandCraft {
 			Blocks.lit_redstone_lamp, Blocks.melon_stem,
 			Blocks.unlit_redstone_torch, Blocks.unpowered_comparator,
 			Blocks.redstone_wire, Blocks.wall_sign, Blocks.unpowered_repeater,
-			Blocks.iron_door, Blocks.wool).unionWith(AIHelper.woodenDoors).invert();
+			Blocks.iron_door, Blocks.wool).unionWith(BlockSets.WOODEN_DOR).invert();
 
 	public static final class MyBlockFilter extends BlockFilter {
 		@Override

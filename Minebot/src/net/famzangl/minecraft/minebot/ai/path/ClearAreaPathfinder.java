@@ -21,7 +21,8 @@ import java.util.LinkedList;
 
 import net.famzangl.minecraft.minebot.Pos;
 import net.famzangl.minecraft.minebot.ai.AIHelper;
-import net.famzangl.minecraft.minebot.ai.BlockWhitelist;
+import net.famzangl.minecraft.minebot.ai.path.world.BlockSet;
+import net.famzangl.minecraft.minebot.ai.path.world.WorldData;
 import net.famzangl.minecraft.minebot.ai.task.DestroyInRangeTask;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.BlockPos;
@@ -31,8 +32,8 @@ public class ClearAreaPathfinder extends MovePathFinder {
 	private final BlockPos minPos;
 	private final BlockPos maxPos;
 	private int topY;
-	private final HashSet<BlockPos> foundPositions = new HashSet<BlockPos>();
-	private BlockPos pathEndPosition;
+//	private final HashSet<BlockPos> foundPositions = new HashSet<BlockPos>();
+//	private BlockPos pathEndPosition;
 
 	public ClearAreaPathfinder(BlockPos pos1, BlockPos pos2) {
 		minPos = Pos.minPos(pos1, pos2);
@@ -40,33 +41,33 @@ public class ClearAreaPathfinder extends MovePathFinder {
 		topY = maxPos.getY();
 	}
 
-	@Override
-	protected boolean runSearch(BlockPos playerPosition) {
-		foundPositions.clear();
-		pathEndPosition = playerPosition;
-		do {
-			final boolean finished = super.runSearch(pathEndPosition);
-			if (!finished) {
-				return false;
-			}
-		} while (foundPositions.size() < 20 && pathEndPosition != null);
-		return true;
-	}
+//	@Override
+//	protected boolean runSearch(BlockPos playerPosition) {
+//		foundPositions.clear();
+//		pathEndPosition = playerPosition;
+//		do {
+//			final boolean finished = super.runSearch(pathEndPosition);
+//			if (!finished) {
+//				return false;
+//			}
+//		} while (foundPositions.size() < 20 && pathEndPosition != null);
+//		return true;
+//	}
 
-	@Override
-	protected void foundPath(LinkedList<Pos> path) {
-		for (final Pos p : path) {
-			foundPositions.add(p);
-			foundPositions.add(p.add(0, 1, 0));
-			pathEndPosition = p;
-		}
-
-		super.foundPath(path);
-	}
+//	@Override
+//	protected void foundPath(LinkedList<Pos> path) {
+//		for (final Pos p : path) {
+//			foundPositions.add(p);
+//			foundPositions.add(p.add(0, 1, 0));
+//			pathEndPosition = p;
+//		}
+//
+//		super.foundPath(path);
+//	}
 
 	@Override
 	protected void noPathFound() {
-		pathEndPosition = null;
+//		pathEndPosition = null;
 		super.noPathFound();
 	}
 
@@ -96,8 +97,8 @@ public class ClearAreaPathfinder extends MovePathFinder {
 	}
 
 	private boolean isTemporaryCleared(int x, int y, int z) {
-		return isClearedBlock(helper, x, y, z)
-				|| foundPositions.contains(new Pos(x, y, z));
+		return isClearedBlock(world, x, y, z);
+//				|| foundPositions.contains(new BlockPos(x, y, z));
 	}
 
 	private boolean isInArea(int x, int y, int z) {
@@ -105,11 +106,11 @@ public class ClearAreaPathfinder extends MovePathFinder {
 				&& minPos.getZ() <= z && z <= maxPos.getZ();
 	}
 	
-	private static final BlockWhitelist clearedBlocks = new BlockWhitelist(Blocks.air,
+	private static final BlockSet clearedBlocks = new BlockSet(Blocks.air,
 			Blocks.torch);
 
-	private static boolean isClearedBlock(AIHelper helper, int x, int y, int z) {
-		return clearedBlocks.contains(helper.getBlockId(x, y, z));
+	private static boolean isClearedBlock(WorldData world, int x, int y, int z) {
+		return clearedBlocks.isAt(world, x, y, z);
 	}
 
 	@Override
@@ -136,12 +137,13 @@ public class ClearAreaPathfinder extends MovePathFinder {
 	}
 
 	public int getToClearCount(AIHelper helper) {
+		WorldData world = helper.getWorld();
 		int count = 0;
 		int newTopY = minPos.getY();
 		for (int y = minPos.getY(); y <= maxPos.getY(); y++) {
 			for (int z = minPos.getZ(); z <= maxPos.getZ(); z++) {
 				for (int x = minPos.getX(); x <= maxPos.getX(); x++) {
-					if (!isClearedBlock(helper, x, y, z)) {
+					if (!isClearedBlock(world, x, y, z)) {
 						count++;
 						newTopY = Math.max(y, newTopY);
 					}

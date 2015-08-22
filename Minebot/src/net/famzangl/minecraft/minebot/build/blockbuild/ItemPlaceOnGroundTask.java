@@ -17,15 +17,15 @@
 package net.famzangl.minecraft.minebot.build.blockbuild;
 
 import net.famzangl.minecraft.minebot.ai.BlockItemFilter;
-import net.famzangl.minecraft.minebot.ai.BlockWhitelist;
 import net.famzangl.minecraft.minebot.ai.ItemFilter;
+import net.famzangl.minecraft.minebot.ai.path.world.BlockSet;
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.BlockPos;
 
 public class ItemPlaceOnGroundTask extends BuildFlatOnGroundTask {
 
-	public static final BlockWhitelist BLOCKS = new BlockWhitelist(Blocks.dirt,
+	public static final BlockSet BLOCKS = new BlockSet(Blocks.dirt,
 			Blocks.stone, Blocks.cobblestone, Blocks.beacon, Blocks.bookshelf,
 			Blocks.brick_block, Blocks.cake, Blocks.coal_block,
 			Blocks.coal_ore, Blocks.crafting_table, Blocks.diamond_block,

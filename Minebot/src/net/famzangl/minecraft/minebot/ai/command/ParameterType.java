@@ -20,6 +20,7 @@ public enum ParameterType {
 	BLOCK_NAME,
 	FIXED,
 	NUMBER,
+	DOUBLE,
 	COMMAND,
 	COLOR,
 	FILE,
