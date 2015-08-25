@@ -1,7 +1,6 @@
 package net.famzangl.minecraft.minebot.ai.net;
 
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.projectile.EntityFishHook;
 
 public interface NetworkHelper {
 

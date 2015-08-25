@@ -7,6 +7,7 @@ import net.minecraft.util.BlockPos;
 public class RecordingWorld extends WorldWithDelta {
 
 	private static final int TIME_TO_PLACE = 5;
+	private static final int TIME_TO_FACE = 3;
 	private int timeInTicks = 0;
 	private EntityPlayer blockBreaker;
 
@@ -33,7 +34,7 @@ public class RecordingWorld extends WorldWithDelta {
 		//how much damage to give the block per tick. The block is destroyed on damage >= 1;
 		float hardness = block.getPlayerRelativeBlockHardness(blockBreaker, getBackingWorld(), blockPos);
 		System.out.println("TIME to destroy block at " + blockPos + ": " + 1 / hardness);
-		return (int) Math.ceil(1 / hardness);
+		return (int) Math.round(1 / hardness) + TIME_TO_FACE;
 	}
 
 	@Override

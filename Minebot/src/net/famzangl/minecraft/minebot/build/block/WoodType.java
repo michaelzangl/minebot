@@ -16,24 +16,25 @@
  *******************************************************************************/
 package net.famzangl.minecraft.minebot.build.block;
 
+import net.famzangl.minecraft.minebot.ai.path.world.BlockMetaSet;
+import net.famzangl.minecraft.minebot.ai.path.world.BlockSet;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockPlanks.EnumType;
 import net.minecraft.init.Blocks;
 
 /**
  * A type of wood used in the game.
+ * 
  * @see LogItemFilter
  * @see WoodItemFilter
  * @author michael
  *
  */
 public enum WoodType {
-	OAK(Blocks.log, 0, EnumType.OAK),
-	SPRUCE(Blocks.log, 1, EnumType.SPRUCE),
-	BIRCH(Blocks.log, 2, EnumType.BIRCH),
-	JUNGLE(Blocks.log, 3, EnumType.JUNGLE),
-	ACACIA(Blocks.log2, 0, EnumType.ACACIA),
-	DARK_OAK(Blocks.log2, 1, EnumType.DARK_OAK);
+	OAK(Blocks.log, 0, EnumType.OAK), SPRUCE(Blocks.log, 1, EnumType.SPRUCE), BIRCH(
+			Blocks.log, 2, EnumType.BIRCH), JUNGLE(Blocks.log, 3,
+			EnumType.JUNGLE), ACACIA(Blocks.log2, 0, EnumType.ACACIA), DARK_OAK(
+			Blocks.log2, 1, EnumType.DARK_OAK);
 
 	public final Block block;
 	public final int lowerBits;
@@ -43,5 +44,15 @@ public enum WoodType {
 		this.block = block;
 		this.lowerBits = lowerBits;
 		this.plankType = plankType;
+	}
+
+	/**
+	 * Returns a block set with all blocks of this type.
+	 * 
+	 * @return
+	 */
+	public BlockSet getLogBlocks() {
+		return new BlockMetaSet(block, lowerBits).unionWith(block,
+				lowerBits | 0x4).unionWith(block, lowerBits | 0x8);
 	}
 }

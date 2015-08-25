@@ -16,11 +16,11 @@
  *******************************************************************************/
 package net.famzangl.minecraft.minebot.ai.task.move;
 
-import net.famzangl.minecraft.minebot.Pos;
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.task.AITask;
 import net.famzangl.minecraft.minebot.ai.task.TaskOperations;
 import net.famzangl.minecraft.minebot.ai.task.error.PositionTaskError;
+import net.minecraft.util.BlockPos;
 
 /**
  * Simply walks towards (x, z) assuming there is nothing in the way.
@@ -31,9 +31,9 @@ public class WalkTowardsTask extends AITask {
 
 	private final int x;
 	private final int z;
-	private Pos fromPos;
+	private BlockPos fromPos;
 
-	public WalkTowardsTask(int x, int z, Pos fromPos) {
+	public WalkTowardsTask(int x, int z, BlockPos fromPos) {
 		this.x = x;
 		this.z = z;
 		this.fromPos = fromPos;

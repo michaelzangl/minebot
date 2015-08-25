@@ -26,7 +26,6 @@ import net.famzangl.minecraft.minebot.ai.command.SafeStrategyRule;
 import net.famzangl.minecraft.minebot.ai.path.MineBySettingsPathFinder;
 import net.famzangl.minecraft.minebot.ai.path.MineNerbyPathFinder;
 import net.famzangl.minecraft.minebot.ai.path.MineSinglePathFinder;
-import net.famzangl.minecraft.minebot.ai.path.MovePathFinder;
 import net.famzangl.minecraft.minebot.ai.path.OrebfuscatedMinePathFinder;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSet;
 import net.famzangl.minecraft.minebot.ai.strategy.AIStrategy;

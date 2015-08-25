@@ -9,20 +9,18 @@ import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
+import java.awt.image.DataBufferByte;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.ConcurrentModificationException;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
@@ -31,17 +29,11 @@ import javax.imageio.ImageIO;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JComponent;
-import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSeparator;
 import javax.swing.JToolBar;
-
-import com.google.gson.Gson;
-import com.google.gson.JsonIOException;
-import com.google.gson.JsonSyntaxException;
-import com.google.gson.stream.JsonReader;
 
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.net.ChunkListener;
@@ -57,6 +49,10 @@ import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.IChunkProvider;
 import net.minecraft.world.chunk.storage.ExtendedBlockStorage;
+
+import com.google.gson.Gson;
+import com.google.gson.JsonIOException;
+import com.google.gson.JsonSyntaxException;
 
 /**
  * Reads the map that is sent to the user,
@@ -191,11 +187,34 @@ public class MapReader implements ChunkListener {
 			}
 		}
 
-		public void renderAt(Chunk chunk, int dx, int dz) {
-			int color = mode.getColor(chunk, dx, dz);
+		public void renderAt(WorldData world, Chunk chunk, int dx, int dz) {
+			int color = mode.getColor(world, chunk, chunk.xPosition * 16 + dx, chunk.zPosition * 16 + dz);
 			getPaintingImage().setRGB(
 					-pos.topLeftX + chunk.xPosition * 16 + dx,
 					-pos.topLeftZ + chunk.zPosition * 16 + dz, color);
+		}
+
+		public void renderChunk(WorldData world, Chunk chunk) {
+			int chunkX = chunk.xPosition * 16;
+			int chunkZ = chunk.zPosition * 16;
+
+			byte[] pixels = ((DataBufferByte)getPaintingImage().getRaster().getDataBuffer()).getData();
+			
+			for (int dz = 0; dz < 16; dz++) {
+				int offset = 4 * ((-pos.topLeftZ + chunkZ + dz) * BLOCK_SIZE + -pos.topLeftX + chunkX);
+				byte[] row = new byte[16 * 4];
+				for (int dx = 0; dx < 16; dx++) {
+					int x = chunkX + dx;
+					int z = chunkZ + dz;
+					
+					int color = mode.getColor(world, chunk, x, z);
+					row[dx * 4] = (byte) (color >> 24);
+					row[dx * 4 + 1] = (byte) (color);
+					row[dx * 4 + 2] = (byte) (color >> 8);
+					row[dx * 4 + 3] = (byte) (color >> 16);
+				}
+				System.arraycopy(row, 0, pixels, offset, row.length);
+			}
 		}
 	}
 
@@ -437,9 +456,9 @@ public class MapReader implements ChunkListener {
 			}
 		}
 
-		public void renderAt(Chunk chunk, int dx, int dz) {
+		public void renderChunk(WorldData world, Chunk chunk) {
 			for (WriteableImage i : images) {
-				i.renderAt(chunk, dx, dz);
+				i.renderChunk(world, chunk);
 			}
 		}
 
@@ -571,12 +590,10 @@ public class MapReader implements ChunkListener {
 			}
 			image.setChunkHash(chunk.xPosition, chunk.zPosition, hash);
 
-			for (int dz = 0; dz < 16; dz++) {
-				for (int dx = 0; dx < 16; dx++) {
-					image.renderAt(chunk, dx, dz);
-				}
-			}
+			WorldData world = registeredHelper.getWorld();
+			image.renderChunk(world, chunk);
 
+			// FIXME: Only mark if image was really c
 			image.markChanged();
 		}
 
@@ -897,7 +914,7 @@ public class MapReader implements ChunkListener {
 		EntityPlayerSP playerSP = helper.getMinecraft().thePlayer;
 		BlockPos newPlayer = playerSP == null ? null : helper
 				.getPlayerPosition();
-		int newLook = niceDegrees(playerSP == null ? null
+		int newLook = niceDegrees(playerSP == null ? 0
 				: (int) playerSP.rotationYaw);
 		mapDisplay.setPosition(newPlayer, newLook);
 

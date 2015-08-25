@@ -21,25 +21,63 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import net.famzangl.minecraft.minebot.Pos;
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSets;
 import net.famzangl.minecraft.minebot.ai.path.world.WorldData;
 import net.famzangl.minecraft.minebot.ai.path.world.WorldWithDelta;
+import net.famzangl.minecraft.minebot.ai.utils.BlockArea;
+import net.famzangl.minecraft.minebot.ai.utils.BlockArea.AreaVisitor;
+import net.famzangl.minecraft.minebot.ai.utils.BlockCuboid;
 import net.minecraft.util.BlockPos;
 
 /**
  * Destroys all Blocks in a given area. Individual blocks can be excluded, see
  * {@link #blacklist(BlockPos)}
  * 
- * @author michael
+ * @author Michael Zangl
  *
  */
 public class DestroyInRangeTask extends AITask implements CanPrefaceAndDestroy {
-	private final BlockPos minPos;
-	private final BlockPos maxPos;
+	private class ClosestBlockFinder implements AreaVisitor {
+		BlockPos next = null;
+		double currentMin = Float.POSITIVE_INFINITY;
+		private final AIHelper h;
+
+		public ClosestBlockFinder(AIHelper h) {
+			this.h = h;
+		}
+
+		@Override
+		public void visit(WorldData world, int x, int y, int z) {
+			final double rating = rate(h, x, y, z);
+			if (rating >= 0 && rating < currentMin) {
+				next = new BlockPos(x, y, z);
+				currentMin = rating;
+			}
+		}
+	}
+
+	private class ApplyToDelta implements AreaVisitor {
+
+		public ApplyToDelta() {
+		}
+
+		@Override
+		public void visit(WorldData world, int x, int y, int z) {
+			if (isSafeToDestroy(world, x, y, z)) {
+				// FIXME: Use generics instead of cast.
+				((WorldWithDelta)world).setBlock(x, y, z, 0, 0);
+			} else {
+				System.out.println("No destruction for " + x + "," + y + ","
+						+ z + ", block is: " + world.getBlockId(x, y, z));
+			}
+		}
+
+	}
+
 	private int facingAttempts;
-	private final ArrayList<BlockPos> blacklist = new ArrayList<BlockPos>();
+	private final ArrayList<BlockPos> failedBlocks = new ArrayList<BlockPos>();
+	private BlockArea range;
 
 	/**
 	 * Create a new {@link DestroyInRangeTask}.
@@ -50,44 +88,31 @@ public class DestroyInRangeTask extends AITask implements CanPrefaceAndDestroy {
 	 *            The other corner
 	 */
 	public DestroyInRangeTask(BlockPos p1, BlockPos p2) {
-		minPos = Pos.minPos(p1, p2);
-		maxPos = Pos.maxPos(p1, p2);
+		this(new BlockCuboid(p1, p2));
+	}
+
+	public DestroyInRangeTask(BlockArea range) {
+		this.range = range;
 	}
 
 	private BlockPos getNextToDestruct(AIHelper h) {
-		BlockPos next = null;
-		double currentMin = Float.POSITIVE_INFINITY;
-
-		for (int x = minPos.getX(); x <= maxPos.getX(); x++) {
-			for (int y = minPos.getY(); y <= maxPos.getY(); y++) {
-				for (int z = minPos.getZ(); z <= maxPos.getZ(); z++) {
-					final double rating = rate(h, x, y, z);
-					if (rating >= 0 && rating < currentMin) {
-						next = new BlockPos(x, y, z);
-						currentMin = rating;
-					}
-					// System.out.println(String.format("%d, %d, %d: %f", x, y,
-					// z,
-					// (float) rating));
-				}
-			}
-		}
-
-		return next;
+		ClosestBlockFinder f = new ClosestBlockFinder(h);
+		range.accept(f, h.getWorld());
+		return f.next;
 	}
 
 	private double rate(AIHelper h, int x, int y, int z) {
 		if (noDestructionRequired(h.getWorld(), x, y, z)) {
 			return -1;
 		} else {
-			return h.getMinecraft().thePlayer.getDistanceSq(x + .5, y + .5,
-					z + .5);
+			return h.getMinecraft().thePlayer.getDistanceSq(x + .5,
+					y + .5 - h.getMinecraft().thePlayer.getEyeHeight(), z + .5);
 		}
 	}
 
 	private boolean noDestructionRequired(WorldData world, int x, int y, int z) {
 		return !isSafeToDestroy(world, x, y, z)
-				|| blacklist.contains(new Pos(x, y, z));
+				|| failedBlocks.contains(new BlockPos(x, y, z));
 	}
 
 	private boolean isSafeToDestroy(WorldData world, int x, int y, int z) {
@@ -114,7 +139,7 @@ public class DestroyInRangeTask extends AITask implements CanPrefaceAndDestroy {
 	public void runTick(AIHelper h, TaskOperations o) {
 		BlockPos n = getNextToDestruct(h);
 		if (facingAttempts > 20) {
-			blacklist.add(n);
+			failedBlocks.add(n);
 			n = getNextToDestruct(h);
 		}
 		if (n != null) {
@@ -128,29 +153,26 @@ public class DestroyInRangeTask extends AITask implements CanPrefaceAndDestroy {
 		}
 	}
 
-	@Override
-	public int getGameTickTimeout(AIHelper helper) {
-		return 100 * (Math.abs(minPos.getX() - maxPos.getX()) + 1)
-				* (Math.abs(minPos.getY() - maxPos.getY()) + 1)
-				* (Math.abs(minPos.getZ() - maxPos.getZ()) + 1);
-	}
+	 @Override
+	 public int getGameTickTimeout(AIHelper helper) {
+		 return 2 * super.getGameTickTimeout(helper);
+	 }
 
 	@Override
 	public String toString() {
-		return "DestroyInRangeTask [minPos=" + minPos + ", maxPos=" + maxPos
-				+ ", facingAttempts=" + facingAttempts + ", blacklist="
-				+ blacklist + "]";
+		return "DestroyInRangeTask [range=" + range + ", facingAttempts="
+				+ facingAttempts + ", failedBlocks=" + failedBlocks + "]";
 	}
 
-	/**
-	 * Add a {@link BlockPos} to the list of blocks that should be excluded from
-	 * this area.
-	 * 
-	 * @param pos
-	 */
-	public void blacklist(BlockPos pos) {
-		blacklist.add(pos);
-	}
+//	/**
+//	 * Add a {@link BlockPos} to the list of blocks that should be excluded from
+//	 * this area.
+//	 * 
+//	 * @param pos
+//	 */
+//	public void blacklist(BlockPos pos) {
+//		failedBlocks.add(pos);
+//	}
 
 	@Override
 	public List<BlockPos> getPredestroyPositions(AIHelper helper) {
@@ -161,18 +183,8 @@ public class DestroyInRangeTask extends AITask implements CanPrefaceAndDestroy {
 
 	@Override
 	public boolean applyToDelta(WorldWithDelta world) {
-		// TODO Check which blocks are really destroyed / fail if they are not.
-		for (int x = minPos.getX(); x <= maxPos.getX(); x++) {
-			for (int y = minPos.getY(); y <= maxPos.getY(); y++) {
-				for (int z = minPos.getZ(); z <= maxPos.getZ(); z++) {
-					if (!noDestructionRequired(world, x, y, z)) {
-						world.setBlock(x, y, z, 0, 0);
-					} else {
-						System.out.println("No destruction for " + x + "," + y + "," + z + ", block is: " + world.getBlockId(x, y, z));
-					}
-				}
-			}
-		}
+		// FIXME Check which blocks are really destroyed / fail if they are not.
+		range.accept(new ApplyToDelta(), world);
 		return true;
 	}
 }

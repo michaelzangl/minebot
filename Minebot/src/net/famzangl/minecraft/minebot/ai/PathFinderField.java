@@ -21,7 +21,7 @@ import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.PriorityQueue;
 
-import net.famzangl.minecraft.minebot.Pos;
+import net.minecraft.util.BlockPos;
 
 /**
  * The basic path finding algorithm.
@@ -319,22 +319,22 @@ public class PathFinderField implements Comparator<Integer> {
 		int cy = getY(currentNode);
 		int cz = getZ(currentNode);
 		System.out.println("Reconstruct.");
-		final LinkedList<Pos> path = new LinkedList<Pos>();
+		final LinkedList<BlockPos> path = new LinkedList<BlockPos>();
 		while (cx != origX || cy != origY || cz != origZ) {
-			path.addFirst(new Pos(cx, cy, cz));
+			path.addFirst(new BlockPos(cx, cy, cz));
 			final int current = getIndexForBlock(cx, cy, cz);
 			debug(current);
 			cx -= getFromDirectionX(current);
 			cy -= getFromDirectionY(current);
 			cz -= getFromDirectionZ(current);
 		}
-		path.addFirst(new Pos(origX, origY, origZ));
+		path.addFirst(new BlockPos(origX, origY, origZ));
 		foundPath(path);
 	}
 
-	protected void foundPath(LinkedList<Pos> path) {
+	protected void foundPath(LinkedList<BlockPos> path) {
 		System.out.println("Found a path!");
-		for (final Pos p : path) {
+		for (final BlockPos p : path) {
 			System.out.println("Path part: " + p);
 		}
 	}
@@ -390,7 +390,7 @@ public class PathFinderField implements Comparator<Integer> {
 
 	private void debug(int nodeId) {
 		System.out.println("pos="
-				+ new Pos(getX(nodeId), getY(nodeId), getZ(nodeId))
+				+ new BlockPos(getX(nodeId), getY(nodeId), getZ(nodeId))
 				+ ", inQueue=" + isInQueue(nodeId) + ", visited="
 				+ isVisited(nodeId) + ", distance=" + getDistance(nodeId)
 				+ ", fromX=" + getFromDirectionX(nodeId) + ", fromY="

@@ -16,59 +16,42 @@
  *******************************************************************************/
 package net.famzangl.minecraft.minebot.ai.path;
 
-import java.util.HashSet;
-import java.util.LinkedList;
-
-import net.famzangl.minecraft.minebot.Pos;
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSet;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSets;
 import net.famzangl.minecraft.minebot.ai.path.world.WorldData;
 import net.famzangl.minecraft.minebot.ai.task.DestroyInRangeTask;
+import net.famzangl.minecraft.minebot.ai.utils.BlockArea.AreaVisitor;
+import net.famzangl.minecraft.minebot.ai.utils.BlockCuboid;
+import net.famzangl.minecraft.minebot.ai.utils.BlockFilteredArea;
+import net.famzangl.minecraft.minebot.ai.utils.BlockIntersection;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.BlockPos;
 
 public class ClearAreaPathfinder extends MovePathFinder {
+	public enum ClearMode {
+		VISIT_EVERY_POS(6, 0), CLEAR_3X2X3(5, 1);
 
-	private final BlockPos minPos;
-	private final BlockPos maxPos;
-	private int topY;
-//	private final HashSet<BlockPos> foundPositions = new HashSet<BlockPos>();
-//	private BlockPos pathEndPosition;
+		public final int maxHeight, maxExtendXZ;
 
-	public ClearAreaPathfinder(BlockPos pos1, BlockPos pos2) {
-		minPos = Pos.minPos(pos1, pos2);
-		maxPos = Pos.maxPos(pos1, pos2);
-		topY = maxPos.getY();
+		ClearMode(int maxHeight, int maxExtendX) {
+			this.maxHeight = maxHeight;
+			this.maxExtendXZ = maxExtendX;
+		}
 	}
 
-//	@Override
-//	protected boolean runSearch(BlockPos playerPosition) {
-//		foundPositions.clear();
-//		pathEndPosition = playerPosition;
-//		do {
-//			final boolean finished = super.runSearch(pathEndPosition);
-//			if (!finished) {
-//				return false;
-//			}
-//		} while (foundPositions.size() < 20 && pathEndPosition != null);
-//		return true;
-//	}
+	private int topY;
+	private final BlockCuboid area;
+	private ClearMode mode;
 
-//	@Override
-//	protected void foundPath(LinkedList<Pos> path) {
-//		for (final Pos p : path) {
-//			foundPositions.add(p);
-//			foundPositions.add(p.add(0, 1, 0));
-//			pathEndPosition = p;
-//		}
-//
-//		super.foundPath(path);
-//	}
+	public ClearAreaPathfinder(BlockPos pos1, BlockPos pos2, ClearMode mode) {
+		this.mode = mode;
+		area = new BlockCuboid(pos1, pos2);
+		topY = area.getMax().getY();
+	}
 
 	@Override
 	protected void noPathFound() {
-//		pathEndPosition = null;
 		super.noPathFound();
 	}
 
@@ -76,9 +59,9 @@ public class ClearAreaPathfinder extends MovePathFinder {
 	protected float rateDestination(int distance, int x, int y, int z) {
 		if (isInArea(x, y, z)
 				&& (!isTemporaryCleared(x, y, z) || !isTemporaryCleared(x,
-						y + 1, z) && y < maxPos.getY())) {
-			final float bonus = 0.0001f * (x - minPos.getX()) + 0.001f
-					* (y - minPos.getY());
+						y + 1, z) && y < area.getMax().getY())) {
+			final float bonus = 0.0001f * (x - area.getMin().getX()) + 0.001f
+					* (y - area.getMin().getY());
 			int layerMalus;
 			if (topY <= y) {
 				layerMalus = 5;
@@ -91,7 +74,8 @@ public class ClearAreaPathfinder extends MovePathFinder {
 			} else {
 				layerMalus = 0;
 			}
-			return distance + bonus + layerMalus + (maxPos.getY() - y) * 2;
+			return distance + bonus + layerMalus + (area.getMax().getY() - y)
+					* 2;
 		} else {
 			return -1;
 		}
@@ -99,18 +83,17 @@ public class ClearAreaPathfinder extends MovePathFinder {
 
 	private boolean isTemporaryCleared(int x, int y, int z) {
 		return isClearedBlock(world, x, y, z);
-//				|| foundPositions.contains(new BlockPos(x, y, z));
+		// || foundPositions.contains(new BlockPos(x, y, z));
 	}
 
 	private boolean isInArea(int x, int y, int z) {
-		return minPos.getX() <= x && x <= maxPos.getX() && minPos.getY() <= y && y <= maxPos.getY()
-				&& minPos.getZ() <= z && z <= maxPos.getZ();
+		return area.contains(world, x, y, z);
 	}
-	
+
 	private static final BlockSet clearedBlocks = new BlockSet(Blocks.air,
 			Blocks.torch);
 
-	private static boolean isClearedBlock(WorldData world, int x, int y, int z) {
+	protected static boolean isClearedBlock(WorldData world, int x, int y, int z) {
 		return clearedBlocks.isAt(world, x, y, z);
 	}
 
@@ -118,17 +101,23 @@ public class ClearAreaPathfinder extends MovePathFinder {
 	protected void addTasksForTarget(BlockPos currentPos) {
 		super.addTasksForTarget(currentPos);
 		BlockPos top = currentPos;
-		for (int i = 1; i < 6; i++) {
+		for (int i = 1; i < mode.maxHeight; i++) {
 			final BlockPos pos = currentPos.add(0, i, 0);
-			if (pos.getY() <= maxPos.getY()) {
+			if (pos.getY() <= area.getMax().getY()) {
 				top = pos;
 			}
 		}
 		// avoid gravel/...
-		while (!BlockSets.SAFE_CEILING.isAt(world, top) && top.getY() > currentPos.getY() + 1) {
+		while (!BlockSets.SAFE_CEILING.isAt(world, top)
+				&& top.getY() > currentPos.getY() + 1) {
 			top = top.add(0, -1, 0);
 		}
-		addTask(new DestroyInRangeTask(currentPos, top));
+		BlockCuboid range = new BlockCuboid(currentPos, top);
+		range = range.extendXZ(mode.maxExtendXZ);
+		BlockIntersection clamped = range.intersectWith(new BlockFilteredArea(
+				area, clearedBlocks.invert()));
+
+		addTask(new DestroyInRangeTask(clamped));
 	}
 
 	@Override
@@ -137,26 +126,38 @@ public class ClearAreaPathfinder extends MovePathFinder {
 	}
 
 	public int getAreaSize() {
-		return (maxPos.getX() - minPos.getX() + 1) * (maxPos.getY() - minPos.getY() + 1)
-				* (maxPos.getZ() - minPos.getZ() + 1);
+		return area.getVolume();
+	}
+
+	private static class AreaTopVisitor implements AreaVisitor {
+		private int count = 0;
+		private int newTopY;
+
+		public AreaTopVisitor(int initialTopY) {
+			newTopY = initialTopY;
+		}
+
+		@Override
+		public void visit(WorldData world, int x, int y, int z) {
+			if (!isClearedBlock(world, x, y, z)) {
+				count++;
+				newTopY = Math.max(y, newTopY);
+			}
+		}
+
+		@Override
+		public String toString() {
+			return "AreaTopVisitor [count=" + count + ", newTopY=" + newTopY
+					+ "]";
+		}
 	}
 
 	public int getToClearCount(AIHelper helper) {
 		WorldData world = helper.getWorld();
-		int count = 0;
-		int newTopY = minPos.getY();
-		for (int y = minPos.getY(); y <= maxPos.getY(); y++) {
-			for (int z = minPos.getZ(); z <= maxPos.getZ(); z++) {
-				for (int x = minPos.getX(); x <= maxPos.getX(); x++) {
-					if (!isClearedBlock(world, x, y, z)) {
-						count++;
-						newTopY = Math.max(y, newTopY);
-					}
-				}
-			}
-		}
-		topY = newTopY;
-		System.out.println("top Y:  " + newTopY);
-		return count;
+		AreaTopVisitor v = new AreaTopVisitor(area.getMin().getY());
+		area.accept(v, world);
+		topY = v.newTopY;
+		System.out.println("top Y:  " + v);
+		return v.count;
 	}
 }

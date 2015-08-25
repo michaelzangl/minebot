@@ -16,16 +16,9 @@
  *******************************************************************************/
 package net.famzangl.minecraft.minebot.ai.task;
 
-import java.lang.reflect.Field;
-
 import net.famzangl.minecraft.minebot.ai.AIHelper;
-import net.famzangl.minecraft.minebot.ai.net.MinebotNetHandler;
 import net.famzangl.minecraft.minebot.ai.net.NetworkHelper;
-import net.minecraft.client.multiplayer.PlayerControllerMP;
 import net.minecraft.entity.projectile.EntityFishHook;
-import net.minecraft.network.INetHandler;
-import net.minecraft.network.NetworkManager;
-import net.minecraft.network.play.INetHandlerPlayClient;
 
 /**
  * This task right-clicks as soon as a fish bit on the fishing rod. It assumes

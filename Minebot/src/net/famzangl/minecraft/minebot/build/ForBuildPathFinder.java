@@ -19,7 +19,6 @@ package net.famzangl.minecraft.minebot.build;
 import java.util.Arrays;
 import java.util.LinkedList;
 
-import net.famzangl.minecraft.minebot.Pos;
 import net.famzangl.minecraft.minebot.ai.BlockItemFilter;
 import net.famzangl.minecraft.minebot.ai.path.MovePathFinder;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSet;
@@ -128,12 +127,12 @@ public class ForBuildPathFinder extends MovePathFinder {
 	}
 
 	@Override
-	protected void foundPath(LinkedList<Pos> path) {
-		Pos currentPos = path.removeFirst();
+	protected void foundPath(LinkedList<BlockPos> path) {
+		BlockPos currentPos = path.removeFirst();
 		addTask(new AlignToGridTask(currentPos.getX(), currentPos.getY(),
 				currentPos.getZ()));
 		while (!path.isEmpty()) {
-			final Pos nextPos = path.removeFirst();
+			final BlockPos nextPos = path.removeFirst();
 			addTask(new WalkTowardsTask(currentPos, nextPos));
 			currentPos = nextPos;
 		}

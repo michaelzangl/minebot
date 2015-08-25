@@ -3,7 +3,9 @@ package net.famzangl.minecraft.minebot.map;
 import java.util.Hashtable;
 
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSet;
-import net.minecraft.block.Block;
+import net.famzangl.minecraft.minebot.ai.path.world.WorldData;
+import net.famzangl.minecraft.minebot.ai.utils.BlockCounter;
+import net.famzangl.minecraft.minebot.ai.utils.BlockCuboid;
 import net.minecraft.block.material.MapColor;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
@@ -15,61 +17,63 @@ public enum RenderMode {
 			new MapRenderer(), ""), BIOME(new BiomeRenderer(), "-biome");
 
 	private interface IRenderer {
-		int getColor(Chunk chunk, int dx, int dz);
+		/**
+		 * Gets the color for one pixel of the map.
+		 * 
+		 * @param world
+		 *            The world to use.
+		 * @param chunk
+		 *            The chunk we are rendering
+		 * @param dx
+		 *            World x coordinate
+		 * @param dz
+		 *            World y coordinate
+		 * @return The rgba color.
+		 */
+		int getColor(WorldData world, Chunk chunk, int dx, int dz);
 	}
 
 	private static class UndergroundRenderer implements RenderMode.IRenderer {
 		private static final BlockSet IGNORED_COVER_BLOCKS = new BlockSet(
 				Blocks.air, Blocks.leaves, Blocks.leaves2, Blocks.log,
-				Blocks.log2, Blocks.torch, Blocks.water,
-				Blocks.flowing_water, Blocks.waterlily, Blocks.lava,
-				Blocks.flowing_lava, Blocks.snow, Blocks.snow_layer,
-				Blocks.ice);
+				Blocks.log2, Blocks.torch, Blocks.water, Blocks.flowing_water,
+				Blocks.waterlily, Blocks.lava, Blocks.flowing_lava,
+				Blocks.snow, Blocks.snow_layer, Blocks.ice);
 		private static final BlockSet UNDERGROUND_BLOCKS = new BlockSet(
 				Blocks.air, Blocks.torch);
 		private static final BlockSet STRUCTURE_BLOCKS = new BlockSet(
-				Blocks.oak_fence, Blocks.end_portal_frame,
-				Blocks.end_stone, Blocks.bookshelf, Blocks.prismarine,
-				Blocks.planks, Blocks.nether_brick, Blocks.nether_wart,
-				Blocks.torch);
+				Blocks.oak_fence, Blocks.end_portal_frame, Blocks.end_stone,
+				Blocks.bookshelf, Blocks.prismarine, Blocks.planks,
+				Blocks.nether_brick, Blocks.nether_wart, Blocks.torch);
 		private static final BlockSet INTERESTING_BLOCKS = new BlockSet(
 				Blocks.chest, Blocks.mob_spawner, Blocks.gold_block);
 
 		@Override
-		public int getColor(Chunk chunk, int dx, int dz) {
-			int h = chunk.getHeight(dx, dz) + 1;
+		public int getColor(WorldData world, Chunk chunk, int dx, int dz) {
+			int h = chunk.getHeight(dx & 0xf, dz & 0xf) + 1;
 			while (h > 3
-					&& IGNORED_COVER_BLOCKS.contains(chunk.getBlock(dx, h,
-							dz))) {
+					&& IGNORED_COVER_BLOCKS.contains(chunk.getBlock(dx, h, dz))) {
 				h--;
 			}
-			int underground = 0;
-			int structure = 0;
-			int interesting = 0;
-			for (int i = 0; i < h; i++) {
-				Block block = chunk.getBlock(dx, i, dz);
-				if (UNDERGROUND_BLOCKS.contains(block)) {
-					underground++;
-				}
-				if (STRUCTURE_BLOCKS.contains(block)) {
-					structure++;
-				}
-				if (INTERESTING_BLOCKS.contains(block)) {
-					interesting++;
-				}
-			}
-			int r = Math.min((int) (structure / 6.0 * 0xff), 0xff);
-			int g = Math.min((int) (interesting / 2.0 * 0xff), 0xff);
-			int b = Math.min((int) (Math.sqrt(underground) / 6.0 * 0xff),
-					0xff);
+			BlockCuboid area = new BlockCuboid(new BlockPos(dx, 0, dz),
+					new BlockPos(dx, h, dz));
+
+			int[] count = BlockCounter.countBlocks(world, area,
+					STRUCTURE_BLOCKS, INTERESTING_BLOCKS, UNDERGROUND_BLOCKS);
+			// structure
+			int r = Math.min((int) (count[0] / 6.0 * 0xff), 0xff);
+			// interesting
+			int g = Math.min((int) (count[1] / 2.0 * 0xff), 0xff);
+			// underground
+			int b = Math.min((int) (Math.sqrt(count[2]) / 6.0 * 0xff), 0xff);
 			return 0xff000000 | (r << 16) | (g << 8) | b;
 		}
 	}
 
 	private static class MapRenderer implements RenderMode.IRenderer {
 		@Override
-		public int getColor(Chunk chunk, int dx, int dz) {
-			int h = chunk.getHeight(dx, dz) + 1;
+		public int getColor(WorldData world, Chunk chunk, int dx, int dz) {
+			int h = chunk.getHeight(dx & 0xf, dz & 0xf) + 1;
 			IBlockState state;
 			do {
 				--h;
@@ -156,7 +160,7 @@ public enum RenderMode {
 		}
 
 		@Override
-		public int getColor(Chunk chunk, int dx, int dz) {
+		public int getColor(WorldData world, Chunk chunk, int dx, int dz) {
 			int i = dx & 15;
 			int j = dz & 15;
 			int k = chunk.getBiomeArray()[j << 4 | i] & 255;
@@ -179,7 +183,7 @@ public enum RenderMode {
 		return ext;
 	}
 
-	public int getColor(Chunk chunk, int dx, int dz) {
-		return renderer.getColor(chunk, dx, dz);
+	public int getColor(WorldData world, Chunk chunk, int dx, int dz) {
+		return renderer.getColor(world, chunk, dx, dz);
 	}
 }

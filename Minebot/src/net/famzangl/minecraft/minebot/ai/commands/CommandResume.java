@@ -7,7 +7,6 @@ import net.famzangl.minecraft.minebot.ai.command.AICommandParameter;
 import net.famzangl.minecraft.minebot.ai.command.ParameterType;
 import net.famzangl.minecraft.minebot.ai.command.SafeStrategyRule;
 import net.famzangl.minecraft.minebot.ai.strategy.AIStrategy;
-import net.famzangl.minecraft.minebot.ai.strategy.RespawnStrategy;
 
 @AICommand(helpText = "Resume the last thing that was aborted.", name = "minebot")
 public class CommandResume {

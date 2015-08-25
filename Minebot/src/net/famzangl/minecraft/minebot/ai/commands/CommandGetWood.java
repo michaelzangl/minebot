@@ -29,13 +29,32 @@ import net.famzangl.minecraft.minebot.build.block.WoodType;
 
 @AICommand(helpText = "Gets wood", name = "minebot")
 public class CommandGetWood {
+	public static class TreePathFinderStrategy extends PathFinderStrategy {
+
+		private TreePathFinder treeFinder;
+
+		public TreePathFinderStrategy(TreePathFinder pathFinder,
+				String description) {
+			super(pathFinder, description);
+			treeFinder = pathFinder;
+		}
+		
+		@Override
+		public void searchTasks(AIHelper helper) {
+			if (treeFinder.addTasksForLargeTree(helper)) {
+				return;
+			}
+			super.searchTasks(helper);
+		}
+	}
+	
 	@AICommandInvocation(safeRule = SafeStrategyRule.DEFEND_MINING)
 	public static AIStrategy run(
 			AIHelper helper,
 			@AICommandParameter(type = ParameterType.FIXED, fixedName = "lumberjack", description = "") String nameArg,
 			@AICommandParameter(type = ParameterType.ENUM, description = "wood type", optional = true) WoodType type,
 			@AICommandParameter(type = ParameterType.FIXED, fixedName = "replant", description = "", optional = true) String replant) {
-		return new PathFinderStrategy(
+		return new TreePathFinderStrategy(
 				new TreePathFinder(type, replant != null), "Getting some " + (type == null ? "wood" : type.toString().toLowerCase()));
 	}
 

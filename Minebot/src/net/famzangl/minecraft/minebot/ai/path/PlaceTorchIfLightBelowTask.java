@@ -19,13 +19,13 @@ package net.famzangl.minecraft.minebot.ai.path;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import net.famzangl.minecraft.minebot.Pos;
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.BlockItemFilter;
 import net.famzangl.minecraft.minebot.ai.task.PlaceTorchSomewhereTask;
 import net.famzangl.minecraft.minebot.ai.task.SkipWhenSearchingPrefetch;
 import net.famzangl.minecraft.minebot.ai.task.TaskOperations;
 import net.minecraft.init.Blocks;
+import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
 
 @SkipWhenSearchingPrefetch
@@ -33,11 +33,11 @@ public class PlaceTorchIfLightBelowTask extends PlaceTorchSomewhereTask {
 
 	private static final BlockItemFilter TORCH_FILTER = new BlockItemFilter(
 			Blocks.torch);
-	private final Pos currentPos;
+	private final BlockPos currentPos;
 	private final float torchLightLevel;
 	private boolean attempted;
 
-	public PlaceTorchIfLightBelowTask(Pos currentPos,
+	public PlaceTorchIfLightBelowTask(BlockPos currentPos,
 			EnumFacing doNotPlaceAt, float torchLightLevel) {
 		super(Arrays.asList(currentPos, currentPos.add(0, 1, 0)),
 				getDirections(doNotPlaceAt));

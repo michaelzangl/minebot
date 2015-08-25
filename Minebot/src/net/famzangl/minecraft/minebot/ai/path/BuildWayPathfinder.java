@@ -126,7 +126,7 @@ public class BuildWayPathfinder extends AlongTrackPathFinder {
 			addTask(placeTask);
 
 			final DestroyInRangeTask clearTask = getClearAreaTask();
-			clearTask.blacklist(first);
+			//FIXME: clearTask.blacklist(first);
 			addTask(clearTask);
 
 			for (int i = 1; i < width; i++) {

@@ -27,71 +27,103 @@ import net.minecraft.util.BlockPos;
 /**
  * A set of blocks, identified by Id.
  * 
- * @author michael
+ * @author Michael Zangl
  *
  */
 public class BlockSet {
 
+	// Should be approx. one cache line.
 	public static int MAX_BLOCKIDS = 4096;
 
-	private final long[] set = new long[MAX_BLOCKIDS / 64];
+	protected final long[] set;
 
 	public BlockSet(int... ids) {
+		this();
 		for (int i : ids) {
 			setBlock(i);
 		}
 	}
 
 	public BlockSet(Block... blocks) {
+		this();
 		for (Block b : blocks) {
 			setBlock(Block.getIdFromBlock(b));
 		}
 	}
 
-	private BlockSet() {
+	BlockSet() {
+		 set = new long[getSetLength()];
+	}
+
+	protected int getSetLength() {
+		return MAX_BLOCKIDS / 64;
 	}
 
 	private void setBlock(int i) {
-		set[i / 64] |= 1l << i;
-		if (contains(9)) {
-			System.out.println("Water for " + i);
-		}
+		set[i / 64] |= 1l << (i & 63);
 	}
 
 	// private void clearBlock(int i) {
 	// set[i / 64] &= ~(1 << (i & 63));
 	// }
 
+	@Deprecated
 	public boolean contains(int blockId) {
-		return (set[blockId / 64] & (1l << blockId)) != 0;
+		return (set[blockId / 64] & (1l << (blockId & 63))) != 0;
 	}
 
 	public boolean contains(Block block) {
 		return contains(Block.getIdFromBlock(block));
 	}
 
+	@Deprecated
 	public boolean contains(IBlockState meta) {
 		return contains(meta.getBlock());
 	}
 
-	public BlockSet intersectWith(BlockSet wl2) {
-		BlockSet res = new BlockSet();
+	public boolean containsWithMeta(int blockWithMeta) {
+		return contains(blockWithMeta >> 4);
+	}
+
+	public BlockSet intersectWith(BlockSet bs2) {
+		BlockSet bs1 = bs2.compatibleSet(this);
+		bs2 = bs1.compatibleSet(bs2);
+		BlockSet res = bs1.newSet();
 		for (int i = 0; i < res.set.length; i++) {
-			res.set[i] = set[i] & wl2.set[i];
+			res.set[i] = set[i] & bs2.set[i];
 		}
 		return res;
 	}
 
-	public BlockSet unionWith(BlockSet wl2) {
-		BlockSet res = new BlockSet();
+	protected BlockSet compatibleSet(BlockSet bs1) {
+		return bs1;
+	}
+
+	BlockSet newSet() {
+		return new BlockSet();
+	}
+
+	protected BlockSet convertToMetaSet() {
+		return new BlockMetaSet(this);
+	}
+
+	public BlockSet unionWith(BlockSet bs2) {
+		BlockSet bs1 = bs2.compatibleSet(this);
+		bs2 = bs1.compatibleSet(bs2);
+		BlockSet res = bs1.newSet();
 		for (int i = 0; i < res.set.length; i++) {
-			res.set[i] = set[i] | wl2.set[i];
+			res.set[i] = set[i] | bs2.set[i];
 		}
 		return res;
 	}
 
 	public BlockSet invert() {
-		BlockSet res = new BlockSet();
+		BlockSet res;
+		if (this instanceof BlockMetaSet) {
+			res = new BlockMetaSet();
+		} else {
+			res = new BlockSet();
+		}
 		for (int i = 0; i < res.set.length; i++) {
 			res.set[i] = ~set[i];
 		}
@@ -108,7 +140,7 @@ public class BlockSet {
 	 * @return
 	 */
 	public boolean isAt(WorldData world, BlockPos pos) {
-		return contains(world.getBlockId(pos));
+		return containsWithMeta(world.getBlockIdWithMeta(pos));
 	}
 
 	/**
@@ -125,14 +157,18 @@ public class BlockSet {
 	 * @return
 	 */
 	public boolean isAt(WorldData world, int x, int y, int z) {
-		return contains(world.getBlockId(x, y, z));
+		return containsWithMeta(world.getBlockIdWithMeta(x, y, z));
 	}
-	
-	public List<BlockPos> findBlocks(WorldData world, BlockPos around, int radius) {
+
+	@Deprecated
+	public List<BlockPos> findBlocks(WorldData world, BlockPos around,
+			int radius) {
 		ArrayList<BlockPos> pos = new ArrayList<BlockPos>();
-		for (int x = around .getX() - radius; x <= around.getX() + radius; x++) {
+		// FIXME: Use areas for this.
+		for (int x = around.getX() - radius; x <= around.getX() + radius; x++) {
 			for (int z = around.getZ() - radius; z <= around.getZ() + radius; z++) {
-				for (int y = around.getY() - radius; y <= around.getY() + radius; y++) {
+				for (int y = around.getY() - radius; y <= around.getY()
+						+ radius; y++) {
 					if (isAt(world, x, y, z)) {
 						pos.add(new BlockPos(x, y, z));
 					}
@@ -141,7 +177,6 @@ public class BlockSet {
 		}
 		return pos;
 	}
-
 
 	@Override
 	public int hashCode() {
@@ -168,7 +203,7 @@ public class BlockSet {
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
-		builder.append("BlockWhitelist [");
+		builder.append("BlockSet [");
 		getBlockString(builder);
 		builder.append("]");
 		return builder.toString();
@@ -177,17 +212,24 @@ public class BlockSet {
 	public void getBlockString(StringBuilder builder) {
 		boolean needsComma = false;
 		for (int i = 0; i < MAX_BLOCKIDS; i++) {
-			if (contains(i)) {
+			String str = getForBlock(i);
+			if (str != null) {
 				if (needsComma) {
 					builder.append(", ");
 				} else {
 					needsComma = true;
 				}
-				builder.append(Block.getBlockById(i).getLocalizedName());
-				builder.append(" (");
-				builder.append(i);
-				builder.append(")");
+				builder.append(str);
 			}
+		}
+	}
+
+	protected String getForBlock(int blockId) {
+		if (contains(blockId)) {
+			return Block.getBlockById(blockId).getLocalizedName() + " ("
+					+ blockId + ")";
+		} else {
+			return null;
 		}
 	}
 }

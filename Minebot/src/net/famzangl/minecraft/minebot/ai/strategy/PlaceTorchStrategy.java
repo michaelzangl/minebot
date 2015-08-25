@@ -1,6 +1,5 @@
 package net.famzangl.minecraft.minebot.ai.strategy;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -10,7 +9,6 @@ import net.famzangl.minecraft.minebot.ai.BlockItemFilter;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSet;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSets;
 import net.famzangl.minecraft.minebot.ai.path.world.WorldData;
-import net.famzangl.minecraft.minebot.ai.task.error.SelectTaskError;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.BlockPos;
@@ -55,7 +53,7 @@ public class PlaceTorchStrategy extends AIStrategy {
 	private BlockPos currentPosition;
 
 	public PlaceTorchStrategy() {
-		torchLightLevel = 1;
+		torchLightLevel = 3;
 	}
 
 	@Override

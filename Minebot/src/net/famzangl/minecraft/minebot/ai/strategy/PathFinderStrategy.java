@@ -24,6 +24,7 @@ import net.famzangl.minecraft.minebot.ai.path.world.WorldWithDelta;
 import net.famzangl.minecraft.minebot.ai.render.PosMarkerRenderer;
 import net.famzangl.minecraft.minebot.ai.task.AITask;
 import net.famzangl.minecraft.minebot.ai.task.WaitTask;
+import net.minecraft.util.BlockPos;
 import net.minecraftforge.fml.common.gameevent.TickEvent.RenderTickEvent;
 
 /**
@@ -160,7 +161,7 @@ public class PathFinderStrategy extends TaskStrategy {
 
 	@Override
 	public void drawMarkers(RenderTickEvent event, AIHelper helper) {
-		Pos target = pathFinder.getCurrentTarget();
+		BlockPos target = pathFinder.getCurrentTarget();
 		if (target != null) {
 			renderer.render(event, helper, target, target.add(0, 1, 0));
 		}

@@ -16,6 +16,8 @@
  *******************************************************************************/
 package net.famzangl.minecraft.minebot.ai.strategy;
 
+import java.util.HashSet;
+
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.minecraftforge.fml.common.gameevent.TickEvent.RenderTickEvent;
 
@@ -67,15 +69,26 @@ public class StackStrategy extends AIStrategy {
 	@Override
 	public String getDescription(AIHelper helper) {
 		StringBuilder str = new StringBuilder("");
+		HashSet<String> alreadyDisplayed = new HashSet<String>();
 		AIStrategy current = stack.getCurrentStrategy();
 		for (AIStrategy s : stack.getStrategies()) {
-			if (str.length() != 0) {
-				str.append("\n");
+			String description = s.getDescription(helper);
+			for (String line : description.split("\n")) {
+				if (line.isEmpty()) {
+					continue;
+				}
+				if (s != current && alreadyDisplayed.contains(line)) {
+					continue;
+				}
+				if (str.length() != 0) {
+					str.append("\n");
+				}
+				if (s == current && !(s instanceof StackStrategy)) {
+					str.append("-> ");
+				}
+				str.append(line);
+				alreadyDisplayed.add(line);
 			}
-			if (s == current && !(s instanceof StackStrategy)) {
-				str.append("-> ");
-			}
-			str.append(s.getDescription(helper));
 		}
 		return str.toString();
 	}

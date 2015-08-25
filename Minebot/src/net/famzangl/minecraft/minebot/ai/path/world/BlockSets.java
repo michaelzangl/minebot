@@ -111,6 +111,9 @@ public class BlockSets {
 	public static final BlockSet SAFE_AFTER_DESTRUCTION = new BlockSet(
 			Blocks.vine);
 
+	public static final BlockSet LEAVES = new BlockSet(Blocks.leaves, Blocks.leaves2);
+	public static final BlockSet LOGS = new BlockSet(Blocks.log, Blocks.log2);
+
 	public static boolean safeSideAround(WorldData world, int x, int y, int z) {
 		return SAFE_SIDE.isAt(world, x + 1, y, z)
 				&& SAFE_SIDE.isAt(world, x - 1, y, z)

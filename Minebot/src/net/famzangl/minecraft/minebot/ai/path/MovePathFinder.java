@@ -87,7 +87,7 @@ public class MovePathFinder extends PathFinderField {
 	protected final BlockSet forbiddenBlocks;
 	private TaskReceiver receiver;
 
-	private Pos currentTarget;
+	private BlockPos currentTarget;
 
 	public MovePathFinder() {
 		super();
@@ -191,13 +191,13 @@ public class MovePathFinder extends PathFinderField {
 	}
 
 	@Override
-	protected void foundPath(LinkedList<Pos> path) {
+	protected void foundPath(LinkedList<BlockPos> path) {
 		super.foundPath(path);
-		Pos currentPos = path.removeFirst();
+		BlockPos currentPos = path.removeFirst();
 		addTask(new AlignToGridTask(currentPos.getX(), currentPos.getY(),
 				currentPos.getZ()));
 		while (!path.isEmpty()) {
-			Pos nextPos = path.removeFirst();
+			BlockPos nextPos = path.removeFirst();
 			EnumFacing moveDirection;
 			moveDirection = direction(currentPos, nextPos);
 			if (torchLightLevel >= 0 && moveDirection != EnumFacing.UP && false) {
@@ -218,7 +218,7 @@ public class MovePathFinder extends PathFinderField {
 				nextPos = path.removeFirst();
 				stepsAdded++;
 			}
-			final Pos peeked = path.peekFirst();
+			final BlockPos peeked = path.peekFirst();
 			if (stepsAdded > 0) {
 				System.out.println("Shortcut from " + currentPos + " to "
 						+ nextPos);
@@ -255,7 +255,7 @@ public class MovePathFinder extends PathFinderField {
 	 * @param pos2
 	 * @return
 	 */
-	private boolean isAreaClear(Pos pos1, Pos pos2) {
+	private boolean isAreaClear(BlockPos pos1, BlockPos pos2) {
 		if (pos1.getY() != pos2.getY()) {
 			return false;
 		}
@@ -277,10 +277,10 @@ public class MovePathFinder extends PathFinderField {
 		return true;
 	}
 
-	private EnumFacing direction(Pos currentPos, final Pos nextPos) {
+	private EnumFacing direction(BlockPos currentPos, final BlockPos nextPos) {
 		BlockPos delta = nextPos.subtract(currentPos);
 		if (delta.getY() != 0 && (delta.getX() != 0 || delta.getZ() != 0)) {
-			delta = new Pos(delta.getX(), 0, delta.getZ());
+			delta = new BlockPos(delta.getX(), 0, delta.getZ());
 		}
 		return AIHelper.getDirectionFor(delta);
 	}
@@ -319,7 +319,7 @@ public class MovePathFinder extends PathFinderField {
 		}
 	}
 
-	public Pos getCurrentTarget() {
+	public BlockPos getCurrentTarget() {
 		return currentTarget;
 	}
 

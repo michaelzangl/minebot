@@ -16,15 +16,10 @@
  *******************************************************************************/
 package net.famzangl.minecraft.minebot.ai.task;
 
-import java.util.Collections;
-import java.util.List;
-
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.path.world.RecordingWorld;
-import net.famzangl.minecraft.minebot.ai.path.world.WorldData;
 import net.famzangl.minecraft.minebot.ai.path.world.WorldWithDelta;
 import net.famzangl.minecraft.minebot.ai.strategy.TaskStrategy;
-import net.minecraft.util.BlockPos;
 
 /**
  * This is a specific task that the {@link TaskStrategy} should work on.
@@ -82,8 +77,7 @@ public abstract class AITask {
 	/**
 	 * This computes the game tick timeout once.
 	 * <p>
-	 * The default value is the time to destroy all blocks given with
-	 * {@link #getBlocksToDestory(WorldData)}
+	 * The default value is the time to apply the world delta.
 	 * <p>
 	 * If that list is empty, the timeout is 5 seconds.
 	 * 

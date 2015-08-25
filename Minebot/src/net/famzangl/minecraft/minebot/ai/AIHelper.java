@@ -22,7 +22,6 @@ import java.util.Random;
 
 import net.famzangl.minecraft.minebot.Pos;
 import net.famzangl.minecraft.minebot.ai.command.AIChatController;
-import net.famzangl.minecraft.minebot.ai.net.MinebotNetHandler;
 import net.famzangl.minecraft.minebot.ai.net.NetworkHelper;
 import net.famzangl.minecraft.minebot.ai.path.world.WorldData;
 import net.famzangl.minecraft.minebot.ai.strategy.AIStrategy;

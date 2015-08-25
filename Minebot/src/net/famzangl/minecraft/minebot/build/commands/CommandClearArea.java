@@ -24,6 +24,7 @@ import net.famzangl.minecraft.minebot.ai.command.AICommandParameter;
 import net.famzangl.minecraft.minebot.ai.command.ParameterType;
 import net.famzangl.minecraft.minebot.ai.command.SafeStrategyRule;
 import net.famzangl.minecraft.minebot.ai.path.ClearAreaPathfinder;
+import net.famzangl.minecraft.minebot.ai.path.ClearAreaPathfinder.ClearMode;
 import net.famzangl.minecraft.minebot.ai.strategy.AIStrategy;
 import net.famzangl.minecraft.minebot.ai.strategy.PathFinderStrategy;
 import net.minecraft.util.BlockPos;
@@ -46,9 +47,7 @@ public class CommandClearArea {
 			final int max = pathFinder.getAreaSize();
 			if (max <= 100000) {
 				float toClearCount = pathFinder.getToClearCount(helper);
-				progress = 100
-						- Math.round(100f * toClearCount
-								/ max) + "%";
+				progress = 100 - Math.round(100f * toClearCount / max) + "%";
 				done = toClearCount == 0;
 			}
 			super.searchTasks(helper);
@@ -58,7 +57,7 @@ public class CommandClearArea {
 		public String getDescription(AIHelper helper) {
 			return "Clear area: " + progress;
 		}
-		
+
 		@Override
 		public boolean hasFailed() {
 			return !done;
@@ -68,14 +67,16 @@ public class CommandClearArea {
 	@AICommandInvocation(safeRule = SafeStrategyRule.DEFEND_MINING)
 	public static AIStrategy run(
 			AIHelper helper,
-			@AICommandParameter(type = ParameterType.FIXED, fixedName = "clear", description = "") String nameArg) {
+			@AICommandParameter(type = ParameterType.FIXED, fixedName = "clear", description = "") String nameArg,
+			@AICommandParameter(type = ParameterType.ENUM, description = "clear mode", optional = true) ClearMode mode) {
 		final BlockPos pos1 = helper.getPos1();
 		final BlockPos pos2 = helper.getPos2();
 		if (pos1 == null || pos2 == null) {
 			AIChatController.addChatLine("Set positions first.");
 			return null;
 		} else {
-			return new ClearAreaStrategy(new ClearAreaPathfinder(pos1, pos2));
+			return new ClearAreaStrategy(new ClearAreaPathfinder(pos1, pos2,
+					mode == null ? ClearMode.VISIT_EVERY_POS : mode));
 		}
 	}
 }

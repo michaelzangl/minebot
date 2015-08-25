@@ -26,7 +26,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.network.NetHandlerPlayClient;
 import net.minecraft.entity.Entity;
-import net.minecraft.network.INetHandler;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.Packet;
 import net.minecraft.network.play.INetHandlerPlayClient;
@@ -42,7 +41,6 @@ import net.minecraft.network.play.server.S2APacketParticles;
 import net.minecraft.network.play.server.S3APacketTabComplete;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumParticleTypes;
-import net.minecraft.world.ChunkCoordIntPair;
 
 import com.mojang.authlib.GameProfile;
 
