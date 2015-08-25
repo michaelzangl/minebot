@@ -216,7 +216,7 @@ public class PathFinderField implements Comparator<Integer> {
 		startTime = System.currentTimeMillis();
 		long iteration = 0;
 		while (!pqEmpty()
-				&& ((iteration++ & 0xff) != 0 || hasTimeLeft(startTime))) {
+				&& ((iteration++ & 0xff) == 0 || hasTimeLeft(startTime))) {
 			final int currentNode = pqPoll();
 			final int currentDistance = getDistance(currentNode);
 			if (currentDest != null
