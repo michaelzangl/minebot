@@ -22,7 +22,7 @@ public class AlongTrackPathFinder extends MovePathFinder {
 	protected final int cx;
 	protected final int cy;
 	protected final int cz;
-	protected final Integer length;
+	protected final int length;
 
 	public AlongTrackPathFinder(int dx, int dz, int cx, int cy, int cz, int length) {
 		this.dx = dx;
@@ -34,8 +34,8 @@ public class AlongTrackPathFinder extends MovePathFinder {
 	}
 
 	protected boolean isOnTrack(int x, int z) {
-		return dz != 0 && x == cx && dz * (z - cz) >= 0 || dx != 0 && z == cz
-				&& dx * (x - cx) >= 0 && (length < 0 || getStepNumber(x, z) <= length);
+		return (dz != 0 && x == cx && dz * (z - cz) >= 0 || dx != 0 && z == cz
+				&& dx * (x - cx) >= 0) && (length < 0 || getStepNumber(x, z) <= length);
 	}
 
 	/**

@@ -19,6 +19,7 @@ package net.famzangl.minecraft.minebot.ai.path;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Collections;
+import java.util.Hashtable;
 
 import net.famzangl.minecraft.minebot.Pos;
 import net.famzangl.minecraft.minebot.ai.AIHelper;
@@ -28,54 +29,84 @@ import net.famzangl.minecraft.minebot.ai.path.world.WorldWithDelta;
 import net.famzangl.minecraft.minebot.ai.task.AITask;
 import net.famzangl.minecraft.minebot.ai.task.DestroyInRangeTask;
 import net.famzangl.minecraft.minebot.ai.task.PlaceTorchSomewhereTask;
+import net.famzangl.minecraft.minebot.ai.task.RunOnceTask;
 import net.famzangl.minecraft.minebot.ai.task.SkipWhenSearchingPrefetch;
 import net.famzangl.minecraft.minebot.ai.task.TaskOperations;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
 
 public class TunnelPathFinder extends AlongTrackPathFinder {
-
-	private final static BlockSet tunneled = BlockSets.AIR
-			.unionWith(BlockSets.TORCH);
-
-	private BitSet finishedTunnels = new BitSet();
-
 	/**
-	 * How much more to tunnel to the side.
+	 * Marks a section of the tunnel as done.
+	 * 
+	 * @author Michael Zangl
 	 */
-	private final int addToSide;
-	private final int addToTop;
-	private final TorchSide torches;
-
-	private final boolean addBranches;
-
 	@SkipWhenSearchingPrefetch
-	private final class MarkAsDoneTask extends AITask {
+	private final class MarkAsDoneTask extends RunOnceTask {
 		private final int stepNumber;
-		private boolean done = false;
 
 		private MarkAsDoneTask(int stepNumber) {
 			this.stepNumber = stepNumber;
 		}
 
 		@Override
-		public void runTick(AIHelper h, TaskOperations o) {
+		protected void runOnce(AIHelper h, TaskOperations o) {
 			finishedTunnels.set(stepNumber);
-			done = true;
-		}
-
-		@Override
-		public boolean isFinished(AIHelper h) {
-			return done;
+			o.faceAndDestroyForNextTask();
 		}
 
 		@Override
 		public boolean applyToDelta(WorldWithDelta world) {
 			return true;
 		}
+
+		@Override
+		public String toString() {
+			return "MarkAsDoneTask [stepNumber=" + stepNumber + "]";
+		}
 	}
 
-	public static enum TorchSide {
+	/**
+	 * Marks that we have reached a given section of the tunnel.
+	 * 
+	 * @author Michael Zangl
+	 */
+	@SkipWhenSearchingPrefetch
+	private final class MarkAsReachedTask extends RunOnceTask {
+		private final int stepNumber;
+
+		private MarkAsReachedTask(int stepNumber) {
+			this.stepNumber = stepNumber;
+		}
+
+		@Override
+		protected void runOnce(AIHelper h, TaskOperations o) {
+			tunnelPositionStartCount.put(stepNumber, getStartCount(stepNumber) + 1);
+			
+			synchronized (currentStepNumberMutex) {
+				currentStepNumber = stepNumber;	
+			}
+			o.faceAndDestroyForNextTask();
+		}
+
+		@Override
+		public boolean applyToDelta(WorldWithDelta world) {
+			return true;
+		}
+
+		@Override
+		public String toString() {
+			return "MarkAsReachedTask [stepNumber=" + stepNumber + "]";
+		}
+	}
+
+	/**
+	 * The side of the tunnel at which the torch is placed.
+	 * 
+	 * @author Michael Zangl
+	 *
+	 */
+	public enum TorchSide {
 		NONE(false, false, false), LEFT(true, false, false), RIGHT(false, true,
 				false), BOTH(true, true, false), FLOOR(false, false, true);
 
@@ -90,8 +121,29 @@ public class TunnelPathFinder extends AlongTrackPathFinder {
 		}
 	}
 
+	private final static BlockSet FREE_TUNNEL_BLOCKS = BlockSets.AIR
+			.unionWith(BlockSets.TORCH);
+
+	private BitSet finishedTunnels = new BitSet();
+	/**
+	 * How often did we attempt to tunnel at a given position?
+	 */
+	private Hashtable<Integer, Integer> tunnelPositionStartCount = new Hashtable<Integer, Integer>();
+
+	/**
+	 * How much more to tunnel to the side.
+	 */
+	private final int addToSide;
+	private final int addToTop;
+	private final TorchSide torches;
+
+	private final boolean addBranches;
+	
+	private int currentStepNumber = 0;
+	private final Object currentStepNumberMutex = new Object();
+
 	public TunnelPathFinder(int dx, int dz, int cx, int cy, int cz,
-			int addToSide, int addToTop, TorchSide torches, Integer length) {
+			int addToSide, int addToTop, TorchSide torches, int length) {
 		super(dx, dz, cx, cy, cz, length);
 		this.addToSide = Math.max(0, addToSide);
 		this.addToTop = addToTop;
@@ -101,16 +153,66 @@ public class TunnelPathFinder extends AlongTrackPathFinder {
 
 	@Override
 	protected float rateDestination(int distance, int x, int y, int z) {
-		if (isOnTrack(x, z) && y == cy && !tunneled.isAt(world, x, y, z)
-				&& !finishedTunnels.get(getStepNumber(x, z))) {
+		if (shouldTunnel(x, y, z)) {
 			return distance + 1;
 		} else {
 			return -1;
 		}
 	}
 
+	/**
+	 * Test if we should dig a tunnel to that position.
+	 * 
+	 * @param x
+	 *            The x pos.
+	 * @param y
+	 *            The y pos
+	 * @param z
+	 *            The z pos
+	 * @return
+	 */
+	private boolean shouldTunnel(int x, int y, int z) {
+		if (y != cy || !isOnTrack(x, z)) {
+			// not on track
+			return false;
+		}
+		int stepNumber = getStepNumber(x, z);
+		
+		if (finishedTunnels.get(stepNumber)) {
+			// we already handled that position.
+			return false;
+		}
+
+		boolean isFree = FREE_TUNNEL_BLOCKS.isAt(world, x, y, z)
+				&& FREE_TUNNEL_BLOCKS.isAt(world, x, y + 1, z);
+		
+		int startCount = getStartCount(stepNumber);
+		
+		if (startCount > 0 && startCount < 5) {
+			// we started something but got stopped by e.g. eat/,,,
+			return true;
+		} else {
+			return !isFree;
+		}
+	}
+
+	private int getStartCount(int stepNumber) {
+		Integer startCount = tunnelPositionStartCount.get(stepNumber);
+		if (startCount == null) {
+			return 0;
+		} else {
+			return startCount;
+		}
+	}
+
 	@Override
 	protected void addTasksForTarget(BlockPos currentPos) {
+		final int stepNumber = getStepNumber(currentPos.getX(),
+				currentPos.getZ());
+//		if (getStartCount(stepNumber) < 1) {
+//			tunnelPositionStartCount.put(stepNumber, 1);
+//		}
+		addTask(new MarkAsReachedTask(stepNumber));
 		BlockPos p1, p2;
 		if (dx == 0) {
 			p1 = currentPos.add(addToSide, 0, 0);
@@ -121,8 +223,6 @@ public class TunnelPathFinder extends AlongTrackPathFinder {
 		}
 		addTask(new DestroyInRangeTask(p1, p2));
 
-		final int stepNumber = getStepNumber(currentPos.getX(),
-				currentPos.getZ());
 		final boolean isTorchStep = stepNumber % 8 == 0;
 		if (torches.right && isTorchStep) {
 			addTorchesTask(currentPos, -dz, dx);
@@ -172,12 +272,22 @@ public class TunnelPathFinder extends AlongTrackPathFinder {
 		addTask(new PlaceTorchSomewhereTask(positions,
 				AIHelper.getDirectionForXZ(dirX, dirZ), EnumFacing.DOWN));
 	}
+	
+	public String getProgress() {
+		synchronized (currentStepNumberMutex) {
+			String str = currentStepNumber + "";
+			if (length >= 0) {
+				str += "/" + length;
+			}
+			return str + "m";
+		}
+	}
 
 	@Override
 	public String toString() {
 		return "TunnelPathFinder [addToSide=" + addToSide + ", addToTop="
 				+ addToTop + ", dx=" + dx + ", dz=" + dz + ", cx=" + cx
-				+ ", cy=" + cy + ", cz=" + cz + ", torches=" + torches + "]";
+				+ ", cy=" + cy + ", cz=" + cz + ", torches=" + torches + ", length=" + length + "]";
 	}
 
 }

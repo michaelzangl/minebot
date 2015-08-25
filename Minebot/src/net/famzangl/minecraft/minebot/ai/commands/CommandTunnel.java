@@ -39,7 +39,8 @@ public class CommandTunnel {
 			@AICommandParameter(type = ParameterType.FIXED, fixedName = "branches", description = "add sideward branches", optional = true) String sidewardBranches,
 			@AICommandParameter(type = ParameterType.ENUM, description = "torch side", optional = true) TorchSide torches,
 			@AICommandParameter(type = ParameterType.NUMBER, description = "max length", optional = true) Integer length) {
-		return run(helper, nameArg, inDirection, sidewardBranches != null ? -1 : 0, 0, torches, length);
+		return run(helper, nameArg, inDirection, sidewardBranches != null ? -1
+				: 0, 0, torches, length);
 	}
 
 	@AICommandInvocation(safeRule = SafeStrategyRule.DEFEND_MINING)
@@ -64,8 +65,14 @@ public class CommandTunnel {
 		}
 
 		final BlockPos pos = helper.getPlayerPosition();
-		return new PathFinderStrategy(new TunnelPathFinder(inDirection.getFrontOffsetX(),
-				inDirection.getFrontOffsetZ(), pos.getX(), pos.getY(), pos.getZ(), addToSide, addToTop,
-				torches, length), "Tunneling");
+		final TunnelPathFinder tunnel = new TunnelPathFinder(
+				inDirection.getFrontOffsetX(), inDirection.getFrontOffsetZ(),
+				pos.getX(), pos.getY(), pos.getZ(), addToSide, addToTop,
+				torches, length);
+		return new PathFinderStrategy(tunnel, null) {
+			public String getDescription(AIHelper helper) {
+				return "Tunneling " + tunnel.getProgress();
+			}
+		};
 	}
 }
