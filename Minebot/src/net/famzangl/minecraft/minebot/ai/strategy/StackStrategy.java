@@ -77,17 +77,17 @@ public class StackStrategy extends AIStrategy {
 				if (line.isEmpty()) {
 					continue;
 				}
-				if (s != current && alreadyDisplayed.contains(line)) {
+				boolean markAsCurrent = s == current && !(s instanceof StackStrategy);
+				if (!alreadyDisplayed.add(line) && !markAsCurrent) {
 					continue;
 				}
 				if (str.length() != 0) {
 					str.append("\n");
 				}
-				if (s == current && !(s instanceof StackStrategy)) {
+				if (markAsCurrent) {
 					str.append("-> ");
 				}
 				str.append(line);
-				alreadyDisplayed.add(line);
 			}
 		}
 		return str.toString();
