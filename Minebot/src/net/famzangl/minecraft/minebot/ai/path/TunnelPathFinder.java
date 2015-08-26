@@ -32,6 +32,8 @@ import net.famzangl.minecraft.minebot.ai.task.PlaceTorchSomewhereTask;
 import net.famzangl.minecraft.minebot.ai.task.RunOnceTask;
 import net.famzangl.minecraft.minebot.ai.task.SkipWhenSearchingPrefetch;
 import net.famzangl.minecraft.minebot.ai.task.TaskOperations;
+import net.famzangl.minecraft.minebot.ai.utils.BlockCuboid;
+import net.famzangl.minecraft.minebot.ai.utils.BlockFilteredArea;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
 
@@ -81,10 +83,11 @@ public class TunnelPathFinder extends AlongTrackPathFinder {
 
 		@Override
 		protected void runOnce(AIHelper h, TaskOperations o) {
-			tunnelPositionStartCount.put(stepNumber, getStartCount(stepNumber) + 1);
-			
+			tunnelPositionStartCount.put(stepNumber,
+					getStartCount(stepNumber) + 1);
+
 			synchronized (currentStepNumberMutex) {
-				currentStepNumber = stepNumber;	
+				currentStepNumber = stepNumber;
 			}
 			o.faceAndDestroyForNextTask();
 		}
@@ -138,7 +141,7 @@ public class TunnelPathFinder extends AlongTrackPathFinder {
 	private final TorchSide torches;
 
 	private final boolean addBranches;
-	
+
 	private int currentStepNumber = 0;
 	private final Object currentStepNumberMutex = new Object();
 
@@ -177,7 +180,7 @@ public class TunnelPathFinder extends AlongTrackPathFinder {
 			return false;
 		}
 		int stepNumber = getStepNumber(x, z);
-		
+
 		if (finishedTunnels.get(stepNumber)) {
 			// we already handled that position.
 			return false;
@@ -185,9 +188,9 @@ public class TunnelPathFinder extends AlongTrackPathFinder {
 
 		boolean isFree = FREE_TUNNEL_BLOCKS.isAt(world, x, y, z)
 				&& FREE_TUNNEL_BLOCKS.isAt(world, x, y + 1, z);
-		
+
 		int startCount = getStartCount(stepNumber);
-		
+
 		if (startCount > 0 && startCount < 5) {
 			// we started something but got stopped by e.g. eat/,,,
 			return true;
@@ -209,9 +212,9 @@ public class TunnelPathFinder extends AlongTrackPathFinder {
 	protected void addTasksForTarget(BlockPos currentPos) {
 		final int stepNumber = getStepNumber(currentPos.getX(),
 				currentPos.getZ());
-//		if (getStartCount(stepNumber) < 1) {
-//			tunnelPositionStartCount.put(stepNumber, 1);
-//		}
+		// if (getStartCount(stepNumber) < 1) {
+		// tunnelPositionStartCount.put(stepNumber, 1);
+		// }
 		addTask(new MarkAsReachedTask(stepNumber));
 		BlockPos p1, p2;
 		if (dx == 0) {
@@ -221,7 +224,9 @@ public class TunnelPathFinder extends AlongTrackPathFinder {
 			p1 = currentPos.add(0, 0, addToSide);
 			p2 = currentPos.add(0, 1 + addToTop, -addToSide);
 		}
-		addTask(new DestroyInRangeTask(p1, p2));
+		BlockFilteredArea area = new BlockFilteredArea(new BlockCuboid(p1, p2),
+				FREE_TUNNEL_BLOCKS.invert());
+		addTask(new DestroyInRangeTask(area));
 
 		final boolean isTorchStep = stepNumber % 8 == 0;
 		if (torches.right && isTorchStep) {
@@ -272,7 +277,7 @@ public class TunnelPathFinder extends AlongTrackPathFinder {
 		addTask(new PlaceTorchSomewhereTask(positions,
 				AIHelper.getDirectionForXZ(dirX, dirZ), EnumFacing.DOWN));
 	}
-	
+
 	public String getProgress() {
 		synchronized (currentStepNumberMutex) {
 			String str = currentStepNumber + "";
@@ -287,7 +292,8 @@ public class TunnelPathFinder extends AlongTrackPathFinder {
 	public String toString() {
 		return "TunnelPathFinder [addToSide=" + addToSide + ", addToTop="
 				+ addToTop + ", dx=" + dx + ", dz=" + dz + ", cx=" + cx
-				+ ", cy=" + cy + ", cz=" + cz + ", torches=" + torches + ", length=" + length + "]";
+				+ ", cy=" + cy + ", cz=" + cz + ", torches=" + torches
+				+ ", length=" + length + "]";
 	}
 
 }
