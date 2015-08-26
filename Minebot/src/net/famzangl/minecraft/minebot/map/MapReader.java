@@ -199,7 +199,7 @@ public class MapReader implements ChunkListener {
 			int chunkZ = chunk.zPosition * 16;
 
 			byte[] pixels = ((DataBufferByte)getPaintingImage().getRaster().getDataBuffer()).getData();
-			
+			boolean wasChanged = false;
 			for (int dz = 0; dz < 16; dz++) {
 				int offset = 4 * ((-pos.topLeftZ + chunkZ + dz) * BLOCK_SIZE + -pos.topLeftX + chunkX);
 				byte[] row = new byte[16 * 4];
@@ -213,7 +213,17 @@ public class MapReader implements ChunkListener {
 					row[dx * 4 + 2] = (byte) (color >> 8);
 					row[dx * 4 + 3] = (byte) (color >> 16);
 				}
-				System.arraycopy(row, 0, pixels, offset, row.length);
+				for (int i = 0; i < row.length; i++) {
+					if (row[i] != pixels[offset + i]) {
+						// simply copy the rest.
+						System.arraycopy(row, i, pixels, offset + i, row.length - i);
+						wasChanged = true;
+						break;
+					}
+				}
+			}
+			if (wasChanged) {
+				markChanged();
 			}
 		}
 	}
@@ -466,7 +476,6 @@ public class MapReader implements ChunkListener {
 			for (WriteableImage i : images) {
 				i.markChanged();
 			}
-			mapDisplay.repaint();
 		}
 
 		public boolean isValidForChunkHash(int x, int z, int hash) {
@@ -593,8 +602,8 @@ public class MapReader implements ChunkListener {
 			WorldData world = registeredHelper.getWorld();
 			image.renderChunk(world, chunk);
 
-			// FIXME: Only mark if image was really c
-			image.markChanged();
+			//TODO: Only repaint if image was changed and is in view.
+			mapDisplay.repaint();
 		}
 
 		public void stop() {
