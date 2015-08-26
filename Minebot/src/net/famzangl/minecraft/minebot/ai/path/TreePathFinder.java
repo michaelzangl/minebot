@@ -52,12 +52,35 @@ public class TreePathFinder extends MovePathFinder {
 			.unionWith(BlockSets.LOGS);
 
 	private class LargeTreeState {
+		/**
+		 * This is an intended preface stopper.
+		 * 
+		 * @author Michael Zangl
+		 */
+		private class TopReachedTask extends RunOnceTask {
+
+			@Override
+			protected void runOnce(AIHelper h, TaskOperations o) {
+				topReached = true;
+			}
+
+		}
+
+		/**
+		 * TODO: Increase for {@link WoodType#SPRUCE}
+		 */
+		private static final int TREE_TOP_OFFSET = 2;
 		private int minX;
 		private int minZ;
 
 		/**
-		 * The height at which we started. We need to dig down to here when
-		 * digging down again.
+		 * The height at which we started. We need to dig down at least to here
+		 * when digging down again.
+		 */
+		private int playerStartY;
+
+		/**
+		 * Lowest log for the tree.
 		 */
 		private int minY;
 
@@ -71,10 +94,11 @@ public class TreePathFinder extends MovePathFinder {
 		 * An offset (0..3) to compute the stairs.
 		 */
 		private int stairOffset;
+		private boolean topReached;
 
 		public LargeTreeState(int minX, int minY, int minZ) {
 			this.minX = minX;
-			this.minY = minY;
+			this.playerStartY = minY;
 			this.minZ = minZ;
 		}
 
@@ -102,20 +126,35 @@ public class TreePathFinder extends MovePathFinder {
 		}
 
 		public void scanTreeHeight(WorldData world, BlockPos ignoredPlayerPos) {
-			for (topY = minY; topY < 255; topY++) {
-				BlockPos corner = new BlockPos(minX, topY, minZ);
-				BlockCuboid trunk = new BlockCuboid(corner, corner.add(1, 0, 1));
-				int trunkBlocks = BlockCounter.countBlocks(world, trunk, logs)[0];
-				int should = topY <= ignoredPlayerPos.getY() + 1 ? 3 : 4;
-				System.out.println("For y=" + topY + ": " + trunkBlocks);
+			minY = topY = playerStartY;
+			for (int y = playerStartY; y < 255; y++) {
+				int trunkBlocks = countTrunkBlocks(world, y);
+				int should = y <= ignoredPlayerPos.getY() + 1 ? 1
+						: y <= ignoredPlayerPos.getY() + 2 ? 3 : 4;
 				if (trunkBlocks < should) {
 					break;
 				}
+				topY = y;
+			}
+
+			for (int y = playerStartY; y > 0; y--) {
+				int trunkBlocks = countTrunkBlocks(world, y);
+				if (trunkBlocks < 1) {
+					break;
+				}
+				minY = y;
 			}
 		}
 
-		public int getTreeHeight() {
-			return topY - minY;
+		private int countTrunkBlocks(WorldData world, int topY) {
+			BlockPos corner = new BlockPos(minX, topY, minZ);
+			BlockCuboid trunk = new BlockCuboid(corner, corner.add(1, 0, 1));
+			int trunkBlocks = BlockCounter.countBlocks(world, trunk, logs)[0];
+			return trunkBlocks;
+		}
+
+		public int getTreeHeightAbovePlayer() {
+			return topY - playerStartY;
 		}
 
 		/**
@@ -145,38 +184,67 @@ public class TreePathFinder extends MovePathFinder {
 
 			// dig up until the top.
 			BlockPos lastPos = pos;
-			for (int y = pos.getY() + 1; y < topY; y++) {
-				BlockPos digTo = getPosition(y);
-				if (!BlockSets.safeSideAndCeilingAround(world,
-						digTo.add(0, 1, 0))
-						|| !BlockSets.safeSideAround(world, digTo)
-						|| !BlockSets.SAFE_GROUND.isAt(world,
-								digTo.add(0, -1, 0))) {
-					break;
+			if (!topReached) {
+				for (int y = pos.getY() + 1; y < topY - TREE_TOP_OFFSET; y++) {
+					BlockPos digTo = getPosition(y);
+					if (!BlockSets.safeSideAndCeilingAround(world,
+							digTo.add(0, 1, 0))
+							|| !BlockSets.safeSideAround(world, digTo)
+							|| !BlockSets.SAFE_GROUND.isAt(world,
+									digTo.add(0, -1, 0))) {
+						break;
+					}
+					addTask(new JumpMoveTask(digTo, lastPos.getX(),
+							lastPos.getZ()));
+					lastPos = digTo;
 				}
-				addTask(new JumpMoveTask(digTo, lastPos.getX(), lastPos.getZ()));
-				lastPos = digTo;
 			}
+			addTask(new TopReachedTask());
 			// now destroy all
-			for (int y = lastPos.getY(); y >= pos.getY(); y--) {
+			for (int y = lastPos.getY(); y >= minY; y--) {
 				BlockPos digTo = getPosition(y);
 				addTask(new HorizontalMoveTask(digTo));
-				// TODO: Destroy all above y.
+				// TODO: Destroy all logs above y.
 				addTask(new DestroyInRangeTask(new BlockPos(minX, y, minZ),
 						new BlockPos(minX + 1, y + 4, minZ + 1)));
+			}
+
+			// plant saplings
+			if (replant) {
+				addReplantTasks(h);
+			}
+		}
+
+		private void addReplantTasks(AIHelper h) {
+			for (int i = 0; i < 4; i++) {
+				BlockPos floorBase = getPosition(minY + i).add(0, -i, 0);
+				if (!BlockSets.SAFE_GROUND.isAt(world, floorBase.add(0, -1, 0))
+						|| !BlockSets.safeSideAround(world, floorBase)
+						|| !BlockSets.safeSideAndCeilingAround(world,
+								floorBase.add(0, 1, 0))) {
+					return;
+				}
+			}
+
+			for (int i = 0; i < 4; i++) {
+				BlockPos floorBase = getPosition(minY + i).add(0, -i, 0);
+				if (i != 0) {
+					addTask(new HorizontalMoveTask(floorBase));
+				}
+				addTask(new PlantSaplingTask(floorBase, type));
 			}
 		}
 
 		private boolean isValidPlayerPosition(BlockPos pos) {
-			return !(pos.getY() < minY || pos.getY() >= topY || !getPosition(
+			return !(pos.getY() < playerStartY || pos.getY() >= topY || !getPosition(
 					pos.getY()).equals(pos));
 		}
 
 		@Override
 		public String toString() {
 			return "LargeTreeState [minX=" + minX + ", minZ=" + minZ
-					+ ", minY=" + minY + ", topY=" + topY + ", stairOffset="
-					+ stairOffset + "]";
+					+ ", minY=" + playerStartY + ", topY=" + topY
+					+ ", stairOffset=" + stairOffset + "]";
 		}
 
 	}
@@ -301,7 +369,7 @@ public class TreePathFinder extends MovePathFinder {
 				currentPos.add(-1, 0, -1), }) {
 			LargeTreeState state = new LargeTreeState(p);
 			state.scanTreeHeight(world, currentPos);
-			if (state.getTreeHeight() > 3) {
+			if (state.getTreeHeightAbovePlayer() > 4) {
 				// we are in a large tree.
 				state.setYOffsetByPosition(currentPos);
 				addTask(new SwitchToLargeTreeTask(state));
