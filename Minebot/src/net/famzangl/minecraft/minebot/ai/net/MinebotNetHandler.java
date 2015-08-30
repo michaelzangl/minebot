@@ -77,16 +77,15 @@ public class MinebotNetHandler extends NetHandlerPlayClient implements
 				if (AIChatController.getRegistry().interceptTab(m, this)) {
 					return;
 				}
-			} else {
-				lastSendTabComplete = m;
 			}
+			lastSendTabComplete = m;
 		}
 		super.addToSendQueue(p_147297_1_);
 	}
 
 	@Override
 	public void handleTabComplete(S3APacketTabComplete packetIn) {
-		if (lastSendTabComplete.startsWith("/")
+		if (lastSendTabComplete != null && lastSendTabComplete.startsWith("/")
 				&& !lastSendTabComplete.contains(" ")) {
 			String[] newStrings = AIChatController.getRegistry()
 					.fillTabComplete(this, packetIn.func_149630_c(),
