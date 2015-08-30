@@ -44,13 +44,16 @@ import net.minecraft.util.EnumParticleTypes;
 
 import com.mojang.authlib.GameProfile;
 
-public class MinebotNetHandler extends NetHandlerPlayClient implements NetworkHelper {
+public class MinebotNetHandler extends NetHandlerPlayClient implements
+		NetworkHelper {
 	private static final double MAX_FISH_DISTANCE = 10;
 
 	private final ConcurrentLinkedQueue<BlockPos> foundFishPositions = new ConcurrentLinkedQueue<BlockPos>();
 
 	private final CopyOnWriteArrayList<ChunkListener> listeners = new CopyOnWriteArrayList<ChunkListener>();
-	
+
+	private String lastSendTabComplete;
+
 	public MinebotNetHandler(Minecraft mcIn, GuiScreen p_i46300_2_,
 			NetworkManager p_i46300_3_, GameProfile p_i46300_4_) {
 		super(mcIn, p_i46300_2_, p_i46300_3_, p_i46300_4_);
@@ -68,13 +71,14 @@ public class MinebotNetHandler extends NetHandlerPlayClient implements NetworkHe
 				}
 			}
 		} else if (p_147297_1_ instanceof C14PacketTabComplete) {
-			System.out.println("Tab!");
 			C14PacketTabComplete complete = (C14PacketTabComplete) p_147297_1_;
 			String m = complete.getMessage();
 			if (m.startsWith("/") && m.indexOf(" ") >= 0) {
 				if (AIChatController.getRegistry().interceptTab(m, this)) {
 					return;
 				}
+			} else {
+				lastSendTabComplete = m;
 			}
 		}
 		super.addToSendQueue(p_147297_1_);
@@ -82,7 +86,13 @@ public class MinebotNetHandler extends NetHandlerPlayClient implements NetworkHe
 
 	@Override
 	public void handleTabComplete(S3APacketTabComplete packetIn) {
-		// FIXME: Intercept /mine...
+		if (lastSendTabComplete.startsWith("/")
+				&& !lastSendTabComplete.contains(" ")) {
+			String[] newStrings = AIChatController.getRegistry()
+					.fillTabComplete(this, packetIn.func_149630_c(),
+							lastSendTabComplete);
+			packetIn = new S3APacketTabComplete(newStrings);
+		}
 		super.handleTabComplete(packetIn);
 	}
 
@@ -90,16 +100,17 @@ public class MinebotNetHandler extends NetHandlerPlayClient implements NetworkHe
 			NetworkManager manager, INetHandlerPlayClient oldHandler) {
 		NetHandlerPlayClient netHandler = (NetHandlerPlayClient) oldHandler;
 		if (netHandler != null && netHandler instanceof NetHandlerPlayClient) {
-			
-			if(!(netHandler instanceof MinebotNetHandler)) {
-			GuiScreen screen = PrivateFieldUtils.getFieldValue(netHandler,
-					NetHandlerPlayClient.class, GuiScreen.class);
-			MinebotNetHandler handler = new MinebotNetHandler(
-					aiController.getMinecraft(), screen,
-					netHandler.getNetworkManager(), netHandler.getGameProfile());
-			netHandler.getNetworkManager().setNetHandler(handler);
-			System.out.println("Minebot network handler injected.");
-			return handler;
+
+			if (!(netHandler instanceof MinebotNetHandler)) {
+				GuiScreen screen = PrivateFieldUtils.getFieldValue(netHandler,
+						NetHandlerPlayClient.class, GuiScreen.class);
+				MinebotNetHandler handler = new MinebotNetHandler(
+						aiController.getMinecraft(), screen,
+						netHandler.getNetworkManager(),
+						netHandler.getGameProfile());
+				netHandler.getNetworkManager().setNetHandler(handler);
+				System.out.println("Minebot network handler injected.");
+				return handler;
 			} else {
 				return (NetworkHelper) netHandler;
 			}
@@ -115,28 +126,32 @@ public class MinebotNetHandler extends NetHandlerPlayClient implements NetworkHe
 				double x = packetIn.getXCoordinate();
 				double y = packetIn.getYCoordinate();
 				double z = packetIn.getZCoordinate();
-				//foundFishPositions.add(new BlockPos(x, y, z));
-				//System.out.println("NetHandler: fish at " + new BlockPos(x, y, z) + ", packet: " + Arrays.toString(packetIn.getParticleArgs()) + "; " + packetIn.getParticleCount()+ "; " + packetIn.getXOffset()+ "; " + packetIn.getYOffset()+ "; " + packetIn.getZOffset());
+				// foundFishPositions.add(new BlockPos(x, y, z));
+				// System.out.println("NetHandler: fish at " + new BlockPos(x,
+				// y, z) + ", packet: " +
+				// Arrays.toString(packetIn.getParticleArgs()) + "; " +
+				// packetIn.getParticleCount()+ "; " + packetIn.getXOffset()+
+				// "; " + packetIn.getYOffset()+ "; " + packetIn.getZOffset());
 			}
 		}
 		super.handleParticles(packetIn);
 	}
-	
+
 	@Override
 	public void handleEffect(S28PacketEffect packetIn) {
 		super.handleEffect(packetIn);
 	}
-	
+
 	@Override
 	public void handleSoundEffect(S29PacketSoundEffect packetIn) {
-	    String name = packetIn.func_149212_c();
+		String name = packetIn.func_149212_c();
 		if ("random.splash".equals(name)) {
 			double x = packetIn.func_149207_d();
 			double y = packetIn.func_149211_e();
 			double z = packetIn.func_149210_f();
-			foundFishPositions.add(new BlockPos(x,y,z));
-			System.out.println("NetHandler: fish at " + new BlockPos(x,y,z));
-	}
+			foundFishPositions.add(new BlockPos(x, y, z));
+			System.out.println("NetHandler: fish at " + new BlockPos(x, y, z));
+		}
 		super.handleSoundEffect(packetIn);
 	}
 
@@ -159,23 +174,22 @@ public class MinebotNetHandler extends NetHandlerPlayClient implements NetworkHe
 		System.out.println("NetHandler: reset");
 		foundFishPositions.clear();
 	}
-	
+
 	@Override
 	public void handleChunkData(S21PacketChunkData packetIn) {
 		int x = packetIn.func_149273_e();
-		int z  = packetIn.func_149276_g();
+		int z = packetIn.func_149276_g();
 		fireChunkChange(x, z);
 		super.handleChunkData(packetIn);
 	}
-	
+
 	@Override
 	public void handleMapChunkBulk(S26PacketMapChunkBulk packetIn) {
-	    for (int i = 0; i < packetIn.func_149254_d(); ++i)
-	    {
-	        int x = packetIn.func_149255_a(i);
-	        int y = packetIn.func_149253_b(i);
-	        fireChunkChange(x, y);
-	    }
+		for (int i = 0; i < packetIn.func_149254_d(); ++i) {
+			int x = packetIn.func_149255_a(i);
+			int y = packetIn.func_149253_b(i);
+			fireChunkChange(x, y);
+		}
 		super.handleMapChunkBulk(packetIn);
 	}
 
@@ -184,7 +198,7 @@ public class MinebotNetHandler extends NetHandlerPlayClient implements NetworkHe
 		blockChange(packetIn.func_179827_b());
 		super.handleBlockChange(packetIn);
 	}
-	
+
 	@Override
 	public void handleBlockAction(S24PacketBlockAction packetIn) {
 		blockChange(packetIn.func_179825_a());

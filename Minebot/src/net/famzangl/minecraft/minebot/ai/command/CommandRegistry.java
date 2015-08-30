@@ -23,6 +23,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Hashtable;
+import java.util.LinkedHashSet;
 import java.util.List;
 
 import net.famzangl.minecraft.minebot.ai.AIHelper;
@@ -198,6 +199,22 @@ public class CommandRegistry {
 		final ArrayList<String> asList = new ArrayList<String>(suggestions);
 		Collections.sort(asList);
 		return asList;
+	}
+
+	public String[] fillTabComplete(MinebotNetHandler minebotNetHandler, String[] serverResponse,
+			String lastSendTabComplete) {
+		String command = getCommandId(lastSendTabComplete);
+		LinkedHashSet<String> res = new LinkedHashSet<String>();
+		for (String c : commandTable.keySet()) {
+			if (c.startsWith(command)) {
+				res.add("/" + c);
+			}
+		}
+		if (res.isEmpty())
+			return serverResponse;
+		res.addAll(Arrays.asList(serverResponse));
+		
+		return res.toArray(new String[0]);
 	}
 
 	public boolean interceptCommand(String m) {
