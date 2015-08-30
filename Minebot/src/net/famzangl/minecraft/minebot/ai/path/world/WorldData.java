@@ -21,6 +21,7 @@ import net.minecraft.world.chunk.storage.ExtendedBlockStorage;
 public class WorldData {
 	private static final int BARRIER_ID = Block.getIdFromBlock(Blocks.barrier);
 	private static final int CACHE_ENTRIES = 10;
+	private static final double FLOOR_HEIGHT = .55;
 
 	public static abstract class ChunkAccessor {
 		protected ExtendedBlockStorage[] blockStorage;
@@ -195,16 +196,28 @@ public class WorldData {
 		return (EnumFacing) metaValue.getValue(BlockTorch.FACING);
 	}
 
+	/**
+	 * Gets the grid player position. A player is always referenced by the foot
+	 * block for this bot. The block below the player is the floor block (or
+	 * ground block). A slab below the player is still considered ground, so the
+	 * floor block is the block the player above that slab. Flat blocks or
+	 * blocks the player can walk through are not considered ground, so they are
+	 * the floor block instead.
+	 * 
+	 * @return
+	 */
 	public BlockPos getPlayerPosition() {
 		final int x = (int) Math.floor(thePlayerToGetPositionFrom.posX);
 		final int y = (int) Math.floor(thePlayerToGetPositionFrom
-				.getEntityBoundingBox().minY + 0.06);
+				.getEntityBoundingBox().minY + FLOOR_HEIGHT);
 		final int z = (int) Math.floor(thePlayerToGetPositionFrom.posZ);
 		return new BlockPos(x, y, z);
 	}
 
 	/**
-	 * Returns the current state of the world if this world is a state in the future.
+	 * Returns the current state of the world if this world is a state in the
+	 * future.
+	 * 
 	 * @return A world.
 	 */
 	public WorldData getCurrentState() {

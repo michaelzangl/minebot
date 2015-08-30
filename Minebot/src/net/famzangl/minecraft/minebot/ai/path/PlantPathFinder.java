@@ -16,8 +16,10 @@
  *******************************************************************************/
 package net.famzangl.minecraft.minebot.ai.path;
 
+import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.ClassItemFilter;
 import net.famzangl.minecraft.minebot.ai.ItemFilter;
+import net.famzangl.minecraft.minebot.ai.path.world.BlockMetaSet;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSet;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSets;
 import net.famzangl.minecraft.minebot.ai.path.world.WorldData;
@@ -34,17 +36,24 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.BlockPos;
 
 public class PlantPathFinder extends MovePathFinder {
-	public enum PlantType {
-		ANY(Blocks.farmland, Items.wheat_seeds, Items.carrot, Items.potato), WHEAT(
-				Blocks.farmland, Items.wheat_seeds), CARROT(Blocks.farmland,
-				Items.carrot), POTATO(Blocks.farmland, Items.potato), NETHERWART(
-				Blocks.soul_sand, Items.nether_wart);
+	private static final BlockSet FARMLAND = new BlockSet(Blocks.farmland);
+	private static final BlockSet NETHERWART_FARMLAND = new BlockSet(
+			Blocks.soul_sand);
 
-		public final Block farmland;
+	private static final BlockSet FARMLANDABLE = new BlockSet(Blocks.dirt,
+			Blocks.grass);
+
+	public enum PlantType {
+		ANY(FARMLAND, Items.wheat_seeds, Items.carrot, Items.potato), WHEAT(
+				FARMLAND, Items.wheat_seeds), CARROT(FARMLAND, Items.carrot), POTATO(
+				FARMLAND, Items.potato), NETHERWART(NETHERWART_FARMLAND,
+				Items.nether_wart);
+
+		public final BlockSet farmland;
 
 		private final Item[] items;
 
-		private PlantType(Block farmland, Item... items) {
+		private PlantType(BlockSet farmland, Item... items) {
 			this.farmland = farmland;
 			this.items = items;
 		}
@@ -75,11 +84,6 @@ public class PlantPathFinder extends MovePathFinder {
 
 	private final PlantType type;
 
-	private static final BlockSet farmlandable = new BlockSet(
-			Blocks.dirt, Blocks.grass);
-	private static final BlockSet farmland = new BlockSet(
-			Blocks.farmland);
-
 	public PlantPathFinder(PlantType type) {
 		this.type = type;
 		allowedGroundForUpwardsBlocks = allowedGroundBlocks;
@@ -95,12 +99,13 @@ public class PlantPathFinder extends MovePathFinder {
 	protected float rateDestination(int distance, int x, int y, int z) {
 		if (isGrown(world, x, y, z)) {
 			return distance + 1;
-		} else if (BlockSets.AIR.isAt(world, x, y, z) && farmland.isAt(world, x, y - 1, z)
+		} else if (BlockSets.AIR.isAt(world, x, y, z)
+				&& type.farmland.isAt(world, x, y - 1, z)
 				&& helper.canSelectItem(new SeedFilter(type))) {
 			return distance + 1;
-		} else if (type.farmland == Blocks.farmland
+		} else if (type.farmland == FARMLAND
 				&& BlockSets.AIR.isAt(world, x, y, z)
-				&& farmlandable.contains(helper.getBlock(x, y - 1, z))
+				&& FARMLANDABLE.contains(helper.getBlock(x, y - 1, z))
 				&& helper.canSelectItem(new SeedFilter(type))
 				&& helper.canSelectItem(new ClassItemFilter(ItemHoe.class))) {
 			return distance + 10;
@@ -114,6 +119,8 @@ public class PlantPathFinder extends MovePathFinder {
 		if (Block.getBlockById(blockWithMeta >> 4) instanceof BlockCrops) {
 			final int metadata = blockWithMeta & 0xf;
 			return metadata >= 7;
+		} else if (new BlockMetaSet(Blocks.nether_wart, 3).isAt(world, x, y,z)) {
+			return true;
 		}
 		return false;
 	}
@@ -122,11 +129,16 @@ public class PlantPathFinder extends MovePathFinder {
 	protected void addTasksForTarget(BlockPos currentPos) {
 		if (BlockSets.AIR.isAt(world, currentPos)) {
 			BlockPos farmlandPos = currentPos.add(0, -1, 0);
-			if (!farmland.isAt(world, farmlandPos)) {
+			if (!type.farmland.isAt(world, farmlandPos)) {
 				addTask(new UseItemOnBlockAtTask(new ClassItemFilter(
 						ItemHoe.class), farmlandPos));
 			}
-			addTask(new PlaceBlockAtFloorTask(currentPos, new SeedFilter(type)));
+			addTask(new PlaceBlockAtFloorTask(currentPos, new SeedFilter(type)) {
+				@Override
+				protected boolean isAtDesiredHeight(AIHelper h) {
+					return true;
+				}
+			});
 		} else {
 			addTask(new DestroyBlockTask(currentPos));
 		}

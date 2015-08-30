@@ -17,6 +17,7 @@
 package net.famzangl.minecraft.minebot.ai.task.place;
 
 import net.famzangl.minecraft.minebot.ai.AIHelper;
+import net.famzangl.minecraft.minebot.ai.BlockItemFilter;
 import net.famzangl.minecraft.minebot.ai.ItemFilter;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSets;
 import net.famzangl.minecraft.minebot.ai.task.AITask;
@@ -89,10 +90,15 @@ public class PlaceBlockAtFloorTask extends AITask {
 	}
 
 	protected void tryPlaceBlock(AIHelper h) {
-		if (h.getMinecraft().thePlayer.getEntityBoundingBox().minY >= getPlaceAtPos()
-				.getY() && isFacingRightBlock(h)) {
+		if (isAtDesiredHeight(h)
+				&& isFacingRightBlock(h)) {
 			h.overrideUseItem();
 		}
+	}
+
+	protected boolean isAtDesiredHeight(AIHelper h) {
+		return h.getMinecraft().thePlayer
+				.getEntityBoundingBox().minY >= getPlaceAtPos().getY();
 	}
 
 	protected boolean isFacingRightBlock(AIHelper h) {

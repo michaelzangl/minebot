@@ -36,32 +36,36 @@ public class BlockMetaSet extends BlockSet {
 
 	private void setBlock(int blockId) {
 		int bit = blockId * 16;
-		set[bit / 64] |= 0xffffl << (bit & 64);
+		set[bit / 64] |= 0xffffl << (63);
 	}
 
 	private void setBlockAndMeta(int blockId, int meta) {
 		int bit = blockId * 16 + (meta & 0xf);
-		set[bit / 64] |= 1l << (bit & 64);
+		long mask = 1l << (bit & 63);
+		set[bit / 64] |= mask;
 	}
 
 	@Override
 	public boolean contains(int blockId) {
 		int bit = blockId * 16;
-		long mask = 0xffffl << (bit & 64);
-		return (set[bit / 64] & mask) == mask;
+		long mask = 0xffffl << (bit & 63);
+		long query = set[bit / 64];
+		return (query & mask) == mask;
 	}
 
 	private boolean containsAny(int blockId) {
 		int bit = blockId * 16;
-		long mask = 0xffffl << (bit & 64);
-		return (set[bit / 64] & mask) != 0;
+		long mask = 0xffffl << (bit & 63);
+		long query = set[bit / 64];
+		return (query & mask) != 0;
 	}
 
 	@Override
 	public boolean containsWithMeta(int blockWithMeta) {
 		int bit = blockWithMeta;
-		long mask = 1l << (blockWithMeta & 64);
-		return (set[bit / 64] & mask) == mask;
+		long mask = 1l << (blockWithMeta & 63);
+		long query = set[bit / 64];
+		return (query & mask) == mask;
 	}
 
 	protected BlockSet compatibleSet(BlockSet bs1) {
