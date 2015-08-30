@@ -932,7 +932,7 @@ public class MapReader implements ChunkListener {
 
 	private void checkIsAlive(AIHelper helper) {
 		boolean isAlive = helper.isAlive();
-		if (!isAlive && wasAlive) {
+		if (!isAlive && wasAlive && helper.getMinecraft().thePlayer != null) {
 			addIcon(new IconDefinition(helper.getPlayerPosition(), "Death: "
 					+ new Date().toLocaleString(), IconType.DEATH));
 		}
