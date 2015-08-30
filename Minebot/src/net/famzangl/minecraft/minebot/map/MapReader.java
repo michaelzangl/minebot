@@ -188,7 +188,8 @@ public class MapReader implements ChunkListener {
 		}
 
 		public void renderAt(WorldData world, Chunk chunk, int dx, int dz) {
-			int color = mode.getColor(world, chunk, chunk.xPosition * 16 + dx, chunk.zPosition * 16 + dz);
+			int color = mode.getColor(world, chunk, chunk.xPosition * 16 + dx,
+					chunk.zPosition * 16 + dz);
 			getPaintingImage().setRGB(
 					-pos.topLeftX + chunk.xPosition * 16 + dx,
 					-pos.topLeftZ + chunk.zPosition * 16 + dz, color);
@@ -198,15 +199,17 @@ public class MapReader implements ChunkListener {
 			int chunkX = chunk.xPosition * 16;
 			int chunkZ = chunk.zPosition * 16;
 
-			byte[] pixels = ((DataBufferByte)getPaintingImage().getRaster().getDataBuffer()).getData();
+			byte[] pixels = ((DataBufferByte) getPaintingImage().getRaster()
+					.getDataBuffer()).getData();
 			boolean wasChanged = false;
 			for (int dz = 0; dz < 16; dz++) {
-				int offset = 4 * ((-pos.topLeftZ + chunkZ + dz) * BLOCK_SIZE + -pos.topLeftX + chunkX);
+				int offset = 4 * ((-pos.topLeftZ + chunkZ + dz) * BLOCK_SIZE
+						+ -pos.topLeftX + chunkX);
 				byte[] row = new byte[16 * 4];
 				for (int dx = 0; dx < 16; dx++) {
 					int x = chunkX + dx;
 					int z = chunkZ + dz;
-					
+
 					int color = mode.getColor(world, chunk, x, z);
 					row[dx * 4] = (byte) (color >> 24);
 					row[dx * 4 + 1] = (byte) (color);
@@ -216,7 +219,8 @@ public class MapReader implements ChunkListener {
 				for (int i = 0; i < row.length; i++) {
 					if (row[i] != pixels[offset + i]) {
 						// simply copy the rest.
-						System.arraycopy(row, i, pixels, offset + i, row.length - i);
+						System.arraycopy(row, i, pixels, offset + i, row.length
+								- i);
 						wasChanged = true;
 						break;
 					}
@@ -420,7 +424,16 @@ public class MapReader implements ChunkListener {
 		private void write() {
 			Gson gson = new Gson();
 			try {
-				gson.toJson(settings, new FileWriter(getFile()));
+				// String json = gson.toJson(settings, SettingsContainer.class);
+				// SettingsContainer mySettings = gson.fromJson(json,
+				// SettingsContainer.class);
+
+				FileWriter fileWriter = new FileWriter(getFile());
+				try {
+					gson.toJson(settings, SettingsContainer.class, fileWriter);
+				} finally {
+					fileWriter.close();
+				}
 			} catch (JsonIOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -602,7 +615,7 @@ public class MapReader implements ChunkListener {
 			WorldData world = registeredHelper.getWorld();
 			image.renderChunk(world, chunk);
 
-			//TODO: Only repaint if image was changed and is in view.
+			// TODO: Only repaint if image was changed and is in view.
 			mapDisplay.repaint();
 		}
 
@@ -985,5 +998,6 @@ public class MapReader implements ChunkListener {
 				iconDefinition.getPosition().getZ());
 		MultiModeImage image = task.getImage(pos);
 		image.setting.addIcon(iconDefinition);
+		mapDisplay.repaint();
 	}
 }
