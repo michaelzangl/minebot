@@ -88,8 +88,11 @@ public class BlockSets {
 	private static final BlockSet explicitSafeSideBlocks = new BlockSet(
 			Blocks.anvil, Blocks.cobblestone_wall, Blocks.cactus, Blocks.reeds,
 			Blocks.web, Blocks.glass_pane, Blocks.bed, Blocks.enchanting_table,
-			Blocks.waterlily, Blocks.brewing_stand, Blocks.vine, Blocks.chest)
-			.unionWith(FENCE).unionWith(FENCE_GATE);
+			Blocks.waterlily, Blocks.brewing_stand, Blocks.vine, Blocks.chest,
+			Blocks.tripwire, Blocks.tripwire_hook,
+			Blocks.wooden_pressure_plate, Blocks.stone_pressure_plate,
+			Blocks.wooden_button, Blocks.stone_button).unionWith(FENCE)
+			.unionWith(FENCE_GATE);
 
 	/**
 	 * Blocks that form a solid ground.
@@ -111,7 +114,8 @@ public class BlockSets {
 	public static final BlockSet SAFE_AFTER_DESTRUCTION = new BlockSet(
 			Blocks.vine);
 
-	public static final BlockSet LEAVES = new BlockSet(Blocks.leaves, Blocks.leaves2);
+	public static final BlockSet LEAVES = new BlockSet(Blocks.leaves,
+			Blocks.leaves2);
 	public static final BlockSet LOGS = new BlockSet(Blocks.log, Blocks.log2);
 
 	public static boolean safeSideAround(WorldData world, int x, int y, int z) {
@@ -125,14 +129,15 @@ public class BlockSets {
 		return safeSideAround(world, pos.getX(), pos.getY(), pos.getZ());
 	}
 
-	public static boolean safeSideAndCeilingAround(WorldData world, int x, int y,
-			int z) {
+	public static boolean safeSideAndCeilingAround(WorldData world, int x,
+			int y, int z) {
 		return safeSideAround(world, x, y, z)
 				&& SAFE_CEILING.isAt(world, x, y + 1, z);
 	}
 
 	public static boolean safeSideAndCeilingAround(WorldData world, BlockPos pos) {
-		return safeSideAndCeilingAround(world, pos.getX(), pos.getY(), pos.getZ());
+		return safeSideAndCeilingAround(world, pos.getX(), pos.getY(),
+				pos.getZ());
 	}
 
 	private BlockSets() {
