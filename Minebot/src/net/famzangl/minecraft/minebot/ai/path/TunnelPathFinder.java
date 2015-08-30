@@ -54,7 +54,14 @@ public class TunnelPathFinder extends AlongTrackPathFinder {
 		@Override
 		protected void runOnce(AIHelper h, TaskOperations o) {
 			finishedTunnels.set(stepNumber);
+			inQueueTunnels.clear(stepNumber);
 			o.faceAndDestroyForNextTask();
+		}
+		
+		@Override
+		public void onCanceled() {
+			inQueueTunnels.clear(stepNumber);
+			super.onCanceled();
 		}
 
 		@Override
@@ -128,6 +135,7 @@ public class TunnelPathFinder extends AlongTrackPathFinder {
 			.unionWith(BlockSets.TORCH);
 
 	private BitSet finishedTunnels = new BitSet();
+	private BitSet inQueueTunnels = new BitSet();
 	/**
 	 * How often did we attempt to tunnel at a given position?
 	 */
@@ -181,7 +189,7 @@ public class TunnelPathFinder extends AlongTrackPathFinder {
 		}
 		int stepNumber = getStepNumber(x, z);
 
-		if (finishedTunnels.get(stepNumber)) {
+		if (finishedTunnels.get(stepNumber) || inQueueTunnels.get(stepNumber)) {
 			// we already handled that position.
 			return false;
 		}
@@ -224,7 +232,8 @@ public class TunnelPathFinder extends AlongTrackPathFinder {
 			p1 = currentPos.add(0, 0, addToSide);
 			p2 = currentPos.add(0, 1 + addToTop, -addToSide);
 		}
-		BlockFilteredArea area = new BlockFilteredArea(new BlockCuboid(p1, p2),
+		BlockCuboid tunnelArea = new BlockCuboid(p1, p2);
+		BlockFilteredArea area = new BlockFilteredArea(tunnelArea,
 				FREE_TUNNEL_BLOCKS.invert());
 		addTask(new DestroyInRangeTask(area));
 
@@ -235,7 +244,7 @@ public class TunnelPathFinder extends AlongTrackPathFinder {
 		if (torches.left && isTorchStep) {
 			addTorchesTask(currentPos, dz, -dx);
 		}
-		if (torches.floor && isTorchStep) {
+		if (torches.floor && isTorchStep && !containsTorches(tunnelArea)) {
 			addTask(new PlaceTorchSomewhereTask(
 					Collections.singletonList(currentPos), EnumFacing.DOWN));
 		}
@@ -245,6 +254,12 @@ public class TunnelPathFinder extends AlongTrackPathFinder {
 			addBranchTask(currentPos, dz, -dx);
 		}
 		addTask(new MarkAsDoneTask(stepNumber));
+	}
+
+	private boolean containsTorches(BlockCuboid tunnelArea) {
+		BlockFilteredArea torchArea = new BlockFilteredArea(tunnelArea,
+				BlockSets.TORCH);
+		return torchArea.getVolume() > 0;
 	}
 
 	private void addBranchTask(BlockPos currentPos, int dx, int dz) {

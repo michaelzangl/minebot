@@ -132,6 +132,10 @@ public abstract class TaskStrategy extends AIStrategy implements
 	@Override
 	protected TickResult onGameTick(AIHelper helper) {
 		if (desyncTimer > 0) {
+			// clear the tasks
+			for (AITask t : tasks) {
+				t.onCanceled();
+			}
 			tasks.clear();
 			System.out.println("Waiting because of desync... " + desyncTimer);
 			desyncTimer--;

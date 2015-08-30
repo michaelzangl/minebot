@@ -125,4 +125,10 @@ public abstract class AITask {
 		return false;
 	}
 
+	/**
+	 * Called whenever this task was canceled.
+	 */
+	public void onCanceled() {
+	}
+
 }
