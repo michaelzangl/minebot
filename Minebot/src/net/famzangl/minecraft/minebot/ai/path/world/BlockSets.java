@@ -3,19 +3,38 @@ package net.famzangl.minecraft.minebot.ai.path.world;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.BlockPos;
 
+/**
+ * This is a helper class that holds lots of block sets and helper functions to
+ * check blocks for safety.
+ * 
+ * @author Michael Zangl
+ */
 public class BlockSets {
 
 	/**
 	 * Blocks we can just walk over/next to without problems.
 	 */
-	public static final BlockSet SIMPLE_CUBE = new BlockSet(Blocks.bedrock,
-			Blocks.bookshelf, Blocks.brick_block, Blocks.brown_mushroom_block,
-			Blocks.cake, Blocks.clay, Blocks.coal_block, Blocks.coal_ore,
-			Blocks.cobblestone, Blocks.crafting_table, Blocks.diamond_block,
-			Blocks.diamond_ore, Blocks.dirt, Blocks.double_stone_slab,
-			Blocks.double_wooden_slab, Blocks.emerald_block,
-			Blocks.emerald_ore, Blocks.farmland, Blocks.furnace, Blocks.glass,
-			Blocks.glowstone, Blocks.grass, Blocks.gold_block, Blocks.gold_ore,
+	public static final BlockSet SIMPLE_CUBE = new BlockSet(
+			Blocks.bedrock,
+			Blocks.bookshelf,
+			Blocks.brick_block,
+			Blocks.brown_mushroom_block,
+			Blocks.cake,
+			Blocks.clay,
+			Blocks.coal_block,
+			Blocks.coal_ore,
+			Blocks.cobblestone,
+			Blocks.crafting_table,
+			Blocks.diamond_block,
+			Blocks.diamond_ore,
+			Blocks.dirt,
+			Blocks.double_stone_slab,
+			Blocks.double_wooden_slab,
+			Blocks.emerald_block,
+			Blocks.emerald_ore,
+			// FIXME: Not a cube.
+			Blocks.farmland, Blocks.furnace, Blocks.glass, Blocks.glowstone,
+			Blocks.grass, Blocks.gold_block, Blocks.gold_ore,
 			Blocks.hardened_clay, Blocks.iron_block, Blocks.iron_ore,
 			Blocks.lapis_block, Blocks.lapis_ore, Blocks.leaves,
 			Blocks.leaves2, Blocks.lit_pumpkin, Blocks.lit_furnace,
@@ -30,10 +49,16 @@ public class BlockSets {
 			Blocks.obsidian, Blocks.packed_ice, Blocks.planks, Blocks.pumpkin,
 			Blocks.quartz_block, Blocks.quartz_ore, Blocks.red_mushroom_block,
 			Blocks.redstone_block, Blocks.redstone_lamp, Blocks.redstone_ore,
-			Blocks.sandstone, Blocks.snow, Blocks.soul_sand,
-			Blocks.stained_glass, Blocks.stained_hardened_clay, Blocks.stone,
-			Blocks.stonebrick, Blocks.wool);
+			Blocks.sandstone,
+			Blocks.snow,
+			// FIXME: Not a cube.
+			Blocks.soul_sand, Blocks.stained_glass,
+			Blocks.stained_hardened_clay, Blocks.stone, Blocks.stonebrick,
+			Blocks.wool);
 
+	/**
+	 * Blocks that fall down.
+	 */
 	public static final BlockSet FALLING = new BlockSet(Blocks.gravel,
 			Blocks.sand);
 
@@ -48,6 +73,9 @@ public class BlockSets {
 			Blocks.stone_brick_stairs, Blocks.stone_stairs, Blocks.stone_slab,
 			Blocks.wooden_slab, Blocks.quartz_stairs);
 
+	/**
+	 * All rail blocks.
+	 */
 	public static final BlockSet RAILS = new BlockSet(Blocks.golden_rail,
 			Blocks.detector_rail, Blocks.rail, Blocks.activator_rail);
 
@@ -62,9 +90,16 @@ public class BlockSets {
 			Blocks.sapling, Blocks.snow_layer, Blocks.nether_wart,
 			Blocks.standing_sign, Blocks.wall_sign).unionWith(RAILS);
 
+	/**
+	 * Torches.
+	 */
 	public static final BlockSet TORCH = new BlockSet(Blocks.torch,
 			Blocks.redstone_torch);
 
+	/**
+	 * Blocks our head can walk though. Signs could be added here, but we stay
+	 * away from them for now.
+	 */
 	public static final BlockSet HEAD_CAN_WALK_TRHOUGH = new BlockSet(
 			Blocks.air, Blocks.double_plant, Blocks.cocoa).unionWith(TORCH);
 
@@ -114,6 +149,9 @@ public class BlockSets {
 	public static final BlockSet SAFE_AFTER_DESTRUCTION = new BlockSet(
 			Blocks.vine);
 
+	/**
+	 * All leaves. FIXME: Only consider leaves that do not decay as safe ground.
+	 */
 	public static final BlockSet LEAVES = new BlockSet(Blocks.leaves,
 			Blocks.leaves2);
 	public static final BlockSet LOGS = new BlockSet(Blocks.log, Blocks.log2);
