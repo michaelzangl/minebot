@@ -52,7 +52,7 @@ public class BlockSet {
 	}
 
 	BlockSet() {
-		 set = new long[getSetLength()];
+		set = new long[getSetLength()];
 	}
 
 	protected int getSetLength() {
@@ -69,7 +69,7 @@ public class BlockSet {
 
 	@Deprecated
 	public boolean contains(int blockId) {
-		return (set[blockId / 64] & (1l << (blockId & 63))) != 0;
+		return containsWithMeta(blockId << 4);
 	}
 
 	public boolean contains(Block block) {
@@ -82,7 +82,9 @@ public class BlockSet {
 	}
 
 	public boolean containsWithMeta(int blockWithMeta) {
-		return contains(blockWithMeta >> 4);
+		int bit = blockWithMeta >> 4;
+		long query = set[bit / 64];
+		return (query & (1l << (bit & 63))) != 0;
 	}
 
 	public BlockSet intersectWith(BlockSet bs2) {
