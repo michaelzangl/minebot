@@ -152,7 +152,7 @@ public class CommandRegistry {
 			}
 		}
 		if (evaluateable.size() != 1) {
-			throw new UnknownCommandException(evaluateable);
+			throw new UnknownCommandException(commandID, arguments, evaluateable);
 		}
 		CommandDefinition evaluateableCommand = evaluateable.get(0);
 		return evaluateableCommand;

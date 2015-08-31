@@ -17,6 +17,7 @@
 package net.famzangl.minecraft.minebot.ai.command;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class UnknownCommandException extends Exception {
 
@@ -25,13 +26,25 @@ public class UnknownCommandException extends Exception {
 	 */
 	private static final long serialVersionUID = -3166540443273412972L;
 	private final ArrayList<CommandDefinition> evaluateable;
+	private final String commandID;
+	private final String[] arguments;
 
-	public UnknownCommandException(ArrayList<CommandDefinition> evaluateable) {
+	public UnknownCommandException(String commandID, String[] arguments, ArrayList<CommandDefinition> evaluateable) {
+		this.commandID = commandID;
+		this.arguments = arguments;
 		this.evaluateable = evaluateable;
 	}
 
 	public ArrayList<CommandDefinition> getEvaluateable() {
 		return evaluateable;
 	}
-
+	
+	@Override
+	public String getMessage() {
+		if (evaluateable.isEmpty()) {
+			return "Could not find a meaning for /" + commandID + " " + Arrays.toString(arguments);
+		} else {
+			return "Those arguments are ambigious for /" + commandID + " " + Arrays.toString(arguments);
+		}
+	}
 }
