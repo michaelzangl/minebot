@@ -55,8 +55,12 @@ public class BlockCuboid extends BlockArea {
 	}
 
 	private void acceptY(AreaVisitor v, int y, WorldData world) {
-		for (int z = min.getZ(); z <= max.getZ(); z++) {
-			for (int x = min.getX(); x <= max.getX(); x++) {
+		int minZ = min.getZ();
+		int maxZ = max.getZ();
+		int minX = min.getX();
+		int maxX = max.getX();
+		for (int z = minZ; z <= maxZ; z++) {
+			for (int x = minX; x <= maxX; x++) {
 				v.visit(world, x, y, z);
 			}
 		}
