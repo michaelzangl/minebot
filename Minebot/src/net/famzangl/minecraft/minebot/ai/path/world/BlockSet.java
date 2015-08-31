@@ -90,7 +90,7 @@ public class BlockSet {
 		bs2 = bs1.compatibleSet(bs2);
 		BlockSet res = bs1.newSet();
 		for (int i = 0; i < res.set.length; i++) {
-			res.set[i] = set[i] & bs2.set[i];
+			res.set[i] = bs1.set[i] & bs2.set[i];
 		}
 		return res;
 	}
@@ -104,7 +104,7 @@ public class BlockSet {
 	}
 
 	protected BlockSet convertToMetaSet() {
-		return new BlockMetaSet(this);
+		return BlockMetaSet.fromBlockSet(this);
 	}
 
 	public BlockSet unionWith(BlockSet bs2) {
@@ -112,18 +112,13 @@ public class BlockSet {
 		bs2 = bs1.compatibleSet(bs2);
 		BlockSet res = bs1.newSet();
 		for (int i = 0; i < res.set.length; i++) {
-			res.set[i] = set[i] | bs2.set[i];
+			res.set[i] = bs1.set[i] | bs2.set[i];
 		}
 		return res;
 	}
 
 	public BlockSet invert() {
-		BlockSet res;
-		if (this instanceof BlockMetaSet) {
-			res = new BlockMetaSet();
-		} else {
-			res = new BlockSet();
-		}
+		BlockSet res = newSet();
 		for (int i = 0; i < res.set.length; i++) {
 			res.set[i] = ~set[i];
 		}

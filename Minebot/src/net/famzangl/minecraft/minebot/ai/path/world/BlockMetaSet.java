@@ -13,10 +13,8 @@ import net.minecraft.init.Blocks;
  *
  */
 public class BlockMetaSet extends BlockSet {
-	public BlockMetaSet() {
-	}
 
-	public BlockMetaSet(BlockSet wl2) {
+	private BlockMetaSet() {
 	}
 
 	public BlockMetaSet(Block block, int meta) {
@@ -70,7 +68,7 @@ public class BlockMetaSet extends BlockSet {
 
 	protected BlockSet compatibleSet(BlockSet bs1) {
 		return bs1.convertToMetaSet();
-	};
+	}
 
 	BlockSet newSet() {
 		return new BlockMetaSet();
@@ -117,5 +115,17 @@ public class BlockMetaSet extends BlockSet {
 			b.append(")");
 		}
 		return null;
+	}
+
+	public static BlockMetaSet fromBlockSet(BlockSet set) {
+		BlockMetaSet converted = new BlockMetaSet();
+		for (int blockId = 0; blockId < MAX_BLOCKIDS; blockId++) {
+			if (set.contains(blockId)) {
+				int bit = blockId * 16;
+				long mask = 0xffffl << (bit & 63);
+				converted.set[bit / 64] |= mask;
+			}
+		}
+		return converted;
 	}
 }
