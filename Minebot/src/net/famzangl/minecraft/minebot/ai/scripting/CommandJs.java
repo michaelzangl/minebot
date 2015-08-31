@@ -25,12 +25,15 @@ import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 
 import net.famzangl.minecraft.minebot.ai.AIHelper;
+import net.famzangl.minecraft.minebot.ai.command.AIChatController;
 import net.famzangl.minecraft.minebot.ai.command.AICommand;
 import net.famzangl.minecraft.minebot.ai.command.AICommandInvocation;
 import net.famzangl.minecraft.minebot.ai.command.AICommandParameter;
 import net.famzangl.minecraft.minebot.ai.command.ParameterType;
 import net.famzangl.minecraft.minebot.ai.strategy.AIStrategy;
 import net.famzangl.minecraft.minebot.ai.strategy.AIStrategy.TickResult;
+import net.famzangl.minecraft.minebot.ai.task.error.StringTaskError;
+import net.famzangl.minecraft.minebot.ai.task.error.TaskError;
 
 @AICommand(name = "minebot", helpText = "Execute a javascript file.")
 public class CommandJs {
@@ -78,6 +81,7 @@ public class CommandJs {
 		private boolean stopped;
 		private AIStrategy activeStrategy;
 		private final Object activeStrategyMutex = new Object();
+		private TaskError error;
 
 		public ScriptRunner(File file) {
 			this.fileName = file;
@@ -88,7 +92,7 @@ public class CommandJs {
 			try {
 				synchronized (tickHelperMutex) {
 					if (stopped) {
-						throw new RuntimeException("Cannot reactivate.");
+						throw new ScriptException("Cannot reactivate.");
 					}
 				}
 				ScriptEngineManager manager = new ScriptEngineManager();
@@ -98,8 +102,14 @@ public class CommandJs {
 				engine.eval(fis);
 			} catch (ScriptException e) {
 				e.printStackTrace();
+				synchronized (tickHelperMutex) {
+					error = new StringTaskError(e.getMessage());
+				}
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();
+				synchronized (tickHelperMutex) {
+					error = new StringTaskError("File was not found: " + fileName);
+				}
 			} finally {
 				finished = true;
 				tickDone();
@@ -107,7 +117,13 @@ public class CommandJs {
 		}
 
 		public boolean isFinished() {
-			return finished;
+			synchronized (tickHelperMutex) {
+				if (error != null) {
+					AIChatController.addChatLine("JS Error: " + error.getMessage());
+					error = null;
+				}
+				return finished;
+			}
 		}
 
 		/**
@@ -118,6 +134,11 @@ public class CommandJs {
 		 */
 		public TickResult runForTick(AIHelper helper) {
 			synchronized (tickHelperMutex) {
+				if (error != null) {
+					AIChatController.addChatLine("JS Error: " + error.getMessage());
+					error = null;
+				}
+				
 				synchronized (activeStrategyMutex) {
 					if (activeStrategy != null) {
 						TickResult tickResult = activeStrategy.gameTick(helper);
@@ -217,6 +238,10 @@ public class CommandJs {
 					}
 				}
 			}
+		}
+		
+		public TaskError getError() {
+			return error;
 		}
 	}
 
