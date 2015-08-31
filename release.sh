@@ -24,6 +24,6 @@ done
 
 echo "Packing release"
 cd "$base/releases"
-zip $tag $tag/*
+zip "$tag.zip" $tag/*
 
 
