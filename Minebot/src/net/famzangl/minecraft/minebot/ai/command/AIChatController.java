@@ -40,6 +40,7 @@ import net.famzangl.minecraft.minebot.ai.commands.CommandShear;
 import net.famzangl.minecraft.minebot.ai.commands.CommandSit;
 import net.famzangl.minecraft.minebot.ai.commands.CommandStop;
 import net.famzangl.minecraft.minebot.ai.commands.CommandStore;
+import net.famzangl.minecraft.minebot.ai.commands.CommandTestMinectaft;
 import net.famzangl.minecraft.minebot.ai.commands.CommandTint;
 import net.famzangl.minecraft.minebot.ai.commands.CommandTunnel;
 import net.famzangl.minecraft.minebot.ai.commands.CommandUngrab;
@@ -105,6 +106,7 @@ public class AIChatController {
 		
 		registerCommand(CommandDumpSigns.class);
 		registerCommand(CommandRenderMap.class);
+		registerCommand(CommandTestMinectaft.class);
 
 
 		registerCommand(CommandBuild.class);
