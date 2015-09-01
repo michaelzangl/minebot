@@ -97,6 +97,9 @@ public class CommandJs {
 				}
 				ScriptEngineManager manager = new ScriptEngineManager();
 				ScriptEngine engine = manager.getEngineByName("JavaScript");
+				if (engine == null) {
+					throw new ScriptException("No Javascript engine was found.");
+				}
 				FileReader fis = new FileReader(fileName);
 				engine.put("minescript", new MineScript(this));
 				engine.eval(fis);
