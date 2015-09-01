@@ -121,10 +121,7 @@ public class CommandJs {
 
 		public boolean isFinished() {
 			synchronized (tickHelperMutex) {
-				if (error != null) {
-					AIChatController.addChatLine("JS Error: " + error.getMessage());
-					error = null;
-				}
+				printError();
 				return finished;
 			}
 		}
@@ -137,10 +134,7 @@ public class CommandJs {
 		 */
 		public TickResult runForTick(AIHelper helper) {
 			synchronized (tickHelperMutex) {
-				if (error != null) {
-					AIChatController.addChatLine("JS Error: " + error.getMessage());
-					error = null;
-				}
+				printError();
 				
 				synchronized (activeStrategyMutex) {
 					if (activeStrategy != null) {
@@ -173,9 +167,17 @@ public class CommandJs {
 			}
 		}
 
+		private void printError() {
+			if (error != null) {
+				AIChatController.addChatLine("JS Error: " + error.getMessage());
+				error = null;
+			}
+		}
+
 		@Override
 		public void tickDone() {
 			synchronized (tickHelperMutex) {
+				printError();
 				scriptInsideTick = false;
 				scriptWaitingForTick = false;
 				tickHelperMutex.notifyAll();
