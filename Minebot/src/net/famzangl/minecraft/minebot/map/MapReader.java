@@ -1,12 +1,8 @@
 package net.famzangl.minecraft.minebot.map;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Frame;
 import java.awt.Graphics;
-import java.awt.Point;
-import java.awt.event.ActionEvent;
-import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
 import java.awt.image.DataBufferByte;
@@ -26,12 +22,8 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
 import javax.imageio.ImageIO;
-import javax.swing.AbstractAction;
-import javax.swing.Action;
-import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
-import javax.swing.JPanel;
 import javax.swing.JSeparator;
 import javax.swing.JToolBar;
 
@@ -65,24 +57,24 @@ public class MapReader implements ChunkListener {
 
 	private static final int ALL_CHUNKS_LOAD_INTERVALL = 30 * 20;
 
-	private static final int BLOCK_SIZE = 1024;
+	static final int BLOCK_SIZE = 1024;
 
 	private final File baseFile;
 
 	private BlockingQueue<Chunk> chunksToProcess = new LinkedBlockingQueue<Chunk>();
 	private BlockingQueue<WriteableImage> imagesToWrite = new LinkedBlockingQueue<WriteableImage>();
 
-	private MapDisplay mapDisplay = new MapDisplay();
-	private MapDisplayDialog mapDialog = new MapDisplayDialog(mapDisplay);
+	private MapDisplay mapDisplay = new MapDisplay(this);
+	MapDisplayDialog mapDialog = new MapDisplayDialog(mapDisplay);
 
 	private WorldChangeManager wcm = new WorldChangeManager(mapDialog);
 
 	private ChunkQueue chunkQueue = new ChunkQueue();
 
-	private final MapReaderTask task = new MapReaderTask();
+	final MapReaderTask task = new MapReaderTask();
 	private final MapWriterTask writer = new MapWriterTask();
 
-	private final class WriteableImage {
+	final class WriteableImage {
 
 		/**
 		 * Overlay this image over the original image. Set whenever there was an
@@ -259,7 +251,7 @@ public class MapReader implements ChunkListener {
 		}
 	}
 
-	private static class ImagePos {
+	static class ImagePos {
 		private int topLeftX;
 		private int topLeftZ;
 
@@ -369,7 +361,7 @@ public class MapReader implements ChunkListener {
 		private List<IconDefinition> icons = new LinkedList<IconDefinition>();
 	}
 
-	private static class WriteableSetting {
+	static class WriteableSetting {
 
 		private final ImagePos pos;
 		private SettingsContainer settings = null;
@@ -455,10 +447,10 @@ public class MapReader implements ChunkListener {
 		}
 	}
 
-	private class MultiModeImage {
+	class MultiModeImage {
 		private WriteableImage[] images = new WriteableImage[RenderMode
 				.values().length];
-		private WriteableSetting setting;
+		WriteableSetting setting;
 
 		public MultiModeImage(ImagePos pos) {
 			for (int i = 0; i < images.length; i++) {
@@ -543,7 +535,7 @@ public class MapReader implements ChunkListener {
 		return data.getBlockIdWithMeta(x, y, z) >> 4 == BEDROCK_ID;
 	}
 
-	private final class MapReaderTask implements Runnable {
+	final class MapReaderTask implements Runnable {
 		private static final long SAVE_TIME = 10000;
 		private boolean stopped;
 		private boolean doStop;
@@ -636,177 +628,9 @@ public class MapReader implements ChunkListener {
 
 	}
 
-	private class MapDisplay extends JPanel {
-		private static final int BLOCKS_PER_BASE_PIXEL_MAX = 256;
+	static final class MapDisplayDialog extends JFrame {
 
-		private int BASE_PIXEL = 16;
-
-		private int blocksPerBasePixel = 32;
-
-		private BlockPos playerPos = null;
-		private int playerLook;
-
-		private RenderMode mode = RenderMode.MAP;
-
-		private Action plusAction = new AbstractAction("+") {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				blocksPerPixelMultiply(.5);
-			}
-		};
-		private Action minusAction = new AbstractAction("-") {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				blocksPerPixelMultiply(2);
-			}
-		};
-
-		private PlayerPositionLabel playerPositionLabel = new PlayerPositionLabel();
-
-		@Override
-		public void paint(Graphics g) {
-			super.paint(g);
-			int scaledSize = BLOCK_SIZE * BASE_PIXEL / blocksPerBasePixel;
-			if (player == null) {
-				return;
-			}
-			playerPos = player;
-			playerLook = look;
-			g.setColor(Color.RED);
-			ArrayList<IconDefinition> icons = new ArrayList<IconDefinition>();
-			// System.out.println("Redraw at " + playerPos);
-			int minPosX = ImagePos.round(player.getX() - getWidth()
-					* blocksPerBasePixel / BASE_PIXEL / 2);
-			int maxPosX = ImagePos.round(player.getX() + getWidth()
-					* blocksPerBasePixel / BASE_PIXEL / 2);
-			int minPosZ = ImagePos.round(player.getZ() - getHeight()
-					* blocksPerBasePixel / BASE_PIXEL / 2);
-			int maxPosZ = ImagePos.round(player.getZ() + getHeight()
-					* blocksPerBasePixel / BASE_PIXEL / 2);
-			for (int x = minPosX; x <= maxPosX; x += BLOCK_SIZE) {
-				for (int z = minPosZ; z <= maxPosZ; z += BLOCK_SIZE) {
-					ImagePos pos = new ImagePos(x, z);
-					MultiModeImage imageChunk = task.getImage(pos);
-					WriteableImage im = imageChunk.getForRenderMode(mode);
-					icons.addAll(imageChunk.setting.getIcons());
-
-					BufferedImage draw = im.getPaintingImage();
-
-					g.drawImage(draw, blockToPanelX(x), blockToPanelY(z),
-							scaledSize, scaledSize, null);
-					g.drawRect(blockToPanelX(x), blockToPanelY(z), scaledSize,
-							scaledSize);
-					g.drawString(x + "," + z, blockToPanelX(x),
-							blockToPanelY(z));
-				}
-			}
-
-			for (IconDefinition icon : icons) {
-				BufferedImage img = icon.getIcon(mode);
-				int x = blockToPanelX(icon.getPosition().getX())
-						- img.getWidth() / 2;
-				int y = blockToPanelY(icon.getPosition().getZ())
-						- img.getHeight() / 2;
-				g.drawImage(img, x, y, null);
-			}
-
-			drawPlayer(g);
-		}
-
-		private void drawPlayer(Graphics g) {
-			int x = blockToPanelX(playerPos.getX());
-			int y = blockToPanelY(playerPos.getZ());
-			int offset = BASE_PIXEL / blocksPerBasePixel / 2;
-			x += offset;
-			y += offset;
-			g.setColor(Color.RED);
-			g.drawArc(x - 5, y - 5, 10, 10, 0, 360);
-			g.setColor(new Color(1, 0, 0, .4f));
-			g.fillArc(x - 10, y - 10, 20, 20,
-					niceDegrees(-playerLook - 90 - 20), 40);
-		}
-
-		private int blockToPanelX(int blockX) {
-			return (blockX - playerPos.getX()) * BASE_PIXEL
-					/ blocksPerBasePixel + getWidth() / 2;
-		}
-
-		private int blockToPanelY(int blockZ) {
-			return (blockZ - playerPos.getZ()) * BASE_PIXEL
-					/ blocksPerBasePixel + getHeight() / 2;
-		}
-
-		private BlockPos getBlockPosition(Point panelPosition) {
-			int blockX = (int) ((panelPosition.getX() - getWidth() / 2.0)
-					* blocksPerBasePixel / BASE_PIXEL + playerPos.getX());
-			int blockZ = (int) ((panelPosition.getY() - getHeight() / 2.0)
-					* blocksPerBasePixel / BASE_PIXEL + playerPos.getZ());
-			return new BlockPos(blockX, 64, blockZ);
-		}
-
-		public void blocksPerPixelMultiply(double d) {
-			blocksPerBasePixel = Math.min(
-					Math.max((int) Math.round(blocksPerBasePixel * d), 1),
-					BLOCKS_PER_BASE_PIXEL_MAX);
-
-			minusAction
-					.setEnabled(blocksPerBasePixel < BLOCKS_PER_BASE_PIXEL_MAX);
-			plusAction.setEnabled(blocksPerBasePixel > 1);
-			invalidateMap();
-			mapDialog.updateTitle();
-		}
-
-		public void setMode(RenderMode mode) {
-			this.mode = mode;
-			invalidateMap();
-		}
-
-		public Action createChangeModeAction(final RenderMode myMode) {
-			return new AbstractAction("Mode: " + myMode) {
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					setMode(myMode);
-				}
-			};
-		}
-
-		public Action getMinusAction() {
-			return plusAction;
-		}
-
-		public Action getPlusAction() {
-			return minusAction;
-		}
-
-		@Override
-		public String getToolTipText(MouseEvent event) {
-			BlockPos pos = getBlockPosition(event.getPoint());
-			return pos.getX() + "," + pos.getZ();
-		}
-
-		public JComponent getPlayerPosition() {
-			return playerPositionLabel;
-		}
-
-		public void invalidateMap() {
-			repaint();
-		}
-
-		public void setPosition(BlockPos newPlayer, int newLook) {
-			if ((newPlayer == null && player != null)
-					|| (newPlayer != null && !newPlayer.equals(player))
-					|| newLook != look) {
-				playerPositionLabel.setPosition(newPlayer);
-				player = newPlayer;
-				look = newLook;
-				repaint();
-			}
-		}
-	}
-
-	private static final class MapDisplayDialog extends JFrame {
-
-		private MapDisplay d;
+		private final MapDisplay d;
 
 		public MapDisplayDialog(MapDisplay d) {
 			this.d = d;
@@ -828,9 +652,8 @@ public class MapReader implements ChunkListener {
 			setVisible(true);
 		}
 
-		private void updateTitle() {
-			setTitle("Map view. Scale: "
-					+ ((float) d.blocksPerBasePixel / d.BASE_PIXEL));
+		void updateTitle() {
+			setTitle("Map view - scale: " + d.getScale());
 		}
 	}
 
@@ -899,10 +722,6 @@ public class MapReader implements ChunkListener {
 	}
 
 	int currentIndex = 0;
-
-	private BlockPos player;
-
-	private int look;
 
 	private AIHelper registeredHelper;
 
@@ -980,7 +799,7 @@ public class MapReader implements ChunkListener {
 		chunkQueue.offer(new ChunkCoordIntPair(chunkX, chunkZ));
 	}
 
-	private int niceDegrees(int cameraYaw) {
+	int niceDegrees(int cameraYaw) {
 		return ((cameraYaw % 360 + 360) % 360);
 	}
 
