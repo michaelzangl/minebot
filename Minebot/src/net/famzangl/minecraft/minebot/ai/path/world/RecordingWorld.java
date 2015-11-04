@@ -48,7 +48,7 @@ public class RecordingWorld extends WorldWithDelta {
 		if (p1.equals(p2)) {
 			return 5;
 		} else {
-			double hDist = Math.hypot(p1.getX() - p2.getX(), p1.getY() - p2.getY());
+			double hDist = Math.hypot(p1.getX() - p2.getX(), p1.getZ() - p2.getZ());
 			double time = 1 + hDist / 4;
 			return (int) Math.ceil(time * 20);
 		}
