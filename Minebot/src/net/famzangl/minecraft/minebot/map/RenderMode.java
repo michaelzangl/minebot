@@ -191,4 +191,8 @@ public enum RenderMode {
 	public int getColor(WorldData world, Chunk chunk, int dx, int dz) {
 		return renderer.getColor(world, chunk, dx, dz);
 	}
+
+	public String getName() {
+		return toString();
+	}
 }

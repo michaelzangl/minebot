@@ -1,6 +1,7 @@
 package net.famzangl.minecraft.minebot.map;
 
 import java.awt.Color;
+import java.awt.Container;
 import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
@@ -24,6 +25,29 @@ import net.minecraft.util.BlockPos;
  * @author Michael Zangl
  */
 public class MapDisplay extends JPanel {
+	private final class ChangeRendermodeAction extends AbstractAction implements RenderModeListener {
+		private final RenderMode myMode;
+
+		private ChangeRendermodeAction(RenderMode myMode) {
+			super(myMode.getName());
+			this.myMode = myMode;
+		}
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			setMode(myMode);
+		}
+
+		@Override
+		public void rendermodeChanged(RenderMode mode) {
+			setEnabled(mode != myMode);
+		}
+	}
+
+	public interface RenderModeListener {
+		public void rendermodeChanged(RenderMode mode);
+	}
+	
 	private final class MinusAction extends AbstractAction {
 		private MinusAction(String name) {
 			super(name);
@@ -125,6 +149,8 @@ public class MapDisplay extends JPanel {
 
 	private PlayerPositionLabel playerPositionLabel = new PlayerPositionLabel();
 
+	private final ArrayList<RenderModeListener> renderModeListeners = new ArrayList<RenderModeListener>();
+
 	@Override
 	public void paint(Graphics g) {
 		super.paint(g);
@@ -220,17 +246,30 @@ public class MapDisplay extends JPanel {
 	}
 
 	public void setMode(RenderMode mode) {
-		this.mode = mode;
-		invalidateMap();
+		if (this.mode != mode) {
+			this.mode = mode;
+			for (RenderModeListener l : renderModeListeners) {
+				l.rendermodeChanged(mode);
+			}
+			invalidateMap();
+		}
+	}
+	
+	public void addRenderModeListener(RenderModeListener l, boolean fireOnce) {
+		renderModeListeners .add(l);
+		if (fireOnce) {
+			l.rendermodeChanged(mode);
+		}
+	}
+	
+	public void removeRenderModeListener(RenderModeListener l) {
+		renderModeListeners.remove(l);
 	}
 
 	public Action createChangeModeAction(final RenderMode myMode) {
-		return new AbstractAction("Mode: " + myMode) {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				setMode(myMode);
-			}
-		};
+		ChangeRendermodeAction action = new ChangeRendermodeAction(myMode);
+		addRenderModeListener(action, true);
+		return action;
 	}
 
 	public Action getMinusAction() {
