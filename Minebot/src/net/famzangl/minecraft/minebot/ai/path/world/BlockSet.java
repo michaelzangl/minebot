@@ -67,9 +67,16 @@ public class BlockSet {
 	// set[i / 64] &= ~(1 << (i & 63));
 	// }
 
-	@Deprecated
-	public boolean contains(int blockId) {
+	private boolean contains(int blockId) {
 		return containsWithMeta(blockId << 4);
+	}
+
+	public boolean containsAll(int blockId) {
+		return contains(blockId);
+	}
+
+	public boolean containsAny(int blockId) {
+		return contains(blockId);
 	}
 
 	public boolean contains(Block block) {

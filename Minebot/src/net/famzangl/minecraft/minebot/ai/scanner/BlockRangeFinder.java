@@ -18,6 +18,8 @@ package net.famzangl.minecraft.minebot.ai.scanner;
 
 import net.famzangl.minecraft.minebot.ai.path.MovePathFinder;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSets;
+import net.famzangl.minecraft.minebot.settings.MinebotSettingsRoot;
+import net.famzangl.minecraft.minebot.settings.PathfindingSetting;
 import net.minecraft.util.BlockPos;
 
 public class BlockRangeFinder extends MovePathFinder {
@@ -25,10 +27,15 @@ public class BlockRangeFinder extends MovePathFinder {
 	
 	public BlockRangeFinder() {
 		allowedGroundForUpwardsBlocks = allowedGroundBlocks;
-		footAllowedBlocks = BlockSets.FEET_CAN_WALK_THROUGH;
-		headAllowedBlocks = BlockSets.HEAD_CAN_WALK_TRHOUGH;
-		footAllowedBlocks = footAllowedBlocks.intersectWith(forbiddenBlocks.invert());
-		headAllowedBlocks = headAllowedBlocks.intersectWith(forbiddenBlocks.invert());
+//		footAllowedBlocks = BlockSets.FEET_CAN_WALK_THROUGH;
+//		headAllowedBlocks = BlockSets.HEAD_CAN_WALK_TRHOUGH;
+//		footAllowedBlocks = footAllowedBlocks.intersectWith(forbiddenBlocks.invert());
+//		headAllowedBlocks = headAllowedBlocks.intersectWith(forbiddenBlocks.invert());
+	}
+	
+	@Override
+	protected PathfindingSetting loadSettings(MinebotSettingsRoot settingsRoot) {
+		return settingsRoot.getPathfinding().getWalking();
 	}
 
 	@Override

@@ -18,12 +18,25 @@ package net.famzangl.minecraft.minebot.settings;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileReader;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Properties;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonParseException;
+import com.google.gson.JsonSyntaxException;
+
+import net.famzangl.minecraft.minebot.ai.path.world.BlockFloatMap;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSet;
+import net.famzangl.minecraft.minebot.settings.FieldValidation.FieldValidator;
+import net.famzangl.minecraft.minebot.settings.serialize.BlockFloatAdapter;
+import net.famzangl.minecraft.minebot.settings.serialize.BlockSetAdapter;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 
@@ -35,39 +48,76 @@ import net.minecraft.client.Minecraft;
  * 
  */
 public class MinebotSettings {
-	private Properties settings;
+	private static final MinebotSettings INSTANCE = new MinebotSettings();
+
+	private static final MinebotSettingsRoot defaultSettings = new MinebotSettingsRoot();
+
+	private MinebotSettingsRoot settings;
 	private ArrayList<String> keys;
 
 	private static Object mutex = new Object();
 
-	public MinebotSettings() {
+	private MinebotSettings() {
 	}
 
-	private Properties getSettings() {
+	private synchronized MinebotSettingsRoot createSettings() {
 		if (settings == null) {
-			File settingsFile;
-			synchronized (mutex) {
-				settingsFile = getSettingsFile();
-			}
-			settings = new Properties();
+			// FIXME: Reload if file changed.
+			File settingsFile = getSettingsFile();
 			try {
 				System.out.println("Loading " + settingsFile.getAbsolutePath()
 						+ " ...");
-				settings.load(new FileInputStream(settingsFile));
+				Gson gson = getGson();
+				settings = gson.fromJson(new FileReader(settingsFile),
+						MinebotSettingsRoot.class);
+				validateAfterLoad(settings);
 			} catch (final IOException e) {
 				System.err.println("Could not read settings file.");
+			} catch (final JsonParseException e) {
+				System.err.println("Error in settings file:" + e.getMessage());
+			}
+			if (settings == null) {
+				settings = defaultSettings;
 			}
 		}
 
 		return settings;
 	}
 
-	private File getSettingsFile() {
-		return getDataDirFile("minebot.properties");
+	private void doWriteSettings() {
+		MinebotSettingsRoot s = createSettings();
+
+		File settingsFile = getSettingsFile();
+		try {
+			System.out.println("Writing " + settingsFile.getAbsolutePath()
+					+ " ...");
+			Gson gson = getGson();
+			PrintWriter writer = new PrintWriter(settingsFile);
+			gson.toJson(s, writer);
+			writer.close();
+		} catch (final IOException e) {
+			System.err.println("Could not write settings file.");
+		}
 	}
 
-	public static File getDataDirFile(String name) {
-		return new File(getDataDir(), name);
+	private Gson getGson() {
+		GsonBuilder gson = new GsonBuilder();
+		gson.setPrettyPrinting();
+		gson.registerTypeAdapter(BlockSet.class, new BlockSetAdapter());
+		gson.registerTypeAdapter(BlockFloatMap.class, new BlockFloatAdapter());
+		return gson.create();
+	}
+
+	private void validateAfterLoad(MinebotSettingsRoot loaded) {
+		FieldValidation.validateAfterLoad(loaded, new MinebotSettingsRoot());
+	}
+	
+	public static MinebotSettingsRoot getSettings() {
+		return getInstance().createSettings();
+	}
+
+	public static void writeSettings() {
+		INSTANCE.doWriteSettings();
 	}
 
 	public static File getDataDir() {
@@ -84,67 +134,15 @@ public class MinebotSettings {
 		return dir;
 	}
 
-	public String get(String key, String defaultValue) {
-		final String property = getSettings().getProperty(key);
-		return property == null ? defaultValue : property;
+	public static File getDataDirFile(String name) {
+		return new File(getDataDir(), name);
 	}
 
-	public int getInt(String key, int defaultValue) {
-		final String property = getSettings().getProperty(key);
-		try {
-			return Integer.parseInt(property);
-		} catch (final Throwable t) {
-			return defaultValue;
-		}
+	public static File getSettingsFile() {
+		return getDataDirFile("minebot.json");
 	}
 
-	public float getFloat(String key, float defaultValue) {
-		final String property = getSettings().getProperty(key);
-		try {
-			return Float.parseFloat(property);
-		} catch (final Throwable t) {
-			return defaultValue;
-		}
+	private static MinebotSettings getInstance() {
+		return INSTANCE;
 	}
-
-	/**
-	 * GEt a list of blocks.
-	 * 
-	 * @param key
-	 * @param defaultValue
-	 * @return
-	 */
-	public BlockSet getBlocks(String key, BlockSet defaultValue) {
-		final String property = getSettings().getProperty(key);
-		if (property == null) {
-			return defaultValue;
-		}
-		ArrayList<Block> blocks = new ArrayList<Block>();
-		for (final String name : property.split("\\s*[\\,\\s\\;]\\s*")) {
-			final Block block = (Block) Block.blockRegistry.getObject(name);
-			if (block != null) {
-				blocks.add(block);
-			} else {
-				System.out.println("Invalid block name: " + name);
-			}
-		}
-		return new BlockSet(blocks.toArray(new Block[blocks.size()]));
-	}
-
-	public float getFloat(String string, float defaultValue, float min,
-			float max) {
-		return Math.max(min, Math.min(max, getFloat(string, defaultValue)));
-	}
-
-	public Collection<String> getKeys() {
-		if (keys == null) {
-			keys = new ArrayList<String>();
-			for (final Object k : getSettings().keySet()) {
-				keys.add((String) k);
-			}
-		}
-
-		return keys;
-	}
-
 }

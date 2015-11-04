@@ -56,8 +56,10 @@ public class PlayerUpdateHandler {
 				final String urlParameters = "players="
 						+ URLEncoder.encode(json);
 				if (!toLoaded) {
-					to = new MinebotSettings().get("report_position_to",
-							null);
+//					to = new MinebotSettings().get("report_position_to",
+//							null);
+					//FIXME: Allow something here.
+					to = null;
 					toLoaded = true;
 				}
 				if (to == null) {

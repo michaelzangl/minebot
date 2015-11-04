@@ -26,10 +26,12 @@ import java.util.Scanner;
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.command.AIChatController;
 import net.famzangl.minecraft.minebot.ai.command.UnknownCommandException;
-import net.famzangl.minecraft.minebot.ai.commands.CommandLoad;
+import net.famzangl.minecraft.minebot.ai.commands.CommandRun;
+import net.famzangl.minecraft.minebot.ai.scripting.CommandJs.RunScriptStrategy;
 import net.famzangl.minecraft.minebot.ai.scripting.CommandJs.ScriptStrategy;
 import net.famzangl.minecraft.minebot.ai.scripting.CommandJs.TickProvider;
 import net.famzangl.minecraft.minebot.ai.strategy.InventoryDefinition;
+import net.famzangl.minecraft.minebot.ai.strategy.RunFileStrategy;
 import net.famzangl.minecraft.minebot.ai.strategy.StackStrategy;
 import net.famzangl.minecraft.minebot.ai.strategy.StrategyStack;
 import net.famzangl.minecraft.minebot.ai.strategy.WalkTowardsStrategy;
@@ -166,7 +168,7 @@ public class MineScript {
 	}
 
 	public void serverCommand(String command) {
-		CommandLoad.runCommand(waitForTick(), command);
+		RunFileStrategy.runCommand(waitForTick(), command);
 		tickProvider.tickDone();
 	}
 

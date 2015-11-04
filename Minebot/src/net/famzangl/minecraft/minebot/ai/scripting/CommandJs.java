@@ -37,7 +37,7 @@ import net.famzangl.minecraft.minebot.ai.task.error.TaskError;
 
 @AICommand(name = "minebot", helpText = "Execute a javascript file.")
 public class CommandJs {
-	
+
 	public static class ScriptStrategy {
 		private final AIStrategy strategy;
 
@@ -95,23 +95,31 @@ public class CommandJs {
 						throw new ScriptException("Cannot reactivate.");
 					}
 				}
-				ScriptEngineManager manager = new ScriptEngineManager();
+				ScriptEngineManager manager = new ScriptEngineManager(null);
 				ScriptEngine engine = manager.getEngineByName("JavaScript");
+				if (engine == null) {
+					engine = manager.getEngineByName("nashorn");
+				}
 				if (engine == null) {
 					throw new ScriptException("No Javascript engine was found.");
 				}
-				FileReader fis = new FileReader(fileName);
+				FileReader fis;
+				try {
+					fis = new FileReader(fileName);
+				} catch (FileNotFoundException e) {
+					throw new ScriptException("File was not found: " + fileName);
+				}
 				engine.put("minescript", new MineScript(this));
 				engine.eval(fis);
-			} catch (ScriptException e) {
+			} catch (Throwable e) {
+				System.out.println("Error while executing the script.");
+				System.out.println("Your are using java "
+						+ System.getProperty("java.version") + " "
+						+ System.getProperty("java.vendor") + " on "
+						+ System.getProperty("os.name"));
 				e.printStackTrace();
 				synchronized (tickHelperMutex) {
 					error = new StringTaskError(e.getMessage());
-				}
-			} catch (FileNotFoundException e) {
-				e.printStackTrace();
-				synchronized (tickHelperMutex) {
-					error = new StringTaskError("File was not found: " + fileName);
 				}
 			} finally {
 				finished = true;
@@ -135,7 +143,7 @@ public class CommandJs {
 		public TickResult runForTick(AIHelper helper) {
 			synchronized (tickHelperMutex) {
 				printError();
-				
+
 				synchronized (activeStrategyMutex) {
 					if (activeStrategy != null) {
 						TickResult tickResult = activeStrategy.gameTick(helper);
@@ -244,7 +252,7 @@ public class CommandJs {
 				}
 			}
 		}
-		
+
 		public TaskError getError() {
 			return error;
 		}
@@ -290,7 +298,7 @@ public class CommandJs {
 	public static AIStrategy run(
 			AIHelper helper,
 			@AICommandParameter(type = ParameterType.FIXED, fixedName = "js", description = "") String nameArg,
-			@AICommandParameter(type = ParameterType.FILE, relativeToSettingsFile="scripts", description = "") File file) {
+			@AICommandParameter(type = ParameterType.FILE, relativeToSettingsFile = "scripts", description = "") File file) {
 		return new RunScriptStrategy(file);
 	}
 }

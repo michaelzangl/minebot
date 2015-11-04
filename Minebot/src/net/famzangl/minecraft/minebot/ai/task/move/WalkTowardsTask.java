@@ -17,6 +17,7 @@
 package net.famzangl.minecraft.minebot.ai.task.move;
 
 import net.famzangl.minecraft.minebot.ai.AIHelper;
+import net.famzangl.minecraft.minebot.ai.path.world.RecordingWorld;
 import net.famzangl.minecraft.minebot.ai.task.AITask;
 import net.famzangl.minecraft.minebot.ai.task.TaskOperations;
 import net.famzangl.minecraft.minebot.ai.task.error.PositionTaskError;
@@ -29,14 +30,15 @@ import net.minecraft.util.BlockPos;
  */
 public class WalkTowardsTask extends AITask {
 
-	private final int x;
-	private final int z;
-	private BlockPos fromPos;
+	protected final int x;
+	protected final int z;
+	private BlockPos ensureOnPos;
+	private BlockPos startPosition;
 
 	public WalkTowardsTask(int x, int z, BlockPos fromPos) {
 		this.x = x;
 		this.z = z;
-		this.fromPos = fromPos;
+		this.ensureOnPos = this.startPosition = fromPos;
 	}
 
 	@Override
@@ -46,19 +48,27 @@ public class WalkTowardsTask extends AITask {
 
 	@Override
 	public void runTick(AIHelper h, TaskOperations o) {
-		if (fromPos != null) {
-			if (!h.isStandingOn(fromPos.getX(), fromPos.getY(), fromPos.getZ())) {
-				o.desync(new PositionTaskError(fromPos.getX(), fromPos.getY(), fromPos.getZ()));
+		if (ensureOnPos != null) {
+			if (!h.isStandingOn(ensureOnPos.getX(), ensureOnPos.getY(), ensureOnPos.getZ())) {
+				o.desync(new PositionTaskError(ensureOnPos.getX(), ensureOnPos.getY(), ensureOnPos.getZ()));
 			}
-			fromPos = null;
+			ensureOnPos = null;
 		}
 		final boolean nextIsFacing = o.faceAndDestroyForNextTask();
 		h.walkTowards(x + 0.5, z + 0.5, false, !nextIsFacing);
 	}
+	
+	@Override
+	public int getGameTickTimeout(AIHelper helper) {
+		if (startPosition == null) {
+			startPosition = helper.getPlayerPosition();
+		}
+		return RecordingWorld.timeToWalk(startPosition, new BlockPos(x, startPosition.getY(), z));
+	}
 
 	@Override
 	public String toString() {
-		return "WalkTowardsTask [x=" + x + ", z=" + z + ", fromPos=" + fromPos
+		return "WalkTowardsTask [x=" + x + ", z=" + z + ", fromPos=" + ensureOnPos
 				+ "]";
 	}
 

@@ -91,6 +91,7 @@ public class MinebotNetHandler extends NetHandlerPlayClient implements
 					.fillTabComplete(this, packetIn.func_149630_c(),
 							lastSendTabComplete);
 			packetIn = new S3APacketTabComplete(newStrings);
+			lastSendTabComplete = null;
 		}
 		super.handleTabComplete(packetIn);
 	}

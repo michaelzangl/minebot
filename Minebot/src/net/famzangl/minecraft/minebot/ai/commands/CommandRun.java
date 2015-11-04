@@ -29,14 +29,14 @@ import net.famzangl.minecraft.minebot.ai.strategy.AIStrategy;
 import net.famzangl.minecraft.minebot.ai.strategy.RunFileStrategy;
 import net.minecraft.client.gui.GuiChat;
 
-@AICommand(helpText = "Run build commands from a file.", name = "minebot")
-public class CommandLoad {
+@AICommand(helpText = "Run build commands from a file.", name = "minebuild")
+public class CommandRun {
 
 	@AICommandInvocation()
 	public static AIStrategy run(
 			AIHelper helper,
-			@AICommandParameter(type = ParameterType.FIXED, fixedName = "run", description = "") String nameArg,
-			@AICommandParameter(type = ParameterType.FILE, relativeToSettingsFile = "scripts", description = "") File file) {
+			@AICommandParameter(type = ParameterType.FIXED, fixedName = "load", description = "") String nameArg,
+			@AICommandParameter(type = ParameterType.FILE, relativeToSettingsFile = "build", description = "") File file) {
 		return new RunFileStrategy(file);
 	}
 }

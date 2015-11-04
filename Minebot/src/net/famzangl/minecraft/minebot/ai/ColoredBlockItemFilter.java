@@ -19,6 +19,7 @@ package net.famzangl.minecraft.minebot.ai;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSet;
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
+import net.minecraft.item.EnumDyeColor;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 
@@ -29,40 +30,46 @@ import net.minecraft.item.ItemStack;
  * 
  */
 public class ColoredBlockItemFilter extends BlockItemFilter {
-	public static final BlockSet COLORABLE_BLOCKS = new BlockSet( Blocks.wool,
+	public static final BlockSet COLORABLE_BLOCKS = new BlockSet(Blocks.wool,
 			Blocks.stained_hardened_clay, Blocks.stained_glass,
-			Blocks.stained_glass_pane, Blocks.carpet );
+			Blocks.stained_glass_pane, Blocks.carpet);
 	private final int colorMeta;
 
-	/**
-	 * Right names for sheep wool and most blocks.
-	 * <p>
-	 * (15 - color) for dyes
-	 */
-	public static final String[] COLORS = new String[] { "White", "Orange",
-			"Magenta", "LightBlue", "Yellow", "Lime", "Pink", "Gray",
-			"LightGray", "Cyan", "Purple", "Blue", "Brown", "Green", "Red",
-			"Black" };
+	// /**
+	// * Right names for sheep wool and most blocks.
+	// * <p>
+	// * (15 - color) for dyes
+	// */
+	// public static final String[] COLORS = new String[] { "White", "Orange",
+	// "Magenta", "LightBlue", "Yellow", "Lime", "Pink", "Gray",
+	// "LightGray", "Cyan", "Purple", "Blue", "Brown", "Green", "Red",
+	// "Black" };
 
 	public ColoredBlockItemFilter(Block matched, String color) {
 		this(matched, colorFromString(color));
 	}
 
-	private static int colorFromString(String color) {
-		final String safeColor = color.replaceAll("[-_]", "");
-		for (int i = 0; i < COLORS.length; i++) {
-			if (COLORS[i].equalsIgnoreCase(safeColor)) {
-				return i;
-			}
+	public static EnumDyeColor colorFromString(String color) {
+		EnumDyeColor res = colorFromStringNull(color);
+		if (res == null) {
+			throw new IllegalArgumentException("Unknown color: " + color);
 		}
-		System.out.println("Did not understand color: " + color);
-		// TODO: warn?
-		return 0;
+		return res;
 	}
 
-	public ColoredBlockItemFilter(Block matched, int color) {
+	public static EnumDyeColor colorFromStringNull(String color) {
+		for (EnumDyeColor v : EnumDyeColor.values()) {
+			if (v.getName().equalsIgnoreCase(color)) {
+				return v;
+			}
+		}
+
+		return null;
+	}
+
+	public ColoredBlockItemFilter(Block matched, EnumDyeColor color) {
 		super(matched);
-		colorMeta = color;
+		colorMeta = color.getMetadata();
 		if (COLORABLE_BLOCKS.contains(matched)) {
 			throw new IllegalArgumentException();
 		}
@@ -108,7 +115,8 @@ public class ColoredBlockItemFilter extends BlockItemFilter {
 
 	@Override
 	public String getDescription() {
-		return COLORS[colorMeta] + " " + super.getDescription();
+		return EnumDyeColor.values()[colorMeta].getName() + " "
+				+ super.getDescription();
 	}
 
 }

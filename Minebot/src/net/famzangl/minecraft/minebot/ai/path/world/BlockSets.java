@@ -11,6 +11,9 @@ import net.minecraft.util.BlockPos;
  */
 public class BlockSets {
 
+
+	public static final BlockSet EMPTY = new BlockSet(new int[0]);
+	
 	/**
 	 * Blocks we can just walk over/next to without problems.
 	 */

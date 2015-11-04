@@ -44,13 +44,13 @@ public class RecordingWorld extends WorldWithDelta {
 		super.setPlayerPosition(playerPosition);
 	}
 
-	private int timeToWalk(BlockPos p1, BlockPos p2) {
+	public static int timeToWalk(BlockPos p1, BlockPos p2) {
 		if (p1.equals(p2)) {
 			return 5;
 		} else {
-		double hDist = Math.hypot(p1.getX() - p2.getX(), p1.getY() - p2.getY());
-		double time = 1 + hDist / 4;
-		return (int) Math.ceil(time * 20);
+			double hDist = Math.hypot(p1.getX() - p2.getX(), p1.getY() - p2.getY());
+			double time = 1 + hDist / 4;
+			return (int) Math.ceil(time * 20);
 		}
 	}
 	

@@ -16,6 +16,7 @@
  *******************************************************************************/
 package net.famzangl.minecraft.minebot.ai.path;
 
+import net.famzangl.minecraft.minebot.ai.path.world.BlockFloatMap;
 import net.minecraft.block.Block;
 import net.minecraft.util.EnumFacing;
 
@@ -30,23 +31,18 @@ public class MineSinglePathFinder extends MinePathfinder {
 	}
 
 	@Override
-	protected ISettingsProvider getFactorProvider() {
-		return new ISettingsProvider() {
-			@Override
-			public float getFloat(Block block2) {
-				return block == block2 ? 1 : 0;
-			}
-		};
+	protected BlockFloatMap getFactorProvider() {
+		BlockFloatMap map = new BlockFloatMap();
+		map.setBlock(Block.getIdFromBlock(block), 1);
+		map.setDefault(0);
+		return map;
 	}
 
 	@Override
-	protected ISettingsProvider getPointsProvider() {
-		return new ISettingsProvider() {
-			@Override
-			public float getFloat(Block name) {
-				return 0;
-			}
-		};
+	protected BlockFloatMap getPointsProvider() {
+		BlockFloatMap map = new BlockFloatMap();
+		map.setDefault(0);
+		return map;
 	}
 
 }

@@ -204,6 +204,7 @@ public class PathFinderField implements Comparator<Integer> {
 			pqClear();
 			final int start = getIndexForBlock(cx, cy, cz);
 			setDistance(start, 1);
+			setInQueue(start);
 			pqAdd(start, 1);
 			final float startRating = rateDestination(start);
 			if (startRating >= 0) {

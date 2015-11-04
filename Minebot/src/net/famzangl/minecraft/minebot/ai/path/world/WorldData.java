@@ -156,8 +156,9 @@ public class WorldData {
 	}
 
 	public boolean isSideTorch(BlockPos pos) {
-		int id = getBlockId(pos);
-		return BlockSets.TORCH.contains(id)
+		int id = getBlockIdWithMeta(pos);
+		// TODO: Convert this to a block set.
+		return BlockSets.TORCH.containsWithMeta(id)
 				&& getBlockState(pos).getValue(BlockTorch.FACING) != EnumFacing.UP;
 	}
 

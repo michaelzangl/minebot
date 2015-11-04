@@ -49,7 +49,7 @@ public class BlockRangeScanner {
 	public void addHandler(BlockHandler h) {
 		handlers.add(h);
 		for (int i = 0; i < BlockSet.MAX_BLOCKIDS; i++) {
-			if (h.getIds().contains(i)) {
+			if (h.getIds().containsAny(i)) {
 				handlersCache[i] = h;
 			}
 		}

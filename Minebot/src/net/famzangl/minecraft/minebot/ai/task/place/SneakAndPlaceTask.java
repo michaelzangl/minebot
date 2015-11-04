@@ -70,7 +70,11 @@ public class SneakAndPlaceTask extends AITask {
 
 	@Override
 	public boolean isFinished(AIHelper h) {
-		return !BlockSets.AIR.isAt(h.getWorld(), pos.add(0, -1, 0)) && !h.isJumping();
+		return !BlockSets.AIR.isAt(h.getWorld(), getPositionToPlaceAt()) && !h.isJumping();
+	}
+
+	protected BlockPos getPositionToPlaceAt() {
+		return pos.add(0, -1, 0);
 	}
 
 	@Override
@@ -78,7 +82,7 @@ public class SneakAndPlaceTask extends AITask {
 		if (faceTimer > 0) {
 			faceTimer--;
 		}
-		if (h.sneakFrom(getFromPos(), inDirection)) {
+		if (h.sneakFrom(getFromPos(), inDirection, faceWhileSneaking())) {
 			final boolean hasRequiredHeight = h.getMinecraft().thePlayer
 					.getEntityBoundingBox().minY > minBuildHeight - 0.05;
 			if (hasRequiredHeight) {
@@ -98,6 +102,10 @@ public class SneakAndPlaceTask extends AITask {
 				h.overrideMovement(i);
 			}
 		}
+	}
+
+	protected boolean faceWhileSneaking() {
+		return false;
 	}
 
 	protected boolean isFacingRightBlock(AIHelper h) {

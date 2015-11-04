@@ -15,6 +15,23 @@ import net.minecraft.world.chunk.Chunk;
 public enum RenderMode {
 	UNDERGROUND(new UndergroundRenderer(), "-underground"), MAP(
 			new MapRenderer(), ""), BIOME(new BiomeRenderer(), "-biome");
+	private static final BlockSet GLOBAL_COVER_BLACKLIST = new BlockSet(
+			Blocks.wooden_slab, Blocks.stone_slab, Blocks.stone_slab2,
+			Blocks.air);
+	private static final BlockSet IGNORED_COVER_BLOCKS = new BlockSet(
+			Blocks.air, Blocks.leaves, Blocks.leaves2, Blocks.log,
+			Blocks.log2, Blocks.torch, Blocks.water, Blocks.flowing_water,
+			Blocks.waterlily, Blocks.lava, Blocks.flowing_lava,
+			Blocks.snow, Blocks.snow_layer, Blocks.ice)
+			.unionWith(GLOBAL_COVER_BLACKLIST);
+	private static final BlockSet UNDERGROUND_BLOCKS = new BlockSet(
+			Blocks.air, Blocks.torch);
+	private static final BlockSet STRUCTURE_BLOCKS = new BlockSet(
+			Blocks.oak_fence, Blocks.end_portal_frame, Blocks.end_stone,
+			Blocks.bookshelf, Blocks.prismarine, Blocks.planks,
+			Blocks.nether_brick, Blocks.nether_wart, Blocks.torch);
+	private static final BlockSet INTERESTING_BLOCKS = new BlockSet(
+			Blocks.chest, Blocks.mob_spawner, Blocks.gold_block);
 
 	private interface IRenderer {
 		/**
@@ -34,19 +51,6 @@ public enum RenderMode {
 	}
 
 	private static class UndergroundRenderer implements RenderMode.IRenderer {
-		private static final BlockSet IGNORED_COVER_BLOCKS = new BlockSet(
-				Blocks.air, Blocks.leaves, Blocks.leaves2, Blocks.log,
-				Blocks.log2, Blocks.torch, Blocks.water, Blocks.flowing_water,
-				Blocks.waterlily, Blocks.lava, Blocks.flowing_lava,
-				Blocks.snow, Blocks.snow_layer, Blocks.ice);
-		private static final BlockSet UNDERGROUND_BLOCKS = new BlockSet(
-				Blocks.air, Blocks.torch);
-		private static final BlockSet STRUCTURE_BLOCKS = new BlockSet(
-				Blocks.oak_fence, Blocks.end_portal_frame, Blocks.end_stone,
-				Blocks.bookshelf, Blocks.prismarine, Blocks.planks,
-				Blocks.nether_brick, Blocks.nether_wart, Blocks.torch);
-		private static final BlockSet INTERESTING_BLOCKS = new BlockSet(
-				Blocks.chest, Blocks.mob_spawner, Blocks.gold_block);
 
 		@Override
 		public int getColor(WorldData world, Chunk chunk, int dx, int dz) {
@@ -78,7 +82,8 @@ public enum RenderMode {
 			do {
 				--h;
 				state = chunk.getBlockState(new BlockPos(dx, h, dz));
-			} while (state.getBlock().getMapColor(state) == MapColor.airColor
+			} while ((GLOBAL_COVER_BLACKLIST.contains(state.getBlock()) || state
+					.getBlock().getMapColor(state) == MapColor.airColor)
 					&& h > 0);
 
 			MapColor color = (state.getBlock().getMapColor(state));

@@ -169,6 +169,7 @@ public abstract class TaskStrategy extends AIStrategy implements
 				desync(new StringTaskError(
 						"Task timed out. It should have been completed in "
 								+ (tickTimeout / 20f) + "s"));
+				System.out.println("Task was: " + task);
 				return TickResult.TICK_HANDLED;
 			} else {
 				temporaryHelper = helper;

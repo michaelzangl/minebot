@@ -21,6 +21,7 @@ import java.util.Collection;
 
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.ColoredBlockItemFilter;
+import net.minecraft.item.EnumDyeColor;
 
 public class ColorNameBuilder extends ParameterBuilder {
 
@@ -32,20 +33,15 @@ public class ColorNameBuilder extends ParameterBuilder {
 
 		@Override
 		public boolean couldEvaluateAgainst(String string) {
-			for (final String color : ColoredBlockItemFilter.COLORS) {
-				if (color.equalsIgnoreCase(string)) {
-					return true;
-				}
-			}
-			return false;
+			return ColoredBlockItemFilter.colorFromStringNull(string) != null;
 		}
 
 		@Override
 		public void getTabCompleteOptions(String currentStart,
 				Collection<String> addTo) {
-			for (final String color : ColoredBlockItemFilter.COLORS) {
-				if (color.toLowerCase().startsWith(currentStart.toLowerCase())) {
-					addTo.add(color);
+			for (final EnumDyeColor color : EnumDyeColor.values()) {
+				if (color.getName().toLowerCase().startsWith(currentStart.toLowerCase())) {
+					addTo.add(color.getName());
 				}
 			}
 		}
@@ -62,16 +58,7 @@ public class ColorNameBuilder extends ParameterBuilder {
 
 	@Override
 	public Object getParameter(AIHelper helper, String[] arguments) {
-		final String[] colors = ColoredBlockItemFilter.COLORS;
-		for (int i = 0; i < colors.length; i++) {
-			final String color = colors[i];
-			if (color.equalsIgnoreCase(arguments[0])) {
-				// FIXME: REturn color object.
-				// EnumDyeColor
-				return i;
-			}
-		}
-		throw new CommandEvaluationException("Not a color: " + arguments[0]);
+		return ColoredBlockItemFilter.colorFromString(arguments[0]);
 	}
 
 }

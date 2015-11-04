@@ -25,6 +25,8 @@ import net.famzangl.minecraft.minebot.ai.path.world.BlockSet;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSets;
 import net.famzangl.minecraft.minebot.ai.task.move.AlignToGridTask;
 import net.famzangl.minecraft.minebot.build.blockbuild.BuildTask;
+import net.famzangl.minecraft.minebot.settings.MinebotSettingsRoot;
+import net.famzangl.minecraft.minebot.settings.PathfindingSetting;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.BlockPos;
 
@@ -49,13 +51,18 @@ public class ForBuildPathFinder extends MovePathFinder {
 
 	public ForBuildPathFinder(BuildTask task) {
 		this.task = task;
-		allowedGroundForUpwardsBlocks = allowedGroundBlocks;
-		footAllowedBlocks = BlockSets.FEET_CAN_WALK_THROUGH;
-		headAllowedBlocks = BlockSets.HEAD_CAN_WALK_TRHOUGH;
-		footAllowedBlocks = footAllowedBlocks.intersectWith(forbiddenBlocks
-				.invert());
-		headAllowedBlocks = headAllowedBlocks.intersectWith(forbiddenBlocks
-				.invert());
+//		allowedGroundForUpwardsBlocks = allowedGroundBlocks;
+//		footAllowedBlocks = BlockSets.FEET_CAN_WALK_THROUGH;
+//		headAllowedBlocks = BlockSets.HEAD_CAN_WALK_TRHOUGH;
+//		footAllowedBlocks = footAllowedBlocks.intersectWith(forbiddenBlocks
+//				.invert());
+//		headAllowedBlocks = headAllowedBlocks.intersectWith(forbiddenBlocks
+//				.invert());
+	}
+	
+	@Override
+	protected PathfindingSetting loadSettings(MinebotSettingsRoot settingsRoot) {
+		return settingsRoot.getPathfinding().getConstructionPathfinder();
 	}
 
 	@Override

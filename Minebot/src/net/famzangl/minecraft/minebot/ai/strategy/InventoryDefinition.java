@@ -23,6 +23,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonArray;
 
 /**
  * This is a definition of what the (current) inventory of the player contains.
@@ -88,6 +89,19 @@ public class InventoryDefinition {
 				return s;
 			}
 		}
-		return null;
+		return new InventorySlot(i, 0, 0, -1);
+	}
+	
+	public String getJSON() {
+		Gson gson = new Gson();
+		
+		JsonArray array = new JsonArray();
+		for (int i = 0; i < 36; i++) {
+			InventorySlot slot = slots.get(i);
+			if (slot.amount > 0) {
+				array.add(gson.toJsonTree(slot));
+			}
+		}
+		return gson.toJson(array);
 	}
 }

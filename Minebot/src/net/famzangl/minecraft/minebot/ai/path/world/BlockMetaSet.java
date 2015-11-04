@@ -44,14 +44,15 @@ public class BlockMetaSet extends BlockSet {
 	}
 
 	@Override
-	public boolean contains(int blockId) {
+	public boolean containsAll(int blockId) {
 		int bit = blockId * 16;
 		long mask = 0xffffl << (bit & 63);
 		long query = set[bit / 64];
 		return (query & mask) == mask;
 	}
 
-	private boolean containsAny(int blockId) {
+	@Override
+	public boolean containsAny(int blockId) {
 		int bit = blockId * 16;
 		long mask = 0xffffl << (bit & 63);
 		long query = set[bit / 64];
@@ -92,7 +93,7 @@ public class BlockMetaSet extends BlockSet {
 	@Override
 	protected String getForBlock(int blockId) {
 		if (containsAny(blockId)) {
-			if (contains(blockId)) {
+			if (containsAll(blockId)) {
 				// shorten it.
 				return super.getForBlock(blockId);
 			}
@@ -100,9 +101,9 @@ public class BlockMetaSet extends BlockSet {
 			StringBuilder b = new StringBuilder();
 			b.append(Block.getBlockById(blockId).getLocalizedName());
 			b.append(" (");
+			boolean needsComma = false;
 			for (int i = 0; i < 16; i++) {
-				boolean needsComma = false;
-				if (containsWithMeta(blockId << 4 + i)) {
+				if (containsWithMeta((blockId << 4) + i)) {
 					if (needsComma)
 						b.append(", ");
 					else
@@ -113,6 +114,7 @@ public class BlockMetaSet extends BlockSet {
 				}
 			}
 			b.append(")");
+			return b.toString();
 		}
 		return null;
 	}
@@ -120,7 +122,7 @@ public class BlockMetaSet extends BlockSet {
 	public static BlockMetaSet fromBlockSet(BlockSet set) {
 		BlockMetaSet converted = new BlockMetaSet();
 		for (int blockId = 0; blockId < MAX_BLOCKIDS; blockId++) {
-			if (set.contains(blockId)) {
+			if (set.containsAny(blockId)) {
 				int bit = blockId * 16;
 				long mask = 0xffffl << (bit & 63);
 				converted.set[bit / 64] |= mask;

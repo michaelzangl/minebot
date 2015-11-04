@@ -128,8 +128,7 @@ public class MoveScanner {
 					for (int x = 0; x < 16; x ++) {
 						int data = array[oFrom + x];
 						
-						blocks[oResult + x] = (short) (policy.getPositionFlags(
-								(data >> 4) & 0xfff, data & 0xf) | DEFAULT_POSITION_FLAGS);
+						blocks[oResult + x] = (short) (policy.getPositionFlags(data) | DEFAULT_POSITION_FLAGS);
 					}
 				}
 			}
@@ -582,24 +581,23 @@ public class MoveScanner {
 		 * Gets all flags (except safe_to_go) for the given block.
 		 * 
 		 * @param blockIndex
-		 * @param blockMeta
 		 * @return A short (packed int an int).
 		 */
-		int getPositionFlags(int blockIndex, int blockMeta) {
+		int getPositionFlags(int blockWithMeta) {
 			int flag = 0;
-			if (safeCeiling.contains(blockIndex)) {
+			if (safeCeiling.containsWithMeta(blockWithMeta)) {
 				flag |= BLOCK_IS_SAFE_CEILING;
 			}
-			if (safeHead.contains(blockIndex)) {
+			if (safeHead.containsWithMeta(blockWithMeta)) {
 				flag |= BLOCK_IS_SAFE_HEAD;
 			}
-			if (safeFoot.contains(blockIndex)) {
+			if (safeFoot.containsWithMeta(blockWithMeta)) {
 				flag |= BLOCK_IS_SAFE_FOOT;
 			}
-			if (safeFloor.contains(blockIndex)) {
+			if (safeFloor.containsWithMeta(blockWithMeta)) {
 				flag |= BLOCK_IS_SAFE_GROUND;
 			}
-			if (safeSide.contains(blockIndex)) {
+			if (safeSide.containsWithMeta(blockWithMeta)) {
 				flag |= BLOCK_IS_SAFE_SIDE;
 			}
 			return flag;

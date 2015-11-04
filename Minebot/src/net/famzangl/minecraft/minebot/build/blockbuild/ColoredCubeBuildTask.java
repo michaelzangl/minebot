@@ -21,6 +21,7 @@ import net.famzangl.minecraft.minebot.ai.ColoredBlockItemFilter;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSet;
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
+import net.minecraft.item.EnumDyeColor;
 import net.minecraft.util.BlockPos;
 
 public class ColoredCubeBuildTask extends CubeBuildTask {
@@ -28,7 +29,7 @@ public class ColoredCubeBuildTask extends CubeBuildTask {
 	public static final BlockSet BLOCKS = new BlockSet( Blocks.wool,
 			Blocks.stained_glass, Blocks.stained_hardened_clay);
 
-	public ColoredCubeBuildTask(BlockPos forPosition, Block blockType, int extraColor) {
+	public ColoredCubeBuildTask(BlockPos forPosition, Block blockType, EnumDyeColor extraColor) {
 		this(forPosition, new ColoredBlockItemFilter(blockType, extraColor));
 	}
 

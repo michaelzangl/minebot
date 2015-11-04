@@ -33,24 +33,27 @@ import net.famzangl.minecraft.minebot.ai.task.move.JumpMoveTask;
 import net.famzangl.minecraft.minebot.ai.task.move.UpwardsMoveTask;
 import net.famzangl.minecraft.minebot.ai.task.move.WalkTowardsTask;
 import net.famzangl.minecraft.minebot.settings.MinebotSettings;
+import net.famzangl.minecraft.minebot.settings.MinebotSettingsRoot;
+import net.famzangl.minecraft.minebot.settings.PathfindingSetting;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
 
 /**
  * A pathfinder that lets you move around a minecraft world.
+ * <p>
+ * This pathfinder uses several fields to check if a block may be walked
+ * through.
  * 
- * @author michael
+ * @author Michael Zangl
  * 
  */
 public class MovePathFinder extends PathFinderField {
-	protected BlockSet upwardsBuildBlocks;
-
-	protected AIHelper helper;
-	protected WorldData world;
-	protected MinebotSettings settings;
-
-	protected float torchLightLevel;
+	/**
+	 * Blocks that are destructable faster.
+	 */
+	protected final static BlockSet fastDestructableBlocks = new BlockSet(
+			Blocks.dirt, Blocks.gravel, Blocks.sand, Blocks.sandstone);
 
 	/**
 	 * Blocks we should not dig through, e.g. because we cannot handle them
@@ -61,48 +64,85 @@ public class MovePathFinder extends PathFinderField {
 			Blocks.piston_extension, Blocks.piston_head);
 
 	/**
+	 * The AI helper
+	 */
+	protected AIHelper helper;
+	/**
+	 * The local world we do path finding on. This may already represent the
+	 * expected world state in the future.
+	 */
+	protected WorldData world;
+
+	/**
+	 * The minebot settings used.
+	 */
+	protected PathfindingSetting pathSettings;
+	protected MinebotSettingsRoot settings;
+
+	/**
+	 * The blocks we use when building upwards.
+	 */
+	protected BlockSet upwardsBuildBlocks;
+
+	/**
 	 * This list can be changed. Only blocks of this type are walked to.
 	 */
-	protected BlockSet allowedGroundBlocks = BlockSets.SAFE_GROUND;
-	protected BlockSet allowedGroundForUpwardsBlocks = BlockSets.SAFE_GROUND
-			.unionWith(BlockSets.FEET_CAN_WALK_THROUGH);
+	protected BlockSet allowedGroundBlocks;
+	/**
+	 * Those ground blocks are the blocks we allow to 'stand' on after a upwards
+	 * move.
+	 */
+	protected BlockSet allowedGroundForUpwardsBlocks;
 
-	protected BlockSet footAllowedBlocks = BlockSets.SAFE_AFTER_DESTRUCTION
-			.unionWith(BlockSets.SAFE_CEILING).unionWith(BlockSets.FALLING);
-	protected BlockSet headAllowedBlocks = footAllowedBlocks;
+	/**
+	 * Blocks we allow the feet to walk through.
+	 */
+	protected BlockSet footAllowedBlocks;
+	/**
+	 * Blocks we allow the head to walk through.
+	 */
+	protected BlockSet headAllowedBlocks;
 
 	protected BlockSet shortFootBlocks = BlockSets.FEET_CAN_WALK_THROUGH;
 	protected BlockSet shortHeadBlocks = BlockSets.HEAD_CAN_WALK_TRHOUGH;
 
-	protected final static BlockSet fastDestructableBlocks = new BlockSet(
-			Blocks.dirt, Blocks.gravel, Blocks.sand, Blocks.sandstone);
+	protected PathfindingSetting setting;
 
-	private static final BlockSet defaultUpwardsBlocks = new BlockSet(
-			Blocks.dirt, Blocks.stone, Blocks.cobblestone, Blocks.sand);
-
-	/**
-	 * Current forbidden block settings. Just FYI, never used by this
-	 * pathfinder.
-	 */
-	protected final BlockSet forbiddenBlocks;
+	// /**
+	// * Current forbidden block settings. Just FYI, never used by this
+	// * pathfinder.
+	// */
+	// protected final BlockSet forbiddenBlocks;
 	private TaskReceiver receiver;
 
 	private BlockPos currentTarget;
 
 	public MovePathFinder() {
 		super();
-		settings = new MinebotSettings();
+		settings = MinebotSettings.getSettings();
+		pathSettings = loadSettings(settings);
 
-		upwardsBuildBlocks = settings.getBlocks("upwards_place_block",
-				defaultUpwardsBlocks);
-		forbiddenBlocks = settings.getBlocks("blacklisted_blocks",
-				defaultForbiddenBlocks);
+		upwardsBuildBlocks = pathSettings.getUpwardsBuildBlocks();
 
-		torchLightLevel = settings.getFloat("place_torches_at", 1.0f, -1, 15);
-		footAllowedBlocks = footAllowedBlocks.intersectWith(forbiddenBlocks
-				.invert());
-		headAllowedBlocks = headAllowedBlocks.intersectWith(forbiddenBlocks
-				.invert());
+		allowedGroundBlocks = pathSettings.getAllowedGround();
+		allowedGroundForUpwardsBlocks = pathSettings
+				.getAllowedGroundWhenUpwards();
+		footAllowedBlocks = pathSettings.getFootWalkThrough();
+		headAllowedBlocks = pathSettings.getHeadWalkThrough();
+
+		// getBlocks("upwards_place_block",
+		// defaultUpwardsBlocks);
+		// forbiddenBlocks = settings.getBlocks("blacklisted_blocks",
+		// defaultForbiddenBlocks);
+		//
+		// footAllowedBlocks = footAllowedBlocks.intersectWith(forbiddenBlocks
+		// .invert());
+		// headAllowedBlocks = headAllowedBlocks.intersectWith(forbiddenBlocks
+		// .invert());
+	}
+
+	protected PathfindingSetting loadSettings(MinebotSettingsRoot settingsRoot) {
+		return settingsRoot.getPathfinding().getDestructivePathfinder();
 	}
 
 	@Override
@@ -198,19 +238,7 @@ public class MovePathFinder extends PathFinderField {
 				currentPos.getZ()));
 		while (!path.isEmpty()) {
 			BlockPos nextPos = path.removeFirst();
-			EnumFacing moveDirection;
-			moveDirection = direction(currentPos, nextPos);
-			if (torchLightLevel >= 0 && moveDirection != EnumFacing.UP && false) {
-				//TODO
-				EnumFacing direction;
-				if (moveDirection == EnumFacing.UP) {
-					direction = EnumFacing.DOWN;
-				} else {
-					direction = moveDirection;
-				}
-				addTask(new PlaceTorchIfLightBelowTask(currentPos, direction,
-						torchLightLevel));
-			}
+			EnumFacing moveDirection = direction(currentPos, nextPos);
 			int stepsAdded = 0;
 			while (path.peekFirst() != null
 					&& isAreaClear(currentPos, path.peekFirst())

@@ -17,8 +17,9 @@
 package net.famzangl.minecraft.minebot.ai.strategy;
 
 import net.famzangl.minecraft.minebot.ai.AIHelper;
-import net.famzangl.minecraft.minebot.ai.commands.CommandLoad;
+import net.famzangl.minecraft.minebot.ai.commands.CommandRun;
 import net.famzangl.minecraft.minebot.settings.MinebotSettings;
+import net.famzangl.minecraft.minebot.settings.MinebotSettingsRoot;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiMainMenu;
 import net.minecraft.client.multiplayer.WorldClient;
@@ -32,14 +33,14 @@ import net.minecraft.client.multiplayer.WorldClient;
 public abstract class ValueActionStrategy extends AIStrategy {
 
 	private double lastValue = -1;
-	private final MinebotSettings settings;
+	private final MinebotSettingsRoot settings;
 	private boolean shouldLogOut;
 	private boolean shouldRunCommand;
 	private boolean shouldStop;
 	private static final float EPSILON = 0.01f;
 
 	public ValueActionStrategy() {
-		settings = new MinebotSettings();
+		settings = MinebotSettings.getSettings();
 	}
 
 	@Override
@@ -68,7 +69,8 @@ public abstract class ValueActionStrategy extends AIStrategy {
 	}
 
 	private double getSetting(String string) {
-		return settings.getFloat(getSettingPrefix() + string + "_value", -1);
+		return -1;// FIXME settings.getFloat(getSettingPrefix() + string +
+					// "_value", -1);
 	}
 
 	protected abstract double getValue(AIHelper helper);
@@ -78,8 +80,8 @@ public abstract class ValueActionStrategy extends AIStrategy {
 	@Override
 	protected TickResult onGameTick(AIHelper helper) {
 		if (shouldRunCommand) {
-			CommandLoad.runCommand(helper,
-					settings.get(getSettingPrefix() + "_command", ""));
+			// FIXME CommandLoad.runCommand(helper,
+			// settings.get(getSettingPrefix() + "_command", ""));
 			shouldRunCommand = false;
 			return TickResult.TICK_AGAIN;
 		} else if (shouldLogOut) {

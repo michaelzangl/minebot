@@ -28,7 +28,8 @@ import net.famzangl.minecraft.minebot.ai.path.world.WorldWithDelta;
 @SkipWhenSearchingPrefetch
 public class WaitTask extends AITask {
 
-	private int ticks;
+	private final int ticks;
+	private int ticked;
 
 	public WaitTask() {
 		this(1);
@@ -40,12 +41,12 @@ public class WaitTask extends AITask {
 
 	@Override
 	public boolean isFinished(AIHelper h) {
-		return ticks <= 0;
+		return ticks <= ticked;
 	}
 
 	@Override
 	public void runTick(AIHelper h, TaskOperations o) {
-		ticks--;
+		ticked++;
 	}
 
 	@Override
@@ -56,6 +57,11 @@ public class WaitTask extends AITask {
 	@Override
 	public boolean applyToDelta(WorldWithDelta world) {
 		return true;
+	}
+	
+	@Override
+	public int getGameTickTimeout(AIHelper helper) {
+		return ticks + 5;
 	}
 
 }

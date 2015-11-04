@@ -40,6 +40,7 @@ import net.famzangl.minecraft.minebot.build.blockbuild.StandingSignBuildTask;
 import net.famzangl.minecraft.minebot.build.blockbuild.StandingSignBuildTask.SignDirection;
 import net.famzangl.minecraft.minebot.build.blockbuild.WoodBuildTask;
 import net.minecraft.block.Block;
+import net.minecraft.item.EnumDyeColor;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
 
@@ -86,7 +87,7 @@ public class CommandScheduleBuild {
 			@AICommandParameter(type = ParameterType.FIXED, fixedName = "schedule", description = "") String nameArg,
 			@AICommandParameter(type = ParameterType.POSITION, description = "Where to place it (relative is to your current pos)") BlockPos forPosition,
 			@AICommandParameter(type = ParameterType.BLOCK_NAME, description = "The block", blockFilter = RunColoredFilter.class) Block blockToPlace,
-			@AICommandParameter(type = ParameterType.COLOR, description = "The color") int color) {
+			@AICommandParameter(type = ParameterType.COLOR, description = "The color") EnumDyeColor color) {
 		if (ColoredCubeBuildTask.BLOCKS.contains(blockToPlace)) {
 			addTask(helper, new ColoredCubeBuildTask(forPosition, blockToPlace,
 					color));

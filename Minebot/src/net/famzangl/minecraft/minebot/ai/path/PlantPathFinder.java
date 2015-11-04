@@ -26,6 +26,8 @@ import net.famzangl.minecraft.minebot.ai.path.world.WorldData;
 import net.famzangl.minecraft.minebot.ai.task.UseItemOnBlockAtTask;
 import net.famzangl.minecraft.minebot.ai.task.place.DestroyBlockTask;
 import net.famzangl.minecraft.minebot.ai.task.place.PlaceBlockAtFloorTask;
+import net.famzangl.minecraft.minebot.settings.MinebotSettingsRoot;
+import net.famzangl.minecraft.minebot.settings.PathfindingSetting;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockCrops;
 import net.minecraft.init.Blocks;
@@ -86,13 +88,18 @@ public class PlantPathFinder extends MovePathFinder {
 
 	public PlantPathFinder(PlantType type) {
 		this.type = type;
-		allowedGroundForUpwardsBlocks = allowedGroundBlocks;
-		footAllowedBlocks = BlockSets.FEET_CAN_WALK_THROUGH;
-		headAllowedBlocks = BlockSets.HEAD_CAN_WALK_TRHOUGH;
-		footAllowedBlocks = footAllowedBlocks.intersectWith(forbiddenBlocks
-				.invert());
-		headAllowedBlocks = headAllowedBlocks.intersectWith(forbiddenBlocks
-				.invert());
+//		allowedGroundForUpwardsBlocks = allowedGroundBlocks;
+//		footAllowedBlocks = BlockSets.FEET_CAN_WALK_THROUGH;
+//		headAllowedBlocks = BlockSets.HEAD_CAN_WALK_TRHOUGH;
+//		footAllowedBlocks = footAllowedBlocks.intersectWith(forbiddenBlocks
+//				.invert());
+//		headAllowedBlocks = headAllowedBlocks.intersectWith(forbiddenBlocks
+//				.invert());
+	}
+	
+	@Override
+	protected PathfindingSetting loadSettings(MinebotSettingsRoot settingsRoot) {
+		return settingsRoot.getPathfinding().getPlanting();
 	}
 
 	@Override

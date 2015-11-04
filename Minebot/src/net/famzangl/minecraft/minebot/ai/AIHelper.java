@@ -860,15 +860,24 @@ public abstract class AIHelper {
 	}
 
 	/**
-	 * Sneak while standing on that block.
+	 * Sneak while standing on that block facing that direction.
 	 * 
-	 * @param blockX
-	 * @param blockY
-	 * @param blockZ
-	 * @param inDirection
-	 * @return
+	 * @param pos The position of which we should sneak to the side.
+	 * @param inDirection The side to sneak at.
+	 * @return <code>true</code> on arrival.
 	 */
 	public boolean sneakFrom(BlockPos pos, EnumFacing inDirection) {
+		return sneakFrom(pos, inDirection, true);
+	}
+	/**
+	 * Sneak while standing on that block.
+	 * 
+	 * @param pos The position of which we should sneak to the side.
+	 * @param inDirection The side to sneak at.
+	 * @param face Should we face that position?
+	 * @return <code>true</code> on arrival.
+	 */
+	public boolean sneakFrom(BlockPos pos, EnumFacing inDirection, boolean face) {
 		final Block block = getBoundsBlock(pos);
 		double destX = pos.getX() + .5;
 		double destZ = pos.getZ() + .5;
@@ -888,7 +897,7 @@ public abstract class AIHelper {
 		default:
 			throw new IllegalArgumentException("Cannot handle " + inDirection);
 		}
-		return walkTowards(destX, destZ, false);
+		return walkTowards(destX, destZ, false, face);
 	}
 
 	/**

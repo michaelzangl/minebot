@@ -19,6 +19,7 @@ package net.famzangl.minecraft.minebot.ai.path;
 import java.util.Random;
 import java.util.Set;
 
+import net.famzangl.minecraft.minebot.ai.path.world.BlockFloatMap;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSet;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSets;
 import net.famzangl.minecraft.minebot.ai.task.DestroyInRangeTask;
@@ -50,43 +51,43 @@ public abstract class MinePathfinder extends MovePathFinder {
 	 */
 	protected final float preferedLayerInfluence = 0.3f;
 
-	private final FloatBlockCache points;
-	private final FloatBlockCache factors;
+	private final BlockFloatMap points;
+	private final BlockFloatMap factors;
 
-	protected static interface ISettingsProvider {
-		float getFloat(Block name);
-	}
+//	protected static interface ISettingsProvider {
+//		float getFloat(Block name);
+//	}
 
-	private class FloatBlockCache {
-		private final float[] cached = new float[MAX_BLOCK_IDS];
-		private final boolean[] isCached = new boolean[MAX_BLOCK_IDS];
-		private final ISettingsProvider settingsProvider;
-
-		public FloatBlockCache(ISettingsProvider settingsProvider) {
-			super();
-			this.settingsProvider = settingsProvider;
-		}
-
-		public float getForBlock(int id) {
-
-			if (!isCached[id]) {
-				// final String name = Block.blockRegistry.getNameForObject(
-				// Block.blockRegistry.getObjectById(id)).replace(
-				// "minecraft:", "");
-				cached[id] = settingsProvider
-						.getFloat((Block) Block.blockRegistry.getObjectById(id));
-				isCached[id] = true;
-			}
-			return cached[id];
-		}
-	}
+//	private class FloatBlockCache {
+//		private final float[] cached = new float[MAX_BLOCK_IDS];
+//		private final boolean[] isCached = new boolean[MAX_BLOCK_IDS];
+//		private final ISettingsProvider settingsProvider;
+//
+//		public FloatBlockCache(ISettingsProvider settingsProvider) {
+//			super();
+//			this.settingsProvider = settingsProvider;
+//		}
+//
+//		public float getForBlock(int id) {
+//
+//			if (!isCached[id]) {
+//				// final String name = Block.blockRegistry.getNameForObject(
+//				// Block.blockRegistry.getObjectById(id)).replace(
+//				// "minecraft:", "");
+//				cached[id] = settingsProvider
+//						.getFloat((Block) Block.blockRegistry.getObjectById(id));
+//				isCached[id] = true;
+//			}
+//			return cached[id];
+//		}
+//	}
 
 	@SuppressWarnings("unchecked")
 	public MinePathfinder(EnumFacing preferedDirection, int preferedLayer) {
 		this.preferedDirection = preferedDirection;
 		this.preferedLayer = preferedLayer;
-		points = new FloatBlockCache(getPointsProvider());
-		factors = new FloatBlockCache(getFactorProvider());
+		points = getPointsProvider();
+		factors = getFactorProvider();
 	}
 
 	@Override
@@ -95,7 +96,8 @@ public abstract class MinePathfinder extends MovePathFinder {
 				.getKeys()) {
 			int id = Block.getIdFromBlock((Block) Block.blockRegistry
 					.getObject(k));
-			float f = factors.getForBlock(id);
+			// TODO: Do this better...
+			float f = factors.get(id * 16);
 			if (f > 0) {
 				headAllowedBlocks.intersectWith(new BlockSet(id));
 				footAllowedBlocks.intersectWith(new BlockSet(id));
@@ -104,9 +106,9 @@ public abstract class MinePathfinder extends MovePathFinder {
 		return super.runSearch(playerPosition);
 	}
 
-	protected abstract ISettingsProvider getFactorProvider();
+	protected abstract BlockFloatMap getFactorProvider();
 
-	protected abstract ISettingsProvider getPointsProvider();
+	protected abstract BlockFloatMap getPointsProvider();
 
 	@Override
 	protected float rateDestination(int distance, int x, int y, int z) {
@@ -116,8 +118,7 @@ public abstract class MinePathfinder extends MovePathFinder {
 		float addForDoubleMine = 0;
 
 		if (!(r1 != Float.POSITIVE_INFINITY && r2 != Float.POSITIVE_INFINITY)) {
-			addForDoubleMine = settings
-					.getFloat("mine_double_add", 1, 0.0f, 10);
+			addForDoubleMine = settings.getMining().getDoubleBonus();
 		}
 
 		final float rating = Math.min(r1, r2);
@@ -149,16 +150,15 @@ public abstract class MinePathfinder extends MovePathFinder {
 	}
 
 	private float makeRandom(float f) {
-		final float r = settings.getFloat("mine_randomness", 0, 0, 1)
-				* rand.nextFloat();
+		final float r = settings.getMining().getRandomness() * rand.nextFloat();
 		return f * (1 - r);
 	}
 
 	private float rateOreBlockDistance(int distance, int x, int y, int z) {
-		final int id = world.getBlockId(x, y, z);
-		final float point = points.getForBlock(id);
+		final int id = world.getBlockIdWithMeta(x, y, z);
+		final float point = points.get(id);
 
-		final float factor = factors.getForBlock(id);
+		final float factor = factors.get(id);
 		if (factor == 0) {
 			return Float.POSITIVE_INFINITY;
 		} else {
@@ -168,7 +168,7 @@ public abstract class MinePathfinder extends MovePathFinder {
 	}
 
 	protected boolean isOreBlock(int x, int y, int z) {
-		return factors.getForBlock(world.getBlockId(x, y, z)) > 0;
+		return factors.get(world.getBlockIdWithMeta(x, y, z)) > 0;
 	}
 
 	@Override
