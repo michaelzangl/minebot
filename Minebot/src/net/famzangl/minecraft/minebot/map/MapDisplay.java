@@ -6,6 +6,8 @@ import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
@@ -17,14 +19,81 @@ import javax.swing.JPanel;
 import net.famzangl.minecraft.minebot.map.MapReader.ImagePos;
 import net.famzangl.minecraft.minebot.map.MapReader.MultiModeImage;
 import net.famzangl.minecraft.minebot.map.MapReader.WriteableImage;
+import net.famzangl.minecraft.minebot.map.PlayerPositionLabel.FollowPlayerListener;
 import net.minecraft.util.BlockPos;
+import net.minecraft.util.MapPopulator;
 
 /**
  * This panel displays the map.
  * 
  * @author Michael Zangl
  */
-public class MapDisplay extends JPanel {
+public class MapDisplay extends JPanel implements FollowPlayerListener {
+	private final class ClickAndDragHelper implements MouseListener, MouseMotionListener {
+		private boolean isDragActive;
+		private BlockPos dragCenter;
+		private Point dragOrigin;
+		
+		@Override
+		public void mouseReleased(MouseEvent e) {
+			checkStartandDoDraging(e);
+			if (!isDragActive) {
+				showPopupMenu(e);
+			}
+			endDrag();
+		}
+
+		@Override
+		public void mousePressed(MouseEvent e) {
+			dragOrigin = e.getPoint();
+			dragCenter = getBlockPosition(dragOrigin);
+		}
+
+		@Override
+		public void mouseExited(MouseEvent e) {
+			endDrag();
+		}
+
+		@Override
+		public void mouseEntered(MouseEvent e) {
+		}
+
+		@Override
+		public void mouseClicked(MouseEvent e) {
+		}
+
+		@Override
+		public void mouseDragged(MouseEvent e) {
+			checkStartandDoDraging(e);
+		}
+
+		@Override
+		public void mouseMoved(MouseEvent e) {
+			checkStartandDoDraging(e);
+		}
+
+		private void endDrag() {
+			dragOrigin = null;
+			dragCenter = null;
+			isDragActive = false;
+		}
+
+		private void showPopupMenu(MouseEvent e) {
+			MapContextMenu popup = new MapContextMenu(getBlockPosition(e.getPoint()));
+			popup.show(MapDisplay.this, e.getX(), e.getY());
+		}
+
+		private void checkStartandDoDraging(MouseEvent e) {
+			System.out.println("Drag... " + e.getPoint() + " from " + dragOrigin);
+			if (dragOrigin != null && e.getPoint().distance(dragOrigin) > 10) {
+				isDragActive = true;
+			}
+			if (isDragActive && dragCenter != null) {
+				setMapPosition(dragCenter, e.getPoint());
+			}
+		}
+	}
+
 	private final class ChangeRendermodeAction extends AbstractAction implements RenderModeListener {
 		private final RenderMode myMode;
 
@@ -128,6 +197,9 @@ public class MapDisplay extends JPanel {
 	 */
 	public MapDisplay(MapReader mapReader) {
 		map = mapReader;
+		ClickAndDragHelper clickAndDragHelper = new ClickAndDragHelper();
+		addMouseListener(clickAndDragHelper);
+		addMouseMotionListener(clickAndDragHelper);
 	}
 
 	private static final int BLOCKS_PER_BASE_PIXEL_MAX = 256;
@@ -147,9 +219,11 @@ public class MapDisplay extends JPanel {
 	private Action plusAction = new PlusAction("+");
 	private Action minusAction = new MinusAction("-");
 
-	private PlayerPositionLabel playerPositionLabel = new PlayerPositionLabel();
+	private PlayerPositionLabel playerPositionLabel = new PlayerPositionLabel(this);
 
 	private final ArrayList<RenderModeListener> renderModeListeners = new ArrayList<RenderModeListener>();
+
+	private boolean mapCenterFollowsPlayer = true;
 
 	@Override
 	public void paint(Graphics g) {
@@ -162,7 +236,9 @@ public class MapDisplay extends JPanel {
 			player = activePlayer;
 		}
 		playerPositionLabel.setPosition(player.playerPosition);
-		mapCenter = player.playerPosition;
+		if (mapCenterFollowsPlayer) {
+			mapCenter = player.playerPosition;
+		}
 		g.setColor(Color.RED);
 		ArrayList<IconDefinition> icons = new ArrayList<IconDefinition>();
 		// System.out.println("Redraw at " + playerPos);
@@ -310,6 +386,20 @@ public class MapDisplay extends JPanel {
 				}
 			}
 		}
+	}
+	
+	public void setMapPosition(BlockPos position, Point point) {
+		mapCenterFollowsPlayer = false;
+		int dx = point.x - getWidth() / 2;
+		int dy = point.y - getHeight() / 2;
+		mapCenter = position.add(-dx * getScale(), 0, -dy * getScale());
+		setFollowPlayer(false);
+	}
+	
+	@Override
+	public void setFollowPlayer(boolean follow) {
+		mapCenterFollowsPlayer = follow;
+		repaint();
 	}
 
 	public float getScale() {
