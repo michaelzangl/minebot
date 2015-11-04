@@ -18,7 +18,7 @@ public final class PlayerPositionLabel extends JPanel {
 		add(y);
 		add(z);
 		x.setPreferredSize(new Dimension(50, 15));
-		y.setPreferredSize(new Dimension(20, 15));
+		y.setPreferredSize(new Dimension(30, 15));
 		z.setPreferredSize(new Dimension(50, 15));
 	}
 
