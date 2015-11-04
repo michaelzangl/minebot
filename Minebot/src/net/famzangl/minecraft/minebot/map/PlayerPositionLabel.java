@@ -26,6 +26,7 @@ public final class PlayerPositionLabel extends JPanel {
 		x.setText(newPlayer == null ? "?" : newPlayer.getX() + "");
 		y.setText(newPlayer == null ? "?" : newPlayer.getY() + "");
 		z.setText(newPlayer == null ? "?" : newPlayer.getZ() + "");
+		
+		setToolTipText(newPlayer == null ? "?" : newPlayer.getX() + " " + newPlayer.getY() + " " + newPlayer.getZ());
 	}
-
 }
