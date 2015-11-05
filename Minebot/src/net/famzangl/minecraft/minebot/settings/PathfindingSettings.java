@@ -11,7 +11,7 @@ public class PathfindingSettings {
 	private static final BlockSet allowedForUpwards = BlockSets.SAFE_GROUND
 			.unionWith(BlockSets.FEET_CAN_WALK_THROUGH);
 	private static final BlockSet destructableBlocks = BlockSets.SAFE_AFTER_DESTRUCTION
-			.unionWith(BlockSets.SAFE_CEILING).unionWith(BlockSets.FALLING);
+			.unionWith(BlockSets.SAFE_CEILING).unionWith(BlockSets.FALLING).intersectWith(BlockSets.INDESTRUCTABLE.invert());
 
 	private PathfindingSetting destructive = new PathfindingSetting(
 			BlockSets.SAFE_GROUND, allowedForUpwards, destructableBlocks,

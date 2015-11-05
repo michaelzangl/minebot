@@ -153,11 +153,17 @@ public class BlockSets {
 			Blocks.vine);
 
 	/**
+	 * Blocks that are considered indestructable and should be avoided.
+	 */
+	public static final BlockSet INDESTRUCTABLE = new BlockSet(Blocks.bedrock, Blocks.barrier, Blocks.obsidian);
+	
+	/**
 	 * All leaves. FIXME: Only consider leaves that do not decay as safe ground.
 	 */
 	public static final BlockSet LEAVES = new BlockSet(Blocks.leaves,
 			Blocks.leaves2);
 	public static final BlockSet LOGS = new BlockSet(Blocks.log, Blocks.log2);
+
 
 	public static boolean safeSideAround(WorldData world, int x, int y, int z) {
 		return SAFE_SIDE.isAt(world, x + 1, y, z)
