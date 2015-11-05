@@ -52,6 +52,7 @@ import net.famzangl.minecraft.minebot.ai.scripting.CommandJs;
 import net.famzangl.minecraft.minebot.build.commands.CommandBuild;
 import net.famzangl.minecraft.minebot.build.commands.CommandClearArea;
 import net.famzangl.minecraft.minebot.build.commands.CommandCount;
+import net.famzangl.minecraft.minebot.build.commands.CommandExpand;
 import net.famzangl.minecraft.minebot.build.commands.CommandListBuilds;
 import net.famzangl.minecraft.minebot.build.commands.CommandMove;
 import net.famzangl.minecraft.minebot.build.commands.CommandReset;
@@ -118,6 +119,7 @@ public class AIChatController {
 		registerCommand(CommandReset.class);
 		registerCommand(CommandScheduleBuild.class);
 		registerCommand(CommandSetPos.class);
+		registerCommand(CommandExpand.class);
 		registerCommand(CommandStepNext.class);
 		registerCommand(CommandStepPlace.class);
 		registerCommand(CommandStepWalk.class);

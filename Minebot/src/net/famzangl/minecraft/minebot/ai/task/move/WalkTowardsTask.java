@@ -49,10 +49,13 @@ public class WalkTowardsTask extends AITask {
 	@Override
 	public void runTick(AIHelper h, TaskOperations o) {
 		if (ensureOnPos != null) {
-			if (!h.isStandingOn(ensureOnPos.getX(), ensureOnPos.getY(), ensureOnPos.getZ())) {
-				o.desync(new PositionTaskError(ensureOnPos.getX(), ensureOnPos.getY(), ensureOnPos.getZ()));
+			if (!h.isStandingOn(ensureOnPos)) {
+				o.desync(new PositionTaskError(ensureOnPos));
 			}
 			ensureOnPos = null;
+		}
+		if (startPosition == null) {
+			startPosition = h.getPlayerPosition();
 		}
 		final boolean nextIsFacing = o.faceAndDestroyForNextTask();
 		h.walkTowards(x + 0.5, z + 0.5, false, !nextIsFacing);
@@ -61,9 +64,10 @@ public class WalkTowardsTask extends AITask {
 	@Override
 	public int getGameTickTimeout(AIHelper helper) {
 		if (startPosition == null) {
-			startPosition = helper.getPlayerPosition();
+			return super.getGameTickTimeout(helper);
+		} else {
+			return RecordingWorld.timeToWalk(startPosition, new BlockPos(x, startPosition.getY(), z));
 		}
-		return RecordingWorld.timeToWalk(startPosition, new BlockPos(x, startPosition.getY(), z));
 	}
 
 	@Override
