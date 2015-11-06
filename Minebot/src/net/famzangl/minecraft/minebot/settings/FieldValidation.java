@@ -1,6 +1,7 @@
 package net.famzangl.minecraft.minebot.settings;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -127,6 +128,11 @@ public class FieldValidation {
 	}
 
 	private static void addValidators(Field f, ArrayList<FieldValidator> list) {
+		if (Modifier.isStatic(f.getModifiers()) || Modifier.isFinal(f.getModifiers())) {
+			// cannot set static/final fields.
+			return;
+		}
+		
 		if (!f.getType().isPrimitive()) {
 			list.add(new NotNullValidator(f));
 			list.add(new RecourseValidator(f));
