@@ -24,6 +24,7 @@ import java.io.PrintWriter;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 import java.util.Properties;
 
@@ -55,18 +56,21 @@ public class MinebotSettings {
 	private MinebotSettingsRoot settings;
 	private ArrayList<String> keys;
 
+	private long settingsLastModified = 0;
+
 	private static Object mutex = new Object();
 
 	private MinebotSettings() {
 	}
 
 	private synchronized MinebotSettingsRoot createSettings() {
-		if (settings == null) {
-			// FIXME: Reload if file changed.
-			File settingsFile = getSettingsFile();
+		File settingsFile = getSettingsFile();
+		if (settings == null || changedSinceLastLoad(settingsFile)) {
+			settings = null;
 			try {
+				settingsLastModified = settingsFile.lastModified();
 				System.out.println("Loading " + settingsFile.getAbsolutePath()
-						+ " ...");
+						+ " ... (date: " + new Date(settingsLastModified) + ")");
 				Gson gson = getGson();
 				settings = gson.fromJson(new FileReader(settingsFile),
 						MinebotSettingsRoot.class);
@@ -77,11 +81,16 @@ public class MinebotSettings {
 				System.err.println("Error in settings file:" + e.getMessage());
 			}
 			if (settings == null) {
+				System.err.println("Fall back to default settings.");
 				settings = defaultSettings;
 			}
 		}
 
 		return settings;
+	}
+
+	private boolean changedSinceLastLoad(File settingsFile) {
+		return settingsFile.lastModified() > settingsLastModified;
 	}
 
 	private void doWriteSettings() {
@@ -111,7 +120,7 @@ public class MinebotSettings {
 	private void validateAfterLoad(MinebotSettingsRoot loaded) {
 		FieldValidation.validateAfterLoad(loaded, new MinebotSettingsRoot());
 	}
-	
+
 	public static MinebotSettingsRoot getSettings() {
 		return getInstance().createSettings();
 	}
