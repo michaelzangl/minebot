@@ -60,5 +60,10 @@ public class ColorNameBuilder extends ParameterBuilder {
 	public Object getParameter(AIHelper helper, String[] arguments) {
 		return ColoredBlockItemFilter.colorFromString(arguments[0]);
 	}
+	
+	@Override
+	protected Class<?> getRequiredParameterClass() {
+		return EnumDyeColor.class;
+	}
 
 }
