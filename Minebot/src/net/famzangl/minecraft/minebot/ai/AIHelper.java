@@ -26,8 +26,10 @@ import net.famzangl.minecraft.minebot.ai.net.NetworkHelper;
 import net.famzangl.minecraft.minebot.ai.path.world.WorldData;
 import net.famzangl.minecraft.minebot.ai.strategy.AIStrategy;
 import net.famzangl.minecraft.minebot.ai.task.BlockSide;
+import net.famzangl.minecraft.minebot.ai.tools.ToolRater;
 import net.famzangl.minecraft.minebot.build.BuildManager;
 import net.famzangl.minecraft.minebot.map.MapReader;
+import net.famzangl.minecraft.minebot.settings.MinebotSettings;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockFence;
 import net.minecraft.block.BlockFenceGate;
@@ -497,22 +499,38 @@ public abstract class AIHelper {
 	/**
 	 * Selects a good tool for mining the given Block.
 	 * 
-	 * @param x
-	 * @param y
-	 * @param z
+	 * @param pos
 	 */
 	public void selectToolFor(final BlockPos pos) {
-		selectCurrentItem(new ItemFilter() {
-			@Override
-			public boolean matches(ItemStack itemStack) {
-				return itemStack != null
-						&& itemStack.getItem() != null
-						&& itemStack.getItem().getStrVsBlock(itemStack,
-								getBlock(pos)) > 1;
-			}
-		});
+		ToolRater toolRater = new ToolRater();
+		toolRater.addRater(ToolRater.getToolMatchesRater());
+		selectToolFor(pos, toolRater);
 	}
 
+	/**
+	 * Selects a good tool for mining the given Block.
+	 * 
+	 * @param pos
+	 * @param ToolRater the tool rater that rates the tool.
+	 */
+	public float selectToolFor(final BlockPos pos, ToolRater rater) {
+		int bestRatingSlot = mc.thePlayer.inventory.currentItem;
+		if (bestRatingSlot < 0 || bestRatingSlot >= 9) {
+			bestRatingSlot = 0;
+		}
+		int block = getWorld().getBlockIdWithMeta(pos);
+		float bestRating = rater.rateTool(mc.thePlayer.inventory.getStackInSlot(bestRatingSlot), block);
+		for (int i = 0; i < 9; ++i) {
+			float rating = rater.rateTool(mc.thePlayer.inventory.getStackInSlot(i), block);
+			if (rating > bestRating) {
+				bestRating = rating;
+				bestRatingSlot = i;
+			}
+		}
+
+		mc.thePlayer.inventory.currentItem = bestRatingSlot;
+		return bestRating;
+	}
 	/**
 	 * Faces a block and destroys it if possible.
 	 * 
@@ -524,7 +542,8 @@ public abstract class AIHelper {
 		}
 
 		if (isFacingBlock(pos)) {
-			selectToolFor(pos);
+			ToolRater settings = MinebotSettings.getSettings().getToolRater();
+			selectToolFor(pos, settings);
 			overrideAttack();
 		}
 	}

@@ -35,9 +35,11 @@ import com.google.gson.JsonSyntaxException;
 
 import net.famzangl.minecraft.minebot.ai.path.world.BlockFloatMap;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSet;
+import net.famzangl.minecraft.minebot.ai.tools.ToolRater;
 import net.famzangl.minecraft.minebot.settings.FieldValidation.FieldValidator;
 import net.famzangl.minecraft.minebot.settings.serialize.BlockFloatAdapter;
 import net.famzangl.minecraft.minebot.settings.serialize.BlockSetAdapter;
+import net.famzangl.minecraft.minebot.settings.serialize.ToolRaterAdapter;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 
@@ -76,7 +78,7 @@ public class MinebotSettings {
 						MinebotSettingsRoot.class);
 				validateAfterLoad(settings);
 			} catch (final IOException e) {
-				System.err.println("Could not read settings file.");
+				System.err.println("Could not read settings file: " + e.getMessage());
 			} catch (final JsonParseException e) {
 				System.err.println("Error in settings file:" + e.getMessage());
 			}
@@ -109,11 +111,12 @@ public class MinebotSettings {
 		}
 	}
 
-	private Gson getGson() {
+	public static Gson getGson() {
 		GsonBuilder gson = new GsonBuilder();
 		gson.setPrettyPrinting();
 		gson.registerTypeAdapter(BlockSet.class, new BlockSetAdapter());
 		gson.registerTypeAdapter(BlockFloatMap.class, new BlockFloatAdapter());
+		gson.registerTypeAdapter(ToolRater.class, new ToolRaterAdapter());
 		return gson.create();
 	}
 

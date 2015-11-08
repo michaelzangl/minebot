@@ -1,0 +1,31 @@
+{
+  "takes_damage": { "defaultValue" : 0.99 },
+  "matches": {
+    "defaultValue" : 2,
+    "values": { 
+      "minecraft:leaves" : .99,
+      "minecraft:leaves2" : .99
+    }
+  },
+  "is_enchanted": { "defaultValue" : 0.9 },
+  "depleted&is_enchanted": { "defaultValue" : 0.1 },
+  "matches&fortune": {
+    "defaultValue" : 0.95,
+    "values": { 
+      "minecraft:emerald_ore" : 2,
+      "minecraft:diamond_ore" : 2,
+      "minecraft:quartz_ore" : 2,
+      "minecraft:coal_ore" : 1.5,
+      "minecraft:redstone_ore" : 1.5
+    }
+  },
+  "unbreaking&matches": {
+    "defaultValue": 1.01
+  },
+  "silk_touch": {
+    "defaultValue" : 1.0,
+    "values": { 
+      "minecraft:dirt" : [1, 1, 1.5, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+    }
+  }
+}

@@ -64,4 +64,11 @@ public class BlockFloatMap {
 	public float getDefaultValue() {
 		return defaultValue;
 	}
+
+	@Override
+	public String toString() {
+		return "BlockFloatMap [floats=..., defaultValue=" + defaultValue + "]";
+	}
+	
+	
 }

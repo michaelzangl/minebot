@@ -26,24 +26,27 @@ public class BlockFloatAdapter implements JsonSerializer<BlockFloatMap>,
 			JsonDeserializationContext context) throws JsonParseException {
 		try {
 			BlockFloatMap map = new BlockFloatMap();
-			JsonObject values = json.getAsJsonObject().get("values")
-					.getAsJsonObject();
-			for (Entry<String, JsonElement> e : values.entrySet()) {
-				int blockId;
-				if (e.getKey().matches("\\d+")) {
-					blockId = Integer.parseInt(e.getKey());
-				} else {
-					blockId = Block.getIdFromBlock(Block.getBlockFromName(e
-							.getKey()));
-				}
-				if (e.getValue().isJsonArray()) {
-					for (int i = 0; i < 16; i++) {
-						JsonElement value = e.getValue().getAsJsonArray()
-								.get(i);
-						map.set(blockId * 16 + i, value.getAsFloat());
+			JsonElement valuesElement = json.getAsJsonObject().get("values");
+			if (valuesElement != null) {
+				JsonObject values = valuesElement
+						.getAsJsonObject();
+				for (Entry<String, JsonElement> e : values.entrySet()) {
+					int blockId;
+					if (e.getKey().matches("\\d+")) {
+						blockId = Integer.parseInt(e.getKey());
+					} else {
+						blockId = Block.getIdFromBlock(Block.getBlockFromName(e
+								.getKey()));
 					}
-				} else {
-					map.setBlock(blockId, e.getValue().getAsFloat());
+					if (e.getValue().isJsonArray()) {
+						for (int i = 0; i < 16; i++) {
+							JsonElement value = e.getValue().getAsJsonArray()
+									.get(i);
+							map.set(blockId * 16 + i, value.getAsFloat());
+						}
+					} else {
+						map.setBlock(blockId, e.getValue().getAsFloat());
+					}
 				}
 			}
 
@@ -51,7 +54,7 @@ public class BlockFloatAdapter implements JsonSerializer<BlockFloatMap>,
 					.getAsFloat());
 			return map;
 		} catch (Throwable t) {
-			return null;
+			throw new JsonParseException("Error while parsing float map: " + t, t);
 		}
 	}
 
@@ -63,7 +66,7 @@ public class BlockFloatAdapter implements JsonSerializer<BlockFloatMap>,
 		if (Float.isNaN(defaultValue)) {
 			defaultValue = 0;
 		}
-		res.addProperty("default", defaultValue);
+		res.addProperty("defaultValue", defaultValue);
 		JsonObject valueMap = new JsonObject();
 
 		for (int blockId = 0; blockId < BlockSet.MAX_BLOCKIDS; blockId++) {
