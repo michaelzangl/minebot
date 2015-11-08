@@ -129,7 +129,7 @@ public class BlockSets {
 			Blocks.waterlily, Blocks.brewing_stand, Blocks.vine, Blocks.chest,
 			Blocks.tripwire, Blocks.tripwire_hook,
 			Blocks.wooden_pressure_plate, Blocks.stone_pressure_plate,
-			Blocks.wooden_button, Blocks.stone_button).unionWith(FENCE)
+			Blocks.wooden_button, Blocks.stone_button, Blocks.monster_egg).unionWith(FENCE)
 			.unionWith(FENCE_GATE);
 
 	/**
