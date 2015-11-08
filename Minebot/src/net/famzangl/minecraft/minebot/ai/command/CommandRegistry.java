@@ -26,6 +26,12 @@ import java.util.Hashtable;
 import java.util.LinkedHashSet;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.Marker;
+import org.apache.logging.log4j.MarkerManager;
+
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.net.MinebotNetHandler;
 import net.famzangl.minecraft.minebot.ai.strategy.AIStrategy;
@@ -46,17 +52,22 @@ import net.minecraft.util.BlockPos;
 
 public class CommandRegistry {
 
+	private static final Marker MARKER_REGISTER = MarkerManager.getMarker("register");
+	private static final Marker MARKER_TAB_COMPLETE = MarkerManager.getMarker("tab_complete");
+	private static final Marker MARKER_EVALUATE = MarkerManager.getMarker("evaluate");
+	private static final Logger LOGGER = LogManager.getLogger(CommandRegistry.class);
+	
 	private final Hashtable<String, List<CommandDefinition>> commandTable = new Hashtable<String, List<CommandDefinition>>();
 	private IAIControllable controlled;
 
 	public void register(Class<?> commandClass) {
+		LOGGER.info(MARKER_REGISTER, "Registering: " + commandClass.getCanonicalName());
 		checkCommandClass(commandClass);
 		final String name = commandClass.getAnnotation(AICommand.class).name();
 		List<CommandDefinition> list = commandTable.get(name);
 		if (list == null) {
 			list = new ArrayList<CommandDefinition>();
 			commandTable.put(name, list);
-			addCommandHandler(name);
 		}
 		getCommandsForClass(commandClass, list);
 	}
@@ -64,7 +75,10 @@ public class CommandRegistry {
 	public void execute(String name, String[] args) {
 		if (controlled == null) {
 			AIChatController.addChatLine("ERROR: No controller started.");
+			LOGGER.error(MARKER_EVALUATE, "controlled has not been set.");
+			return;
 		}
+		LOGGER.info(MARKER_EVALUATE, "Evaluating: " + combine(args));
 		try {
 			final AIStrategy strategy = evaluateCommandWithSaferule(
 					controlled.getAiHelper(), name, args);
@@ -75,44 +89,39 @@ public class CommandRegistry {
 			if (e.getEvaluateable().size() > 0) {
 				AIChatController
 						.addChatLine("ERROR: More than 1 command matches your command line.");
+				LOGGER.error(MARKER_EVALUATE, "Multiple commands matched: " + StringUtils.join(e.getEvaluateable(), ","), e);
 			} else {
 				AIChatController.addChatLine("ERROR: No command:"
 						+ combine(args) + ".");
+				LOGGER.error(MARKER_EVALUATE, "No command found for: " + args, e);
 			}
 		} catch (final CommandEvaluationException e) {
 			AIChatController.addChatLine("ERROR while evaluating: "
 					+ e.getMessage());
+			LOGGER.error(MARKER_EVALUATE, "Command evaluation failed.", e);
+			
 		} catch (final Throwable e) {
 			e.printStackTrace();
 			AIChatController
 					.addChatLine("ERROR: Could not evaluate. Please report.");
+			LOGGER.error(MARKER_EVALUATE, "Command evaluation failed because of unknown error.", e);
 		}
 	}
 
 	private String combine(String[] args) {
-		final StringBuilder b = new StringBuilder();
-		for (final String a : args) {
-			b.append(" ");
-			b.append(a);
-		}
-		return b.toString();
+		return StringUtils.join(args, " ");
 	}
 
 	public List<String> addTabCompletionOptions(String name, String[] args,
 			BlockPos pos) {
-		// FIXME
+		LOGGER.info(MARKER_TAB_COMPLETE, "Requested tab complete options: " +name + " " + combine(args));
 		if (controlled == null) {
+			LOGGER.error(MARKER_TAB_COMPLETE, "Evaluating: " + combine(args));
 			return Collections.emptyList();
 		}
-		return tabCompletion(controlled.getAiHelper(), name, args);
-	}
-
-	private void addCommandHandler(String name) {
-		ServerCommandManager cm = ((ServerCommandManager) (MinecraftServer
-				.getServer().getCommandManager()));
-		// FIXME!
-		// cm.registerCommand(new CommandHandler(name));
-		System.out.println("Command " + name + " registered.");
+		List<String> completion = tabCompletion(controlled.getAiHelper(), name, args);
+		LOGGER.debug(MARKER_TAB_COMPLETE, "Resulting options: " + completion);
+		return completion;
 	}
 
 	private void checkCommandClass(Class<?> commandClass) {
@@ -223,7 +232,7 @@ public class CommandRegistry {
 		}
 		String commandId = getCommandId(m);
 		if (commandTable.containsKey(commandId)) {
-			System.out.println("Minebot handling command: " + m);
+			LOGGER.debug(MARKER_EVALUATE, "Minebot handling command: %s", m);
 			String[] args = getCommandArgs(m);
 			execute(commandId, args);
 			return true;
@@ -254,7 +263,8 @@ public class CommandRegistry {
 		String commandId = getCommandId(m);
 		if (commandTable.containsKey(commandId)) {
 			String[] args = getCommandArgs(m);
-			System.out.println("Minebot handling tab: " + commandId + ", "
+
+			LOGGER.debug(MARKER_TAB_COMPLETE, "Minebot handling tab: " + commandId + ", "
 					+ combine(args));
 			List<String> options = addTabCompletionOptions(commandId, args,
 					null);
@@ -287,6 +297,7 @@ public class CommandRegistry {
 		for (final Method m : commandClass.getMethods()) {
 			if (Modifier.isStatic(m.getModifiers())
 					&& m.isAnnotationPresent(AICommandInvocation.class)) {
+				LOGGER.debug(MARKER_REGISTER, "Registering method: %s#%s()",  commandClass.getCanonicalName(), m.getName());
 				commands.addAll(getCommandsForMethod(m));
 			}
 		}

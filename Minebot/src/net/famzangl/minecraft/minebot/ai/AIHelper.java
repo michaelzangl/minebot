@@ -20,6 +20,11 @@ import java.io.File;
 import java.util.List;
 import java.util.Random;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.Marker;
+import org.apache.logging.log4j.MarkerManager;
+
 import net.famzangl.minecraft.minebot.Pos;
 import net.famzangl.minecraft.minebot.ai.command.AIChatController;
 import net.famzangl.minecraft.minebot.ai.net.NetworkHelper;
@@ -68,6 +73,9 @@ import com.google.common.base.Predicate;
  * 
  */
 public abstract class AIHelper {
+	private static final Marker MARKER_FACING = MarkerManager
+			.getMarker("facing");
+	private static final Logger LOGGER = LogManager.getLogger(AIHelper.class);
 	private static final double SNEAK_OFFSET = .2;
 	private static final double WALK_PER_STEP = 4.3 / 20;
 	private static final double MIN_DISTANCE_ERROR = 0.05;
@@ -116,8 +124,10 @@ public abstract class AIHelper {
 	}
 
 	protected void invalidateChunkCache() {
-		if (minecraftWorld == null || mc.theWorld != minecraftWorld.getBackingWorld()) {
-			minecraftWorld = mc.theWorld == null ? null : new WorldData(mc.theWorld, mc.thePlayer); 
+		if (minecraftWorld == null
+				|| mc.theWorld != minecraftWorld.getBackingWorld()) {
+			minecraftWorld = mc.theWorld == null ? null : new WorldData(
+					mc.theWorld, mc.thePlayer);
 		}
 		if (minecraftWorld != null) {
 			minecraftWorld.invalidateChunkCache();
@@ -203,7 +213,7 @@ public abstract class AIHelper {
 	 * @return
 	 */
 	public Block getBlock(BlockPos pos) {
-		//TODO: Warn that no delta is used.
+		// TODO: Warn that no delta is used.
 		return getBlock(pos.getX(), pos.getY(), pos.getZ());
 	}
 
@@ -216,14 +226,14 @@ public abstract class AIHelper {
 	 * @return The block.
 	 */
 	public Block getBlock(int x, int y, int z) {
-		//TODO: Warn that no delta is used.
+		// TODO: Warn that no delta is used.
 		return mc.theWorld.getBlockState(new BlockPos(x, y, z)).getBlock();
 	}
 
 	public WorldData getWorld() {
 		return minecraftWorld;
 	}
-	
+
 	/**
 	 * Check if this is basically a block that cannot harm us if it is next to
 	 * us.
@@ -242,9 +252,9 @@ public abstract class AIHelper {
 	 * @param block
 	 * @return
 	 */
-//	public boolean canWalkThrough(Block block) {
-//		return HEAD_CAN_WALK_TRHOUGH.contains(block);
-//	}
+	// public boolean canWalkThrough(Block block) {
+	// return HEAD_CAN_WALK_TRHOUGH.contains(block);
+	// }
 
 	/**
 	 * Check if the block is a block that we could walk on as if it was air.
@@ -253,9 +263,9 @@ public abstract class AIHelper {
 	 * @param block
 	 * @return
 	 */
-//	public boolean canWalkOn(Block block) {
-//		return FEET_CAN_WALK_THROUGH.contains(block);
-//	}
+	// public boolean canWalkOn(Block block) {
+	// return FEET_CAN_WALK_THROUGH.contains(block);
+	// }
 
 	/**
 	 * Check if we can stand on the block.
@@ -263,10 +273,9 @@ public abstract class AIHelper {
 	 * @param block
 	 * @return
 	 */
-//	public boolean isSafeStandableBlock(Block block) {
-//		return SAFE_GROUND.contains(block);
-//	}
-
+	// public boolean isSafeStandableBlock(Block block) {
+	// return SAFE_GROUND.contains(block);
+	// }
 
 	private Block getBoundsBlock(BlockPos pos) {
 		Block block = getBlock(pos);
@@ -289,7 +298,8 @@ public abstract class AIHelper {
 		face(x, y, z, 1, 1);
 	}
 
-	private void face(double x, double y, double z, float yawInfluence, float pitchInfluence) {
+	private void face(double x, double y, double z, float yawInfluence,
+			float pitchInfluence) {
 		final double d0 = x - mc.thePlayer.posX;
 		final double d1 = z - mc.thePlayer.posZ;
 		final double d2 = y - mc.thePlayer.posY - mc.thePlayer.getEyeHeight();
@@ -305,18 +315,21 @@ public abstract class AIHelper {
 			float rotations = fullRotations(yaw - rotationYaw);
 			float yawChange = yaw - rotationYaw - rotations;
 			float pitchChange = pitch - rotationPitch;
-			yawInfluence = Math.min(yawInfluence, Math.min(Math.abs(MAX_YAW_CHANGE / yawChange), 1));
-			pitchInfluence = Math.min(pitchInfluence, Math.min(Math.abs(MAX_PITCH_CHANGE / pitchChange), 1));
-			System.out.println("Change: " + yawChange + "," + pitchChange +" => " + yawInfluence + "," + pitchInfluence );
+			yawInfluence = Math.min(yawInfluence,
+					Math.min(Math.abs(MAX_YAW_CHANGE / yawChange), 1));
+			pitchInfluence = Math.min(pitchInfluence,
+					Math.min(Math.abs(MAX_PITCH_CHANGE / pitchChange), 1));
+			LOGGER.trace(MARKER_FACING, "change %f, %f => %f, %f", yawChange,
+					pitchChange, yawInfluence, pitchInfluence);
 
-			mc.thePlayer.setAngles(rotations / .15f + yawChange / 0.15f * yawInfluence,
-					-pitchChange / 0.15f * pitchInfluence);
+			mc.thePlayer.setAngles(rotations / .15f + yawChange / 0.15f
+					* yawInfluence, -pitchChange / 0.15f * pitchInfluence);
 			invalidateObjectMouseOver();
 		}
 	}
-	
+
 	private float fullRotations(float yaw) {
-		return (float) (((int)(yaw / (Math.PI * 2) )) * Math.PI * 2);
+		return (float) (((int) (yaw / (Math.PI * 2))) * Math.PI * 2);
 	}
 
 	/*
@@ -511,7 +524,8 @@ public abstract class AIHelper {
 	 * Selects a good tool for mining the given Block.
 	 * 
 	 * @param pos
-	 * @param ToolRater the tool rater that rates the tool.
+	 * @param ToolRater
+	 *            the tool rater that rates the tool.
 	 */
 	public float selectToolFor(final BlockPos pos, ToolRater rater) {
 		int bestRatingSlot = mc.thePlayer.inventory.currentItem;
@@ -519,9 +533,11 @@ public abstract class AIHelper {
 			bestRatingSlot = 0;
 		}
 		int block = getWorld().getBlockIdWithMeta(pos);
-		float bestRating = rater.rateTool(mc.thePlayer.inventory.getStackInSlot(bestRatingSlot), block);
+		float bestRating = rater.rateTool(
+				mc.thePlayer.inventory.getStackInSlot(bestRatingSlot), block);
 		for (int i = 0; i < 9; ++i) {
-			float rating = rater.rateTool(mc.thePlayer.inventory.getStackInSlot(i), block);
+			float rating = rater.rateTool(
+					mc.thePlayer.inventory.getStackInSlot(i), block);
 			if (rating > bestRating) {
 				bestRating = rating;
 				bestRatingSlot = i;
@@ -531,10 +547,12 @@ public abstract class AIHelper {
 		mc.thePlayer.inventory.currentItem = bestRatingSlot;
 		return bestRating;
 	}
+
 	/**
 	 * Faces a block and destroys it if possible.
 	 * 
-	 * @param pos the Position of that block.
+	 * @param pos
+	 *            the Position of that block.
 	 */
 	public void faceAndDestroy(final BlockPos pos) {
 		if (!isFacingBlock(pos)) {
@@ -881,19 +899,25 @@ public abstract class AIHelper {
 	/**
 	 * Sneak while standing on that block facing that direction.
 	 * 
-	 * @param pos The position of which we should sneak to the side.
-	 * @param inDirection The side to sneak at.
+	 * @param pos
+	 *            The position of which we should sneak to the side.
+	 * @param inDirection
+	 *            The side to sneak at.
 	 * @return <code>true</code> on arrival.
 	 */
 	public boolean sneakFrom(BlockPos pos, EnumFacing inDirection) {
 		return sneakFrom(pos, inDirection, true);
 	}
+
 	/**
 	 * Sneak while standing on that block.
 	 * 
-	 * @param pos The position of which we should sneak to the side.
-	 * @param inDirection The side to sneak at.
-	 * @param face Should we face that position?
+	 * @param pos
+	 *            The position of which we should sneak to the side.
+	 * @param inDirection
+	 *            The side to sneak at.
+	 * @param face
+	 *            Should we face that position?
 	 * @return <code>true</code> on arrival.
 	 */
 	public boolean sneakFrom(BlockPos pos, EnumFacing inDirection, boolean face) {
@@ -939,7 +963,8 @@ public abstract class AIHelper {
 		boolean arrived = distTo > MIN_DISTANCE_ERROR;
 		if (arrived) {
 			if (face) {
-				face(x, mc.thePlayer.getEyeHeight() + mc.thePlayer.posY, z, 1, .1f);
+				face(x, mc.thePlayer.getEyeHeight() + mc.thePlayer.posY, z, 1,
+						.1f);
 			}
 			double speed = 1;
 			if (distTo < 4 * WALK_PER_STEP) {
@@ -951,8 +976,9 @@ public abstract class AIHelper {
 			final double dlength = Math.sqrt(dx * dx + dz * dz);
 			final double same = (lookX * dx + lookZ * dz) / dlength;
 			final double strafe = (lookZ * dx - lookX * dz) / dlength;
-			// System.out.println("look: " + lookX + "," + lookZ + "; d = " + dx
-			// + "," + dz + "; walk: " + same + "," + strafe);
+			LOGGER.trace(MARKER_FACING, "look: " + lookX + "," + lookZ
+					+ "; d = " + dx + "," + dz + "; walk: " + same + ","
+					+ strafe);
 			final MovementInput movement = new MovementInput();
 			movement.moveForward = (float) (speed * same);
 			movement.moveStrafe = (float) (speed * strafe);
@@ -1045,7 +1071,7 @@ public abstract class AIHelper {
 				+ delta);
 	}
 
-	//TODO: Move this to WorldData
+	// TODO: Move this to WorldData
 	public int getLightAt(BlockPos pos) {
 		final Chunk chunk = mc.theWorld.getChunkFromChunkCoords(
 				pos.getX() >> 4, pos.getZ() >> 4);
@@ -1067,7 +1093,7 @@ public abstract class AIHelper {
 		String blockName = domain + name.getResourcePath();
 		return blockName;
 	}
-	
+
 	public void setActiveMapReader(MapReader activeMapReader) {
 		if (this.activeMapReader != null) {
 			this.activeMapReader.onStop();

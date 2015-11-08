@@ -16,6 +16,16 @@
  *******************************************************************************/
 package net.famzangl.minecraft.minebot;
 
+import java.net.URISyntaxException;
+
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.core.Filter;
+import org.apache.logging.log4j.core.LoggerContext;
+import org.apache.logging.log4j.core.config.Configuration;
+import org.apache.logging.log4j.core.config.LoggerConfig;
+
 import net.famzangl.minecraft.minebot.ai.AIController;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.Mod;
@@ -27,6 +37,19 @@ import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 public class MinebotMod {
 	@Instance(value = "minebot-mod")
 	public static MinebotMod instance;
+	
+	static {
+		// logging
+		if (System.getProperty("MINEBOT_LOG", "0").equals("1")) {
+			LoggerContext context = (LoggerContext) LogManager.getContext(false);
+			Configuration config = context.getConfiguration();
+			try {
+				context.setConfigLocation(MinebotMod.class.getResource("log4j.xml").toURI());
+			} catch (URISyntaxException e) {
+				e.printStackTrace();
+			}
+		}
+	}
 	
 	// Note: 6364136223846793005L * 0xc097ef87329e28a5l = 1
 	

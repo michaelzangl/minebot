@@ -21,6 +21,11 @@ import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.PriorityQueue;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.Marker;
+import org.apache.logging.log4j.MarkerManager;
+
 import net.minecraft.util.BlockPos;
 
 /**
@@ -30,6 +35,9 @@ import net.minecraft.util.BlockPos;
  * 
  */
 public class PathFinderField implements Comparator<Integer> {
+	private static final Marker MARKER_PATH = MarkerManager.getMarker("path");
+	private static final Logger LOGGER = LogManager.getLogger(AIHelper.class);
+
 	private static final long MAX_RUN_TIME = 200;
 	// Power of 2!
 	private static final int Y_LEVEL = 32;
@@ -193,10 +201,12 @@ public class PathFinderField implements Comparator<Integer> {
 		if (data.offsetX != cx - SIZE_X_Z / 2
 				|| data.offsetY != cy - Y_LEVEL / 2
 				|| data.offsetZ != cz - SIZE_X_Z / 2) {
+			LOGGER.debug(MARKER_PATH,
+					"Path finding center changed. Marking for restart.");
 			isRunning = false;
 		}
 		if (!isRunning) {
-			System.out.println("Restart");
+			LOGGER.debug(MARKER_PATH, "Restart path finder.");
 			field = new int[FIELD_SIZE];
 			data.offsetX = cx - SIZE_X_Z / 2;
 			data.offsetY = cy - Y_LEVEL / 2;
@@ -214,6 +224,7 @@ public class PathFinderField implements Comparator<Integer> {
 			}
 			isRunning = true;
 		}
+		LOGGER.trace(MARKER_PATH, "Start path finding.");
 		startTime = System.currentTimeMillis();
 		long iteration = 0;
 		while (!pqEmpty()
@@ -242,8 +253,10 @@ public class PathFinderField implements Comparator<Integer> {
 						+ currentDistance;
 				if (isVisited(n)) {
 					if (distance < getDistance(n)) {
-						System.out.println("Warning: Found shorter path to: "
-								+ n);
+						LOGGER.error(
+								MARKER_PATH,
+								"A shorter path was found. THis should not happen. Node: %d.",
+								n);
 					}
 					continue;
 				}
@@ -264,6 +277,7 @@ public class PathFinderField implements Comparator<Integer> {
 			setVisited(currentNode);
 		}
 		if (pqEmpty()) {
+			LOGGER.debug(MARKER_PATH, "Path found to %s", currentDest + "");
 			if (currentDest != null) {
 				planPathTo(currentDest.destNode, cx, cy, cz);
 				terminated();
@@ -273,9 +287,10 @@ public class PathFinderField implements Comparator<Integer> {
 			}
 			return true;
 		} else {
-			System.out
-					.println("Warning: Path finding needs more time. Just got "
-							+ iteration + " iterations.");
+			LOGGER.debug(
+					MARKER_PATH,
+					"Warning: Path finding needs more time. Just got %d iterations.",
+					iteration);
 			pqStats();
 
 			return false;
@@ -289,7 +304,8 @@ public class PathFinderField implements Comparator<Integer> {
 			min = Math.min(min, getDistance(i));
 			max = Math.max(max, getDistance(i));
 		}
-		System.out.println("Queue range: " + min + " to " + max);
+		LOGGER.debug(MARKER_PATH, "Current priority queue range: %d to %d",
+				min, max);
 	}
 
 	private boolean hasTimeLeft(long startTime) {
@@ -302,7 +318,7 @@ public class PathFinderField implements Comparator<Integer> {
 		pqClear();
 		currentDest = null;
 	}
-	
+
 	public void abort() {
 		terminated();
 	}
@@ -312,14 +328,14 @@ public class PathFinderField implements Comparator<Integer> {
 	}
 
 	protected void noPathFound() {
-		System.out.println("Could not find a path.");
+		LOGGER.info(MARKER_PATH, "Path finder did not find a path.");
 	}
 
 	private void planPathTo(int currentNode, int origX, int origY, int origZ) {
+		LOGGER.debug(MARKER_PATH, "Reconstructing path.");
 		int cx = getX(currentNode);
 		int cy = getY(currentNode);
 		int cz = getZ(currentNode);
-		System.out.println("Reconstruct.");
 		final LinkedList<BlockPos> path = new LinkedList<BlockPos>();
 		while (cx != origX || cy != origY || cz != origZ) {
 			path.addFirst(new BlockPos(cx, cy, cz));
@@ -334,9 +350,9 @@ public class PathFinderField implements Comparator<Integer> {
 	}
 
 	protected void foundPath(LinkedList<BlockPos> path) {
-		System.out.println("Found a path!");
+		LOGGER.debug(MARKER_PATH, "Path was found.");
 		for (final BlockPos p : path) {
-			System.out.println("Path part: " + p);
+			LOGGER.trace(MARKER_PATH, "Path part: " + p);
 		}
 	}
 
@@ -390,14 +406,16 @@ public class PathFinderField implements Comparator<Integer> {
 	}
 
 	private void debug(int nodeId) {
-		System.out.println("pos="
-				+ new BlockPos(getX(nodeId), getY(nodeId), getZ(nodeId))
-				+ ", inQueue=" + isInQueue(nodeId) + ", visited="
-				+ isVisited(nodeId) + ", distance=" + getDistance(nodeId)
-				+ ", fromX=" + getFromDirectionX(nodeId) + ", fromY="
-				+ getFromDirectionY(nodeId) + ", fromZ="
-				+ getFromDirectionZ(nodeId) + ", data="
-				+ Integer.toHexString(field[nodeId]));
+		LOGGER.trace(
+				MARKER_PATH,
+				"pos=" + new BlockPos(getX(nodeId), getY(nodeId), getZ(nodeId))
+						+ ", inQueue=" + isInQueue(nodeId) + ", visited="
+						+ isVisited(nodeId) + ", distance="
+						+ getDistance(nodeId) + ", fromX="
+						+ getFromDirectionX(nodeId) + ", fromY="
+						+ getFromDirectionY(nodeId) + ", fromZ="
+						+ getFromDirectionZ(nodeId) + ", data="
+						+ Integer.toHexString(field[nodeId]));
 	}
 
 	private void pqClear() {
@@ -433,14 +451,15 @@ public class PathFinderField implements Comparator<Integer> {
 				}
 			}
 			if (!found && slotArray[fill - 1] != n) {
-				System.out.println("Warning: Trying to remove " + n
+				LOGGER.error(MARKER_PATH, "Warning: Trying to remove " + n
 						+ " which is not in this list (d=" + oldDistance + ")");
 				// search it in other lists...
 				for (int list = 0; list < FAST_DISTANCE_ACCESS; list++) {
 					int distance = list + pqMinDistance;
 					for (int i = 0; i < pqByDistanceFill[pqSlotFor(distance)]; i++) {
 						if (pqByDistance[pqSlotFor(distance)][i] == n) {
-							System.out.println("    -> Found it for d=" + distance);
+							LOGGER.debug(MARKER_PATH, "    -> Found it for d="
+									+ distance);
 						}
 					}
 				}
@@ -518,12 +537,12 @@ public class PathFinderField implements Comparator<Integer> {
 		if (!pq.isEmpty()) {
 			max = Math.max(max, pq.poll());
 		}
-		for (int d = pqMinDistance; d < max ; d++) {
+		for (int d = pqMinDistance; d < max; d++) {
 			pqMinDistance = d;
 			while (!pq.isEmpty() && getDistance(pq.peek()) == d) {
 				pqAdd(pq.poll(), d);
 			}
-			
+
 			if (pqByDistanceFill[pqSlotFor(d)] > 0) {
 				nextMin = d;
 				break;

@@ -16,7 +16,6 @@ public class CommandResume {
 			AIHelper helper,
 			@AICommandParameter(type = ParameterType.FIXED, fixedName = "resume", description = "") String nameArg) {
 		AIStrategy toResume = helper.getResumeStrategy();
-		System.out.println("Resuming: " + toResume);
 		return toResume;
 	}
 }

@@ -245,11 +245,11 @@ public class CommandDefinition {
 	}
 
 	private void dumIAE(IllegalArgumentException e, Object[] params) {
-		System.err.println("There was an argument mismatch. This is what i attempted to use:");
+		System.err.println("There was an argument mismatch. This is what I attempted to use:");
 		for (Object p : params) {
-			System.out.println("   - " + p);
+			System.err.println("   - " + p);
 		}
-		System.err.println("This is the method i attempted to use: " + method.toGenericString());
+		System.err.println("This is the method I attempted to use: " + method.toGenericString());
 	}
 
 	private void doThrow(Throwable exception) {

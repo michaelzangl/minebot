@@ -30,6 +30,7 @@ import net.famzangl.minecraft.minebot.ai.render.BuildMarkerRenderer;
 import net.famzangl.minecraft.minebot.ai.render.PosMarkerRenderer;
 import net.famzangl.minecraft.minebot.ai.strategy.AIStrategy;
 import net.famzangl.minecraft.minebot.ai.strategy.AIStrategy.TickResult;
+import net.famzangl.minecraft.minebot.ai.strategy.RunOnceStrategy;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.gui.ScaledResolution;
@@ -47,6 +48,10 @@ import net.minecraftforge.fml.common.gameevent.TickEvent.Phase;
 import net.minecraftforge.fml.common.gameevent.TickEvent.RenderTickEvent;
 import net.minecraftforge.fml.common.network.FMLNetworkEvent.ClientConnectedToServerEvent;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.Marker;
+import org.apache.logging.log4j.MarkerManager;
 import org.lwjgl.input.Keyboard;
 
 /**
@@ -56,6 +61,27 @@ import org.lwjgl.input.Keyboard;
  * 
  */
 public class AIController extends AIHelper implements IAIControllable {
+	private final class UngrabMouseHelper extends MouseHelper {
+		@Override
+		public void mouseXYChange() {
+		}
+
+		@Override
+		public void grabMouseCursor() {
+		}
+
+		@Override
+		public void ungrabMouseCursor() {
+		}
+	}
+
+	private static final Marker MARKER_EVENT = MarkerManager.getMarker("event");
+	private static final Marker MARKER_STRATEGY = MarkerManager
+			.getMarker("strategy");
+	private static final Marker MARKER_MOUSE = MarkerManager.getMarker("mouse");
+	private static final Logger LOGGER = LogManager
+			.getLogger(AIController.class);
+
 	private final static Hashtable<KeyBinding, AIStrategyFactory> uses = new Hashtable<KeyBinding, AIStrategyFactory>();
 
 	protected static final KeyBinding stop = new KeyBinding("Stop",
@@ -117,7 +143,7 @@ public class AIController extends AIHelper implements IAIControllable {
 	public void connect(ClientConnectedToServerEvent e) {
 		networkHelper = MinebotNetHandler.inject(this, e.manager, e.handler);
 	}
-	
+
 	/**
 	 * Checks if the Bot is active and what it should do.
 	 * 
@@ -125,14 +151,21 @@ public class AIController extends AIHelper implements IAIControllable {
 	 */
 	@SubscribeEvent
 	public void onPlayerTick(ClientTickEvent evt) {
-		if (evt.phase != ClientTickEvent.Phase.START
-				|| getMinecraft().thePlayer == null) {
+		if (evt.phase != ClientTickEvent.Phase.START) {
+			return;
+		} else if (getMinecraft().thePlayer == null) {
+			LOGGER.debug(MARKER_STRATEGY,
+					"Player tick but player is not in world.");
 			return;
 		}
 		if (skipNextTick) {
 			skipNextTick = false;
+			LOGGER.debug(MARKER_STRATEGY,
+					"Tick skip was requested");
 			return;
 		}
+		LOGGER.debug(MARKER_STRATEGY,
+				"Strategy game tick");
 		testUngrabMode();
 		invalidateObjectMouseOver();
 		resetAllInputs();
@@ -144,7 +177,11 @@ public class AIController extends AIHelper implements IAIControllable {
 
 		AIStrategy newStrat;
 		if (dead || stop.isPressed() || stop.isKeyDown()) {
-			if (deactivatedStrategy == null) {
+			// FIXME: Better way to determine of this stategy can be resumed.
+			if (deactivatedStrategy == null
+					&& !(currentStrategy instanceof RunOnceStrategy)) {
+				LOGGER.trace(MARKER_STRATEGY,
+						"Store strategy to be resumed later: " + currentStrategy);
 				deactivatedStrategy = currentStrategy;
 			}
 			deactivateCurrentStrategy();
@@ -153,7 +190,8 @@ public class AIController extends AIHelper implements IAIControllable {
 			deactivateCurrentStrategy();
 			currentStrategy = newStrat;
 			deactivatedStrategy = null;
-			System.out.println("Using new root strategy: " + newStrat);
+			LOGGER.debug(MARKER_STRATEGY, "Using new root strategy: "
+					+ newStrat);
 			currentStrategy.setActive(true, this);
 		}
 
@@ -164,8 +202,10 @@ public class AIController extends AIHelper implements IAIControllable {
 				if (result != TickResult.TICK_AGAIN) {
 					break;
 				}
+				LOGGER.trace(MARKER_STRATEGY, "Strategy requests to tick again.");
 			}
 			if (result == TickResult.ABORT || result == TickResult.NO_MORE_WORK) {
+				LOGGER.debug(MARKER_STRATEGY, "Strategy is dead.");
 				dead = true;
 			}
 			synchronized (strategyDescrMutex) {
@@ -176,14 +216,19 @@ public class AIController extends AIHelper implements IAIControllable {
 				strategyDescr = "";
 			}
 		}
-		
+		LOGGER.debug(MARKER_STRATEGY,
+				"Strategy game tick done");
+
 		if (activeMapReader != null) {
 			activeMapReader.tick(this);
 		}
+
 	}
-	
+
 	private void deactivateCurrentStrategy() {
 		if (currentStrategy != null) {
+			LOGGER.trace(MARKER_STRATEGY,
+					"Deactivating strategy: " + currentStrategy);
 			currentStrategy.setActive(false, this);
 		}
 		currentStrategy = null;
@@ -195,7 +240,7 @@ public class AIController extends AIHelper implements IAIControllable {
 			return;
 		}
 		if (doUngrab) {
-			System.out.println("Un-grabbing mouse");
+			LOGGER.trace(MARKER_MOUSE, "Un-grabbing mouse");
 			// TODO: Reset this on grab
 			getMinecraft().gameSettings.pauseOnLostFocus = false;
 			// getMinecraft().mouseHelper.ungrabMouseCursor();
@@ -238,28 +283,20 @@ public class AIController extends AIHelper implements IAIControllable {
 	}
 
 	private synchronized void startUngrabMode() {
+		LOGGER.trace(MARKER_MOUSE, "Starting mouse ungrab");
 		getMinecraft().mouseHelper.ungrabMouseCursor();
 		getMinecraft().inGameHasFocus = true;
-		oldMouseHelper = getMinecraft().mouseHelper;
-		getMinecraft().mouseHelper = new MouseHelper() {
-			@Override
-			public void mouseXYChange() {
-			}
-
-			@Override
-			public void grabMouseCursor() {
-			}
-
-			@Override
-			public void ungrabMouseCursor() {
-			}
-		};
+		if (!(getMinecraft().mouseHelper instanceof UngrabMouseHelper)) {
+			LOGGER.trace(MARKER_MOUSE, "Storing old mouse helper.");
+			oldMouseHelper = getMinecraft().mouseHelper;
+		}
+		getMinecraft().mouseHelper = new UngrabMouseHelper();
 	}
 
 	private synchronized void testUngrabMode() {
 		if (oldMouseHelper != null) {
 			if (userTookOver()) {
-				System.out.println("Preparing to re-grab the mouse.");
+				LOGGER.debug(MARKER_MOUSE, "Preparing to re-grab the mouse.");
 				// Tell minecraft what really happened.
 				getMinecraft().mouseHelper = oldMouseHelper;
 				getMinecraft().inGameHasFocus = false;
@@ -271,7 +308,7 @@ public class AIController extends AIHelper implements IAIControllable {
 
 	@SubscribeEvent
 	public void resetOnGameEnd(PlayerChangedDimensionEvent unload) {
-		System.out.println("Unloading world.");
+		LOGGER.trace(MARKER_EVENT, "Unloading world.");
 		dead = true;
 		buildManager.reset();
 		setActiveMapReader(null);
@@ -281,7 +318,7 @@ public class AIController extends AIHelper implements IAIControllable {
 	public void resetOnGameEnd2(PlayerRespawnEvent unload) {
 		resetOnGameEnd(null);
 	}
-	
+
 	/**
 	 * Draws the position markers.
 	 * 
@@ -347,12 +384,12 @@ public class AIController extends AIHelper implements IAIControllable {
 
 	@Override
 	public void requestUseStrategy(AIStrategy strategy) {
-		System.out.println("Request to use " + strategy);
+		LOGGER.trace(MARKER_STRATEGY, "Request to use strategy " + strategy);
 		requestedStrategy = strategy;
 	}
 
-//	@SubscribeEvent
-//	@SideOnly(Side.CLIENT)
+	// @SubscribeEvent
+	// @SideOnly(Side.CLIENT)
 	// public void playerInteract(PlayerInteractEvent event) {
 	// final ItemStack stack = event.entityPlayer.inventory.getCurrentItem();
 	// if (stack != null && stack.getItem() == Items.wooden_axe) {
@@ -363,18 +400,18 @@ public class AIController extends AIHelper implements IAIControllable {
 	// }
 	// }
 	// }
-	
+
 	public void initialize() {
 		FMLCommonHandler.instance().bus().register(this);
 
 		// registerAxe();
 	}
-	
+
 	@Override
 	public AIStrategy getResumeStrategy() {
 		return deactivatedStrategy;
 	}
-	
+
 	@Override
 	public NetworkHelper getNetworkHelper() {
 		return networkHelper;
