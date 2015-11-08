@@ -51,7 +51,7 @@ public class UnstoreStrategy extends PathFinderStrategy {
 		public boolean couldUseOneOf(ChestData c) {
 			for (int i = 0; i < 36; i++) {
 				InventorySlot slot = wantedInventory.getSlot(i);
-				if (slot == null || noMoreWork[i]) {
+				if (slot.isEmpty() || noMoreWork[i]) {
 					continue;
 				}
 
@@ -67,7 +67,7 @@ public class UnstoreStrategy extends PathFinderStrategy {
 			ArrayList<AITask> tasks = new ArrayList<AITask>();
 			for (int inventorySlot = 0; inventorySlot < 36; inventorySlot++) {
 				InventorySlot slot = wantedInventory.getSlot(inventorySlot);
-				if (slot == null || !c.couldTakeItem(slot.getFakeMcStack())) {
+				if (slot.isEmpty() || !c.couldTakeItem(slot.getFakeMcStack())) {
 					continue;
 				}
 				if (mainInventory[inventorySlot] != null) {

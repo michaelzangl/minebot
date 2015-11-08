@@ -17,6 +17,7 @@
 package net.famzangl.minecraft.minebot.ai.strategy;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.item.Item;
@@ -43,6 +44,12 @@ public class InventoryDefinition {
 		public InventorySlot(int slotIndex, int amount, int itemId,
 				int damageValue) {
 			super();
+			if (itemId != 0 && Item.getItemById(itemId) == null) {
+				throw new IllegalArgumentException("Could not find item " + itemId);
+			}
+			if (amount <= 0 && itemId != 0) {
+				throw new IllegalArgumentException("Illegal item amount: " + amount);
+			}
 			this.slotIndex = slotIndex;
 			this.amount = amount;
 			this.itemId = itemId;
@@ -50,7 +57,14 @@ public class InventoryDefinition {
 		}
 
 		public ItemStack getFakeMcStack() {
-			ItemStack stack = new ItemStack(Item.getItemById(itemId));
+			if (itemId == 0) {
+				return null;
+			}
+			Item item = Item.getItemById(itemId);
+			if (item == null) {
+				throw new NullPointerException("Could not find item " + itemId);
+			}
+			ItemStack stack = new ItemStack(item);
 			stack.stackSize = this.amount;
 			if (stack.getHasSubtypes()) {
 				stack.setItemDamage(damageValue);
@@ -58,12 +72,16 @@ public class InventoryDefinition {
 			return stack;
 		}
 
+		public boolean isEmpty() {
+			return itemId == 0 || amount == 0;
+		}
+
 	}
 
 	public InventoryDefinition(InventoryPlayer player) {
 		for (int i = 0; i < 36; i++) {
 			ItemStack stack = player.mainInventory[i];
-			if (stack == null) {
+			if (stack == null || stack.getItem() == null) {
 				continue;
 			}
 
@@ -78,9 +96,7 @@ public class InventoryDefinition {
 		Gson gson = new Gson();
 		InventorySlot[] slots = gson
 				.fromJson(serialized, InventorySlot[].class);
-		for (InventorySlot s : slots) {
-			this.slots.add(s);
-		}
+		this.slots.addAll(Arrays.asList(slots));
 	}
 
 	public InventorySlot getSlot(int i) {
