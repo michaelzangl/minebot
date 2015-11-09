@@ -294,11 +294,11 @@ public abstract class AIHelper {
 	 * @param y
 	 * @param z
 	 */
-	public void face(double x, double y, double z) {
-		face(x, y, z, 1, 1);
+	public boolean face(double x, double y, double z) {
+		return face(x, y, z, 1, 1);
 	}
 
-	private void face(double x, double y, double z, float yawInfluence,
+	private boolean face(double x, double y, double z, float yawInfluence,
 			float pitchInfluence) {
 		final double d0 = x - mc.thePlayer.posX;
 		final double d1 = z - mc.thePlayer.posZ;
@@ -325,7 +325,14 @@ public abstract class AIHelper {
 			mc.thePlayer.setAngles(rotations / .15f + yawChange / 0.15f
 					* yawInfluence, -pitchChange / 0.15f * pitchInfluence);
 			invalidateObjectMouseOver();
+
+			final double e0 = x - mc.thePlayer.posX;
+			final double e1 = z - mc.thePlayer.posZ;
+			final double e2 = y - mc.thePlayer.posY - mc.thePlayer.getEyeHeight();
+			final double e3 = d0 * d0 + d2 * d2 + d1 * d1;
+			return d3 < 2.500000277905201E-7D;
 		}
+		return true;
 	}
 
 	private float fullRotations(float yaw) {
