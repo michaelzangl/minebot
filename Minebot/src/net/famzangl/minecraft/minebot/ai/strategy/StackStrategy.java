@@ -100,4 +100,9 @@ public class StackStrategy extends AIStrategy {
 			current.drawMarkers(event, helper);
 		}
 	}
+
+	@Override
+	public String toString() {
+		return "StackStrategy [stack=" + stack + ", aborted=" + aborted + "]";
+	}
 }
