@@ -21,6 +21,7 @@ import net.famzangl.minecraft.minebot.ai.path.world.BlockSet;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSets;
 import net.famzangl.minecraft.minebot.ai.path.world.WorldData;
 import net.famzangl.minecraft.minebot.ai.task.DestroyInRangeTask;
+import net.famzangl.minecraft.minebot.ai.task.DestroyLogInRange;
 import net.famzangl.minecraft.minebot.ai.task.RunOnceTask;
 import net.famzangl.minecraft.minebot.ai.task.TaskOperations;
 import net.famzangl.minecraft.minebot.ai.task.WaitTask;
@@ -70,6 +71,7 @@ public class TreePathFinder extends MovePathFinder {
 		 * TODO: Increase for {@link WoodType#SPRUCE}
 		 */
 		private static final int TREE_TOP_OFFSET = 2;
+		private static final int SINGLE_TREE_SIDE_MAX = 3;
 		private int minX;
 		private int minZ;
 
@@ -204,9 +206,12 @@ public class TreePathFinder extends MovePathFinder {
 			for (int y = lastPos.getY(); y >= minY; y--) {
 				BlockPos digTo = getPosition(y);
 				addTask(new HorizontalMoveTask(digTo));
-				// TODO: Destroy all logs above y.
-				addTask(new DestroyInRangeTask(new BlockPos(minX, y, minZ),
-						new BlockPos(minX + 1, y + 4, minZ + 1)));
+				// Destroy all logs above y.
+				addTask(new DestroyLogInRange(new BlockCuboid(
+						new BlockPos(minX - SINGLE_TREE_SIDE_MAX, y, minZ
+								- SINGLE_TREE_SIDE_MAX), new BlockPos(minX + 1
+								+ SINGLE_TREE_SIDE_MAX, y + 4, minZ + 1
+								+ SINGLE_TREE_SIDE_MAX))));
 			}
 
 			// plant saplings
@@ -353,8 +358,8 @@ public class TreePathFinder extends MovePathFinder {
 			}
 		}
 		if (max > 0) {
-			addTask(new DestroyInRangeTask(currentPos.add(0, 2, 0),
-					currentPos.add(0, max, 0)));
+			addTask(new DestroyInRangeTask(new BlockCuboid(currentPos.add(0, 2,
+					0), currentPos.add(0, max, 0))));
 		}
 
 		if (replant) {
