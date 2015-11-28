@@ -144,7 +144,7 @@ public class BlockSets {
 
 	public static final BlockSet SAFE_CEILING = STAIRS
 			.unionWith(FEET_CAN_WALK_THROUGH).unionWith(SIMPLE_CUBE)
-			.unionWith(AIR);
+			.unionWith(AIR).unionWith(new BlockSet(Blocks.vine));
 
 	/**
 	 * Blocks you need to destroy but that are then safe.
@@ -164,6 +164,27 @@ public class BlockSets {
 			Blocks.leaves2);
 	public static final BlockSet LOGS = new BlockSet(Blocks.log, Blocks.log2);
 
+	public static final BlockSet LOWER_SLABS;
+	static {
+		BlockSet lower = BlockSets.EMPTY;
+		for (int i = 0; i < 8; i++) {
+			lower = lower.unionWith(new BlockMetaSet(Blocks.stone_slab, i));
+			lower = lower.unionWith(new BlockMetaSet(Blocks.wooden_slab, i));
+		}
+		lower = lower.unionWith(new BlockMetaSet(Blocks.stone_slab2, 0));
+		LOWER_SLABS = lower;
+	}
+
+	public static final BlockSet UPPER_SLABS;
+	static {
+		BlockSet upper = BlockSets.EMPTY;
+		for (int i = 0; i < 8; i++) {
+			upper = upper.unionWith(new BlockMetaSet(Blocks.stone_slab, i + 8));
+			upper = upper.unionWith(new BlockMetaSet(Blocks.wooden_slab, i + 8));
+		}
+		upper = upper.unionWith(new BlockMetaSet(Blocks.stone_slab2, 8));
+		UPPER_SLABS = upper;
+	}
 
 	public static boolean safeSideAround(WorldData world, int x, int y, int z) {
 		return SAFE_SIDE.isAt(world, x + 1, y, z)

@@ -18,7 +18,7 @@ package net.famzangl.minecraft.minebot.ai.task.place;
 
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.ItemFilter;
-import net.famzangl.minecraft.minebot.ai.task.BlockSide;
+import net.famzangl.minecraft.minebot.ai.task.BlockHalf;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
 
@@ -27,7 +27,7 @@ public class JumpingPlaceBlockAtSideTask extends JumpingPlaceAtHalfTask {
 	private final int attempts = 0;
 
 	public JumpingPlaceBlockAtSideTask(BlockPos pos, ItemFilter filter,
-			EnumFacing lookingDirection, BlockSide side) {
+			EnumFacing lookingDirection, BlockHalf side) {
 		super(pos, filter, side);
 		this.lookingDirection = lookingDirection;
 	}
@@ -48,7 +48,7 @@ public class JumpingPlaceBlockAtSideTask extends JumpingPlaceAtHalfTask {
 
 	@Override
 	protected EnumFacing[] getBuildDirs() {
-		return side != BlockSide.UPPER_HALF ? new EnumFacing[] {
+		return side != BlockHalf.UPPER_HALF ? new EnumFacing[] {
 				EnumFacing.DOWN,
 				lookingDirection.rotateY(),
 				lookingDirection.rotateYCCW(),
@@ -67,7 +67,7 @@ public class JumpingPlaceBlockAtSideTask extends JumpingPlaceAtHalfTask {
 					|| isFacing(h,
 							lookingDirection.rotateYCCW())
 					|| isFacing(h, lookingDirection)
-					|| side != BlockSide.UPPER_HALF
+					|| side != BlockHalf.UPPER_HALF
 					&& isFacing(h,
 							EnumFacing.DOWN);
 		}

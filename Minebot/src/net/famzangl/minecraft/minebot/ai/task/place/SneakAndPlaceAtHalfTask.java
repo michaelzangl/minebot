@@ -20,24 +20,31 @@ import java.util.Arrays;
 
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.BlockItemFilter;
+import net.famzangl.minecraft.minebot.ai.path.world.BlockBounds;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSets;
-import net.famzangl.minecraft.minebot.ai.task.BlockSide;
+import net.famzangl.minecraft.minebot.ai.task.BlockHalf;
 import net.famzangl.minecraft.minebot.ai.task.TaskOperations;
 import net.famzangl.minecraft.minebot.ai.task.error.StringTaskError;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Vec3;
 
 public class SneakAndPlaceAtHalfTask extends SneakAndPlaceTask {
 
-	protected final BlockSide side;
+	protected final BlockHalf blockHalf;
 
 	protected EnumFacing lookingDirection = null;
 
-	protected final EnumFacing[] DIRS = new EnumFacing[] {
-			EnumFacing.EAST, EnumFacing.NORTH, EnumFacing.WEST,
-			EnumFacing.SOUTH };
+	protected final EnumFacing[] DIRS = new EnumFacing[] { EnumFacing.EAST,
+			EnumFacing.NORTH, EnumFacing.WEST, EnumFacing.SOUTH };
 
 	private int attempts;
+
+	private final BlockPos positionToPlace;
+
+	private Vec3 facePos;
+
+	private double faceCentered = .1;
 
 	protected EnumFacing[] getBuildDirs() {
 		return DIRS;
@@ -45,48 +52,96 @@ public class SneakAndPlaceAtHalfTask extends SneakAndPlaceTask {
 
 	/**
 	 * 
-	 * @param pos The position one over the block to place.
+	 * @param destinationStandPosition
+	 *            The position one over the block to place.
 	 * @param filter
-	 * @param relativeFrom
+	 *            The items to use.
+	 * @param startStandPosition
 	 * @param minBuildHeight
-	 * @param side
+	 * @param blockHalf
 	 */
-	public SneakAndPlaceAtHalfTask(BlockPos pos, BlockItemFilter filter,
-			BlockPos relativeFrom, double minBuildHeight, BlockSide side) {
-		super(pos, filter, relativeFrom, minBuildHeight);
-		this.side = side;
+	public SneakAndPlaceAtHalfTask(BlockPos destinationStandPosition,
+			BlockItemFilter filter, BlockPos startStandPosition,
+			double minBuildHeight, BlockHalf blockHalf) {
+		super(destinationStandPosition, filter, startStandPosition,
+				minBuildHeight);
+		this.blockHalf = blockHalf;
+		positionToPlace = destinationStandPosition.add(0, -1, 0);
+	}
+
+	public SneakAndPlaceAtHalfTask(BlockPos destinationStandPosition,
+			BlockItemFilter filter, BlockPos startStandPosition,
+			BlockPos positionToPlaceAt, double minBuildHeight,
+			BlockHalf blockHalf) {
+		super(destinationStandPosition, filter, startStandPosition,
+				minBuildHeight);
+		this.blockHalf = blockHalf;
+		this.positionToPlace = positionToPlaceAt;
 	}
 
 	@Override
-	protected void faceBlock(AIHelper h, TaskOperations o) {
+	protected boolean faceBlock(AIHelper h, TaskOperations o) {
 		final EnumFacing[] dirs = getBuildDirs();
 		attempts++;
+		boolean success = false;
 		for (int i = 0; i < dirs.length; i++) {
 			final EnumFacing useSide = dirs[attempts / 10 % dirs.length];
-			if (!BlockSets.AIR.isAt(h.getWorld(), getPositionToPlaceAt().add(useSide.getDirectionVec()))) {
-				faceSideBlock(h, useSide);
-				attempts ++;
-				return;
+			if (!BlockSets.AIR.isAt(h.getWorld(),
+					getPositionToPlaceAt().add(useSide.getDirectionVec()))) {
+				success = faceSideBlock(h, useSide);
+				attempts++;
+				break;
 			} else {
 				attempts += 10;
+				faceCentered = .1;
+				facePos = null;
 			}
 		}
 		if (attempts > 90) {
 			o.desync(new StringTaskError("Could not face anywhere to place."));
 		}
+		return success;
 	}
 
-	private void faceSideBlock(AIHelper h, EnumFacing useSide) {
-		h.faceSideOf(getPositionToPlaceAt().add(useSide.getDirectionVec()),
-				useSide.getOpposite(), side == BlockSide.UPPER_HALF ? 0.5 : 0,
-				side == BlockSide.LOWER_HALF ? 0.5 : 1,
-				h.getMinecraft().thePlayer.posX - pos.getX(),
-				h.getMinecraft().thePlayer.posZ - pos.getZ(), lookingDirection);
+	@Override
+	protected BlockPos getPositionToPlaceAt() {
+		return positionToPlace == null ? super.getPositionToPlaceAt()
+				: positionToPlace;
+	}
+
+	private boolean faceSideBlock(AIHelper h, EnumFacing useSide) {
+		if (facePos == null) {
+			BlockPos placeOn = getPositionToPlaceAt().add(
+					useSide.getDirectionVec());
+			BlockBounds bounds = h.getWorld().getBlockBounds(placeOn);
+			BlockBounds faceArea = bounds.clampY(
+					blockHalf == BlockHalf.UPPER_HALF ? 0.5 : 0,
+					blockHalf == BlockHalf.LOWER_HALF ? 0.4 : 1 // <- 0.5 but
+																// craftbukkit
+																// has a problem
+																// with that.
+					).onlySide(useSide.getOpposite());
+			facePos = faceArea.random(placeOn, Math.min(.9, faceCentered));
+			faceCentered += .2;
+		}
+		if (h.face(facePos)) {
+			facePos = null;
+			return true;
+		} else {
+			return false;
+		}
+
+		// TODO: lookingDirection
+		// TODO: h.getMinecraft().thePlayer.posX -
+		// getPositionToPlaceAt().getX(),
+		// TODO: h.getMinecraft().thePlayer.posZ -
+		// getPositionToPlaceAt().getZ(),
 	}
 
 	private boolean isFacing(AIHelper h, EnumFacing useSide) {
-		return h.isFacingBlock(getPositionToPlaceAt().add(useSide.getDirectionVec()),
-				useSide.getOpposite(), side);
+		return h.isFacingBlock(
+				getPositionToPlaceAt().add(useSide.getDirectionVec()),
+				useSide.getOpposite(), blockHalf);
 	}
 
 	@Override
@@ -101,10 +156,11 @@ public class SneakAndPlaceAtHalfTask extends SneakAndPlaceTask {
 
 	@Override
 	public String toString() {
-		return "SneakAndPlaceAtHalfTask [side=" + side + ", lookingDirection="
-				+ lookingDirection + ", DIRS=" + Arrays.toString(DIRS)
-				+ ", attempts=" + attempts + ", pos=" + pos + ", filter="
-				+ filter + ", relativeFrom=" + relativeFrom + "]";
+		return "SneakAndPlaceAtHalfTask [side=" + blockHalf
+				+ ", lookingDirection=" + lookingDirection + ", attempts="
+				+ attempts + ", positionToPlace=" + positionToPlace
+				+ ", destinationStandPosition=" + destinationStandPosition
+				+ ", startStandPosition=" + startStandPosition + ", filter="
+				+ filter + "]";
 	}
-
 }

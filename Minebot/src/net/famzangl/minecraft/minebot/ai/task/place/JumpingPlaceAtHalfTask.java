@@ -19,7 +19,7 @@ package net.famzangl.minecraft.minebot.ai.task.place;
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.ItemFilter;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSets;
-import net.famzangl.minecraft.minebot.ai.task.BlockSide;
+import net.famzangl.minecraft.minebot.ai.task.BlockHalf;
 import net.famzangl.minecraft.minebot.ai.task.TaskOperations;
 import net.famzangl.minecraft.minebot.ai.task.error.StringTaskError;
 import net.minecraft.util.BlockPos;
@@ -43,13 +43,13 @@ public class JumpingPlaceAtHalfTask extends JumpingPlaceBlockAtFloorTask {
 			EnumFacing.EAST, EnumFacing.NORTH, EnumFacing.WEST,
 			EnumFacing.SOUTH };
 
-	protected BlockSide side;
+	protected BlockHalf side;
 	protected EnumFacing lookingDirection = null;
 
 	private int attempts;
 
 	public JumpingPlaceAtHalfTask(BlockPos pos, ItemFilter filter,
-			BlockSide side) {
+			BlockHalf side) {
 		super(pos, filter);
 		this.side = side;
 	}
@@ -66,7 +66,7 @@ public class JumpingPlaceAtHalfTask extends JumpingPlaceBlockAtFloorTask {
 	}
 
 	protected EnumFacing[] getBuildDirs() {
-		return side == BlockSide.UPPER_HALF ? TRY_FOR_UPPER : TRY_FOR_LOWER;
+		return side == BlockHalf.UPPER_HALF ? TRY_FOR_UPPER : TRY_FOR_LOWER;
 	}
 
 	protected boolean faceSideBlock(AIHelper h, EnumFacing dir) {
@@ -76,8 +76,8 @@ public class JumpingPlaceAtHalfTask extends JumpingPlaceBlockAtFloorTask {
 			return false;
 		} else {
 			h.faceSideOf(facingBlock, dir.getOpposite(),
-					getSide(dir) == BlockSide.UPPER_HALF ? 0.5 : 0,
-					getSide(dir) == BlockSide.LOWER_HALF ? 0.5 : 1,
+					getSide(dir) == BlockHalf.UPPER_HALF ? 0.5 : 0,
+					getSide(dir) == BlockHalf.LOWER_HALF ? 0.5 : 1,
 					h.getMinecraft().thePlayer.posX - pos.getX(),
 					h.getMinecraft().thePlayer.posZ - pos.getZ(),
 					lookingDirection);
@@ -85,9 +85,9 @@ public class JumpingPlaceAtHalfTask extends JumpingPlaceBlockAtFloorTask {
 		}
 	}
 
-	protected BlockSide getSide(EnumFacing dir) {
-		return dir == EnumFacing.DOWN ? BlockSide.UPPER_HALF
-				: BlockSide.LOWER_HALF;
+	protected BlockHalf getSide(EnumFacing dir) {
+		return dir == EnumFacing.DOWN ? BlockHalf.UPPER_HALF
+				: BlockHalf.LOWER_HALF;
 	}
 
 	@Override

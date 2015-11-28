@@ -34,9 +34,9 @@ import net.minecraft.util.MovementInput;
  */
 public class SneakAndPlaceTask extends AITask {
 
-	protected final BlockPos pos;
+	protected final BlockPos destinationStandPosition;
+	protected final BlockPos startStandPosition;
 	protected final BlockItemFilter filter;
-	protected final BlockPos relativeFrom;
 	/**
 	 * Direction we need to walk.
 	 */
@@ -46,23 +46,19 @@ public class SneakAndPlaceTask extends AITask {
 
 	/**
 	 * 
-	 * @param x
-	 * @param y
-	 * @param z
-	 * @param filter
-	 * @param relativeFrom
-	 *            Vector: place position -> start standing pos.
-	 * @param minBuildHeight
+	 * @param destinationStandPosition The position over the block we are placing where we stand after the block was placed.
+	 * @param filter The filter for the block to place.
+	 * @param startStandPosition The old position where we were standing before placing the block.
+	 * @param minBuildHeight The minimum height the player needs to have before placing the block. For jumping.
 	 */
-	public SneakAndPlaceTask(BlockPos pos, BlockItemFilter filter,
-			BlockPos relativeFrom, double minBuildHeight) {
-		this.pos = pos;
+	public SneakAndPlaceTask(BlockPos destinationStandPosition, BlockItemFilter filter,
+			BlockPos startStandPosition, double minBuildHeight) {
+		this.destinationStandPosition = destinationStandPosition;
 		this.filter = filter;
-		this.relativeFrom = relativeFrom;
+		this.startStandPosition = startStandPosition;
 		this.minBuildHeight = minBuildHeight;
-		final EnumFacing foundInDir = AIHelper.getDirectionForXZ(
-				-relativeFrom.getX(), -relativeFrom.getZ());
-		if (relativeFrom.getY() != 1 || foundInDir == null) {
+		final EnumFacing foundInDir = AIHelper.getDirectionFor(destinationStandPosition.subtract(startStandPosition));
+		if (foundInDir.getFrontOffsetY() != 0 || foundInDir == null) {
 			throw new IllegalArgumentException();
 		}
 		inDirection = foundInDir;
@@ -74,7 +70,7 @@ public class SneakAndPlaceTask extends AITask {
 	}
 
 	protected BlockPos getPositionToPlaceAt() {
-		return pos.add(0, -1, 0);
+		return destinationStandPosition.add(0, -1, 0);
 	}
 
 	@Override
@@ -87,8 +83,9 @@ public class SneakAndPlaceTask extends AITask {
 					.getEntityBoundingBox().minY > minBuildHeight - 0.05;
 			if (hasRequiredHeight) {
 				if (faceTimer == 0) {
-					faceBlock(h, o);
-					faceTimer = 3;
+					if (faceBlock(h, o)) {
+						faceTimer = 3;
+					}
 				} else if (isFacingRightBlock(h)) {
 					if (h.selectCurrentItem(filter)) {
 						h.overrideUseItem();
@@ -112,18 +109,18 @@ public class SneakAndPlaceTask extends AITask {
 		return h.isFacingBlock(getFromPos(), inDirection);
 	}
 
-	protected void faceBlock(AIHelper h, TaskOperations o) {
-		h.faceSideOf(getFromPos(), inDirection);
+	protected boolean faceBlock(AIHelper h, TaskOperations o) {
+		return h.faceSideOf(getFromPos(), inDirection);
 	}
 
 	protected BlockPos getFromPos() {
-		return pos.add(relativeFrom.getX(), -1, relativeFrom.getZ());
+		return startStandPosition;
 	}
 
 	@Override
 	public String toString() {
-		return "SneakAndPlaceTask [pos=" + pos + ", filter=" + filter
-				+ ", relativeFrom=" + relativeFrom + ", inDirection="
+		return "SneakAndPlaceTask [pos=" + destinationStandPosition + ", filter=" + filter
+				+ ", startStandPosition=" + startStandPosition + ", inDirection="
 				+ inDirection + ", minBuildHeight=" + minBuildHeight + "]";
 	}
 

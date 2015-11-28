@@ -1,5 +1,10 @@
 package net.famzangl.minecraft.minebot.ai.strategy;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.Marker;
+import org.apache.logging.log4j.MarkerManager;
+
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.BlockItemFilter;
 import net.famzangl.minecraft.minebot.ai.command.AIChatController;
@@ -8,7 +13,7 @@ import net.famzangl.minecraft.minebot.ai.path.world.BlockSet;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSets;
 import net.famzangl.minecraft.minebot.ai.path.world.WorldData;
 import net.famzangl.minecraft.minebot.ai.task.AITask;
-import net.famzangl.minecraft.minebot.ai.task.BlockSide;
+import net.famzangl.minecraft.minebot.ai.task.BlockHalf;
 import net.famzangl.minecraft.minebot.ai.task.TaskOperations;
 import net.famzangl.minecraft.minebot.ai.task.WaitTask;
 import net.famzangl.minecraft.minebot.ai.task.inventory.GetOnHotBarTask;
@@ -16,6 +21,8 @@ import net.famzangl.minecraft.minebot.ai.task.move.AlignToGridTask;
 import net.famzangl.minecraft.minebot.ai.task.move.WalkTowardsTask;
 import net.famzangl.minecraft.minebot.ai.task.place.SneakAndPlaceAtHalfTask;
 import net.famzangl.minecraft.minebot.ai.task.place.SneakAndPlaceAtSideTask;
+import net.famzangl.minecraft.minebot.ai.utils.BlockArea.AreaVisitor;
+import net.famzangl.minecraft.minebot.ai.utils.BlockCuboid;
 import net.famzangl.minecraft.minebot.build.block.SlabFilter;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.BlockPos;
@@ -28,29 +35,21 @@ import net.minecraft.util.EnumFacing;
  *
  */
 public class AirbridgeStrategy extends TaskStrategy {
+	private static final Marker MARKER_PROGRESS = MarkerManager
+			.getMarker("progress");
+	private static final Logger LOGGER = LogManager
+			.getLogger(AirbridgeStrategy.class);
 
 	private static final int LAG_TEST_DELAY = 15;
-	private static final BlockSet FLOOR_HALF_SLABS;
-	static {
-		BlockSet fhs = BlockSets.EMPTY;
-		for (int i = 0; i < 8; i++) {
-			fhs = fhs.unionWith(new BlockMetaSet(Blocks.stone_slab, i));
-			fhs = fhs.unionWith(new BlockMetaSet(Blocks.wooden_slab, i));
-		}
-		fhs = fhs.unionWith(new BlockMetaSet(Blocks.stone_slab2, 0));
-		FLOOR_HALF_SLABS = fhs;
-	}
 
 	private static final BlockItemFilter SLABS_FILTER = new BlockItemFilter(
-			FLOOR_HALF_SLABS);
+			BlockSets.LOWER_SLABS);
 
-	private static class BuildHalfslabBridgeTask extends
-			SneakAndPlaceAtHalfTask {
-		public BuildHalfslabBridgeTask(BlockPos buildPos, BlockPos beforeBuild) {
-			super(buildPos, SLABS_FILTER, beforeBuild.subtract(buildPos.add(0,
-					-1, 0)), buildPos.getY() - .5, BlockSide.LOWER_HALF);
-		}
-
+	public static SneakAndPlaceAtHalfTask getBuildHafslabTask(
+			BlockPos buildPos, BlockPos walkToPos, BlockPos beforeBuild) {
+		return new SneakAndPlaceAtHalfTask(walkToPos, SLABS_FILTER,
+				beforeBuild, buildPos, buildPos.getY() + .5,
+				BlockHalf.LOWER_HALF);
 	}
 
 	/**
@@ -81,15 +80,42 @@ public class AirbridgeStrategy extends TaskStrategy {
 		}
 	}
 
+	private class BuildHalfslabVisitor implements AreaVisitor {
+
+		private final BlockPos buildPos;
+		private final BlockPos beforeBuild;
+
+		public BuildHalfslabVisitor(BlockPos buildPos, BlockPos beforeBuild) {
+			this.buildPos = buildPos;
+			this.beforeBuild = beforeBuild;
+		}
+
+		@Override
+		public void visit(WorldData world, int x, int y, int z) {
+			BlockPos pos = new BlockPos(x, y, z);
+			LOGGER.trace(MARKER_PROGRESS, "Schedule half slab for: " + pos);
+
+			addTask(new GetOnHotBarTask(SLABS_FILTER));
+			addTask(getBuildHafslabTask(pos, buildPos,
+					beforeBuild));
+		}
+
+	}
+
 	private final BlockPos start;
 	private final EnumFacing direction;
 	private final int length;
+	private final int toLeft;
+	private final int toRight;
 
-	public AirbridgeStrategy(BlockPos start, EnumFacing direction, int length) {
+	public AirbridgeStrategy(BlockPos start, EnumFacing direction, int length,
+			int toLeft, int toRight) {
 		super();
 		this.start = start;
 		this.direction = direction;
 		this.length = length;
+		this.toLeft = toLeft;
+		this.toRight = toRight;
 		if (direction.getFrontOffsetY() != 0) {
 			throw new IllegalArgumentException("Can only work horizontally.");
 		}
@@ -99,6 +125,11 @@ public class AirbridgeStrategy extends TaskStrategy {
 	public String toString() {
 		return "AirbridgeStrategy [start=" + start + ", direction=" + direction
 				+ "]";
+	}
+
+	private BlockCuboid getSidewardsArea(BlockPos center) {
+		return new BlockCuboid(center, center).extend(toLeft,
+				direction.rotateY()).extend(toRight, direction.rotateYCCW());
 	}
 
 	@Override
@@ -113,8 +144,9 @@ public class AirbridgeStrategy extends TaskStrategy {
 
 		boolean slabsFound = false;
 		for (int i = 0; i < 9; ++i) {
-			if (SLABS_FILTER.matches(helper.getMinecraft().thePlayer.inventory.getStackInSlot(i))) {
-				slabsFound  = true;
+			if (SLABS_FILTER.matches(helper.getMinecraft().thePlayer.inventory
+					.getStackInSlot(i))) {
+				slabsFound = true;
 			}
 		}
 		if (!slabsFound) {
@@ -125,39 +157,48 @@ public class AirbridgeStrategy extends TaskStrategy {
 		BlockPos buildPos = playerPosition;
 		BlockPos beforeBuild = null;
 		int steps = 0;
-		while (isHalfslabAt(world, buildPos) && isInLength(buildPos) && steps < 16 * 3) {
+		while (isHalfslabAt(world, buildPos) && isInLength(buildPos)
+				&& steps < 16 * 3) {
 			beforeBuild = buildPos;
 			buildPos = buildPos.add(direction.getDirectionVec());
 			steps++;
 		}
+		LOGGER.trace(MARKER_PROGRESS, "Suggesting next build position: "
+				+ buildPos + " ater " + steps + " steps");
 
 		if (beforeBuild == null) {
 			BlockPos before = buildPos.subtract(direction.getDirectionVec());
 			if (isAirAt(world, buildPos) && isHalfslabAt(world, before)) {
-				// special case: we stand on air and one before us is slab. Walk back to the slab. Most times because of desync.
+				// special case: we stand on air and one before us is slab. Walk
+				// back to the slab. Most times because of desync.
 				addTask(new WalkTowardsTask(before.getX(), before.getZ(), null));
+				LOGGER.trace(MARKER_PROGRESS, "Standing on a cliff. Walk back to: " + before);
 			} else {
 				// cannot handle this.
 				AIChatController.addChatLine("Please stand on a half slab.");
+				LOGGER.info(MARKER_PROGRESS,
+						"No valid half slab found. Required area is: "
+								+ getSidewardsArea(buildPos.add(0, -1, 0)));
 			}
 			return;
 		}
-		
+
 		if (isAirAtAndBelow(world, buildPos)) {
+			LOGGER.trace(MARKER_PROGRESS, "Building bridge to: " + buildPos);
 			addTask(new SneakToSideTask(beforeBuild, direction));
 
-			addTask(new GetOnHotBarTask(SLABS_FILTER));
-
-			addTask(new BuildHalfslabBridgeTask(buildPos, beforeBuild));
+			BlockCuboid area = getSidewardsArea(buildPos.add(0, -1, 0));
+			area.accept(new BuildHalfslabVisitor(buildPos, beforeBuild), world);
 
 			// wait for the server to sync. If block disappears, we don't fall.
 			addTask(new WaitTask(LAG_TEST_DELAY));
 		} else if (isHalfslabAt(world, buildPos)) {
 			// walk
 			addTask(new WalkTowardsTask(buildPos.getX(), buildPos.getZ(), null));
+			LOGGER.trace(MARKER_PROGRESS, "Walk to: " + buildPos);
 		} else {
 			AIChatController
-					.addChatLine("The way i should build is not cleared.");
+					.addChatLine("The way I should build is not cleared.");
 			return;
 		}
 
@@ -169,19 +210,21 @@ public class AirbridgeStrategy extends TaskStrategy {
 
 	private boolean isHalfslabAt(WorldData world, BlockPos buildPos) {
 		return isAirAt(world, buildPos)
-				&& FLOOR_HALF_SLABS.isAt(world, buildPos.add(0, -1, 0));
+				&& BlockSets.LOWER_SLABS.isAt(world,
+						getSidewardsArea(buildPos.add(0, -1, 0)));
 	}
 
 	private boolean isAirAtAndBelow(WorldData world, BlockPos buildPos) {
 		return isAirAt(world, buildPos)
-				&&BlockSets.AIR.isAt(world, buildPos.add(0, -1, 0));
+				&& BlockSets.AIR.isAt(world,
+						getSidewardsArea(buildPos.add(0, -1, 0)));
 	}
 
 	private boolean isAirAt(WorldData world, BlockPos buildPos) {
-
-		return (buildPos.getY() > 255 || BlockSets.AIR.isAt(world, buildPos))
+		return (buildPos.getY() > 255 || BlockSets.AIR.isAt(world,
+				getSidewardsArea(buildPos)))
 				&& (buildPos.getY() > 254 || BlockSets.AIR.isAt(world,
-						buildPos.add(0, 1, 0)));
+						getSidewardsArea(buildPos.add(0, 1, 0))));
 	}
 
 	@Override

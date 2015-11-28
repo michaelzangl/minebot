@@ -22,6 +22,6 @@ package net.famzangl.minecraft.minebot.ai.task;
  * @author michael
  *
  */
-public enum BlockSide {
+public enum BlockHalf {
 	UPPER_HALF, LOWER_HALF, ANY
 }

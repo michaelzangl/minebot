@@ -20,6 +20,7 @@ import java.io.File;
 import java.util.List;
 import java.util.Random;
 
+import org.apache.commons.lang3.RandomUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.Marker;
@@ -28,10 +29,12 @@ import org.apache.logging.log4j.MarkerManager;
 import net.famzangl.minecraft.minebot.Pos;
 import net.famzangl.minecraft.minebot.ai.command.AIChatController;
 import net.famzangl.minecraft.minebot.ai.net.NetworkHelper;
+import net.famzangl.minecraft.minebot.ai.path.world.BlockBounds;
 import net.famzangl.minecraft.minebot.ai.path.world.WorldData;
 import net.famzangl.minecraft.minebot.ai.strategy.AIStrategy;
-import net.famzangl.minecraft.minebot.ai.task.BlockSide;
+import net.famzangl.minecraft.minebot.ai.task.BlockHalf;
 import net.famzangl.minecraft.minebot.ai.tools.ToolRater;
+import net.famzangl.minecraft.minebot.ai.utils.RandUtils;
 import net.famzangl.minecraft.minebot.build.BuildManager;
 import net.famzangl.minecraft.minebot.map.MapReader;
 import net.famzangl.minecraft.minebot.settings.MinebotSettings;
@@ -52,6 +55,7 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.MovementInput;
 import net.minecraft.util.MovingObjectPosition;
+import net.minecraft.util.Vec3;
 import net.minecraft.util.MovingObjectPosition.MovingObjectType;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.chunk.Chunk;
@@ -114,13 +118,13 @@ public abstract class AIHelper {
 	 * @param maxY
 	 * @return
 	 */
-	private double randBetweenNice(double minY, double maxY) {
+	private static double randBetweenNice(double minY, double maxY) {
 		return maxY - minY < 0.1 ? (maxY + minY) / 2 : randBetween(minY + 0.03,
 				maxY - 0.03);
 	}
 
-	private double randBetween(double a, double b) {
-		return rand.nextDouble() * (b - a) + a;
+	private static double randBetween(double a, double b) {
+		return RandUtils.getBetween(a, b);
 	}
 
 	protected void invalidateChunkCache() {
@@ -233,60 +237,18 @@ public abstract class AIHelper {
 	public WorldData getWorld() {
 		return minecraftWorld;
 	}
-
-	/**
-	 * Check if this is basically a block that cannot harm us if it is next to
-	 * us.
-	 * 
-	 * @param block
-	 * @return
-	 */
-	// public boolean isSafeBlock(Block block) {
-	// return isSafeStandableBlock(block) || canWalkOn(block)
-	// || Block.isEqualTo(block, Blocks.air);
-	// }
-
-	/**
-	 * Check if this is a Block we could walk through as if it was air.
-	 * 
-	 * @param block
-	 * @return
-	 */
-	// public boolean canWalkThrough(Block block) {
-	// return HEAD_CAN_WALK_TRHOUGH.contains(block);
-	// }
-
-	/**
-	 * Check if the block is a block that we could walk on as if it was air.
-	 * Carpets, torches, ...
-	 * 
-	 * @param block
-	 * @return
-	 */
-	// public boolean canWalkOn(Block block) {
-	// return FEET_CAN_WALK_THROUGH.contains(block);
-	// }
-
-	/**
-	 * Check if we can stand on the block.
-	 * 
-	 * @param block
-	 * @return
-	 */
-	// public boolean isSafeStandableBlock(Block block) {
-	// return SAFE_GROUND.contains(block);
-	// }
-
-	private Block getBoundsBlock(BlockPos pos) {
-		Block block = getBlock(pos);
-		if (block instanceof BlockStairs) {
-			// Stairs have crazy bounds
-			block = Blocks.dirt;
-		}
-		block.setBlockBoundsBasedOnState(mc.theWorld, pos);
-		return block;
+	
+	public boolean isFacing(Vec3 vec) {
+		return isFacing(vec.xCoord, vec.yCoord, vec.zCoord);
+	}
+	public boolean isFacing(double x, double y, double z) {
+		return face(x, y, z, 0, 0);
 	}
 
+	public boolean face(Vec3 vec) {
+		return face(vec.xCoord, vec.yCoord, vec.zCoord);
+	}
+	
 	/**
 	 * Faces an exact position in space.
 	 * 
@@ -315,22 +277,23 @@ public abstract class AIHelper {
 			float rotations = fullRotations(yaw - rotationYaw);
 			float yawChange = yaw - rotationYaw - rotations;
 			float pitchChange = pitch - rotationPitch;
+			float yawClamp = Math.min(Math.abs(MAX_YAW_CHANGE / yawChange), 1);
+			float pitchClamp = Math.min(Math.abs(MAX_PITCH_CHANGE / pitchChange), 1);
+			float clamp = Math.min(yawClamp, pitchClamp);
+			
 			yawInfluence = Math.min(yawInfluence,
-					Math.min(Math.abs(MAX_YAW_CHANGE / yawChange), 1));
+					clamp);
 			pitchInfluence = Math.min(pitchInfluence,
-					Math.min(Math.abs(MAX_PITCH_CHANGE / pitchChange), 1));
+					clamp);
+			//TODO: Make this linear?
 			LOGGER.trace(MARKER_FACING, "change %f, %f => %f, %f", yawChange,
 					pitchChange, yawInfluence, pitchInfluence);
 
 			mc.thePlayer.setAngles(rotations / .15f + yawChange / 0.15f
 					* yawInfluence, -pitchChange / 0.15f * pitchInfluence);
 			invalidateObjectMouseOver();
-
-			final double e0 = x - mc.thePlayer.posX;
-			final double e1 = z - mc.thePlayer.posZ;
-			final double e2 = y - mc.thePlayer.posY - mc.thePlayer.getEyeHeight();
-			final double e3 = d0 * d0 + d2 * d2 + d1 * d1;
-			return d3 < 2.500000277905201E-7D;
+			
+			return clamp > .999;
 		}
 		return true;
 	}
@@ -365,7 +328,7 @@ public abstract class AIHelper {
 	}
 
 	public boolean isFacingBlock(BlockPos pos, EnumFacing blockSide,
-			BlockSide half) {
+			BlockHalf half) {
 		return isFacingBlock(pos.getX(), pos.getY(), pos.getZ(), blockSide,
 				half);
 	}
@@ -384,13 +347,13 @@ public abstract class AIHelper {
 	 * @return <code>true</code> if the player faces the block.
 	 */
 	public boolean isFacingBlock(int x, int y, int z, EnumFacing blockSide,
-			BlockSide half) {
+			BlockHalf half) {
 		if (!isFacingBlock(x, y, z, blockSide)) {
 			return false;
 		} else {
 			final double fy = getObjectMouseOver().hitVec.yCoord - y;
-			return half != BlockSide.LOWER_HALF && fy > .5
-					|| half != BlockSide.UPPER_HALF && fy <= .5;
+			return half != BlockHalf.LOWER_HALF && fy > .5
+					|| half != BlockHalf.UPPER_HALF && fy <= .5;
 		}
 	}
 
@@ -589,20 +552,14 @@ public abstract class AIHelper {
 		}
 	}
 
-	public void faceBlock(BlockPos pos) {
-		faceBlock(pos.getX(), pos.getY(), pos.getZ());
-	}
-
 	/**
-	 * Faces a full block.
+	 * Faces a block.
 	 * 
-	 * @param x
-	 * @param y
-	 * @param z
+	 * @param pos
+	 * @return 
 	 */
-	public void faceBlock(final int x, final int y, final int z) {
-		face(x + randBetween(0.1, 0.9), y + randBetween(0.1, 0.9), z
-				+ randBetween(0.1, 0.9));
+	public boolean faceBlock(BlockPos pos) {
+		return face(getWorld().getBlockBounds(pos).random(pos, .95));
 	}
 
 	/**
@@ -610,39 +567,11 @@ public abstract class AIHelper {
 	 * 
 	 * @param pos
 	 * @param sideToFace
+	 * @return 
 	 */
-	public void faceSideOf(BlockPos pos, EnumFacing sideToFace) {
-		int x = pos.getX();
-		int y = pos.getY();
-		int z = pos.getZ();
-		double faceX = x + randBetween(0.1, 0.9);
-		double faceY = y + randBetween(0.1, 0.9);
-		double faceZ = z + randBetween(0.1, 0.9);
-
-		final Block block = getBoundsBlock(pos);
-		switch (sideToFace) {
-		case UP:
-			faceY = y + block.getBlockBoundsMaxY();
-			break;
-		case DOWN:
-			faceY = y + block.getBlockBoundsMinY();
-			break;
-		case EAST:
-			faceX = x + block.getBlockBoundsMaxX();
-			break;
-		case WEST:
-			faceX = x + block.getBlockBoundsMinX();
-			break;
-		case SOUTH:
-			faceZ = z + block.getBlockBoundsMaxZ();
-			break;
-		case NORTH:
-			faceZ = z + block.getBlockBoundsMinZ();
-			break;
-		default:
-			break;
-		}
-		face(faceX, faceY, faceZ);
+	public boolean faceSideOf(BlockPos pos, EnumFacing sideToFace) {
+		BlockBounds bounds = getWorld().getBlockBounds(pos);
+		return face(bounds.onlySide(sideToFace).random(pos, 0.8));
 	}
 
 	/**
@@ -667,58 +596,61 @@ public abstract class AIHelper {
 			double maxY, double centerX, double centerZ, EnumFacing xzdir) {
 		// System.out.println("x = " + x + " y=" + y + " z=" + z + " dir="
 		// + sideToFace);
-		final Block block = getBoundsBlock(pos);
+		BlockBounds bounds = getWorld().getBlockBounds(pos);
+		BlockBounds faceArea = bounds.clampY(minY, maxY).onlySide(sideToFace);
+		LOGGER.trace(MARKER_FACING, "Facing: " + faceArea);
+		face(faceArea.random(pos, .9));
 
-		minY = Math.max(minY, block.getBlockBoundsMinY());
-		maxY = Math.min(maxY, block.getBlockBoundsMaxY());
-		double faceY = randBetweenNice(minY, maxY);
-		double faceX, faceZ;
-
-		if (xzdir == EnumFacing.EAST) {
-			faceX = randBetween(Math.max(block.getBlockBoundsMinX(), centerX),
-					block.getBlockBoundsMaxX());
-			faceZ = centerZ;
-		} else if (xzdir == EnumFacing.WEST) {
-			faceX = randBetween(block.getBlockBoundsMinX(),
-					Math.min(block.getBlockBoundsMaxX(), centerX));
-			faceZ = centerZ;
-		} else if (xzdir == EnumFacing.SOUTH) {
-			faceZ = randBetween(Math.max(block.getBlockBoundsMinZ(), centerZ),
-					block.getBlockBoundsMaxZ());
-			faceX = centerX;
-		} else if (xzdir == EnumFacing.NORTH) {
-			faceZ = randBetween(block.getBlockBoundsMinZ(),
-					Math.min(block.getBlockBoundsMaxZ(), centerZ));
-			faceX = centerX;
-		} else {
-			faceX = randBetweenNice(block.getBlockBoundsMinX(),
-					block.getBlockBoundsMaxX());
-			faceZ = randBetweenNice(block.getBlockBoundsMinZ(),
-					block.getBlockBoundsMaxZ());
-		}
-		switch (sideToFace) {
-		case UP:
-			faceY = block.getBlockBoundsMaxY();
-			break;
-		case DOWN:
-			faceY = block.getBlockBoundsMinY();
-			break;
-		case EAST:
-			faceX = block.getBlockBoundsMaxX();
-			break;
-		case WEST:
-			faceX = block.getBlockBoundsMinX();
-			break;
-		case SOUTH:
-			faceZ = block.getBlockBoundsMaxZ();
-			break;
-		case NORTH:
-			faceZ = block.getBlockBoundsMinZ();
-			break;
-		default:
-			break;
-		}
-		face(faceX + pos.getX(), faceY + pos.getY(), faceZ + pos.getZ());
+//		minY = Math.max(minY, block.getBlockBoundsMinY());
+//		maxY = Math.min(maxY, block.getBlockBoundsMaxY());
+//		double faceY = randBetweenNice(minY, maxY);
+//		double faceX, faceZ;
+//
+//		if (xzdir == EnumFacing.EAST) {
+//			faceX = randBetween(Math.max(block.getBlockBoundsMinX(), centerX),
+//					block.getBlockBoundsMaxX());
+//			faceZ = centerZ;
+//		} else if (xzdir == EnumFacing.WEST) {
+//			faceX = randBetween(block.getBlockBoundsMinX(),
+//					Math.min(block.getBlockBoundsMaxX(), centerX));
+//			faceZ = centerZ;
+//		} else if (xzdir == EnumFacing.SOUTH) {
+//			faceZ = randBetween(Math.max(block.getBlockBoundsMinZ(), centerZ),
+//					block.getBlockBoundsMaxZ());
+//			faceX = centerX;
+//		} else if (xzdir == EnumFacing.NORTH) {
+//			faceZ = randBetween(block.getBlockBoundsMinZ(),
+//					Math.min(block.getBlockBoundsMaxZ(), centerZ));
+//			faceX = centerX;
+//		} else {
+//			faceX = randBetweenNice(block.getBlockBoundsMinX(),
+//					block.getBlockBoundsMaxX());
+//			faceZ = randBetweenNice(block.getBlockBoundsMinZ(),
+//					block.getBlockBoundsMaxZ());
+//		}
+//		switch (sideToFace) {
+//		case UP:
+//			faceY = block.getBlockBoundsMaxY();
+//			break;
+//		case DOWN:
+//			faceY = block.getBlockBoundsMinY();
+//			break;
+//		case EAST:
+//			faceX = block.getBlockBoundsMaxX();
+//			break;
+//		case WEST:
+//			faceX = block.getBlockBoundsMinX();
+//			break;
+//		case SOUTH:
+//			faceZ = block.getBlockBoundsMaxZ();
+//			break;
+//		case NORTH:
+//			faceZ = block.getBlockBoundsMinZ();
+//			break;
+//		default:
+//			break;
+//		}
+//		face(faceX + pos.getX(), faceY + pos.getY(), faceZ + pos.getZ());
 	}
 
 	/**
@@ -928,21 +860,21 @@ public abstract class AIHelper {
 	 * @return <code>true</code> on arrival.
 	 */
 	public boolean sneakFrom(BlockPos pos, EnumFacing inDirection, boolean face) {
-		final Block block = getBoundsBlock(pos);
+		BlockBounds bounds = getWorld().getBlockBounds(pos);
 		double destX = pos.getX() + .5;
 		double destZ = pos.getZ() + .5;
 		switch (inDirection) {
 		case EAST:
-			destX = pos.getX() + block.getBlockBoundsMaxX() + SNEAK_OFFSET;
+			destX = pos.getX() + bounds.getMaxX() + SNEAK_OFFSET;
 			break;
 		case WEST:
-			destX = pos.getX() + block.getBlockBoundsMinX() - SNEAK_OFFSET;
+			destX = pos.getX() + bounds.getMinX() - SNEAK_OFFSET;
 			break;
 		case SOUTH:
-			destZ = pos.getZ() + block.getBlockBoundsMaxZ() + SNEAK_OFFSET;
+			destZ = pos.getZ() + bounds.getMaxZ() + SNEAK_OFFSET;
 			break;
 		case NORTH:
-			destZ = pos.getZ() + block.getBlockBoundsMinZ() - SNEAK_OFFSET;
+			destZ = pos.getZ() + bounds.getMinZ() - SNEAK_OFFSET;
 			break;
 		default:
 			throw new IllegalArgumentException("Cannot handle " + inDirection);

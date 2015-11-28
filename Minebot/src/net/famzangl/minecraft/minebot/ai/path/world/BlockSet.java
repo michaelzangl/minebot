@@ -20,6 +20,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import net.famzangl.minecraft.minebot.ai.utils.BlockCuboid;
+import net.famzangl.minecraft.minebot.ai.utils.BlockFilteredArea;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.util.BlockPos;
@@ -162,6 +164,16 @@ public class BlockSet {
 	 */
 	public boolean isAt(WorldData world, int x, int y, int z) {
 		return containsWithMeta(world.getBlockIdWithMeta(x, y, z));
+	}
+
+	/**
+	 * Checks if all of the given area in the world is filled with this block.
+	 * @param world The world
+	 * @param area The area
+	 * @return <code>true</code> if the area is filled with blocks of this set.
+	 */
+	public boolean isAt(WorldData world, BlockCuboid area) {
+		return new BlockFilteredArea(area, this).getVolume(world) == area.getVolume(world);
 	}
 
 	@Deprecated

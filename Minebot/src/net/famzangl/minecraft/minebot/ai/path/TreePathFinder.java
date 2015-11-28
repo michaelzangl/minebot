@@ -20,6 +20,7 @@ import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSet;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSets;
 import net.famzangl.minecraft.minebot.ai.path.world.WorldData;
+import net.famzangl.minecraft.minebot.ai.task.AITask;
 import net.famzangl.minecraft.minebot.ai.task.DestroyInRangeTask;
 import net.famzangl.minecraft.minebot.ai.task.DestroyLogInRange;
 import net.famzangl.minecraft.minebot.ai.task.RunOnceTask;
@@ -51,6 +52,19 @@ import net.minecraft.util.BlockPos;
 public class TreePathFinder extends MovePathFinder {
 	private static final BlockSet TREE_STUFF = BlockSets.LEAVES
 			.unionWith(BlockSets.LOGS);
+	
+	private static class PrefaceBarrier extends AITask {
+
+		@Override
+		public boolean isFinished(AIHelper h) {
+			return true;
+		}
+
+		@Override
+		public void runTick(AIHelper h, TaskOperations o) {
+		}
+		
+	}
 
 	private class LargeTreeState {
 		/**
@@ -70,8 +84,8 @@ public class TreePathFinder extends MovePathFinder {
 		/**
 		 * TODO: Increase for {@link WoodType#SPRUCE}
 		 */
-		private static final int TREE_TOP_OFFSET = 2;
-		private static final int SINGLE_TREE_SIDE_MAX = 3;
+		private static final int TREE_TOP_OFFSET = 1;
+		private static final int SINGLE_TREE_SIDE_MAX = 4;
 		private int minX;
 		private int minZ;
 
@@ -129,14 +143,19 @@ public class TreePathFinder extends MovePathFinder {
 
 		public void scanTreeHeight(WorldData world, BlockPos ignoredPlayerPos) {
 			minY = topY = playerStartY;
+			setYOffsetByPosition(ignoredPlayerPos);
 			for (int y = playerStartY; y < 255; y++) {
-				int trunkBlocks = countTrunkBlocks(world, y);
-				int should = y <= ignoredPlayerPos.getY() + 1 ? 1
-						: y <= ignoredPlayerPos.getY() + 2 ? 3 : 4;
-				if (trunkBlocks < should) {
+				BlockPos pos = getPosition(y);
+				if (!BlockSets.LOGS.isAt(world, pos.add(0, 3, 0)) || !allowedGroundBlocks.isAt(world, pos.add(0, -1, 0))) {
 					break;
 				}
-				topY = y;
+//				int trunkBlocks = countTrunkBlocks(world, y);
+//				int should = y <= ignoredPlayerPos.getY() + 1 ? 1
+//						: y <= ignoredPlayerPos.getY() + 2 ? 3 : 4;
+//				if (trunkBlocks < should) {
+//					break;
+//				}
+				topY = y + 3;
 			}
 
 			for (int y = playerStartY; y > 0; y--) {
@@ -206,6 +225,7 @@ public class TreePathFinder extends MovePathFinder {
 			for (int y = lastPos.getY(); y >= minY; y--) {
 				BlockPos digTo = getPosition(y);
 				addTask(new HorizontalMoveTask(digTo));
+				addTask(new PrefaceBarrier());
 				// Destroy all logs above y.
 				addTask(new DestroyLogInRange(new BlockCuboid(
 						new BlockPos(minX - SINGLE_TREE_SIDE_MAX, y, minZ

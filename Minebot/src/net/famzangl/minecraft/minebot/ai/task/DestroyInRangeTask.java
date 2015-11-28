@@ -31,6 +31,7 @@ import net.famzangl.minecraft.minebot.ai.utils.BlockArea.AreaVisitor;
 import net.famzangl.minecraft.minebot.ai.utils.BlockCuboid;
 import net.famzangl.minecraft.minebot.settings.MinebotSettings;
 import net.minecraft.util.BlockPos;
+import net.minecraft.util.Vec3;
 
 /**
  * Destroys all Blocks in a given area. Individual blocks can be excluded, see
@@ -68,7 +69,7 @@ public class DestroyInRangeTask extends AITask implements CanPrefaceAndDestroy {
 		public void visit(WorldData world, int x, int y, int z) {
 			if (isSafeToDestroy(world, x, y, z)) {
 				// FIXME: Use generics instead of cast.
-				((WorldWithDelta)world).setBlock(x, y, z, 0, 0);
+				((WorldWithDelta) world).setBlock(x, y, z, 0, 0);
 			} else {
 				System.out.println("No destruction for " + x + "," + y + ","
 						+ z + ", block is: " + world.getBlockId(x, y, z));
@@ -80,6 +81,8 @@ public class DestroyInRangeTask extends AITask implements CanPrefaceAndDestroy {
 	private int facingAttempts;
 	private final ArrayList<BlockPos> failedBlocks = new ArrayList<BlockPos>();
 	private BlockArea range;
+	private Vec3 facingPos;
+	private BlockPos lastFacingFor;
 
 	/**
 	 * Create a new {@link DestroyInRangeTask}.
@@ -140,31 +143,40 @@ public class DestroyInRangeTask extends AITask implements CanPrefaceAndDestroy {
 	@Override
 	public void runTick(AIHelper h, TaskOperations o) {
 		BlockPos n = getNextToDestruct(h);
-		if (facingAttempts > 20) {
+		if (facingAttempts > 23) {
 			failedBlocks.add(n);
 			n = getNextToDestruct(h);
+			facingAttempts = 0;
 		}
 		if (n != null) {
-			if (isFacingAcceptableBlock(h, n)) {
-				ToolRater settings = MinebotSettings.getSettings().getToolRater();
+			if (facingAttempts % 5 == 4 || lastFacingFor == null
+					|| !lastFacingFor.equals(n)) {
+				facingPos = h.getWorld().getBlockBounds(n).random(n, .9);
+				lastFacingFor = n;
+			}
+
+			if (isFacingAcceptableBlock(h, n, h.isFacing(facingPos))) {
+				ToolRater settings = MinebotSettings.getSettings()
+						.getToolRater();
 				h.selectToolFor(n, settings);
 				h.overrideAttack();
 				facingAttempts = 0;
 			} else {
-				h.faceBlock(n);
+				h.face(facingPos);
 				facingAttempts++;
 			}
 		}
 	}
 
-	protected boolean isFacingAcceptableBlock(AIHelper h, BlockPos n) {
+	protected boolean isFacingAcceptableBlock(AIHelper h, BlockPos n,
+			boolean isFacingRightDirection) {
 		return h.isFacingBlock(n);
 	}
 
-	 @Override
-	 public int getGameTickTimeout(AIHelper helper) {
-		 return 2 * super.getGameTickTimeout(helper);
-	 }
+	@Override
+	public int getGameTickTimeout(AIHelper helper) {
+		return 2 * super.getGameTickTimeout(helper);
+	}
 
 	@Override
 	public String toString() {
@@ -172,15 +184,16 @@ public class DestroyInRangeTask extends AITask implements CanPrefaceAndDestroy {
 				+ facingAttempts + ", failedBlocks=" + failedBlocks + "]";
 	}
 
-//	/**
-//	 * Add a {@link BlockPos} to the list of blocks that should be excluded from
-//	 * this area.
-//	 * 
-//	 * @param pos
-//	 */
-//	public void blacklist(BlockPos pos) {
-//		failedBlocks.add(pos);
-//	}
+	// /**
+	// * Add a {@link BlockPos} to the list of blocks that should be excluded
+	// from
+	// * this area.
+	// *
+	// * @param pos
+	// */
+	// public void blacklist(BlockPos pos) {
+	// failedBlocks.add(pos);
+	// }
 
 	@Override
 	public List<BlockPos> getPredestroyPositions(AIHelper helper) {

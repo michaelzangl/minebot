@@ -61,7 +61,9 @@ public class PathFinderStrategy extends TaskStrategy {
 		}
 
 		pathFindingWorld = helper.getWorld();
-		if (!searchTasksWithPathfinder(helper)) {
+		if (isInAir(helper)) {
+			addTask(new WaitTask(1));
+		} else if (!searchTasksWithPathfinder(helper)) {
 			// Path finding needs more time
 			if (!(noPathFound && inShouldTakeOver)) {
 				addTask(new WaitTask(1));
@@ -72,6 +74,10 @@ public class PathFinderStrategy extends TaskStrategy {
 			}
 		}
 		pathFindingWorld = null;
+	}
+
+	private boolean isInAir(AIHelper helper) {
+		return !helper.getMinecraft().thePlayer.onGround;
 	}
 
 	private boolean searchTasksWithPathfinder(AIHelper helper) {

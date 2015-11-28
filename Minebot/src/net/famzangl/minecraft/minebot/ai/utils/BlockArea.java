@@ -31,9 +31,9 @@ public abstract class BlockArea {
 
 	public abstract boolean contains(WorldData world, int x, int y, int z);
 
-	public int getVolume() {
+	public int getVolume(WorldData world) {
 		VolumeVisitor v = new VolumeVisitor();
-		accept(v, null);
+		accept(v, world);
 		return v.volume;
 	}
 	

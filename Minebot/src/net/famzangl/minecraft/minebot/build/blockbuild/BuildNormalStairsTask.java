@@ -19,7 +19,7 @@ package net.famzangl.minecraft.minebot.build.blockbuild;
 import net.famzangl.minecraft.minebot.ai.BlockItemFilter;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSet;
 import net.famzangl.minecraft.minebot.ai.task.AITask;
-import net.famzangl.minecraft.minebot.ai.task.BlockSide;
+import net.famzangl.minecraft.minebot.ai.task.BlockHalf;
 import net.famzangl.minecraft.minebot.ai.task.place.JumpingPlaceBlockAtSideTask;
 import net.famzangl.minecraft.minebot.ai.task.place.SneakAndPlaceAtSideTask;
 import net.minecraft.block.Block;
@@ -60,8 +60,8 @@ public class BuildNormalStairsTask extends CubeBuildTask {
 
 	@Override
 	public AITask getPlaceBlockTask(BlockPos relativeFromPos) {
-		final BlockSide side = inverted ? BlockSide.UPPER_HALF
-				: BlockSide.LOWER_HALF;
+		final BlockHalf side = inverted ? BlockHalf.UPPER_HALF
+				: BlockHalf.LOWER_HALF;
 		if (!isStandablePlace(relativeFromPos)) {
 			return null;
 		} else if (relativeFromPos.equals(FROM_GROUND)) {

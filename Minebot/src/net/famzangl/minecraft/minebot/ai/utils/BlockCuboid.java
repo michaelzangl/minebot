@@ -3,6 +3,8 @@ package net.famzangl.minecraft.minebot.ai.utils;
 import net.famzangl.minecraft.minebot.Pos;
 import net.famzangl.minecraft.minebot.ai.path.world.WorldData;
 import net.minecraft.util.BlockPos;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Vec3i;
 
 /**
  * This is cuboid of blocks.
@@ -69,12 +71,30 @@ public class BlockCuboid extends BlockArea {
 	/**
 	 * Extend in x and z directions.
 	 * 
-	 * @param extend how much
+	 * @param extend
+	 *            how much
 	 * @return The extended cuboid.
 	 */
 	public BlockCuboid extendXZ(int extend) {
 		return new BlockCuboid(min.add(-extend, 0, -extend), max.add(extend, 0,
 				extend));
+	}
+
+	public BlockCuboid extend(int amount, EnumFacing direction) {
+		return boundsWith(move(amount, direction));
+	}
+
+	private BlockCuboid boundsWith(BlockCuboid other) {
+		return new BlockCuboid(Pos.minPos(min, other.min), Pos.maxPos(max, other.max));
+	}
+
+	public BlockCuboid move(int amount, EnumFacing direction) {
+		BlockPos dir = new BlockPos(direction.getDirectionVec());
+		return move(dir.multiply(amount));
+	}
+
+	public BlockCuboid move(Vec3i vec) {
+		return new BlockCuboid(min.add(vec), max.add(vec));
 	}
 
 	@Override

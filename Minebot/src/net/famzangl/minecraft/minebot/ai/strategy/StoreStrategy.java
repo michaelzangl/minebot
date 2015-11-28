@@ -40,6 +40,23 @@ import net.minecraft.util.BlockPos;
  */
 public class StoreStrategy extends PathFinderStrategy {
 	
+	private static class WaitIfNotFullTask extends WaitTask {
+
+		private final ItemStack s;
+		private final ChestData c;
+
+		public WaitIfNotFullTask(int time, ChestData c, ItemStack s) {
+			super(time);
+			this.c = c;
+			this.s = s;
+		}
+		
+		@Override
+		public boolean isFinished(AIHelper h) {
+			return super.isFinished(h) || c.isFullFor(s);
+		}
+	}
+	
 	private static class StorePathFinder extends BlockRangeFinder {
 
 		private ChestBlockHandler chestBlockHandler;
@@ -91,7 +108,7 @@ public class StoreStrategy extends PathFinderStrategy {
 								c.markAsFullFor(s, true);
 							}
 						});
-						addTask(new WaitTask(5));
+						addTask(new WaitIfNotFullTask(5, c, s));
 					}
 				}
 				if (chestOpen) {

@@ -25,7 +25,7 @@ import net.famzangl.minecraft.minebot.ai.command.CommandEvaluationException;
 import net.famzangl.minecraft.minebot.ai.command.ParameterType;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSet;
 import net.famzangl.minecraft.minebot.ai.strategy.AIStrategy;
-import net.famzangl.minecraft.minebot.ai.task.BlockSide;
+import net.famzangl.minecraft.minebot.ai.task.BlockHalf;
 import net.famzangl.minecraft.minebot.build.block.SlabType;
 import net.famzangl.minecraft.minebot.build.block.WoodType;
 import net.famzangl.minecraft.minebot.build.blockbuild.BlockBuildTask;
@@ -180,7 +180,7 @@ public class CommandScheduleBuild {
 			@AICommandParameter(type = ParameterType.POSITION, description = "Where to place it (relative is to your current pos)") BlockPos forPosition,
 			@AICommandParameter(type = ParameterType.BLOCK_NAME, description = "The block", blockFilter = SlabBlockFilter.class) Block blockToPlace,
 			@AICommandParameter(type = ParameterType.ENUM, description = "The subtype of slabs to place") SlabType type,
-			@AICommandParameter(type = ParameterType.ENUM, description = "If a upper or lower half should be placed") BlockSide side) {
+			@AICommandParameter(type = ParameterType.ENUM, description = "If a upper or lower half should be placed") BlockHalf side) {
 		if (BuildHalfslabTask.BLOCKS.contains(blockToPlace)) {
 			addTask(helper, new BuildHalfslabTask(forPosition, type, side));
 		} else {

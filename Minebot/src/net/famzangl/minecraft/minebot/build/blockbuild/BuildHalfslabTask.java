@@ -18,7 +18,7 @@ package net.famzangl.minecraft.minebot.build.blockbuild;
 
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSet;
 import net.famzangl.minecraft.minebot.ai.task.AITask;
-import net.famzangl.minecraft.minebot.ai.task.BlockSide;
+import net.famzangl.minecraft.minebot.ai.task.BlockHalf;
 import net.famzangl.minecraft.minebot.ai.task.place.JumpingPlaceAtHalfTask;
 import net.famzangl.minecraft.minebot.ai.task.place.SneakAndPlaceAtHalfTask;
 import net.famzangl.minecraft.minebot.build.block.SlabFilter;
@@ -30,10 +30,10 @@ public class BuildHalfslabTask extends CubeBuildTask {
 
 	public static final BlockSet BLOCKS = new BlockSet ( Blocks.stone_slab,
 			Blocks.wooden_slab );
-	private final BlockSide side;
+	private final BlockHalf side;
 	private final SlabType slabType;
 
-	public BuildHalfslabTask(BlockPos forPosition, SlabType slabType, BlockSide up) {
+	public BuildHalfslabTask(BlockPos forPosition, SlabType slabType, BlockHalf up) {
 		super(forPosition, new SlabFilter(slabType));
 		this.slabType = slabType;
 		this.side = up;
@@ -48,13 +48,13 @@ public class BuildHalfslabTask extends CubeBuildTask {
 			return new JumpingPlaceAtHalfTask(forPosition.add(0,1,0), blockFilter, side);
 		} else {
 			return new SneakAndPlaceAtHalfTask(forPosition.add(0,1,0), blockFilter,
-					relativeFromPos, getMinHeightToBuild(), side);
+					forPosition.add(relativeFromPos), getMinHeightToBuild(), side);
 		}
 	}
 
 	@Override
 	protected double getBlockHeight() {
-		return side == BlockSide.LOWER_HALF ? .5 : 1;
+		return side == BlockHalf.LOWER_HALF ? .5 : 1;
 	}
 
 	@Override

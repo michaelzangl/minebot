@@ -12,15 +12,33 @@ import net.minecraft.util.EnumFacing;
 
 @AICommand(helpText = "Build a tunnel with the given profile", name = "minebot")
 public class CommandAirbridge {
+	public enum AirbridgeWidth {
+		SMALL(0,0),
+		WIDE(1,1),
+		WIDER(2,2),
+		MAXIMUM(3,3);
+		
+		private final int toLeft, toRight;
+
+		private AirbridgeWidth(int toLeft, int toRight) {
+			this.toLeft = toLeft;
+			this.toRight = toRight;
+		}
+	}
+	
 	@AICommandInvocation(safeRule = SafeStrategyRule.DEFEND)
 	public static AIStrategy run(
 			AIHelper helper,
 			@AICommandParameter(type = ParameterType.FIXED, fixedName = "airbridge", description = "") String nameArg,
 			@AICommandParameter(type = ParameterType.ENUM, description = "direction", optional = true) EnumFacing inDirection,
-			@AICommandParameter(type = ParameterType.NUMBER, description = "max length", optional = true) Integer length) {
+			@AICommandParameter(type = ParameterType.NUMBER, description = "max length", optional = true) Integer length,
+			@AICommandParameter(type = ParameterType.ENUM, description = "width", optional = true) AirbridgeWidth width) {
+		if (width == null) {
+			width = AirbridgeWidth.SMALL;
+		}
 		return new AirbridgeStrategy(helper.getPlayerPosition(),
 				inDirection == null ? helper.getLookDirection() : inDirection,
-				length == null ? -1 : length);
+				length == null ? -1 : length, width.toLeft, width.toRight);
 	}
 
 }

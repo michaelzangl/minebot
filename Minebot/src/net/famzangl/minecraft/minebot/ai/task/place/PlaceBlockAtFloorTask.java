@@ -21,7 +21,7 @@ import net.famzangl.minecraft.minebot.ai.BlockItemFilter;
 import net.famzangl.minecraft.minebot.ai.ItemFilter;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSets;
 import net.famzangl.minecraft.minebot.ai.task.AITask;
-import net.famzangl.minecraft.minebot.ai.task.BlockSide;
+import net.famzangl.minecraft.minebot.ai.task.BlockHalf;
 import net.famzangl.minecraft.minebot.ai.task.TaskOperations;
 import net.famzangl.minecraft.minebot.ai.task.error.SelectTaskError;
 import net.minecraft.util.BlockPos;
@@ -53,8 +53,8 @@ public class PlaceBlockAtFloorTask extends AITask {
 		return h.isFacingBlock(facingBlock, dir.getOpposite(), getSide(dir));
 	}
 
-	protected BlockSide getSide(EnumFacing dir) {
-		return BlockSide.ANY;
+	protected BlockHalf getSide(EnumFacing dir) {
+		return BlockHalf.ANY;
 	}
 
 	protected final BlockPos getPlaceAtPos() {

@@ -7,6 +7,7 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.init.Blocks;
+import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.world.chunk.Chunk;
@@ -213,6 +214,27 @@ public class WorldData {
 				.getEntityBoundingBox().minY + FLOOR_HEIGHT);
 		final int z = (int) Math.floor(thePlayerToGetPositionFrom.posZ);
 		return new BlockPos(x, y, z);
+	}
+
+	public BlockBounds getBlockBounds(BlockPos pos) {
+		return getBlockBounds(pos.getX(), pos.getY(), pos.getZ());
+	}
+
+	public BlockBounds getBlockBounds(int x, int y, int z) {
+		BlockBounds res = BlockBounds.forBlockWithMeta(getBlockIdWithMeta(x, y, z));
+		if (res == BlockBounds.UNKNOWN_BLOCK) {
+			// TODO: Replace this.
+			WorldClient world = getBackingWorld();
+			BlockPos pos = new BlockPos(x, y, z);
+			Block block = world.getBlockState(pos).getBlock();
+			block.setBlockBoundsBasedOnState(world, pos);
+
+			return new BlockBounds(block.getBlockBoundsMinX(),
+					block.getBlockBoundsMaxX(), block.getBlockBoundsMinY(),
+					block.getBlockBoundsMaxY(), block.getBlockBoundsMinZ(),
+					block.getBlockBoundsMaxZ());
+		}
+		return res;
 	}
 
 	/**

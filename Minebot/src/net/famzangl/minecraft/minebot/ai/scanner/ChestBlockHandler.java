@@ -62,12 +62,7 @@ public class ChestBlockHandler extends RangeBlockHandler<ChestData> {
 		}
 
 		public boolean couldPutItem(ItemStack stack) {
-			for (ItemFilter f : fullItems) {
-				if (f.matches(stack)) {
-					return false;
-				}
-			}
-			return isItemAllowed(stack);
+			return !isFullFor(stack) && isItemAllowed(stack);
 		}
 
 		public boolean couldTakeItem(ItemStack stack) {
@@ -144,6 +139,15 @@ public class ChestBlockHandler extends RangeBlockHandler<ChestData> {
 					iterator.remove();
 				}
 			}
+		}
+
+		public boolean isFullFor(ItemStack stack) {
+			for (ItemFilter f : fullItems) {
+				if (f.matches(stack)) {
+					return true;
+				}
+			}
+			return false;
 		}
 	}
 

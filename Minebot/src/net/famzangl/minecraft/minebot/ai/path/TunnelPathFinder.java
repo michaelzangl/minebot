@@ -259,7 +259,7 @@ public class TunnelPathFinder extends AlongTrackPathFinder {
 	private boolean containsTorches(BlockCuboid tunnelArea) {
 		BlockFilteredArea torchArea = new BlockFilteredArea(tunnelArea,
 				BlockSets.TORCH);
-		return torchArea.getVolume() > 0;
+		return torchArea.getVolume(world) > 0;
 	}
 
 	private void addBranchTask(BlockPos currentPos, int dx, int dz) {

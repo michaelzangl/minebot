@@ -25,7 +25,7 @@ import net.famzangl.minecraft.minebot.ai.BlockItemFilter;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSet;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSets;
 import net.famzangl.minecraft.minebot.ai.task.AITask;
-import net.famzangl.minecraft.minebot.ai.task.BlockSide;
+import net.famzangl.minecraft.minebot.ai.task.BlockHalf;
 import net.famzangl.minecraft.minebot.ai.task.DestroyInRangeTask;
 import net.famzangl.minecraft.minebot.ai.task.PlaceBlockTask;
 import net.famzangl.minecraft.minebot.ai.task.PlaceTorchSomewhereTask;
@@ -121,7 +121,7 @@ public class BuildWayPathfinder extends AlongTrackPathFinder {
 
 			final BlockPos first = getPos(0, -1);
 			final AITask placeTask = new BuildHalfslabTask(first, FLOOR,
-					BlockSide.LOWER_HALF).getPlaceBlockTask(currentPos
+					BlockHalf.LOWER_HALF).getPlaceBlockTask(currentPos
 					.subtract(first));
 			addTask(placeTask);
 
@@ -132,7 +132,7 @@ public class BuildWayPathfinder extends AlongTrackPathFinder {
 			for (int i = 1; i < width; i++) {
 				final BlockPos current = getPos(i, -1);
 				addTask(new BuildHalfslabTask(current, FLOOR,
-						BlockSide.LOWER_HALF)
+						BlockHalf.LOWER_HALF)
 						.getPlaceBlockTask(getPos(i - 1, 0).subtract(current)));
 			}
 
