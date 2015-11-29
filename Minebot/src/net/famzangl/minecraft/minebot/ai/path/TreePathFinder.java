@@ -20,6 +20,7 @@ import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSet;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSets;
 import net.famzangl.minecraft.minebot.ai.path.world.WorldData;
+import net.famzangl.minecraft.minebot.ai.strategy.TaskStrategy;
 import net.famzangl.minecraft.minebot.ai.task.AITask;
 import net.famzangl.minecraft.minebot.ai.task.DestroyInRangeTask;
 import net.famzangl.minecraft.minebot.ai.task.DestroyLogInRange;
@@ -160,7 +161,8 @@ public class TreePathFinder extends MovePathFinder {
 
 			for (int y = playerStartY; y > 0; y--) {
 				int trunkBlocks = countTrunkBlocks(world, y);
-				if (trunkBlocks < 1) {
+				BlockPos pos = getPosition(y);
+				if (trunkBlocks < 1 || !allowedGroundBlocks.isAt(world, pos.add(0, -1, 0))) {
 					break;
 				}
 				minY = y;
@@ -176,6 +178,10 @@ public class TreePathFinder extends MovePathFinder {
 
 		public int getTreeHeightAbovePlayer() {
 			return topY - playerStartY;
+		}
+
+		public int getTreeHeight() {
+			return topY - minY;
 		}
 
 		/**
@@ -325,7 +331,9 @@ public class TreePathFinder extends MovePathFinder {
 			addTask(new SwitchToLargeTreeTask(null));
 			return true;
 		}
-		return false;
+		// Attempt to start a new large tree at our position.
+		world = h.getWorld();
+		return handleLargeTree(h.getPlayerPosition());
 	}
 
 	@Override
@@ -351,6 +359,8 @@ public class TreePathFinder extends MovePathFinder {
 	private boolean isLog(int x, int y, int z) {
 		return logs.isAt(world, x, y, z);
 	}
+	
+	
 
 	@Override
 	protected void addTasksForTarget(BlockPos currentPos) {
@@ -394,13 +404,21 @@ public class TreePathFinder extends MovePathFinder {
 				currentPos.add(-1, 0, -1), }) {
 			LargeTreeState state = new LargeTreeState(p);
 			state.scanTreeHeight(world, currentPos);
-			if (state.getTreeHeightAbovePlayer() > 4) {
-				// we are in a large tree.
+			if (state.getTreeHeight() > 6 || state.getTreeHeightAbovePlayer() > 4) {
+				// we are in a large tree that should be handled by this special algorithm.
 				state.setYOffsetByPosition(currentPos);
 				addTask(new SwitchToLargeTreeTask(state));
 				return true;
 			}
 		}
 		return false;
+	}
+	
+	@Override
+	protected boolean runSearch(BlockPos playerPosition) {
+		if (addTasksForLargeTree(helper)) {
+			return true;
+		}
+		return super.runSearch(playerPosition);
 	}
 }

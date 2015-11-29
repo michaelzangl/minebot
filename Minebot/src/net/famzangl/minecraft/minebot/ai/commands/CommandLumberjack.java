@@ -28,7 +28,7 @@ import net.famzangl.minecraft.minebot.ai.strategy.PathFinderStrategy;
 import net.famzangl.minecraft.minebot.build.block.WoodType;
 
 @AICommand(helpText = "Gets wood", name = "minebot")
-public class CommandGetWood {
+public class CommandLumberjack {
 	public static class TreePathFinderStrategy extends PathFinderStrategy {
 
 		private TreePathFinder treeFinder;
@@ -41,9 +41,6 @@ public class CommandGetWood {
 		
 		@Override
 		public void searchTasks(AIHelper helper) {
-			if (treeFinder.addTasksForLargeTree(helper)) {
-				return;
-			}
 			super.searchTasks(helper);
 		}
 	}

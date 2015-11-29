@@ -27,7 +27,7 @@ import net.famzangl.minecraft.minebot.ai.commands.CommandEnchant;
 import net.famzangl.minecraft.minebot.ai.commands.CommandFeed;
 import net.famzangl.minecraft.minebot.ai.commands.CommandFish;
 import net.famzangl.minecraft.minebot.ai.commands.CommandGet;
-import net.famzangl.minecraft.minebot.ai.commands.CommandGetWood;
+import net.famzangl.minecraft.minebot.ai.commands.CommandLumberjack;
 import net.famzangl.minecraft.minebot.ai.commands.CommandHelp;
 import net.famzangl.minecraft.minebot.ai.commands.CommandKill;
 import net.famzangl.minecraft.minebot.ai.commands.CommandRun;
@@ -88,7 +88,7 @@ public class AIChatController {
 		registerCommand(CommandRun.class);
 		registerCommand(CommandJs.class);
 		registerCommand(CommandPlant.class);
-		registerCommand(CommandGetWood.class);
+		registerCommand(CommandLumberjack.class);
 		registerCommand(CommandTint.class);
 		registerCommand(CommandBuildWay.class);
 		registerCommand(CommandShear.class);
