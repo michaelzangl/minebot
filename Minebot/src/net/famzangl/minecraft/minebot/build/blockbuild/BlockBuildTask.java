@@ -17,6 +17,8 @@
 package net.famzangl.minecraft.minebot.build.blockbuild;
 
 import net.famzangl.minecraft.minebot.ai.BlockItemFilter;
+import net.famzangl.minecraft.minebot.ai.command.BlockWithDataOrDontcare;
+import net.famzangl.minecraft.minebot.ai.path.world.BlockMetaSet;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSet;
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
@@ -36,14 +38,14 @@ public class BlockBuildTask extends CubeBuildTask {
 			Blocks.netherrack, Blocks.obsidian, Blocks.pumpkin,
 			Blocks.quartz_block, Blocks.quartz_ore, Blocks.red_mushroom_block,
 			Blocks.redstone_block, Blocks.redstone_lamp, Blocks.redstone_ore,
-			Blocks.sand, Blocks.stonebrick, Blocks.tnt);
+			Blocks.sand, Blocks.stonebrick, Blocks.tnt, Blocks.planks,
+			Blocks.wool, Blocks.stained_glass, Blocks.stained_hardened_clay);
+	private final BlockWithDataOrDontcare blockToPlace;
 
-	public BlockBuildTask(BlockPos forPosition, Block blockToPlace) {
-		this(forPosition, new BlockItemFilter(blockToPlace));
-	}
-
-	private BlockBuildTask(BlockPos forPosition, BlockItemFilter blockFilter) {
-		super(forPosition, blockFilter);
+	public BlockBuildTask(BlockPos forPosition,
+			BlockWithDataOrDontcare blockToPlace) {
+		super(forPosition, new BlockItemFilter(blockToPlace.toBlockSet()));
+		this.blockToPlace = blockToPlace;
 	}
 
 	@Override
@@ -55,6 +57,11 @@ public class BlockBuildTask extends CubeBuildTask {
 	@Override
 	public BuildTask withPositionAndRotation(BlockPos add, int rotateSteps,
 			MirrorDirection mirror) {
-		return new BlockBuildTask(add, this.blockFilter);
+		return new BlockBuildTask(add, this.blockToPlace);
+	}
+
+	@Override
+	public Object[] getCommandArguments() {
+		return new Object[] { blockToPlace.toBlockString() };
 	}
 }

@@ -21,11 +21,13 @@ import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.ColoredBlockItemFilter;
 import net.famzangl.minecraft.minebot.ai.ItemFilter;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSets;
+import net.famzangl.minecraft.minebot.ai.path.world.WorldData;
 import net.famzangl.minecraft.minebot.ai.task.AITask;
 import net.famzangl.minecraft.minebot.ai.task.place.JumpingPlaceAtHalfTask;
 import net.famzangl.minecraft.minebot.build.block.SlabType;
 import net.famzangl.minecraft.minebot.build.block.WoodType;
 import net.famzangl.minecraft.minebot.build.blockbuild.BuildNormalStairsTask.Half;
+import net.famzangl.minecraft.minebot.build.reverse.TaskDescription;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.item.EnumDyeColor;
@@ -40,104 +42,109 @@ public abstract class BuildTask {
 		this.forPosition = forPosition;
 	}
 
-	public static TaskDescription getTaskDescription(Block b, AIHelper h,
-			BlockPos worldPos) throws UnknownBlockException {
-		final String name = AIHelper.getBlockName(b);
-		final IBlockState blockState = h.getMinecraft().theWorld.getBlockState(worldPos);
-		final int blockMetadata = h.getWorld().getBlockIdWithMeta(worldPos) & 0xf;
-		if (BlockBuildTask.BLOCKS.contains(b)) {
-			return new TaskDescription(name, CubeBuildTask.STANDABLE);
-		} else if (ColoredCubeBuildTask.BLOCKS.contains(b)) {
-			return new TaskDescription(name + " "
-					+ EnumDyeColor.byMetadata(blockMetadata).getName(),
-					CubeBuildTask.STANDABLE);
-		} else if (FenceBuildTask.BLOCKS.contains(b)) {
-			return new TaskDescription(name, FenceBuildTask.STANDABLE);
-		} else if (LogBuildTask.BLOCKS.contains(b)) {
-			for (final WoodType t : WoodType.values()) {
-				if (t.lowerBits == (blockMetadata & 0x3) && t.block == b) {
-					String dir;
-					BlockPos[] pos;
-					if ((blockMetadata & 0xc) == 0x4) {
-						dir = "east";
-						pos = LogBuildTask.EAST_WEST_POS;
-					} else if ((blockMetadata & 0xc) == 0x8) {
-						dir = "north";
-						pos = LogBuildTask.NORTH_SOUTH_POS;
-					} else {
-						dir = "up";
-						pos = LogBuildTask.UP_DOWN_POS;
-					}
-					return new TaskDescription(name + " "
-							+ t.toString().toLowerCase() + " " + dir, pos);
-				}
-			}
-			throw new UnknownBlockException("Unknown wood type " + b);
-		} else if (WoodBuildTask.BLOCKS.contains(b)) {
-			return new TaskDescription(
-					name
-							+ " "
-							+ WoodType.values()[blockMetadata].toString()
-									.toLowerCase(), CubeBuildTask.STANDABLE);
-		} else if (BuildNormalStairsTask.BLOCKS.contains(b)) {
-			EnumFacing dir;
-			switch (blockMetadata & 0x3) {
-			case 0:
-				dir = EnumFacing.WEST;
-				break;
-			case 1:
-				dir = EnumFacing.EAST;
-				break;
-			case 2:
-				dir = EnumFacing.NORTH;
-				break;
-			default:
-				dir = EnumFacing.SOUTH;
-				break;
-			}
-			final BlockPos p1 = Pos.fromDir(dir.getOpposite()).add(0, 1, 0);
-			final BlockPos p2 = Pos.fromDir(dir.rotateY()).add(
-					0, 1, 0);
-			final BlockPos p3 = Pos.fromDir(dir.rotateYCCW())
-					.add(0, 1, 0);
-			String up;
-			BlockPos[] standable;
-			if ((blockMetadata & 0x4) == 0) {
-				up = "lower";
-				standable = new BlockPos[] { Pos.ZERO, p1, p2, p3 };
-			} else {
-				up = "upper";
-				standable = new BlockPos[] { p1, p2, p3 };
-			}
-			return new TaskDescription(name + " "
-					+ dir.toString().toLowerCase() + " " + up, standable);
-		} else if (BuildHalfslabTask.BLOCKS.contains(b)) {
-			for (final SlabType t : SlabType.values()) {
-				if (t.slabBlock == b && t.meta == (blockMetadata & 0x7)) {
-					Half up;
-					EnumFacing[] standable;
-					if ((blockMetadata & 0x8) == 0) {
-						up = Half.LOWER;
-						standable = JumpingPlaceAtHalfTask.TRY_FOR_LOWER;
-					} else {
-						up = Half.UPPER;
-						standable = JumpingPlaceAtHalfTask.TRY_FOR_UPPER;
-					}
+//	public static TaskDescription getTaskDescription(WorldData world,
+//			BlockPos worldPos) throws UnknownBlockException {
+//		int blockWithMeta = world.getBlockIdWithMeta(worldPos);
+//		
+//		final IBlockState blockState = h.getMinecraft().theWorld.getBlockState(worldPos);
+//		final int blockMetadata = h.getWorld().getBlockIdWithMeta(worldPos) & 0xf;
+//		if (BlockBuildTask.BLOCKS.contains(b)) {
+//			return new TaskDescription(name, CubeBuildTask.STANDABLE);
+//		} else if (ColoredCubeBuildTask.BLOCKS.contains(b)) {
+//			return new TaskDescription(name + " "
+//					+ EnumDyeColor.byMetadata(blockMetadata).getName(),
+//					CubeBuildTask.STANDABLE);
+//		} else if (FenceBuildTask.BLOCKS.contains(b)) {
+//			return new TaskDescription(name, FenceBuildTask.STANDABLE);
+//		} else if (LogBuildTask.BLOCKS.contains(b)) {
+//			for (final WoodType t : WoodType.values()) {
+//				if (t.lowerBits == (blockMetadata & 0x3) && t.block == b) {
+//					String dir;
+//					BlockPos[] pos;
+//					if ((blockMetadata & 0xc) == 0x4) {
+//						dir = "east";
+//						pos = LogBuildTask.EAST_WEST_POS;
+//					} else if ((blockMetadata & 0xc) == 0x8) {
+//						dir = "north";
+//						pos = LogBuildTask.NORTH_SOUTH_POS;
+//					} else {
+//						dir = "up";
+//						pos = LogBuildTask.UP_DOWN_POS;
+//					}
+//					return new TaskDescription(name + " "
+//							+ t.toString().toLowerCase() + " " + dir, pos);
+//				}
+//			}
+//			throw new UnknownBlockException("Unknown wood type " + b);
+//		} else if (WoodBuildTask.BLOCKS.contains(b)) {
+//			return new TaskDescription(
+//					name
+//							+ " "
+//							+ WoodType.values()[blockMetadata].toString()
+//									.toLowerCase(), CubeBuildTask.STANDABLE);
+//		} else if (BuildNormalStairsTask.BLOCKS.contains(b)) {
+//			EnumFacing dir;
+//			switch (blockMetadata & 0x3) {
+//			case 0:
+//				dir = EnumFacing.WEST;
+//				break;
+//			case 1:
+//				dir = EnumFacing.EAST;
+//				break;
+//			case 2:
+//				dir = EnumFacing.NORTH;
+//				break;
+//			default:
+//				dir = EnumFacing.SOUTH;
+//				break;
+//			}
+//			final BlockPos p1 = Pos.fromDir(dir.getOpposite()).add(0, 1, 0);
+//			final BlockPos p2 = Pos.fromDir(dir.rotateY()).add(
+//					0, 1, 0);
+//			final BlockPos p3 = Pos.fromDir(dir.rotateYCCW())
+//					.add(0, 1, 0);
+//			String up;
+//			BlockPos[] standable;
+//			if ((blockMetadata & 0x4) == 0) {
+//				up = "lower";
+//				standable = new BlockPos[] { Pos.ZERO, p1, p2, p3 };
+//			} else {
+//				up = "upper";
+//				standable = new BlockPos[] { p1, p2, p3 };
+//			}
+//			return new TaskDescription(name + " "
+//					+ dir.toString().toLowerCase() + " " + up, standable);
+//		} else if (BuildHalfslabTask.BLOCKS.contains(b)) {
+//			for (final SlabType t : SlabType.values()) {
+//				if (t.slabBlock == b && t.meta == (blockMetadata & 0x7)) {
+//					Half up;
+//					EnumFacing[] standable;
+//					if ((blockMetadata & 0x8) == 0) {
+//						up = Half.LOWER;
+//						standable = JumpingPlaceAtHalfTask.TRY_FOR_LOWER;
+//					} else {
+//						up = Half.UPPER;
+//						standable = JumpingPlaceAtHalfTask.TRY_FOR_UPPER;
+//					}
+//
+//					return new TaskDescription(name + " "
+//							+ t.toString().toLowerCase() + " "
+//							+ up.toString().toLowerCase(),
+//							Pos.fromDir(standable));
+//				}
+//			}
+//			throw new UnknownBlockException("Cannot find halfslabs " + b);
+//
+//		} else {
+//			throw new UnknownBlockException("Cannot reverse build task for "
+//					+ b);
+//		}
+//	}
 
-					return new TaskDescription(name + " "
-							+ t.toString().toLowerCase() + " "
-							+ up.toString().toLowerCase(),
-							Pos.fromDir(standable));
-				}
-			}
-			throw new UnknownBlockException("Cannot find halfslabs " + b);
-
-		} else {
-			throw new UnknownBlockException("Cannot reverse build task for "
-					+ b);
-		}
-	}
-
+	/**
+	 * Gets a list of relative positions we can stand on when building this.
+	 * @return
+	 */
 	public abstract BlockPos[] getStandablePlaces();
 
 	public BlockPos getForPosition() {
@@ -189,6 +196,10 @@ public abstract class BuildTask {
 
 	public boolean isReadyForBuild(AIHelper helper) {
 		return BlockSets.AIR.isAt(helper.getWorld(), getForPosition());
+	}
+
+	public Object[] getCommandArguments() {
+		throw new UnsupportedOperationException();
 	}
 
 }

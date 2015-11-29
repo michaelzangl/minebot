@@ -16,7 +16,6 @@
  *******************************************************************************/
 package net.famzangl.minecraft.minebot.build.reverse;
 
-import net.famzangl.minecraft.minebot.build.blockbuild.TaskDescription;
 import net.minecraft.block.Block;
 import net.minecraft.util.BlockPos;
 

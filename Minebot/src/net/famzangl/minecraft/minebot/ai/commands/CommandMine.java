@@ -21,6 +21,7 @@ import net.famzangl.minecraft.minebot.ai.command.AICommand;
 import net.famzangl.minecraft.minebot.ai.command.AICommandInvocation;
 import net.famzangl.minecraft.minebot.ai.command.AICommandParameter;
 import net.famzangl.minecraft.minebot.ai.command.AICommandParameter.BlockFilter;
+import net.famzangl.minecraft.minebot.ai.command.BlockWithDataOrDontcare;
 import net.famzangl.minecraft.minebot.ai.command.ParameterType;
 import net.famzangl.minecraft.minebot.ai.command.SafeStrategyRule;
 import net.famzangl.minecraft.minebot.ai.path.MineBySettingsPathFinder;
@@ -77,7 +78,7 @@ public class CommandMine {
 
 	public static final class MineBlockFilter extends BlockFilter {
 		@Override
-		public boolean matches(Block b) {
+		public boolean matches(BlockWithDataOrDontcare b) {
 			return MINEABLE.contains(b);
 		}
 	}
@@ -86,10 +87,10 @@ public class CommandMine {
 	public static AIStrategy run(
 			AIHelper helper,
 			@AICommandParameter(type = ParameterType.FIXED, fixedName = "mine", description = "") String nameArg,
-			@AICommandParameter(type = ParameterType.BLOCK_NAME, description = "The block to mine.", blockFilter = MineBlockFilter.class) Block blockName) {
-		return new PathFinderStrategy(new MineSinglePathFinder(blockName,
+			@AICommandParameter(type = ParameterType.BLOCK_NAME, description = "The block to mine.", blockFilter = MineBlockFilter.class) BlockWithDataOrDontcare blockName) {
+		return new PathFinderStrategy(new MineSinglePathFinder(blockName.toBlockSet(),
 				helper.getLookDirection(), helper.getPlayerPosition().getY()),
-				"Mining " + blockName.getLocalizedName());
+				"Mining " + blockName);
 	}
 
 	@AICommandInvocation(safeRule = SafeStrategyRule.DEFEND_MINING)

@@ -21,6 +21,7 @@ import net.famzangl.minecraft.minebot.ai.command.AICommand;
 import net.famzangl.minecraft.minebot.ai.command.AICommandInvocation;
 import net.famzangl.minecraft.minebot.ai.command.AICommandParameter;
 import net.famzangl.minecraft.minebot.ai.command.AICommandParameter.BlockFilter;
+import net.famzangl.minecraft.minebot.ai.command.BlockWithDataOrDontcare;
 import net.famzangl.minecraft.minebot.ai.command.ParameterType;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSet;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSets;
@@ -49,7 +50,7 @@ public class CommandCraft {
 
 	public static final class MyBlockFilter extends BlockFilter {
 		@Override
-		public boolean matches(Block b) {
+		public boolean matches(BlockWithDataOrDontcare b) {
 			return simpleBlocks.contains(b);
 		}
 	}
@@ -59,9 +60,10 @@ public class CommandCraft {
 			AIHelper helper,
 			@AICommandParameter(type = ParameterType.FIXED, fixedName = "craft", description = "") String nameArg,
 			@AICommandParameter(type = ParameterType.NUMBER, description = "Item count") int itemCount,
-			@AICommandParameter(type = ParameterType.BLOCK_NAME, description = "Block", blockFilter = MyBlockFilter.class) Block itemType,
+			@AICommandParameter(type = ParameterType.BLOCK_NAME, description = "Block", blockFilter = MyBlockFilter.class) BlockWithDataOrDontcare itemType,
 			@AICommandParameter(type = ParameterType.NUMBER, description = "Item subtype", optional = true) Integer itemSubtype) {
-		return run(helper, nameArg, itemCount, Block.getIdFromBlock(itemType),
+		// FIXME: subtype is duplicated. Do this in a better way.
+		return run(helper, nameArg, itemCount, itemType.getBlockId(),
 				itemSubtype);
 	}
 

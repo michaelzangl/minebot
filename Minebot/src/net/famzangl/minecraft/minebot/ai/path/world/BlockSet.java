@@ -18,8 +18,11 @@ package net.famzangl.minecraft.minebot.ai.path.world;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 
+import net.famzangl.minecraft.minebot.ai.command.BlockWithData;
+import net.famzangl.minecraft.minebot.ai.command.BlockWithDataOrDontcare;
 import net.famzangl.minecraft.minebot.ai.utils.BlockCuboid;
 import net.famzangl.minecraft.minebot.ai.utils.BlockFilteredArea;
 import net.minecraft.block.Block;
@@ -32,7 +35,7 @@ import net.minecraft.util.BlockPos;
  * @author Michael Zangl
  *
  */
-public class BlockSet {
+public class BlockSet implements Iterable<BlockWithData> {
 
 	// Should be approx. one cache line.
 	public static int MAX_BLOCKIDS = 4096;
@@ -168,12 +171,16 @@ public class BlockSet {
 
 	/**
 	 * Checks if all of the given area in the world is filled with this block.
-	 * @param world The world
-	 * @param area The area
+	 * 
+	 * @param world
+	 *            The world
+	 * @param area
+	 *            The area
 	 * @return <code>true</code> if the area is filled with blocks of this set.
 	 */
 	public boolean isAt(WorldData world, BlockCuboid area) {
-		return new BlockFilteredArea(area, this).getVolume(world) == area.getVolume(world);
+		return new BlockFilteredArea(area, this).getVolume(world) == area
+				.getVolume(world);
 	}
 
 	@Deprecated
@@ -247,5 +254,46 @@ public class BlockSet {
 		} else {
 			return null;
 		}
+	}
+
+	public boolean contains(BlockWithDataOrDontcare forBlock) {
+		return forBlock.containedIn(this);
+	}
+
+	@Override
+	public Iterator<BlockWithData> iterator() {
+		return new Iterator<BlockWithData>() {
+			int nextId = -1;
+
+			@Override
+			public boolean hasNext() {
+				if (nextId < 0) {
+					scanNext();
+				}
+				return nextId < MAX_BLOCKIDS * 16;
+			}
+
+			private void scanNext() {
+				do {
+					nextId++;
+				} while (nextId < MAX_BLOCKIDS * 16
+						&& !containsWithMeta(nextId));
+			}
+
+			@Override
+			public BlockWithData next() {
+				if (!hasNext()) {
+					throw new IllegalStateException();
+				}
+				BlockWithData next = new BlockWithData(nextId);
+				scanNext();
+				return next;
+			}
+
+			@Override
+			public void remove() {
+				throw new UnsupportedOperationException();
+			}
+		};
 	}
 }

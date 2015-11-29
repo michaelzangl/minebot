@@ -2,6 +2,7 @@ package net.famzangl.minecraft.minebot.ai.path.world;
 
 import java.util.Arrays;
 
+import net.famzangl.minecraft.minebot.ai.command.BlockWithData;
 import net.minecraft.block.Block;
 
 /**
@@ -41,6 +42,10 @@ public class BlockFloatMap {
 
 	public void set(int blockWithMeta, float value) {
 		floats[blockWithMeta] = value;
+	}
+
+	public void set(BlockWithData block, float value) {
+		set(block.getBlockWithMeta(), value);
 	}
 
 	public float get(int blockAndMeta) {

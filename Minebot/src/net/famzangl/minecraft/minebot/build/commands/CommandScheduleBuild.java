@@ -21,6 +21,7 @@ import net.famzangl.minecraft.minebot.ai.command.AICommand;
 import net.famzangl.minecraft.minebot.ai.command.AICommandInvocation;
 import net.famzangl.minecraft.minebot.ai.command.AICommandParameter;
 import net.famzangl.minecraft.minebot.ai.command.AICommandParameter.BlockFilter;
+import net.famzangl.minecraft.minebot.ai.command.BlockWithDataOrDontcare;
 import net.famzangl.minecraft.minebot.ai.command.CommandEvaluationException;
 import net.famzangl.minecraft.minebot.ai.command.ParameterType;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSet;
@@ -33,7 +34,6 @@ import net.famzangl.minecraft.minebot.build.blockbuild.BuildHalfslabTask;
 import net.famzangl.minecraft.minebot.build.blockbuild.BuildNormalStairsTask;
 import net.famzangl.minecraft.minebot.build.blockbuild.BuildNormalStairsTask.Half;
 import net.famzangl.minecraft.minebot.build.blockbuild.BuildTask;
-import net.famzangl.minecraft.minebot.build.blockbuild.ColoredCubeBuildTask;
 import net.famzangl.minecraft.minebot.build.blockbuild.FenceBuildTask;
 import net.famzangl.minecraft.minebot.build.blockbuild.LogBuildTask;
 import net.famzangl.minecraft.minebot.build.blockbuild.StandingSignBuildTask;
@@ -52,7 +52,7 @@ public class CommandScheduleBuild {
 
 	public static final class RunSimpleFilter extends BlockFilter {
 		@Override
-		public boolean matches(Block b) {
+		public boolean matches(BlockWithDataOrDontcare b) {
 			return SIMPLE_WHITELIST.contains(b);
 		}
 	}
@@ -62,7 +62,7 @@ public class CommandScheduleBuild {
 			AIHelper helper,
 			@AICommandParameter(type = ParameterType.FIXED, fixedName = "schedule", description = "") String nameArg,
 			@AICommandParameter(type = ParameterType.POSITION, description = "Where to place it (relative is to your current pos)") BlockPos forPosition,
-			@AICommandParameter(type = ParameterType.BLOCK_NAME, description = "The block", blockFilter = RunSimpleFilter.class) Block blockToPlace) {
+			@AICommandParameter(type = ParameterType.BLOCK_NAME, description = "The block", blockFilter = RunSimpleFilter.class) BlockWithDataOrDontcare blockToPlace) {
 
 		if (BlockBuildTask.BLOCKS.contains(blockToPlace)) {
 			addTask(helper, new BlockBuildTask(forPosition, blockToPlace));
@@ -74,32 +74,33 @@ public class CommandScheduleBuild {
 		return null;
 	}
 
-	public static final class RunColoredFilter extends BlockFilter {
-		@Override
-		public boolean matches(Block b) {
-			return ColoredCubeBuildTask.BLOCKS.contains(b);
-		}
-	}
+//	public static final class RunColoredFilter extends BlockFilter {
+//		@Override
+//		public boolean matches(Block b) {
+//			return ColoredCubeBuildTask.BLOCKS.contains(b);
+//		}
+//	}
 
-	@AICommandInvocation()
-	public static AIStrategy run(
-			AIHelper helper,
-			@AICommandParameter(type = ParameterType.FIXED, fixedName = "schedule", description = "") String nameArg,
-			@AICommandParameter(type = ParameterType.POSITION, description = "Where to place it (relative is to your current pos)") BlockPos forPosition,
-			@AICommandParameter(type = ParameterType.BLOCK_NAME, description = "The block", blockFilter = RunColoredFilter.class) Block blockToPlace,
-			@AICommandParameter(type = ParameterType.COLOR, description = "The color") EnumDyeColor color) {
-		if (ColoredCubeBuildTask.BLOCKS.contains(blockToPlace)) {
-			addTask(helper, new ColoredCubeBuildTask(forPosition, blockToPlace,
-					color));
-		} else {
-			throw new CommandEvaluationException("Cannot build " + blockToPlace);
-		}
-		return null;
-	}
+	// TODO: This is the task of BLOCK_NAME
+//	@AICommandInvocation()
+//	public static AIStrategy run(
+//			AIHelper helper,
+//			@AICommandParameter(type = ParameterType.FIXED, fixedName = "schedule", description = "") String nameArg,
+//			@AICommandParameter(type = ParameterType.POSITION, description = "Where to place it (relative is to your current pos)") BlockPos forPosition,
+//			@AICommandParameter(type = ParameterType.BLOCK_NAME, description = "The block", blockFilter = RunColoredFilter.class) BlockWithDataOrDontcare blockToPlace,
+//			@AICommandParameter(type = ParameterType.COLOR, description = "The color") EnumDyeColor color) {
+//		if (ColoredCubeBuildTask.BLOCKS.contains(blockToPlace)) {
+//			addTask(helper, new ColoredCubeBuildTask(forPosition, blockToPlace,
+//					color));
+//		} else {
+//			throw new CommandEvaluationException("Cannot build " + blockToPlace);
+//		}
+//		return null;
+//	}
 
 	public static final class WoodBlockFilter extends BlockFilter {
 		@Override
-		public boolean matches(Block b) {
+		public boolean matches(BlockWithDataOrDontcare b) {
 			return WoodBuildTask.BLOCKS.contains(b);
 		}
 	}
@@ -121,7 +122,7 @@ public class CommandScheduleBuild {
 
 	public static final class LogBlockFilter extends BlockFilter {
 		@Override
-		public boolean matches(Block b) {
+		public boolean matches(BlockWithDataOrDontcare b) {
 			return LogBuildTask.BLOCKS.contains(b);
 		}
 	}
@@ -144,31 +145,33 @@ public class CommandScheduleBuild {
 
 	public static final class StairsBlockFilter extends BlockFilter {
 		@Override
-		public boolean matches(Block b) {
+		public boolean matches(BlockWithDataOrDontcare b) {
 			return BuildNormalStairsTask.BLOCKS.contains(b);
 		}
 	}
+	
+	// TODO: Merge with Factory
 
-	@AICommandInvocation()
-	public static AIStrategy run(
-			AIHelper helper,
-			@AICommandParameter(type = ParameterType.FIXED, fixedName = "schedule", description = "") String nameArg,
-			@AICommandParameter(type = ParameterType.POSITION, description = "Where to place it (relative is to your current pos)") BlockPos forPosition,
-			@AICommandParameter(type = ParameterType.BLOCK_NAME, description = "The block", blockFilter = StairsBlockFilter.class) Block blockToPlace,
-			@AICommandParameter(type = ParameterType.ENUM, description = "The direction the stairs face") EnumFacing direction,
-			@AICommandParameter(type = ParameterType.ENUM, description = "Upper for inverted stairs", optional = true) Half half) {
-		if (BuildNormalStairsTask.BLOCKS.contains(blockToPlace)) {
-			addTask(helper, new BuildNormalStairsTask(forPosition,
-					blockToPlace, direction, half == null ? Half.LOWER : half));
-		} else {
-			throw new CommandEvaluationException("Cannot build " + blockToPlace);
-		}
-		return null;
-	}
+//	@AICommandInvocation()
+//	public static AIStrategy run(
+//			AIHelper helper,
+//			@AICommandParameter(type = ParameterType.FIXED, fixedName = "schedule", description = "") String nameArg,
+//			@AICommandParameter(type = ParameterType.POSITION, description = "Where to place it (relative is to your current pos)") BlockPos forPosition,
+//			@AICommandParameter(type = ParameterType.BLOCK_NAME, description = "The block", blockFilter = StairsBlockFilter.class) BlockWithDataOrDontcare blockToPlace,
+//			@AICommandParameter(type = ParameterType.ENUM, description = "The direction the stairs face") EnumFacing direction,
+//			@AICommandParameter(type = ParameterType.ENUM, description = "Upper for inverted stairs", optional = true) Half half) {
+//		if (BuildNormalStairsTask.BLOCKS.contains(blockToPlace)) {
+//			addTask(helper, new BuildNormalStairsTask(forPosition,
+//					blockToPlace, direction, half == null ? Half.LOWER : half));
+//		} else {
+//			throw new CommandEvaluationException("Cannot build " + blockToPlace);
+//		}
+//		return null;
+//	}
 
 	public static final class SlabBlockFilter extends BlockFilter {
 		@Override
-		public boolean matches(Block b) {
+		public boolean matches(BlockWithDataOrDontcare b) {
 			return BuildHalfslabTask.BLOCKS.contains(b);
 		}
 	}
@@ -178,7 +181,7 @@ public class CommandScheduleBuild {
 			AIHelper helper,
 			@AICommandParameter(type = ParameterType.FIXED, fixedName = "schedule", description = "") String nameArg,
 			@AICommandParameter(type = ParameterType.POSITION, description = "Where to place it (relative is to your current pos)") BlockPos forPosition,
-			@AICommandParameter(type = ParameterType.BLOCK_NAME, description = "The block", blockFilter = SlabBlockFilter.class) Block blockToPlace,
+			@AICommandParameter(type = ParameterType.BLOCK_NAME, description = "The block", blockFilter = SlabBlockFilter.class) BlockWithDataOrDontcare blockToPlace,
 			@AICommandParameter(type = ParameterType.ENUM, description = "The subtype of slabs to place") SlabType type,
 			@AICommandParameter(type = ParameterType.ENUM, description = "If a upper or lower half should be placed") BlockHalf side) {
 		if (BuildHalfslabTask.BLOCKS.contains(blockToPlace)) {
@@ -191,7 +194,7 @@ public class CommandScheduleBuild {
 
 	public static final class SignBlockFilter extends BlockFilter {
 		@Override
-		public boolean matches(Block b) {
+		public boolean matches(BlockWithDataOrDontcare b) {
 			return StandingSignBuildTask.BLOCKS.contains(b);
 		}
 	}
@@ -201,12 +204,12 @@ public class CommandScheduleBuild {
 			AIHelper helper,
 			@AICommandParameter(type = ParameterType.FIXED, fixedName = "schedule", description = "") String nameArg,
 			@AICommandParameter(type = ParameterType.POSITION, description = "Where to place it (relative is to your current pos)") BlockPos forPosition,
-			@AICommandParameter(type = ParameterType.BLOCK_NAME, description = "The block", blockFilter = SignBlockFilter.class) Block blockToPlace,
+			@AICommandParameter(type = ParameterType.BLOCK_NAME, description = "The block", blockFilter = SignBlockFilter.class) BlockWithDataOrDontcare blockToPlace,
 			@AICommandParameter(type = ParameterType.ENUM, description = "The direction of the sign") SignDirection direction,
 			@AICommandParameter(type = ParameterType.STRING, description = "The first line. Replace space with §.", optional = true) String text1,
-			@AICommandParameter(type = ParameterType.STRING, description = "The first line. Replace space with §.", optional = true) String text2,
-			@AICommandParameter(type = ParameterType.STRING, description = "The first line. Replace space with §.", optional = true) String text3,
-			@AICommandParameter(type = ParameterType.STRING, description = "The first line. Replace space with §.", optional = true) String text4) {
+			@AICommandParameter(type = ParameterType.STRING, description = "The second line. Replace space with §.", optional = true) String text2,
+			@AICommandParameter(type = ParameterType.STRING, description = "The third line. Replace space with §.", optional = true) String text3,
+			@AICommandParameter(type = ParameterType.STRING, description = "The fourth line. Replace space with §.", optional = true) String text4) {
 		if (StandingSignBuildTask.BLOCKS.contains(blockToPlace)) {
 			addTask(helper, new StandingSignBuildTask(forPosition, direction,
 					new String[] { text1, text2, text3, text4 }));

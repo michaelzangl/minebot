@@ -14,47 +14,35 @@
  * You should have received a copy of the GNU General Public License
  * along with Minebot.  If not, see <http://www.gnu.org/licenses/>.
  *******************************************************************************/
-package net.famzangl.minecraft.minebot.build.blockbuild;
+package net.famzangl.minecraft.minebot.build.reverse.factories;
 
-import net.famzangl.minecraft.minebot.ai.BlockItemFilter;
+import java.util.ArrayList;
+
 import net.famzangl.minecraft.minebot.ai.command.BlockWithDataOrDontcare;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSet;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSets;
-import net.minecraft.block.Block;
+import net.famzangl.minecraft.minebot.ai.path.world.WorldData;
+import net.famzangl.minecraft.minebot.build.blockbuild.BuildTask;
+import net.famzangl.minecraft.minebot.build.reverse.TaskDescription;
+import net.famzangl.minecraft.minebot.build.reverse.UnsupportedBlockException;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.BlockPos;
 
-public class FenceBuildTask extends CubeBuildTask {
 
-	public static final BlockPos[] STANDABLE = new BlockPos[] { new BlockPos(-1, 1, 0),
-			new BlockPos(0, 1, -1), new BlockPos(1, 1, 0), new BlockPos(0, 1, 1), };
-
-	public static final BlockSet BLOCKS = new BlockSet(
-			Blocks.cobblestone_wall).unionWith(BlockSets.FENCE);
-
-	private final BlockWithDataOrDontcare fenceBlock;
-
-	public FenceBuildTask(BlockPos forPosition, BlockWithDataOrDontcare fenceBlock) {
-		super(forPosition, new BlockItemFilter(fenceBlock.toBlockSet()));
-		if (!BLOCKS.contains(fenceBlock)) {
-			throw new IllegalArgumentException();
-		}
-		this.fenceBlock = fenceBlock;
-	}
-
-	@Override
-	public BlockPos[] getStandablePlaces() {
-		return STANDABLE;
-	}
-
-	@Override
-	protected double getBlockHeight() {
-		return 1.5;
-	}
-
-	@Override
-	public BuildTask withPositionAndRotation(BlockPos add, int rotateSteps,
-			MirrorDirection mirror) {
-		return new FenceBuildTask(add, fenceBlock);
-	}
+/**
+ * This is a factory for build task descriptions. Those build tasks are then turned into a text file.
+ * @author Michael Zangl
+ *
+ */
+public interface BuildTaskFactory {
+	public BuildTask getTask(BlockPos position, BlockWithDataOrDontcare forBlock);
+	
+	/**
+	 * Attempts to create a task description (textual representation of the task) for the given position.
+	 * @param world The world state.
+	 * @param position The position the build task is at.
+	 * @return The task description.
+	 * @throws UnsupportedBlockException If the block should have been handled but some error occurred (unknown state, ...)
+	 */
+	public TaskDescription getTaskDescription(WorldData world, BlockPos position) throws UnsupportedBlockException;
 }

@@ -1024,15 +1024,6 @@ public abstract class AIHelper {
 		}
 	}
 
-	public static String getBlockName(Block block) {
-		final ResourceLocation name = ((ResourceLocation) Block.blockRegistry
-				.getNameForObject(block));
-		String domain = name.getResourceDomain().equals("minecraft") ? ""
-				: name.getResourceDomain() + ":";
-		String blockName = domain + name.getResourcePath();
-		return blockName;
-	}
-
 	public void setActiveMapReader(MapReader activeMapReader) {
 		if (this.activeMapReader != null) {
 			this.activeMapReader.onStop();

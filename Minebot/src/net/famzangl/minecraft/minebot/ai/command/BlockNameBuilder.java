@@ -55,29 +55,29 @@ public class BlockNameBuilder extends ParameterBuilder {
 
 		@Override
 		public boolean couldEvaluateAgainst(String string) {
-			final Object block = Block.blockRegistry
-					.getObject(new ResourceLocation(string));
-			return block != null && blockFilter.matches((Block) block);
+			BlockWithDataOrDontcare block = BlockWithDataOrDontcare.getFromString(string);
+			return block != null && blockFilter.matches(block);
 		}
 
 		@Override
 		public void getTabCompleteOptions(String currentStart,
 				Collection<String> addTo) {
 			super.getTabCompleteOptions(currentStart, addTo);
-			@SuppressWarnings("unchecked")
-			final Set<ResourceLocation> keys = Block.blockRegistry.getKeys();
-			for (final ResourceLocation k : keys) {
-				final Object block = Block.blockRegistry.getObject(k);
-				if (blockFilter.matches((Block) block)) {
-					if (k.getResourceDomain().equals(MINECRAFT_PREFIX)) {
-						final String subKey = k.getResourcePath();
-						addKey(currentStart, addTo, subKey);
-					} else {
-						addKey(currentStart, addTo,
-								BlockNameBuilder.toString(k));
-					}
-				}
-			}
+//			@SuppressWarnings("unchecked")
+			// BIG TODO: Get a list of all blocks for tab complete.
+//			final Set<ResourceLocation> keys = Block.blockRegistry.getKeys();
+//			for (final ResourceLocation k : keys) {
+//				final Object block = Block.blockRegistry.getObject(k);
+//				if (blockFilter.matches((Block) block)) {
+//					if (k.getResourceDomain().equals(MINECRAFT_PREFIX)) {
+//						final String subKey = k.getResourcePath();
+//						addKey(currentStart, addTo, subKey);
+//					} else {
+//						addKey(currentStart, addTo,
+//								BlockNameBuilder.toString(k));
+//					}
+//				}
+//			}
 		}
 
 		private void addKey(String currentStart, Collection<String> addTo,
@@ -102,17 +102,12 @@ public class BlockNameBuilder extends ParameterBuilder {
 
 	@Override
 	public Object getParameter(AIHelper helper, String[] arguments) {
-		final Object block = Block.blockRegistry.getObject(arguments[0]);
-		if (block == null) {
-			throw new CommandEvaluationException("Block " + arguments[0]
-					+ " is unknown");
-		}
-		return block;
+		return BlockWithDataOrDontcare.getFromString(arguments[0]);
 	}
 
 	@Override
 	protected Class<?> getRequiredParameterClass() {
-		return Block.class;
+		return BlockWithDataOrDontcare.class;
 	}
 
 }

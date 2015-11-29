@@ -14,29 +14,28 @@
  * You should have received a copy of the GNU General Public License
  * along with Minebot.  If not, see <http://www.gnu.org/licenses/>.
  *******************************************************************************/
-package net.famzangl.minecraft.minebot.build.blockbuild;
+package net.famzangl.minecraft.minebot.build.reverse;
 
-public class UnknownBlockException extends Exception {
+import java.util.Arrays;
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -3534869401465171196L;
+import net.minecraft.util.BlockPos;
 
-	public UnknownBlockException() {
-		super();
+public class TaskDescription {
+	private final String commandArgs;
+	private final BlockPos[] buildableFrom;
+
+	public TaskDescription(String commandArgs, BlockPos[] buildableFrom) {
+		this.commandArgs = commandArgs;
+		this.buildableFrom = buildableFrom;
 	}
 
-	public UnknownBlockException(String message, Throwable cause) {
-		super(message, cause);
+	public String getCommandArgs() {
+		return commandArgs;
 	}
 
-	public UnknownBlockException(String message) {
-		super(message);
+	@Override
+	public String toString() {
+		return "TaskDescription [commandArgs=" + commandArgs
+				+ ", buildableFrom=" + Arrays.toString(buildableFrom) + "]";
 	}
-
-	public UnknownBlockException(Throwable cause) {
-		super(cause);
-	}
-
 }

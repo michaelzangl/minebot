@@ -21,13 +21,17 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintStream;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.Marker;
+import org.apache.logging.log4j.MarkerManager;
+
 import net.famzangl.minecraft.minebot.MinebotMod;
 import net.famzangl.minecraft.minebot.Pos;
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.command.AIChatController;
 import net.famzangl.minecraft.minebot.build.blockbuild.BuildTask;
-import net.famzangl.minecraft.minebot.build.blockbuild.TaskDescription;
-import net.famzangl.minecraft.minebot.build.blockbuild.UnknownBlockException;
+import net.famzangl.minecraft.minebot.build.reverse.factories.BuildTaskFactories;
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.BlockPos;
@@ -41,6 +45,9 @@ import net.minecraft.util.EnumFacing;
  *
  */
 public class BuildReverser {
+	private static final Marker MARKER_RECONSTRUCT = MarkerManager
+			.getMarker("reconstruct");
+	private static final Logger LOGGER = LogManager.getLogger(BuildReverser.class);
 	private final AIHelper helper;
 	private final BlockPos minPos;
 	private final BlockPos maxPos;
@@ -70,8 +77,10 @@ public class BuildReverser {
 			if (outFile == null || "-".equals(outFile)) {
 				this.outFile = null;
 				this.out = System.out;
+				LOGGER.info(MARKER_RECONSTRUCT, "Printing reverse build output.");
 			} else {
 				this.out = new PrintStream(outFile);
+				LOGGER.info(MARKER_RECONSTRUCT, "Writing reverse build output to " + outFile);
 			}
 			out.println("# Minebot reverse build script "
 					+ MinebotMod.getVersion());
@@ -81,6 +90,7 @@ public class BuildReverser {
 			out.println("/minebuild reset");
 			out.println("");
 			for (int y = minPos.getY(); y <= maxPos.getY(); y++) {
+				LOGGER.trace(MARKER_RECONSTRUCT, "Start layer at y=" + y);
 				out.println("# Layer " + (y - minPos.getY()));
 				for (int x = minPos.getX(); x <= maxPos.getX(); x++) {
 					final boolean row2 = (x - minPos.getX() & 1) == 1;
@@ -120,21 +130,22 @@ public class BuildReverser {
 
 	private void addBuildPlace(BlockPos pos) {
 		BlockPos localPos = pos.subtract(minPos);
-		System.out.println("Reconstructing: " + localPos);
+		LOGGER.trace(MARKER_RECONSTRUCT, "Reconstructing block at " + pos);
 
 		final Block b = helper.getBlock(pos);
 		if (b != Blocks.air) {
 			try {
-				final TaskDescription taskString = BuildTask
-						.getTaskDescription(b, helper, pos);
+				final TaskDescription taskString = BuildTaskFactories.getTaskFor(helper.getWorld(), pos) ;
+				LOGGER.trace(MARKER_RECONSTRUCT, "Resulting description: " + taskString);
 				field.setBlockAt(localPos, b, taskString);
 				out.println("/minebuild schedule ~" + localPos.getX() + " ~"
 						+ localPos.getY() + " ~" + localPos.getZ() + " "
 						+ taskString.getCommandArgs());
-			} catch (final UnknownBlockException e) {
+			} catch (final UnsupportedBlockException e) {
 				out.println("# Missing: ~" + localPos.getX() + " ~"
 						+ localPos.getY() + " ~" + localPos.getZ() + " "
 						+ b.getLocalizedName());
+				LOGGER.warn(MARKER_RECONSTRUCT, "Error: " + e.getMessage());
 				missingBlocks++;
 			}
 		}

@@ -51,8 +51,8 @@ public abstract class MinePathfinder extends MovePathFinder {
 	 */
 	protected final float preferedLayerInfluence = 0.3f;
 
-	private final BlockFloatMap points;
-	private final BlockFloatMap factors;
+	private BlockFloatMap points;
+	private BlockFloatMap factors;
 
 //	protected static interface ISettingsProvider {
 //		float getFloat(Block name);
@@ -86,12 +86,17 @@ public abstract class MinePathfinder extends MovePathFinder {
 	public MinePathfinder(EnumFacing preferedDirection, int preferedLayer) {
 		this.preferedDirection = preferedDirection;
 		this.preferedLayer = preferedLayer;
-		points = getPointsProvider();
-		factors = getFactorProvider();
 	}
 
 	@Override
 	protected boolean runSearch(BlockPos playerPosition) {
+		// lazy init
+		if (points == null) {
+			points = getPointsProvider();
+		}
+		if (factors == null) {
+			factors = getFactorProvider();
+		}
 		for (ResourceLocation k : (Set<ResourceLocation>) Block.blockRegistry
 				.getKeys()) {
 			int id = Block.getIdFromBlock((Block) Block.blockRegistry

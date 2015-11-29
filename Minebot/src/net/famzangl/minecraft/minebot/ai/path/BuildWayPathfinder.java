@@ -22,6 +22,7 @@ import java.util.Collections;
 
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.BlockItemFilter;
+import net.famzangl.minecraft.minebot.ai.command.BlockWithDontcare;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSet;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSets;
 import net.famzangl.minecraft.minebot.ai.task.AITask;
@@ -176,13 +177,13 @@ public class BuildWayPathfinder extends AlongTrackPathFinder {
 
 		protected final void addNearSide() {
 			final CubeBuildTask task = new BlockBuildTask(getPos(-1, -1),
-					BRIDGE_SIDE);
+					new BlockWithDontcare(BRIDGE_SIDE));
 			addTask(task.getPlaceBlockTask(getPos(1, 1).subtract(getPos(0, 0))));
 		}
 
 		protected final void addFarSide() {
 			final CubeBuildTask task = new BlockBuildTask(getPos(width, -1),
-					BRIDGE_SIDE);
+					new BlockWithDontcare(BRIDGE_SIDE));
 			addTask(task
 					.getPlaceBlockTask(getPos(-1, 1).subtract(getPos(0, 0))));
 		}

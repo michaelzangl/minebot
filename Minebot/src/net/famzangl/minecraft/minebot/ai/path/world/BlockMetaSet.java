@@ -24,6 +24,12 @@ public class BlockMetaSet extends BlockSet {
 		setBlockAndMeta(Block.getIdFromBlock(block), meta);
 	}
 
+	public BlockMetaSet(int... blockIdWithMetas) {
+		for (int i : blockIdWithMetas) {
+			setBlockAndMeta(i >> 4, i & 0xf);
+		}
+	}
+
 	public BlockMetaSet unionWith(Block block, int meta) {
 		return unionWith(new BlockMetaSet(block, meta));
 	}
@@ -79,12 +85,12 @@ public class BlockMetaSet extends BlockSet {
 	protected BlockSet convertToMetaSet() {
 		return this;
 	}
-	
+
 	@Override
 	public BlockMetaSet unionWith(BlockSet bs2) {
 		return (BlockMetaSet) super.unionWith(bs2);
 	}
-	
+
 	@Override
 	public BlockMetaSet intersectWith(BlockSet bs2) {
 		return (BlockMetaSet) super.intersectWith(bs2);

@@ -16,24 +16,28 @@
  *******************************************************************************/
 package net.famzangl.minecraft.minebot.ai.path;
 
+import net.famzangl.minecraft.minebot.ai.command.BlockWithData;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockFloatMap;
+import net.famzangl.minecraft.minebot.ai.path.world.BlockSet;
 import net.minecraft.block.Block;
 import net.minecraft.util.EnumFacing;
 
 public class MineSinglePathFinder extends MinePathfinder {
 
-	private final Block block;
+	private final BlockSet blocks;
 
-	public MineSinglePathFinder(Block block, EnumFacing preferedDirection,
+	public MineSinglePathFinder(BlockSet blocks, EnumFacing preferedDirection,
 			int preferedLayer) {
 		super(preferedDirection, preferedLayer);
-		this.block = block;
+		this.blocks = blocks;
 	}
 
 	@Override
 	protected BlockFloatMap getFactorProvider() {
 		BlockFloatMap map = new BlockFloatMap();
-		map.setBlock(Block.getIdFromBlock(block), 1);
+		for (BlockWithData block : blocks) {
+			map.set(block, 1);
+		}
 		map.setDefault(0);
 		return map;
 	}

@@ -32,12 +32,12 @@ public @interface AICommandParameter {
 	 *
 	 */
 	public static abstract class BlockFilter {
-		public abstract boolean matches(Block b);
+		public abstract boolean matches(BlockWithDataOrDontcare block);
 	}
 	
 	public static class AnyBlockFilter extends BlockFilter {
 		@Override
-		public boolean matches(Block b) {
+		public boolean matches(BlockWithDataOrDontcare b) {
 			return true;
 		}
 	}
