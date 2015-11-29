@@ -24,6 +24,11 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Map.Entry;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.Marker;
+import org.apache.logging.log4j.MarkerManager;
+
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.enchanting.CloseScreenTask;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSet;
@@ -55,6 +60,10 @@ import net.minecraft.util.BlockPos;
  *
  */
 public class CraftStrategy extends PathFinderStrategy {
+	private static final Marker MARKER_RECIPE = MarkerManager
+			.getMarker("recipe");
+	private static final Logger LOGGER = LogManager
+			.getLogger(CraftStrategy.class);
 
 	public static final class CraftingPossibility {
 		public static final int SUBTYPE_IGNORED = 32767;
@@ -65,11 +74,18 @@ public class CraftStrategy extends PathFinderStrategy {
 		private final ItemWithSubtype[][] slots = new ItemWithSubtype[3][3];
 
 		public CraftingPossibility(IRecipe r) {
+			LOGGER.trace(MARKER_RECIPE, "Parsing recipe: " + r);
 			if (r instanceof ShapedRecipes) {
 				ShapedRecipes shapedRecipes = (ShapedRecipes) r;
+				LOGGER.trace(MARKER_RECIPE, "Interpreting ShapedRecipes: "
+						+ shapedRecipes.getRecipeOutput().getItem()
+								.getUnlocalizedName());
 				int[] dim = getSizes(shapedRecipes);
+
 				ItemStack[] items = PrivateFieldUtils.getFieldValue(
 						shapedRecipes, ShapedRecipes.class, ItemStack[].class);
+				LOGGER.trace(MARKER_RECIPE, "Found items of size " + dim[WIDTH]
+						+ "x" + dim[HEIGHT] + ": " + Arrays.toString(items));
 				for (int x = 0; x < dim[WIDTH]; x++) {
 					for (int y = 0; y < dim[HEIGHT]; y++) {
 						ItemStack itemStack = items[x + y * dim[WIDTH]];
@@ -78,27 +94,32 @@ public class CraftStrategy extends PathFinderStrategy {
 						}
 					}
 				}
+				LOGGER.trace(MARKER_RECIPE, "Slots " + Arrays.toString(slots));
 			}
-//			  else if (r instanceof ShapedOreRecipe) { ShapedOreRecipe
-//			  shapedRecipes = (ShapedOreRecipe) r; try { Field widthFiled =
-//			  ShapedOreRecipe.class .getDeclaredField("width");
-//			  widthFiled.setAccessible(true); int width =
-//			  widthFiled.getInt(shapedRecipes); for (int x = 0; x < width; x++)
-//			  { int height = shapedRecipes.getRecipeSize() / width; for (int y
-//			  = 0; y < height; y++) { Object itemStack =
-//			  shapedRecipes.getInput()[x + y width]; if (itemStack instanceof
-//			  ItemStack) { this.slots[x][y] = new ItemWithSubtype( (ItemStack)
-//			  itemStack); } else if (itemStack instanceof ArrayList) {
-//			  ArrayList list = (ArrayList) itemStack; this.slots[x][y] = new
-//			  ItemWithSubtype( (ItemStack) list.get(0)); } } } } catch
-//			  (NoSuchFieldException e) { throw new
-//			  IllegalArgumentException("Cannot access " + r); } catch
-//			  (SecurityException e) { throw new
-//			  IllegalArgumentException("Cannot access " + r); } catch
-//			  (IllegalAccessException e) { throw new
-//			  IllegalArgumentException("Cannot access " + r); }
-//			  }
-			 else {
+			// else if (r instanceof ShapedOreRecipe) { ShapedOreRecipe
+			// shapedRecipes = (ShapedOreRecipe) r; try { Field widthFiled =
+			// ShapedOreRecipe.class .getDeclaredField("width");
+			// widthFiled.setAccessible(true); int width =
+			// widthFiled.getInt(shapedRecipes); for (int x = 0; x < width; x++)
+			// { int height = shapedRecipes.getRecipeSize() / width; for (int y
+			// = 0; y < height; y++) { Object itemStack =
+			// shapedRecipes.getInput()[x + y width]; if (itemStack instanceof
+			// ItemStack) { this.slots[x][y] = new ItemWithSubtype( (ItemStack)
+			// itemStack); } else if (itemStack instanceof ArrayList) {
+			// ArrayList list = (ArrayList) itemStack; this.slots[x][y] = new
+			// ItemWithSubtype( (ItemStack) list.get(0)); } } } } catch
+			// (NoSuchFieldException e) { throw new
+			// IllegalArgumentException("Cannot access " + r); } catch
+			// (SecurityException e) { throw new
+			// IllegalArgumentException("Cannot access " + r); } catch
+			// (IllegalAccessException e) { throw new
+			// IllegalArgumentException("Cannot access " + r); }
+			// }
+			else {
+				LOGGER.error(MARKER_RECIPE,
+						"An item recipe has been found but the item cannot be crafted. The class "
+								+ r.getClass().getCanonicalName()
+								+ " cannot be understood.");
 				throw new IllegalArgumentException("Cannot (yet) craft " + r);
 			}
 		}
@@ -151,6 +172,7 @@ public class CraftStrategy extends PathFinderStrategy {
 					list.add(ss, count);
 				}
 			}
+			LOGGER.trace(MARKER_RECIPE, "Items required for " + this + ": " + list);
 			return list;
 		}
 
@@ -193,6 +215,11 @@ public class CraftStrategy extends PathFinderStrategy {
 			}
 			return possible;
 		}
+
+		@Override
+		public String toString() {
+			return "CraftingWish [amount=" + amount + ", item=" + item + "]";
+		}
 	}
 
 	public static class CraftingTableData {
@@ -201,6 +228,11 @@ public class CraftStrategy extends PathFinderStrategy {
 
 		public CraftingTableData(BlockPos pos) {
 			this.pos = pos;
+		}
+
+		@Override
+		public String toString() {
+			return "CraftingTableData [" + pos + "]";
 		}
 	}
 
@@ -233,6 +265,10 @@ public class CraftStrategy extends PathFinderStrategy {
 			super("Cannor craft " + wish.item);
 		}
 
+		@Override
+		public String toString() {
+			return "CannotCraftError []";
+		}
 	}
 
 	public static class CraftingTableFinder extends BlockRangeFinder {
@@ -277,8 +313,8 @@ public class CraftStrategy extends PathFinderStrategy {
 
 		@Override
 		protected float rateDestination(int distance, int x, int y, int z) {
-			ArrayList<CraftingTableData> tables = h.getReachableForPos(new BlockPos(
-					x, y, z));
+			ArrayList<CraftingTableData> tables = h
+					.getReachableForPos(new BlockPos(x, y, z));
 			return !failed && tables != null && tables.size() > 0 ? distance
 					: -1;
 		}
@@ -296,7 +332,7 @@ public class CraftStrategy extends PathFinderStrategy {
 			if (grid == null) {
 				failed = true;
 				System.err.println("Could not find any way to craft this.");
-				//FIXME: Desync. Error.
+				// FIXME: Desync. Error.
 				return;
 			}
 
@@ -362,10 +398,17 @@ public class CraftStrategy extends PathFinderStrategy {
 			return count;
 		}
 
+		/**
+		 * Gets an array of items that specifies how they need to be placed on the crafting grid.
+		 * @param h
+		 * @param possibilities
+		 * @return
+		 */
 		private ItemWithSubtype[][] getCraftablePossibility(AIHelper h,
 				List<CraftingPossibility> possibilities) {
 			for (CraftingPossibility p : possibilities) {
 				ItemWithSubtype[][] assignedSlots = new ItemWithSubtype[3][3];
+				// TODO: Order this in a better way. We need to have multiples of our item count first.
 				for (ItemStack i : h.getMinecraft().thePlayer.inventory.mainInventory) {
 					if (i == null) {
 						continue;
@@ -378,6 +421,7 @@ public class CraftStrategy extends PathFinderStrategy {
 									&& assignedSlots[x][y] == null) {
 								assignedSlots[x][y] = item;
 								leftOver--;
+								LOGGER.trace("Placing at "+ x + "," + y + ": " + item);
 							}
 						}
 					}
@@ -387,6 +431,7 @@ public class CraftStrategy extends PathFinderStrategy {
 					for (int y = 0; y < 3; y++) {
 						if (!p.goodForPosition(assignedSlots[x][y], x, y)) {
 							allGood = false;
+							LOGGER.warn(MARKER_RECIPE, "Placed wrong item at " + x + "," + y + ": " + assignedSlots[x][y]);
 						}
 					}
 				}
@@ -394,9 +439,15 @@ public class CraftStrategy extends PathFinderStrategy {
 					return assignedSlots;
 				}
 			}
+			LOGGER.warn("Could not find any way to craft any of " + possibilities);
 			return null;
 		}
 
+		@Override
+		public String toString() {
+			return "CraftingTableFinder [wish=" + wish + ", failed=" + failed
+					+ ", oldItemCount=" + oldItemCount + "]";
+		}
 	}
 
 	public CraftStrategy(int amount, int itemId, int subtype) {

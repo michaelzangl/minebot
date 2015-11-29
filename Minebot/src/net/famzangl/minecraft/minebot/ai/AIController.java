@@ -153,19 +153,20 @@ public class AIController extends AIHelper implements IAIControllable {
 	public void onPlayerTick(ClientTickEvent evt) {
 		if (evt.phase != ClientTickEvent.Phase.START) {
 			return;
-		} else if (getMinecraft().thePlayer == null) {
+		} else if (getMinecraft().thePlayer == null
+				|| getMinecraft().theWorld == null) {
 			LOGGER.debug(MARKER_STRATEGY,
 					"Player tick but player is not in world.");
 			return;
 		}
+
+		LOGGER.debug(MARKER_STRATEGY, "Strategy game tick. World time: "
+				+ getMinecraft().theWorld.getTotalWorldTime());
 		if (skipNextTick) {
 			skipNextTick = false;
-			LOGGER.debug(MARKER_STRATEGY,
-					"Tick skip was requested");
+			LOGGER.debug(MARKER_STRATEGY, "Tick skip was requested");
 			return;
 		}
-		LOGGER.debug(MARKER_STRATEGY,
-				"Strategy game tick");
 		testUngrabMode();
 		invalidateObjectMouseOver();
 		resetAllInputs();
@@ -181,7 +182,8 @@ public class AIController extends AIHelper implements IAIControllable {
 			if (deactivatedStrategy == null
 					&& !(currentStrategy instanceof RunOnceStrategy)) {
 				LOGGER.trace(MARKER_STRATEGY,
-						"Store strategy to be resumed later: " + currentStrategy);
+						"Store strategy to be resumed later: "
+								+ currentStrategy);
 				deactivatedStrategy = currentStrategy;
 			}
 			deactivateCurrentStrategy();
@@ -202,7 +204,8 @@ public class AIController extends AIHelper implements IAIControllable {
 				if (result != TickResult.TICK_AGAIN) {
 					break;
 				}
-				LOGGER.trace(MARKER_STRATEGY, "Strategy requests to tick again.");
+				LOGGER.trace(MARKER_STRATEGY,
+						"Strategy requests to tick again.");
 			}
 			if (result == TickResult.ABORT || result == TickResult.NO_MORE_WORK) {
 				LOGGER.debug(MARKER_STRATEGY, "Strategy is dead.");
@@ -216,8 +219,7 @@ public class AIController extends AIHelper implements IAIControllable {
 				strategyDescr = "";
 			}
 		}
-		LOGGER.debug(MARKER_STRATEGY,
-				"Strategy game tick done");
+		LOGGER.debug(MARKER_STRATEGY, "Strategy game tick done");
 
 		if (activeMapReader != null) {
 			activeMapReader.tick(this);
@@ -227,8 +229,8 @@ public class AIController extends AIHelper implements IAIControllable {
 
 	private void deactivateCurrentStrategy() {
 		if (currentStrategy != null) {
-			LOGGER.trace(MARKER_STRATEGY,
-					"Deactivating strategy: " + currentStrategy);
+			LOGGER.trace(MARKER_STRATEGY, "Deactivating strategy: "
+					+ currentStrategy);
 			currentStrategy.setActive(false, this);
 		}
 		currentStrategy = null;

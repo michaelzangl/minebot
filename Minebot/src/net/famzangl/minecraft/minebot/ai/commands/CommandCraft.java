@@ -32,6 +32,9 @@ import net.minecraft.init.Blocks;
 @AICommand(helpText = "Crafts items of the given type.", name = "minebot")
 public class CommandCraft {
 
+	/**
+	 * Blocks that can be crafted.
+	 */
 	private static final BlockSet simpleBlocks = new BlockSet(
 			Blocks.air, Blocks.brewing_stand, Blocks.bed, Blocks.nether_wart,
 			Blocks.cauldron, Blocks.flower_pot, Blocks.wheat, Blocks.reeds,

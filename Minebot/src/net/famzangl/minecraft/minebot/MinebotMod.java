@@ -40,7 +40,8 @@ public class MinebotMod {
 	
 	static {
 		// logging
-		if (System.getProperty("MINEBOT_LOG", "0").equals("1")) {
+		String doLogging = System.getProperty("MINEBOT_LOG", "0");
+		if (doLogging.equals("1")) {
 			LoggerContext context = (LoggerContext) LogManager.getContext(false);
 			Configuration config = context.getConfiguration();
 			try {

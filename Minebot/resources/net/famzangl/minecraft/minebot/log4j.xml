@@ -2,14 +2,17 @@
 <Configuration status="WARN" packages="com.mojang.util">
     <Appenders>
         <Console name="FmlSysOut" target="SYSTEM_OUT">
-            <PatternLayout pattern="[%d{HH:mm:ss}] [%t/%level] [%logger]: %msg%n" />
+            <PatternLayout pattern="[%d{HH:mm:ss}] [%t/%level{WARN=W,DEBUG=D,ERROR=E,TRACE=T,INFO=I}] [%logger]: %msg%n" />
         </Console>
         <Console name="SysOut" target="SYSTEM_OUT">
-            <PatternLayout pattern="[%d{HH:mm:ss}] [%t/%level]: %msg%n" />
+            <PatternLayout pattern="[%d{HH:mm:ss}] [%t/%level{WARN=W,DEBUG=D,ERROR=E,TRACE=T,INFO=I}]: %msg%n" />
         </Console>
         <Queue name="ServerGuiConsole">
-            <PatternLayout pattern="[%d{HH:mm:ss}] [%t/%level] [%logger]: %msg%n" />
+            <PatternLayout pattern="[%d{HH:mm:ss}] [%t/%level{WARN=W,DEBUG=D,ERROR=E,TRACE=T,INFO=I}] [%logger]: %msg%n" />
         </Queue>
+        <Console name="MinebotOut" target="SYSTEM_OUT">
+            <PatternLayout pattern="[%d{HH:mm:ss}] [Minebot/%level{WARN=W,DEBUG=D,ERROR=E,TRACE=T,INFO=I}] [%logger{2}/%marker]: %msg%n" />
+        </Console>
         <RollingRandomAccessFile name="File" fileName="logs/latest.log" filePattern="logs/%d{yyyy-MM-dd}-%i.log.gz">
             <PatternLayout pattern="[%d{HH:mm:ss}] [%t/%level]: %msg%n" />
             <Policies>
@@ -38,8 +41,8 @@
     </Appenders>
     <Loggers>
         <Logger level="trace" name="net.famzangl" additivity="false">
-            <AppenderRef ref="SysOut" level="TRACE" />
-            <AppenderRef ref="File" />
+            <AppenderRef ref="MinebotOut" level="TRACE" />
+            <AppenderRef ref="File" level="TRACE" />
         </Logger>
         <Logger level="info" name="com.mojang" additivity="false">
             <AppenderRef ref="SysOut" level="INFO" />
