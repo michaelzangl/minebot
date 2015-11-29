@@ -38,7 +38,8 @@ import net.minecraft.util.EnumFacing;
 
 public class ChestBlockHandler extends RangeBlockHandler<ChestData> {
 
-	private static final BlockSet CHEST = new BlockSet(Blocks.chest, Blocks.trapped_chest);
+	private static final BlockSet CHEST = new BlockSet(Blocks.chest,
+			Blocks.trapped_chest);
 
 	public static class ChestData {
 		private final BlockPos pos;
@@ -46,10 +47,12 @@ public class ChestBlockHandler extends RangeBlockHandler<ChestData> {
 		private final ArrayList<ItemFilter> fullItems = new ArrayList<ItemFilter>();
 		private final ArrayList<ItemFilter> emptyItems = new ArrayList<ItemFilter>();
 		public BlockPos secondaryPos;
+		private final int chestBlockId;
 
-		public ChestData(BlockPos pos) {
+		public ChestData(BlockPos pos, int chestBlockId) {
 			super();
 			this.pos = pos;
+			this.chestBlockId = chestBlockId;
 		}
 
 		public boolean isItemAllowed(ItemStack stack) {
@@ -149,8 +152,22 @@ public class ChestBlockHandler extends RangeBlockHandler<ChestData> {
 			}
 			return false;
 		}
+
+		public boolean isOfType(int id) {
+			return id == chestBlockId;
+		}
+
+		public void registerByItemFrame(EntityItemFrame f) {
+			ItemStack displayed = f.getDisplayedItem();
+			if (displayed != null) {
+				allowItem(displayed);
+			}
+		}
 	}
 
+	/**
+	 * A table of chests.
+	 */
 	private final Hashtable<BlockPos, ChestData> chests = new Hashtable<BlockPos, ChestData>();
 
 	@Override
@@ -170,52 +187,57 @@ public class ChestBlockHandler extends RangeBlockHandler<ChestData> {
 	protected Collection<Entry<BlockPos, ChestData>> getTargetPositions() {
 		return chests.entrySet();
 	}
-	
+
 	@Override
 	public void scanBlock(WorldData world, int id, int x, int y, int z) {
 		if (CHEST.isAt(world, x, y, z)) {
-			AxisAlignedBB abb = new AxisAlignedBB(x - 1, y, z - 1,
-					x + 2, y + 1, z + 2);
-			List<EntityItemFrame> frames = world.getBackingWorld()
-					.getEntitiesWithinAABB(EntityItemFrame.class, abb);
-			for (EntityItemFrame f : frames) {
-				EnumFacing direction = getDirection(f);
-				if (direction == null) {
-					continue;
-				}
-				BlockPos p = PrivateFieldUtils.getFieldValue(f, EntityHanging.class, BlockPos.class);
-				EnumFacing dir = PrivateFieldUtils.getFieldValue(f, EntityHanging.class, EnumFacing.class);
-				BlockPos myPos = new BlockPos(x, y, z);
-				if (p.offset(dir, -1).equals(myPos)) {
-					// Yeah, frame attached.
-					registerChest(myPos, f);
-				}
-			}
+			BlockPos myPos = new BlockPos(x, y, z);
+			ChestData chest = getChestAt(myPos, id);
+			scanForItemFrames(world, x, y, z, chest);
 		}
-
 	}
 
-	private void registerChest(BlockPos pos, EntityItemFrame f) {
+	private void scanForItemFrames(WorldData world, int x, int y, int z,
+			ChestData chest) {
+		BlockPos myPos = new BlockPos(x, y, z);
+		AxisAlignedBB abb = new AxisAlignedBB(x - 1, y, z - 1, x + 2,
+				y + 1, z + 2);
+		List<EntityItemFrame> frames = world.getBackingWorld()
+				.getEntitiesWithinAABB(EntityItemFrame.class, abb);
+		for (EntityItemFrame f : frames) {
+			EnumFacing direction = getDirection(f);
+			if (direction == null) {
+				continue;
+			}
+			BlockPos p = PrivateFieldUtils.getFieldValue(f,
+					EntityHanging.class, BlockPos.class);
+			EnumFacing dir = PrivateFieldUtils.getFieldValue(f,
+					EntityHanging.class, EnumFacing.class);
+			if (p.offset(dir, -1).equals(myPos)) {
+				// Frame attached to this chest
+				chest.registerByItemFrame(f);
+			}
+		}
+	}
+
+	private ChestData getChestAt(BlockPos pos, int id) {
 		ChestData chest = null;
-		for (EnumFacing d : new EnumFacing[] { EnumFacing.UP,
-				EnumFacing.NORTH, EnumFacing.SOUTH,
-				EnumFacing.EAST, EnumFacing.WEST }) {
+		for (EnumFacing d : new EnumFacing[] { EnumFacing.UP, EnumFacing.NORTH,
+				EnumFacing.SOUTH, EnumFacing.EAST, EnumFacing.WEST }) {
 			BlockPos p = pos.add(d.getFrontOffsetX(), 0, d.getFrontOffsetZ());
-			if (chests.containsKey(p)) {
-				chest = chests.get(p);
+			ChestData attempted = chests.get(p);
+			if (attempted != null && attempted.isOfType(id)) {
+				chest = attempted;
 				if (!chest.pos.equals(pos)) {
 					chest.secondaryPos = pos;
 				}
 			}
 		}
 		if (chest == null) {
-			chest = new ChestData(pos);
+			chest = new ChestData(pos, id);
 			chests.put(pos, chest);
 		}
-		ItemStack displayed = f.getDisplayedItem();
-		if (displayed != null) {
-			chest.allowItem(displayed);
-		}
+		return chest;
 	}
 
 	/**
