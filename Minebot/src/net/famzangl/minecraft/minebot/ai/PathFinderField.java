@@ -83,14 +83,21 @@ public class PathFinderField implements Comparator<Integer> {
 	public PathFinderField() {
 	}
 
-	protected int getIndexForBlock(int x, int y, int z) {
+	protected final int getIndexForBlock(int x, int y, int z) {
 		return x - data.offsetX & SIZE_X_Z - 1
 				| (z - data.offsetZ & SIZE_X_Z - 1) << 8
 				| (y - data.offsetY & Y_LEVEL - 1) << 16;
 	}
 
-	protected final int getX(int blockIndex) {
-		return (blockIndex & SIZE_X_Z - 1) + data.offsetX;
+	protected final int getIndexForBlockSafe(int x, int y, int z) {
+		int dx = x - data.offsetX;
+		int dz = z - data.offsetZ;
+		int dy = y - data.offsetY;
+		return dx == (dx & SIZE_X_Z - 1) && dz == (dz & SIZE_X_Z - 1) && dy == (dy & Y_LEVEL - 1) ? dx | (dz << 8) | (dy << 16) : -1;
+	}
+
+	protected final int getX(int currentNode) {
+		return (currentNode & SIZE_X_Z - 1) + data.offsetX;
 	}
 
 	protected final int getY(int currentNode) {

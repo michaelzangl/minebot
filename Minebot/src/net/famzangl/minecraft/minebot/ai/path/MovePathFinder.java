@@ -318,19 +318,27 @@ public class MovePathFinder extends PathFinderField {
 
 	@Override
 	protected int distanceFor(int from, int to) {
-		int distance = 0;
-		// if (getY(from) != getY(to)) {
-		// up or down
-		distance += 1;
-		// } else {
-		// distance += 3;
-		// }
-		if (getY(from) >= getY(to)) {
-			distance += materialDistance(getX(to), getY(to), getZ(to), true);
-		}
-		if (getY(from) <= getY(to)) {
-			distance += materialDistance(getX(to), getY(to) + 1, getZ(to),
-					false);
+		int distance = 1;
+		int toX = getX(to);
+		int toY = getY(to);
+		int toZ = getZ(to);
+		int fromY = getY(from);
+		if (fromY > toY && (toX != getX(from) || toY != getY(from))) {
+			// sideward down
+			distance += materialDistance(toX, toY + 2, toZ, false);
+			distance += materialDistance(toX, toY + 1, toZ, false);
+			distance += materialDistance(toX, toY, toZ, true);
+		} else {
+			if (fromY >= toY) {
+				distance += materialDistance(toX, toY, toZ, true);
+			} else {
+				distance += 1;
+			}
+			if (fromY <= toY) {
+				distance += materialDistance(toX, toY + 1, toZ, false);
+			} else {
+				distance += 1;
+			}
 		}
 		return distance;
 	}
