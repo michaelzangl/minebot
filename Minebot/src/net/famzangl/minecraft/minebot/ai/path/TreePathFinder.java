@@ -34,9 +34,11 @@ import net.famzangl.minecraft.minebot.ai.task.place.PlantSaplingTask;
 import net.famzangl.minecraft.minebot.ai.utils.BlockCounter;
 import net.famzangl.minecraft.minebot.ai.utils.BlockCuboid;
 import net.famzangl.minecraft.minebot.build.block.WoodType;
+import net.famzangl.minecraft.minebot.map.MapDisplay.PlayerState;
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.BlockPos;
+import net.minecraft.util.EnumFacing;
 
 /**
  * This searches for trees (vertical rows of logs), walks to the bottom most and
@@ -418,6 +420,11 @@ public class TreePathFinder extends MovePathFinder {
 	protected boolean runSearch(BlockPos playerPosition) {
 		if (addTasksForLargeTree(helper)) {
 			return true;
+		}
+		if (BlockSets.AIR.isAt(world, playerPosition.offset(EnumFacing.DOWN))
+				&& allowedGroundBlocks.isAt(world, playerPosition.offset(EnumFacing.DOWN, 2))) {
+			// Bug: Desync during jump. TODO: Port this to all other pathfinders, find a common way to handle it safely.
+			playerPosition = playerPosition.offset(EnumFacing.DOWN);
 		}
 		return super.runSearch(playerPosition);
 	}
