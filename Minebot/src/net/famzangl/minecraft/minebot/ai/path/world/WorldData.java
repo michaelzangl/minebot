@@ -24,6 +24,10 @@ import net.minecraft.world.chunk.storage.ExtendedBlockStorage;
 public class WorldData {
 	private static final int BARRIER_ID = Block.getIdFromBlock(Blocks.barrier);
 	private static final int CACHE_ENTRIES = 10;
+	/**
+	 * A cache pos that may never occur naturally.
+	 */
+	private static final int CACHE_INVALID = 0x10000000;
 	private static final double FLOOR_HEIGHT = .55;
 
 	public static abstract class ChunkAccessor {
@@ -132,7 +136,7 @@ public class WorldData {
 	public void invalidateChunkCache() {
 		for (int i = 0; i < CACHE_ENTRIES; i++) {
 			// chunk coord would be invalid.
-			cachedPos[i] = (long) -1;
+			cachedPos[i] = CACHE_INVALID;
 		}
 	}
 
