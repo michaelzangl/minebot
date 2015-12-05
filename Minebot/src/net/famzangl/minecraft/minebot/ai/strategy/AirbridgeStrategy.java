@@ -41,6 +41,7 @@ public class AirbridgeStrategy extends TaskStrategy {
 			.getLogger(AirbridgeStrategy.class);
 
 	private static final int LAG_TEST_DELAY = 15;
+	private static final int BLOCK_PLACE_DELAY = 4;
 
 	private static final BlockItemFilter SLABS_FILTER = new BlockItemFilter(
 			BlockSets.LOWER_SLABS);
@@ -98,6 +99,7 @@ public class AirbridgeStrategy extends TaskStrategy {
 			addTask(new GetOnHotBarTask(SLABS_FILTER));
 			addTask(getBuildHafslabTask(pos, buildPos,
 					beforeBuild));
+			addTask(new WaitTask(BLOCK_PLACE_DELAY));
 		}
 
 	}
@@ -191,7 +193,7 @@ public class AirbridgeStrategy extends TaskStrategy {
 			area.accept(new BuildHalfslabVisitor(buildPos, beforeBuild), world);
 
 			// wait for the server to sync. If block disappears, we don't fall.
-			addTask(new WaitTask(LAG_TEST_DELAY));
+			addTask(new WaitTask(LAG_TEST_DELAY - BLOCK_PLACE_DELAY));
 		} else if (isHalfslabAt(world, buildPos)) {
 			// walk
 			addTask(new WalkTowardsTask(buildPos.getX(), buildPos.getZ(), null));

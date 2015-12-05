@@ -11,6 +11,7 @@ import net.minecraft.init.Blocks;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Vec3;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.storage.ExtendedBlockStorage;
 
@@ -217,12 +218,19 @@ public class WorldData {
 		return new BlockPos(x, y, z);
 	}
 
+	public Vec3 getExactPlayerPosition() {
+		return new Vec3(thePlayerToGetPositionFrom.posX,
+				thePlayerToGetPositionFrom.getEntityBoundingBox().minY,
+				thePlayerToGetPositionFrom.posZ);
+	}
+
 	public BlockBounds getBlockBounds(BlockPos pos) {
 		return getBlockBounds(pos.getX(), pos.getY(), pos.getZ());
 	}
 
 	public BlockBounds getBlockBounds(int x, int y, int z) {
-		BlockBounds res = BlockBounds.forBlockWithMeta(getBlockIdWithMeta(x, y, z));
+		BlockBounds res = BlockBounds.forBlockWithMeta(getBlockIdWithMeta(x, y,
+				z));
 		if (res == BlockBounds.UNKNOWN_BLOCK) {
 			// TODO: Replace this.
 			WorldClient world = getBackingWorld();

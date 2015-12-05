@@ -6,6 +6,7 @@ import java.util.Hashtable;
 import net.minecraft.block.Block;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.util.BlockPos;
+import net.minecraft.util.Vec3;
 
 public class WorldWithDelta extends WorldData {
 	private Hashtable<Long, ChunkWithDelta> chunkDeltas = new Hashtable<Long, ChunkWithDelta>();
@@ -136,8 +137,14 @@ public class WorldWithDelta extends WorldData {
 		invalidateChunkCache();
 	}
 
+	@Override
 	public BlockPos getPlayerPosition() {
 		return playerPosition;
+	}
+	
+	@Override
+	public Vec3 getExactPlayerPosition() {
+		return new Vec3(playerPosition.getX() + .5, playerPosition.getY(), playerPosition.getZ() + .5);
 	}
 
 	public void setPlayerPosition(BlockPos playerPosition) {

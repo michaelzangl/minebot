@@ -84,7 +84,7 @@ public abstract class AIHelper {
 	private static final double WALK_PER_STEP = 4.3 / 20;
 	private static final double MIN_DISTANCE_ERROR = 0.05;
 	private static final float MAX_PITCH_CHANGE = 20.0f;
-	private static final float MAX_YAW_CHANGE = (float) (Math.PI / 6);
+	private static final float MAX_YAW_CHANGE = 22.5f;
 	private static Minecraft mc = Minecraft.getMinecraft();
 	/**
 	 * A world that never gets a delta applied to it.
@@ -237,10 +237,11 @@ public abstract class AIHelper {
 	public WorldData getWorld() {
 		return minecraftWorld;
 	}
-	
+
 	public boolean isFacing(Vec3 vec) {
 		return isFacing(vec.xCoord, vec.yCoord, vec.zCoord);
 	}
+
 	public boolean isFacing(double x, double y, double z) {
 		return face(x, y, z, 0, 0);
 	}
@@ -248,7 +249,7 @@ public abstract class AIHelper {
 	public boolean face(Vec3 vec) {
 		return face(vec.xCoord, vec.yCoord, vec.zCoord);
 	}
-	
+
 	/**
 	 * Faces an exact position in space.
 	 * 
@@ -262,6 +263,9 @@ public abstract class AIHelper {
 
 	private boolean face(double x, double y, double z, float yawInfluence,
 			float pitchInfluence) {
+
+		LOGGER.trace(MARKER_FACING, "facing " + x + "," + y + "," + z
+				+ " using influence: " + yawInfluence + ";" + pitchInfluence);
 		final double d0 = x - mc.thePlayer.posX;
 		final double d1 = z - mc.thePlayer.posZ;
 		final double d2 = y - mc.thePlayer.posY - mc.thePlayer.getEyeHeight();
@@ -274,28 +278,35 @@ public abstract class AIHelper {
 			final float yaw = (float) (Math.atan2(d1, d0) * 180.0D / Math.PI) - 90.0F;
 			final float pitch = (float) -(Math.atan2(d2,
 					Math.sqrt(d0 * d0 + d1 * d1)) * 180.0D / Math.PI);
-			float rotations = fullRotations(yaw - rotationYaw);
-			float yawChange = yaw - rotationYaw - rotations;
+			float yawChange = closestRotation(yaw - rotationYaw);
 			float pitchChange = pitch - rotationPitch;
+			assert -Math.PI <= yawChange && yawChange <= Math.PI;
 			float yawClamp = Math.min(Math.abs(MAX_YAW_CHANGE / yawChange), 1);
-			float pitchClamp = Math.min(Math.abs(MAX_PITCH_CHANGE / pitchChange), 1);
+			float pitchClamp = Math.min(
+					Math.abs(MAX_PITCH_CHANGE / pitchChange), 1);
 			float clamp = Math.min(yawClamp, pitchClamp);
-			
-			yawInfluence = Math.min(yawInfluence,
-					clamp);
-			pitchInfluence = Math.min(pitchInfluence,
-					clamp);
-			//TODO: Make this linear?
-			LOGGER.trace(MARKER_FACING, "change %f, %f => %f, %f", yawChange,
-					pitchChange, yawInfluence, pitchInfluence);
 
-			mc.thePlayer.setAngles(rotations / .15f + yawChange / 0.15f
+			yawInfluence = Math.min(yawInfluence, clamp);
+			pitchInfluence = Math.min(pitchInfluence, clamp);
+			// TODO: Make this linear?
+
+			mc.thePlayer.setAngles(yawChange / 0.15f
 					* yawInfluence, -pitchChange / 0.15f * pitchInfluence);
 			invalidateObjectMouseOver();
-			
+
+			LOGGER.trace(MARKER_FACING, "facing clamped at " + clamp
+					+ ", new influence:  " + yawInfluence + ";"
+					+ pitchInfluence + ", done: " + (clamp > .999));
+
 			return clamp > .999;
 		}
 		return true;
+	}
+
+	private float closestRotation(float f) {
+		float halfRot = 180;
+		float fullRot = halfRot * 2;
+		return (((f + halfRot) % fullRot + fullRot) % fullRot) - halfRot;
 	}
 
 	private float fullRotations(float yaw) {
@@ -556,7 +567,7 @@ public abstract class AIHelper {
 	 * Faces a block.
 	 * 
 	 * @param pos
-	 * @return 
+	 * @return
 	 */
 	public boolean faceBlock(BlockPos pos) {
 		return face(getWorld().getBlockBounds(pos).random(pos, .95));
@@ -567,7 +578,7 @@ public abstract class AIHelper {
 	 * 
 	 * @param pos
 	 * @param sideToFace
-	 * @return 
+	 * @return
 	 */
 	public boolean faceSideOf(BlockPos pos, EnumFacing sideToFace) {
 		BlockBounds bounds = getWorld().getBlockBounds(pos);
@@ -601,56 +612,56 @@ public abstract class AIHelper {
 		LOGGER.trace(MARKER_FACING, "Facing: " + faceArea);
 		face(faceArea.random(pos, .9));
 
-//		minY = Math.max(minY, block.getBlockBoundsMinY());
-//		maxY = Math.min(maxY, block.getBlockBoundsMaxY());
-//		double faceY = randBetweenNice(minY, maxY);
-//		double faceX, faceZ;
-//
-//		if (xzdir == EnumFacing.EAST) {
-//			faceX = randBetween(Math.max(block.getBlockBoundsMinX(), centerX),
-//					block.getBlockBoundsMaxX());
-//			faceZ = centerZ;
-//		} else if (xzdir == EnumFacing.WEST) {
-//			faceX = randBetween(block.getBlockBoundsMinX(),
-//					Math.min(block.getBlockBoundsMaxX(), centerX));
-//			faceZ = centerZ;
-//		} else if (xzdir == EnumFacing.SOUTH) {
-//			faceZ = randBetween(Math.max(block.getBlockBoundsMinZ(), centerZ),
-//					block.getBlockBoundsMaxZ());
-//			faceX = centerX;
-//		} else if (xzdir == EnumFacing.NORTH) {
-//			faceZ = randBetween(block.getBlockBoundsMinZ(),
-//					Math.min(block.getBlockBoundsMaxZ(), centerZ));
-//			faceX = centerX;
-//		} else {
-//			faceX = randBetweenNice(block.getBlockBoundsMinX(),
-//					block.getBlockBoundsMaxX());
-//			faceZ = randBetweenNice(block.getBlockBoundsMinZ(),
-//					block.getBlockBoundsMaxZ());
-//		}
-//		switch (sideToFace) {
-//		case UP:
-//			faceY = block.getBlockBoundsMaxY();
-//			break;
-//		case DOWN:
-//			faceY = block.getBlockBoundsMinY();
-//			break;
-//		case EAST:
-//			faceX = block.getBlockBoundsMaxX();
-//			break;
-//		case WEST:
-//			faceX = block.getBlockBoundsMinX();
-//			break;
-//		case SOUTH:
-//			faceZ = block.getBlockBoundsMaxZ();
-//			break;
-//		case NORTH:
-//			faceZ = block.getBlockBoundsMinZ();
-//			break;
-//		default:
-//			break;
-//		}
-//		face(faceX + pos.getX(), faceY + pos.getY(), faceZ + pos.getZ());
+		// minY = Math.max(minY, block.getBlockBoundsMinY());
+		// maxY = Math.min(maxY, block.getBlockBoundsMaxY());
+		// double faceY = randBetweenNice(minY, maxY);
+		// double faceX, faceZ;
+		//
+		// if (xzdir == EnumFacing.EAST) {
+		// faceX = randBetween(Math.max(block.getBlockBoundsMinX(), centerX),
+		// block.getBlockBoundsMaxX());
+		// faceZ = centerZ;
+		// } else if (xzdir == EnumFacing.WEST) {
+		// faceX = randBetween(block.getBlockBoundsMinX(),
+		// Math.min(block.getBlockBoundsMaxX(), centerX));
+		// faceZ = centerZ;
+		// } else if (xzdir == EnumFacing.SOUTH) {
+		// faceZ = randBetween(Math.max(block.getBlockBoundsMinZ(), centerZ),
+		// block.getBlockBoundsMaxZ());
+		// faceX = centerX;
+		// } else if (xzdir == EnumFacing.NORTH) {
+		// faceZ = randBetween(block.getBlockBoundsMinZ(),
+		// Math.min(block.getBlockBoundsMaxZ(), centerZ));
+		// faceX = centerX;
+		// } else {
+		// faceX = randBetweenNice(block.getBlockBoundsMinX(),
+		// block.getBlockBoundsMaxX());
+		// faceZ = randBetweenNice(block.getBlockBoundsMinZ(),
+		// block.getBlockBoundsMaxZ());
+		// }
+		// switch (sideToFace) {
+		// case UP:
+		// faceY = block.getBlockBoundsMaxY();
+		// break;
+		// case DOWN:
+		// faceY = block.getBlockBoundsMinY();
+		// break;
+		// case EAST:
+		// faceX = block.getBlockBoundsMaxX();
+		// break;
+		// case WEST:
+		// faceX = block.getBlockBoundsMinX();
+		// break;
+		// case SOUTH:
+		// faceZ = block.getBlockBoundsMaxZ();
+		// break;
+		// case NORTH:
+		// faceZ = block.getBlockBoundsMinZ();
+		// break;
+		// default:
+		// break;
+		// }
+		// face(faceX + pos.getX(), faceY + pos.getY(), faceZ + pos.getZ());
 	}
 
 	/**

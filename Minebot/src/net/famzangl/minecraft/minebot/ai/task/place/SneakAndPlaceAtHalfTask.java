@@ -22,6 +22,7 @@ import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.BlockItemFilter;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockBounds;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSets;
+import net.famzangl.minecraft.minebot.ai.path.world.WorldData;
 import net.famzangl.minecraft.minebot.ai.task.BlockHalf;
 import net.famzangl.minecraft.minebot.ai.task.TaskOperations;
 import net.famzangl.minecraft.minebot.ai.task.error.StringTaskError;
@@ -31,12 +32,68 @@ import net.minecraft.util.Vec3;
 
 public class SneakAndPlaceAtHalfTask extends SneakAndPlaceTask {
 
-	protected final BlockHalf blockHalf;
+	protected final static class PlacingDirection implements
+			Comparable<PlacingDirection> {
 
-	protected EnumFacing lookingDirection = null;
+		private final BlockPos pos;
+		private final EnumFacing direction;
+		private final BlockHalf blockHalf;
+		private final WorldData world;
+
+		public PlacingDirection(BlockPos pos, EnumFacing direction,
+				BlockHalf half, WorldData world) {
+			this.pos = pos;
+			this.direction = direction;
+			this.blockHalf = half;
+			this.world = world;
+		}
+
+		protected BlockBounds getBounds() {
+			BlockPos placeOn = getPlaceOn();
+			BlockBounds bounds = world.getBlockBounds(placeOn);
+			BlockBounds faceArea = bounds.clampY(
+					blockHalf == BlockHalf.UPPER_HALF ? 0.5 : 0.1,
+					blockHalf == BlockHalf.LOWER_HALF ? 0.45 : 0.9 // <- 0.5 but
+																// craftbukkit
+																// has a problem
+																// with that.
+					).onlySide(direction.getOpposite());
+			return faceArea;
+		}
+
+		public Vec3 getRandomPoint(double faceCentered) {
+			return getBounds().random(getPlaceOn(), Math.min(.9, faceCentered));
+		}
+
+		@Override
+		public int compareTo(PlacingDirection o) {
+			Vec3 player = world.getExactPlayerPosition();
+			Vec3 facing = getRandomPoint(0);
+			Vec3 facingO = o.getRandomPoint(0);
+			return -Double.compare(player.distanceTo(facing),
+					player.distanceTo(facingO));
+		}
+
+		public BlockPos getPlaceOn() {
+			return pos.offset(direction);
+		}
+
+		public boolean isFacing(AIHelper h) {
+			return h.isFacingBlock(getPlaceOn(), direction.getOpposite(),
+					blockHalf);
+		}
+
+		public boolean canPlaceOn() {
+			return !BlockSets.AIR.isAt(world, getPlaceOn());
+		}
+	}
 
 	protected final EnumFacing[] DIRS = new EnumFacing[] { EnumFacing.EAST,
 			EnumFacing.NORTH, EnumFacing.WEST, EnumFacing.SOUTH };
+
+	protected final BlockHalf blockHalf;
+
+	protected EnumFacing lookingDirection = null;
 
 	private int attempts;
 
@@ -44,9 +101,26 @@ public class SneakAndPlaceAtHalfTask extends SneakAndPlaceTask {
 
 	private Vec3 facePos;
 
-	private double faceCentered = .1;
+	private double faceCentered = .3;
 
-	protected EnumFacing[] getBuildDirs() {
+	private PlacingDirection[] dirs;
+
+	protected PlacingDirection[] getBuildDirs(AIHelper h) {
+		// we sort them by distance. This order is kept afterwards.
+		if (dirs == null) {
+			EnumFacing[] orders = createBuildDirsUnordered();
+			dirs = new PlacingDirection[orders.length];
+			for (int i = 0; i < orders.length; i++) {
+				EnumFacing f = orders[i];
+				dirs[i] = new PlacingDirection(positionToPlace, f, blockHalf,
+						h.getWorld());
+			}
+			Arrays.sort(dirs);
+		}
+		return dirs;
+	}
+
+	protected EnumFacing[] createBuildDirsUnordered() {
 		return DIRS;
 	}
 
@@ -81,19 +155,17 @@ public class SneakAndPlaceAtHalfTask extends SneakAndPlaceTask {
 
 	@Override
 	protected boolean faceBlock(AIHelper h, TaskOperations o) {
-		final EnumFacing[] dirs = getBuildDirs();
+		final PlacingDirection[] dirs = getBuildDirs(h);
 		attempts++;
 		boolean success = false;
 		for (int i = 0; i < dirs.length; i++) {
-			final EnumFacing useSide = dirs[attempts / 10 % dirs.length];
-			if (!BlockSets.AIR.isAt(h.getWorld(),
-					getPositionToPlaceAt().add(useSide.getDirectionVec()))) {
+			final PlacingDirection useSide = dirs[attempts / 10 % dirs.length];
+			if (useSide.canPlaceOn()) {
 				success = faceSideBlock(h, useSide);
-				attempts++;
 				break;
 			} else {
 				attempts += 10;
-				faceCentered = .1;
+				faceCentered = .3;
 				facePos = null;
 			}
 		}
@@ -109,19 +181,9 @@ public class SneakAndPlaceAtHalfTask extends SneakAndPlaceTask {
 				: positionToPlace;
 	}
 
-	private boolean faceSideBlock(AIHelper h, EnumFacing useSide) {
+	private boolean faceSideBlock(AIHelper h, PlacingDirection direction) {
 		if (facePos == null) {
-			BlockPos placeOn = getPositionToPlaceAt().add(
-					useSide.getDirectionVec());
-			BlockBounds bounds = h.getWorld().getBlockBounds(placeOn);
-			BlockBounds faceArea = bounds.clampY(
-					blockHalf == BlockHalf.UPPER_HALF ? 0.5 : 0,
-					blockHalf == BlockHalf.LOWER_HALF ? 0.4 : 1 // <- 0.5 but
-																// craftbukkit
-																// has a problem
-																// with that.
-					).onlySide(useSide.getOpposite());
-			facePos = faceArea.random(placeOn, Math.min(.9, faceCentered));
+			facePos = direction.getRandomPoint(faceCentered);
 			faceCentered += .2;
 		}
 		if (h.face(facePos)) {
@@ -138,15 +200,13 @@ public class SneakAndPlaceAtHalfTask extends SneakAndPlaceTask {
 		// getPositionToPlaceAt().getZ(),
 	}
 
-	private boolean isFacing(AIHelper h, EnumFacing useSide) {
-		return h.isFacingBlock(
-				getPositionToPlaceAt().add(useSide.getDirectionVec()),
-				useSide.getOpposite(), blockHalf);
+	private boolean isFacing(AIHelper h, PlacingDirection d) {
+		return d.isFacing(h);
 	}
 
 	@Override
 	protected boolean isFacingRightBlock(AIHelper h) {
-		for (final EnumFacing d : getBuildDirs()) {
+		for (final PlacingDirection d : getBuildDirs(h)) {
 			if (isFacing(h, d)) {
 				return true;
 			}

@@ -32,7 +32,7 @@ public class SneakAndPlaceAtSideTask extends SneakAndPlaceAtHalfTask {
 	}
 
 	@Override
-	protected EnumFacing[] getBuildDirs() {
+	protected EnumFacing[] createBuildDirsUnordered() {
 		return new EnumFacing[] { lookingDirection, lookingDirection.rotateY(),
 				lookingDirection.rotateYCCW() };
 	}

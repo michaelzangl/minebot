@@ -25,8 +25,14 @@ public class RandUtils {
 	}
 
 	public static double getBetweenCentered(double a, double b, double centered) {
+		if (centered <= 0) {
+			return (a + b) / 2;
+		}
+		
 		centered = clamp(centered, 0, 1);
-		return (centered / 2 + RANDOM.nextDouble() * (1 - centered)) * (b - a) + a;
+		double size = centered * (b - a);
+		double min = (a + b) / 2 - centered * (b - a) / 2;
+		return RANDOM.nextDouble() * size + min;
 		
 	}
 	
