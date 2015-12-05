@@ -21,8 +21,11 @@ import net.famzangl.minecraft.minebot.ai.task.move.AlignToGridTask;
 import net.famzangl.minecraft.minebot.ai.task.move.WalkTowardsTask;
 import net.famzangl.minecraft.minebot.ai.task.place.SneakAndPlaceAtHalfTask;
 import net.famzangl.minecraft.minebot.ai.task.place.SneakAndPlaceAtSideTask;
+import net.famzangl.minecraft.minebot.ai.utils.BlockArea;
 import net.famzangl.minecraft.minebot.ai.utils.BlockArea.AreaVisitor;
 import net.famzangl.minecraft.minebot.ai.utils.BlockCuboid;
+import net.famzangl.minecraft.minebot.ai.utils.BlockFilteredArea;
+import net.famzangl.minecraft.minebot.ai.utils.ReverseAcceptingArea;
 import net.famzangl.minecraft.minebot.build.block.SlabFilter;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.BlockPos;
@@ -145,7 +148,7 @@ public class AirbridgeStrategy extends TaskStrategy {
 		}
 
 		boolean slabsFound = false;
-		for (int i = 0; i < 9; ++i) {
+		for (int i = 0; i < 9 * 4; ++i) {
 			if (SLABS_FILTER.matches(helper.getMinecraft().thePlayer.inventory
 					.getStackInSlot(i))) {
 				slabsFound = true;
@@ -190,7 +193,11 @@ public class AirbridgeStrategy extends TaskStrategy {
 			addTask(new SneakToSideTask(beforeBuild, direction));
 
 			BlockCuboid area = getSidewardsArea(buildPos.add(0, -1, 0));
-			area.accept(new BuildHalfslabVisitor(buildPos, beforeBuild), world);
+			BlockArea toPlace = new BlockFilteredArea(area, BlockSets.AIR);
+			if ((buildPos.getX() & 1) == (buildPos.getZ() & 1)) {
+				toPlace = new ReverseAcceptingArea(toPlace);
+			}
+			toPlace.accept(new BuildHalfslabVisitor(buildPos, beforeBuild), world);
 
 			// wait for the server to sync. If block disappears, we don't fall.
 			addTask(new WaitTask(LAG_TEST_DELAY - BLOCK_PLACE_DELAY));
@@ -217,9 +224,15 @@ public class AirbridgeStrategy extends TaskStrategy {
 	}
 
 	private boolean isAirAtAndBelow(WorldData world, BlockPos buildPos) {
-		return isAirAt(world, buildPos)
-				&& BlockSets.AIR.isAt(world,
-						getSidewardsArea(buildPos.add(0, -1, 0)));
+		if (!isAirAt(world, buildPos)) {
+			return false;
+		}
+		BlockCuboid floor = getSidewardsArea(buildPos.add(0, -1, 0));
+		if (!BlockSets.AIR.unionWith(BlockSets.LOWER_SLABS).isAt(world, floor)) {
+			return false;
+		} else {
+			return new BlockFilteredArea(floor, BlockSets.AIR).getVolume(world) > 0;
+		}
 	}
 
 	private boolean isAirAt(WorldData world, BlockPos buildPos) {
