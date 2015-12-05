@@ -3,8 +3,8 @@
   "matches": {
     "defaultValue" : 2,
     "values": { 
-      "minecraft:leaves" : .99,
-      "minecraft:leaves2" : .99
+      "minecraft:leaves" : 0.99,
+      "minecraft:leaves2" : 0.99
     }
   },
   "is_enchanted": { "defaultValue" : 0.9 },
@@ -23,6 +23,12 @@
     "defaultValue": 1.01
   },
   "silk_touch": {
+    "defaultValue": 1.0,
+    "values": {
+      "minecraft:monster_egg": 100.0
+    }
+  },
+  "silk_touch&matches": {
     "defaultValue" : 1.0,
     "values": { 
       "minecraft:dirt" : [1, 1, 1.5, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
