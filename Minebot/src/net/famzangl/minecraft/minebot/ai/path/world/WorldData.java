@@ -90,7 +90,7 @@ public class WorldData {
 
 		// chunk.getBlock(x & 15, y, z & 15);
 
-		return a.getBlockIdWithMeta(x, y, z);
+		return a == null ? BARRIER_ID : a.getBlockIdWithMeta(x, y, z);
 	}
 
 	private ChunkAccessor getChunkAccessor(int x, int z) {
