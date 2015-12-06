@@ -29,11 +29,12 @@ import net.minecraft.item.ItemStack;
  *
  */
 public class PutItemInTableTask extends PutItemInContainerTask {
+	private static final int TABLE_INV_OFFSET = 2;
 
 	@Override
 	protected int getStackToPut(AIHelper h) {
 		final GuiEnchantment screen = (GuiEnchantment) h.getMinecraft().currentScreen;
-		for (int i = 1; i < 9 * 4 + 1; i++) {
+		for (int i = TABLE_INV_OFFSET; i < 9 * 4 + TABLE_INV_OFFSET; i++) {
 			final Slot slot = screen.inventorySlots.getSlot(i);
 			if (slot == null || !slot.canTakeStack(h.getMinecraft().thePlayer)) {
 				continue;

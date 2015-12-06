@@ -25,6 +25,7 @@ import net.famzangl.minecraft.minebot.Pos;
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.enchanting.CloseScreenTask;
 import net.famzangl.minecraft.minebot.ai.enchanting.PutItemInTableTask;
+import net.famzangl.minecraft.minebot.ai.enchanting.PutLapisInTableTask;
 import net.famzangl.minecraft.minebot.ai.enchanting.SelectEnchantmentTask;
 import net.famzangl.minecraft.minebot.ai.enchanting.TakeEnchantedItemTask;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSet;
@@ -114,6 +115,7 @@ public class EnchantStrategy extends PathFinderStrategy {
 				};
 			});
 			addTask(new PutItemInTableTask());
+			addTask(new PutLapisInTableTask());
 			enchantTask = new SelectEnchantmentTask();
 			addTask(enchantTask);
 			addTask(new TakeEnchantedItemTask());

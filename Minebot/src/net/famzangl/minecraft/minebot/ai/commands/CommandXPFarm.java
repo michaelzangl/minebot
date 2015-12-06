@@ -27,22 +27,14 @@ import net.famzangl.minecraft.minebot.ai.strategy.AIStrategy;
 
 @AICommand(helpText = "Kill mobs in range and (optionally) enchant whatever you have in the inventory.", name = "minebot")
 public class CommandXPFarm {
-
 	@AICommandInvocation(safeRule = SafeStrategyRule.DEFEND)
 	public static AIStrategy run(
 			AIHelper helper,
 			@AICommandParameter(type = ParameterType.FIXED, fixedName = "xpfarm", description = "") String nameArg,
-			@AICommandParameter(type = ParameterType.NUMBER, description = "Maximum level") Integer level) {
-		return new XPFarmStrategy(false, level == null ? 40 : level);
-	}
-
-	@AICommandInvocation(safeRule = SafeStrategyRule.DEFEND)
-	public static AIStrategy run(
-			AIHelper helper,
-			@AICommandParameter(type = ParameterType.FIXED, fixedName = "xpfarm", description = "") String nameArg,
-			@AICommandParameter(type = ParameterType.FIXED, fixedName = "autoenchant", description = "") String nameArg2,
-			@AICommandParameter(type = ParameterType.NUMBER, description = "Maximum level") Integer level) {
-		return new XPFarmStrategy(true, level == null ? 30 : level);
+			@AICommandParameter(type = ParameterType.FIXED, fixedName = "autoenchant", description = "", optional = true) String nameArg2,
+			@AICommandParameter(type = ParameterType.NUMBER, description = "Maximum level", optional = true) Integer level) {
+		boolean doEnchant = nameArg2 != null;
+		return new XPFarmStrategy(doEnchant, level == null ? (doEnchant ? 30 : 100) : level);
 	}
 
 }

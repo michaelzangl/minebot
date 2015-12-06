@@ -69,7 +69,7 @@ public class TintStrategy extends TaskStrategy {
 
 	}
 
-	private static class DyeItemFilter implements ItemFilter {
+	public static class DyeItemFilter implements ItemFilter {
 
 		private final EnumDyeColor color;
 
