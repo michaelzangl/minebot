@@ -107,6 +107,15 @@ public class InventoryDefinition {
 		}
 		return new InventorySlot(i, 0, 0, -1);
 	}
+
+	public int searchFreeSlot() {
+		for (int i = 0; i < 36; i++) {
+			if (getSlot(i).isEmpty()) {
+				return i;
+			}
+		}
+		return -1;
+	}
 	
 	public String getJSON() {
 		Gson gson = new Gson();

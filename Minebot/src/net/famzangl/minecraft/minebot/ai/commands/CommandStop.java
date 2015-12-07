@@ -22,7 +22,10 @@ import net.famzangl.minecraft.minebot.ai.command.AICommandInvocation;
 import net.famzangl.minecraft.minebot.ai.command.AICommandParameter;
 import net.famzangl.minecraft.minebot.ai.command.ParameterType;
 import net.famzangl.minecraft.minebot.ai.strategy.AIStrategy;
+import net.famzangl.minecraft.minebot.ai.strategy.InventoryDefinition;
 import net.famzangl.minecraft.minebot.ai.strategy.StopInStrategy;
+import net.famzangl.minecraft.minebot.ai.strategy.StopOnConditionStrategy;
+import net.famzangl.minecraft.minebot.ai.strategy.StopOnConditionStrategy.StopCondition;
 import net.famzangl.minecraft.minebot.ai.strategy.StopStrategy;
 
 @AICommand(name = "minebot", helpText = "Stop whatever you are doing.")
@@ -39,18 +42,9 @@ public class CommandStop {
 			AIHelper helper,
 			@AICommandParameter(type = ParameterType.FIXED, fixedName = "stop", description = "") String nameArg,
 			@AICommandParameter(type = ParameterType.FIXED, fixedName = "after", description = "") String nameArg2,
-			@AICommandParameter(type = ParameterType.NUMBER, fixedName = "", description = "Seconds") int seconds) {
-		return new StopInStrategy(seconds, false);
-	}
-
-	@AICommandInvocation()
-	public static AIStrategy run(
-			AIHelper helper,
-			@AICommandParameter(type = ParameterType.FIXED, fixedName = "stop", description = "") String nameArg,
-			@AICommandParameter(type = ParameterType.FIXED, fixedName = "after", description = "") String nameArg2,
-			@AICommandParameter(type = ParameterType.NUMBER, fixedName = "", description = "Seconds") int seconds,
-			@AICommandParameter(type = ParameterType.FIXED, fixedName = "force", description = "") String nameArg3) {
-		return new StopInStrategy(seconds, true);
+			@AICommandParameter(type = ParameterType.NUMBER, description = "Seconds") int seconds,
+			@AICommandParameter(type = ParameterType.FIXED, fixedName = "force", description = "", optional = true) String force) {
+		return new StopInStrategy(seconds, force != null);
 	}
 
 	@AICommandInvocation()
@@ -58,26 +52,29 @@ public class CommandStop {
 			AIHelper helper,
 			@AICommandParameter(type = ParameterType.FIXED, fixedName = "stop", description = "") String nameArg,
 			@AICommandParameter(type = ParameterType.FIXED, fixedName = "on", description = "") String nameArg2,
-			@AICommandParameter(type = ParameterType.FIXED, fixedName = "death", description = "") String nameArg3) {
-		return new AIStrategy() {
+			@AICommandParameter(type = ParameterType.FIXED, fixedName = "death", description = "") String nameArg3,
+			@AICommandParameter(type = ParameterType.FIXED, fixedName = "force", description = "", optional = true) String force) {
+		return new StopOnConditionStrategy(new StopCondition() {
 			@Override
-			public boolean checkShouldTakeOver(AIHelper helper) {
+			public boolean shouldStop(AIHelper helper) {
 				return !helper.isAlive();
 			}
-			
+		}, force != null, "death");
+	}
+
+	@AICommandInvocation()
+	public static AIStrategy runInventory(
+			AIHelper helper,
+			@AICommandParameter(type = ParameterType.FIXED, fixedName = "stop", description = "") String nameArg,
+			@AICommandParameter(type = ParameterType.FIXED, fixedName = "on", description = "") String nameArg2,
+			@AICommandParameter(type = ParameterType.FIXED, fixedName = "fullinv", description = "") String nameArg3,
+			@AICommandParameter(type = ParameterType.FIXED, fixedName = "force", description = "", optional = true) String force) {
+		return new StopOnConditionStrategy(new StopCondition() {
 			@Override
-			public boolean takesOverAnyTime() {
-				return true;
+			public boolean shouldStop(AIHelper helper) {
+				InventoryDefinition inventory = new InventoryDefinition(helper.getMinecraft().thePlayer.inventory);
+				return inventory.searchFreeSlot() < 0;
 			}
-			
-			@Override
-			protected TickResult onGameTick(AIHelper helper) {
-				if (!helper.isAlive()) {
-					return TickResult.ABORT;
-				} else {
-					return TickResult.NO_MORE_WORK;
-				}
-			}
-		};
+		}, force != null, "full inventory");
 	}
 }
