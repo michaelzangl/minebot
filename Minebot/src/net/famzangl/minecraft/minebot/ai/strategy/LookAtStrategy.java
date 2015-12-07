@@ -25,4 +25,11 @@ public class LookAtStrategy extends AIStrategy{
 			return TickResult.TICK_HANDLED;
 		}
 	}
+
+	@Override
+	public String toString() {
+		return "LookAtStrategy [lookAt=" + lookAt + "]";
+	}
+	
+	
 }

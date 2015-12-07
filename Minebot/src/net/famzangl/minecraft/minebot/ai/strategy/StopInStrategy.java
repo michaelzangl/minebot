@@ -57,7 +57,13 @@ public class StopInStrategy extends TimeStrategy {
 	@Override
 	public String getDescription(AIHelper helper) {
 		int time = (int) ((this.time - getTimeElapsed(helper)) / 20);
-		String m = time >= 60 ? time / 60 + "m ":"";
+		String m = time >= 60 ? time / 60 + "m " : "";
 		return "Stop in " + m + (time % 60) + "s";
 	}
+
+	@Override
+	public String toString() {
+		return "StopInStrategy [time=" + time + ", force=" + force + "]";
+	}
+
 }
