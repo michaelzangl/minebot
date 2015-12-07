@@ -28,6 +28,7 @@ import net.famzangl.minecraft.minebot.ai.commands.CommandFeed;
 import net.famzangl.minecraft.minebot.ai.commands.CommandFish;
 import net.famzangl.minecraft.minebot.ai.commands.CommandGet;
 import net.famzangl.minecraft.minebot.ai.commands.CommandLoad;
+import net.famzangl.minecraft.minebot.ai.commands.CommandLookAt;
 import net.famzangl.minecraft.minebot.ai.commands.CommandLumberjack;
 import net.famzangl.minecraft.minebot.ai.commands.CommandHelp;
 import net.famzangl.minecraft.minebot.ai.commands.CommandKill;
@@ -104,6 +105,7 @@ public class AIChatController {
 		registerCommand(CommandXPFarm.class);
 		registerCommand(CommandWalk.class);
 		registerCommand(CommandAirbridge.class);
+		registerCommand(CommandLookAt.class);
 
 		registerCommand(CommandKill.class);
 		registerCommand(CommandFish.class);

@@ -285,13 +285,17 @@ public abstract class AIHelper {
 			float pitchClamp = Math.min(
 					Math.abs(MAX_PITCH_CHANGE / pitchChange), 1);
 			float clamp = Math.min(yawClamp, pitchClamp);
+			if (yawInfluence <= 0 && pitchInfluence <= 0) {
+				// only test, do not set
+				return Math.abs(yawChange) < .01 && Math.abs(pitchChange) < .01;
+			}
 
 			yawInfluence = Math.min(yawInfluence, clamp);
 			pitchInfluence = Math.min(pitchInfluence, clamp);
 			// TODO: Make this linear?
 
-			mc.thePlayer.setAngles(yawChange / 0.15f
-					* yawInfluence, -pitchChange / 0.15f * pitchInfluence);
+			mc.thePlayer.setAngles(yawChange / 0.15f * yawInfluence,
+					-pitchChange / 0.15f * pitchInfluence);
 			invalidateObjectMouseOver();
 
 			LOGGER.trace(MARKER_FACING, "facing clamped at " + clamp
