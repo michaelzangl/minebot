@@ -59,7 +59,9 @@ public abstract class UseItemTask extends AITask {
 				notFacingBlock(h);
 				return;
 			}
-			if (!isBlockAllowed(h, objectMouseOver.getBlockPos())) {
+			// Check is facing to make sure top facing check passed.
+			if (!h.isFacingBlock(objectMouseOver.getBlockPos())
+					|| !isBlockAllowed(h, objectMouseOver.getBlockPos())) {
 				notFacingBlock(h);
 				return;
 			}
