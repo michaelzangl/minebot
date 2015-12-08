@@ -12,6 +12,7 @@ public class MatchesRater extends Rater {
 	@Override
 	protected boolean isAppleciable(ItemStack item, int forBlockAndMeta) {
 		return item != null
+				&& forBlockAndMeta >= 0
 				&& item.getItem() != null
 				&& item.getItem().getStrVsBlock(item,
 						Block.getBlockById(forBlockAndMeta >> 4)) > 1;

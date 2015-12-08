@@ -522,7 +522,7 @@ public abstract class AIHelper {
 		if (bestRatingSlot < 0 || bestRatingSlot >= 9) {
 			bestRatingSlot = 0;
 		}
-		int block = getWorld().getBlockIdWithMeta(pos);
+		int block = pos == null ? -1 : getWorld().getBlockIdWithMeta(pos);
 		float bestRating = rater.rateTool(
 				mc.thePlayer.inventory.getStackInSlot(bestRatingSlot), block);
 		for (int i = 0; i < 9; ++i) {
