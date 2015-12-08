@@ -18,6 +18,8 @@ package net.famzangl.minecraft.minebot.ai.task;
 
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.ClassItemFilter;
+import net.famzangl.minecraft.minebot.ai.tools.ToolRater;
+import net.famzangl.minecraft.minebot.settings.MinebotSettings;
 import net.minecraft.item.ItemFishingRod;
 
 public class ThrowFishingRodTask extends AITask {
@@ -31,7 +33,8 @@ public class ThrowFishingRodTask extends AITask {
 
 	@Override
 	public void runTick(AIHelper h, TaskOperations o) {
-		if (h.selectCurrentItem(new ClassItemFilter(ItemFishingRod.class))) {
+		ToolRater settings = MinebotSettings.getSettings().getFishingRater();
+		if (h.selectToolFor(null, new ToolRater(ToolRater.ToolType.FISHING_ROD)) > 0) {
 			time--;
 			if (time == 2) {
 				h.overrideUseItem();
@@ -41,7 +44,7 @@ public class ThrowFishingRodTask extends AITask {
 	
 	@Override
 	public int getGameTickTimeout(AIHelper helper) {
-		return 950;
+		return 40;
 	}
 
 }

@@ -24,6 +24,7 @@ import net.famzangl.minecraft.minebot.ai.ItemFilter.AndItemFilter;
 import net.famzangl.minecraft.minebot.ai.ItemFilter.NotItemFilter;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockFloatMap;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSet;
+import net.famzangl.minecraft.minebot.ai.tools.ToolRater.ToolType;
 import net.famzangl.minecraft.minebot.ai.tools.rate.AndRater;
 import net.famzangl.minecraft.minebot.ai.tools.rate.EnchantmentRater;
 import net.famzangl.minecraft.minebot.ai.tools.rate.FilterRater;
@@ -179,6 +180,16 @@ public class ToolRater {
 		for (ToolType tt : ToolType.values()) {
 			FILTERS.put(tt.getName(), tt);
 		}
+	}
+
+	public ToolRater() {
+	}
+
+	public ToolRater(ToolType requiredToolType) {
+		BlockFloatMap allBad = new BlockFloatMap();
+		allBad.setDefault(0);
+		raters.add(new NotRater(allBad, new FilterRater(requiredToolType,
+				requiredToolType.getName(), allBad)));
 	}
 
 	private static Rater getCompoundRater(String name, BlockFloatMap values) {

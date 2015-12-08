@@ -25,7 +25,7 @@ public abstract class Rater {
 
 	public float rate(ItemStack item, int forBlockAndMeta) {
 		if (isAppleciable(item, forBlockAndMeta)) {
-			return values.get(forBlockAndMeta);
+			return forBlockAndMeta < 0 ? values.getDefaultValue() : values.get(forBlockAndMeta);
 		} else {
 			return 1;
 		}
