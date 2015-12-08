@@ -97,8 +97,8 @@ public class MineScript {
 		return new ScriptStrategy(new WalkTowardsStrategy(x, z));
 	}
 
-	public BlockPos getPlayerPosition() {
-		return waitForTick().getPlayerPosition();
+	public WrappedBlockPos getPlayerBlockPosition() {
+		return new WrappedBlockPos(waitForTick().getPlayerPosition());
 	}
 	
 	public FoundEntity getPlayer() {
@@ -202,7 +202,7 @@ public class MineScript {
 	}
 
 	private File getPersistenceFile(String key) {
-		if (!key.matches("[a-zA-Z0-8\\._-]")) {
+		if (!key.matches("[a-zA-Z0-8\\._-]+")) {
 			throw new IllegalArgumentException("Invalid key name: " + key);
 		}
 		File dir = AIHelper.getMinebotDir();
