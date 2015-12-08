@@ -4,6 +4,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSet;
+import net.famzangl.minecraft.minebot.ai.task.inventory.ItemWithSubtype;
 import net.minecraft.block.Block;
 import net.minecraft.util.ResourceLocation;
 
@@ -69,4 +70,6 @@ public abstract class BlockWithDataOrDontcare {
 	public abstract BlockSet toBlockSet();
 
 	public abstract boolean containedIn(BlockSet blockSet);
+
+	public abstract ItemWithSubtype getItemType();
 }

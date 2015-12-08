@@ -1,6 +1,7 @@
 package net.famzangl.minecraft.minebot.ai.command;
 
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSet;
+import net.famzangl.minecraft.minebot.ai.task.inventory.ItemWithSubtype;
 import net.minecraft.block.Block;
 
 /**
@@ -32,5 +33,9 @@ public class BlockWithDontcare extends BlockWithDataOrDontcare {
 	@Override
 	public boolean containedIn(BlockSet blockSet) {
 		return blockSet.containsAll(getBlockId());
+	}
+
+	public ItemWithSubtype getItemType() {
+		return new ItemWithSubtype(getBlockId(), -1);
 	}
 }

@@ -9,6 +9,7 @@ import org.apache.commons.lang3.ArrayUtils;
 import net.famzangl.minecraft.minebot.ai.ColoredBlockItemFilter;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockMetaSet;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSet;
+import net.famzangl.minecraft.minebot.ai.task.inventory.ItemWithSubtype;
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.EnumDyeColor;
@@ -121,5 +122,8 @@ public class BlockWithData extends BlockWithDataOrDontcare {
 
 	public int getBlockWithMeta() {
 		return blockIdWithMeta;
+	}
+	public ItemWithSubtype getItemType() {
+		return new ItemWithSubtype(getBlockId(), getMetaValue());
 	}
 }

@@ -30,6 +30,7 @@ import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.MarkerManager;
 
 import net.famzangl.minecraft.minebot.ai.AIHelper;
+import net.famzangl.minecraft.minebot.ai.command.BlockWithDataOrDontcare;
 import net.famzangl.minecraft.minebot.ai.enchanting.CloseScreenTask;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSet;
 import net.famzangl.minecraft.minebot.ai.path.world.WorldData;
@@ -451,8 +452,15 @@ public class CraftStrategy extends PathFinderStrategy {
 	}
 
 	public CraftStrategy(int amount, int itemId, int subtype) {
+		this(amount, new ItemWithSubtype(itemId, subtype));
+	}
+	public CraftStrategy(int amount, ItemWithSubtype item) {
 		super(new CraftingTableFinder(new CraftingWish(amount,
-				new ItemWithSubtype(itemId, subtype))), "Crafting");
+				item)), "Crafting");
+	}
+
+	public CraftStrategy(int amount, BlockWithDataOrDontcare itemType) {
+		this(amount, itemType.getItemType());
 	}
 
 	@Override

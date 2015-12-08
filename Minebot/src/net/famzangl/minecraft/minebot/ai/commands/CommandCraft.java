@@ -34,7 +34,7 @@ import net.minecraft.init.Blocks;
 public class CommandCraft {
 
 	/**
-	 * Blocks that can be crafted.
+	 * Blocks that can not be crafted.
 	 */
 	private static final BlockSet simpleBlocks = new BlockSet(
 			Blocks.air, Blocks.brewing_stand, Blocks.bed, Blocks.nether_wart,
@@ -60,11 +60,8 @@ public class CommandCraft {
 			AIHelper helper,
 			@AICommandParameter(type = ParameterType.FIXED, fixedName = "craft", description = "") String nameArg,
 			@AICommandParameter(type = ParameterType.NUMBER, description = "Item count") int itemCount,
-			@AICommandParameter(type = ParameterType.BLOCK_NAME, description = "Block", blockFilter = MyBlockFilter.class) BlockWithDataOrDontcare itemType,
-			@AICommandParameter(type = ParameterType.NUMBER, description = "Item subtype", optional = true) Integer itemSubtype) {
-		// FIXME: subtype is duplicated. Do this in a better way.
-		return run(helper, nameArg, itemCount, itemType.getBlockId(),
-				itemSubtype);
+			@AICommandParameter(type = ParameterType.BLOCK_NAME, description = "Block", blockFilter = MyBlockFilter.class) BlockWithDataOrDontcare itemType) {
+		return new CraftStrategy(itemCount, itemType);
 	}
 
 	@AICommandInvocation()

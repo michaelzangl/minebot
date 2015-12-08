@@ -22,7 +22,8 @@ import net.minecraft.world.chunk.storage.ExtendedBlockStorage;
  * @author Michael Zangl
  */
 public class WorldData {
-	private static final int BARRIER_ID = Block.getIdFromBlock(Blocks.barrier);
+	private static final int BARRIER_ID = Block.getIdFromBlock(Blocks.barrier) << 4;
+	private static final int AIR_ID = 0;
 	private static final int CACHE_ENTRIES = 10;
 	/**
 	 * A cache pos that may never occur naturally.
@@ -83,8 +84,10 @@ public class WorldData {
 	 * @return
 	 */
 	public int getBlockIdWithMeta(int x, int y, int z) {
-		if (y < 0 || y >= 256) {
+		if (y < 0 || y >= 258) {
 			return BARRIER_ID;
+		} else if (y >= 256) {
+			return AIR_ID;
 		}
 		ChunkAccessor a = getChunkAccessor(x, z);
 
