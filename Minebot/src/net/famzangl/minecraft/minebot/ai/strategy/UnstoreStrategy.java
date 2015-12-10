@@ -81,7 +81,7 @@ public class UnstoreStrategy extends PathFinderStrategy {
 							.min(mainInventory[inventorySlot].getMaxStackSize(),
 									slot.amount)) {
 						System.out
-						.println("This slot already contains enough items.");
+								.println("This slot already contains enough items.");
 						noMoreWork[inventorySlot] = true;
 						continue;
 					}
@@ -123,11 +123,19 @@ public class UnstoreStrategy extends PathFinderStrategy {
 						SameItemFilter filter = new SameItemFilter(
 								slot.getFakeMcStack());
 						List<Slot> inventorySlots = screen.inventorySlots.inventorySlots;
+						int fromStackRating = -1;
+						int missing = getMissingAmount(h,
+								getSlotContentCount(screen.inventorySlots
+										.getSlot(getToStack(h))));
 						for (int i = 0; i < inventorySlots.size() - 36; i++) {
 							Slot s = inventorySlots.get(i);
 							if (filter.matches(s.getStack())) {
-								fromStack = i;
-								break;
+								int rating = rateSize(h,
+										s.getStack().stackSize, missing);
+								if (rating > fromStackRating) {
+									fromStackRating = rating;
+									fromStack = i;
+								}
 							}
 						}
 						if (fromStack < 0) {
@@ -137,6 +145,18 @@ public class UnstoreStrategy extends PathFinderStrategy {
 					}
 
 					return fromStack;
+				}
+
+				private int rateSize(AIHelper h, int stackSize, int missing) {
+					if (stackSize == missing) {
+						return 4;
+					} else if (stackSize == missing * 2) {
+						return 3;
+					} else if (stackSize < missing) {
+						return 2;
+					} else {
+						return 1;
+					}
 				}
 
 				@Override
@@ -159,15 +179,15 @@ public class UnstoreStrategy extends PathFinderStrategy {
 			scanner.addHandler(chestBlockHandler);
 			return scanner;
 		}
-		
+
 		public UnstorePathFinder(Wishlist list) {
 			this.list = list;
 		}
 
 		@Override
 		protected float rateDestination(int distance, int x, int y, int z) {
-			ArrayList<ChestData> chests = chestBlockHandler.getReachableForPos(new Pos(
-					x, y, z));
+			ArrayList<ChestData> chests = chestBlockHandler
+					.getReachableForPos(new Pos(x, y, z));
 			if (chests != null) {
 				for (ChestData c : chests) {
 					if (list.couldUseOneOf(c)) {

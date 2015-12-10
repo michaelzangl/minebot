@@ -167,7 +167,7 @@ public abstract class MoveInInventoryTask extends AITask {
 		return getSlotContentCount(to) - oldCount;
 	}
 
-	private int getSlotContentCount(Slot slot) {
+	protected int getSlotContentCount(Slot slot) {
 		return slot.getHasStack() ? slot.getStack().stackSize : 0;
 	}
 
