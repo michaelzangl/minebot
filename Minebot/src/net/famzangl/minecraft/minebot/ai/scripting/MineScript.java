@@ -21,6 +21,7 @@ import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Scanner;
 
 import net.famzangl.minecraft.minebot.ai.AIHelper;
@@ -184,9 +185,17 @@ public class MineScript {
 	public String getString(String key, String defaultValue) {
 		File file = getPersistenceFile(key);
 		try {
-			return new Scanner(file, "UTF-8").useDelimiter("\\A").next();
+			if (!file.exists()) {
+				return defaultValue;
+			}
+			Scanner scanner = new Scanner(file, "UTF-8");
+			String line = scanner.useDelimiter("\\A").next();
+			scanner.close();
+			return line;
 		} catch (FileNotFoundException e) {
 			return defaultValue;
+		} catch (NoSuchElementException e) {
+			return "";
 		}
 	}
 
@@ -194,7 +203,9 @@ public class MineScript {
 		File file = getPersistenceFile(key);
 
 		try {
-			new PrintWriter(file, "UTF-8").print(value);
+			PrintWriter writer = new PrintWriter(file, "UTF-8");
+			writer.print(value);
+			writer.close();
 		} catch (FileNotFoundException e) {
 			throw new UnsupportedOperationException("Persistence dir is not writeable.");
 		} catch (UnsupportedEncodingException e) {
@@ -210,7 +221,7 @@ public class MineScript {
 		if (!persistence.exists()) {
 			persistence.mkdirs();
 		}
-		File file = new File(dir, key);
+		File file = new File(persistence, key);
 		return file;
 	}
 }
