@@ -14,6 +14,7 @@ import net.famzangl.minecraft.minebot.ai.path.world.BlockSets;
 import net.famzangl.minecraft.minebot.ai.path.world.WorldData;
 import net.famzangl.minecraft.minebot.ai.task.AITask;
 import net.famzangl.minecraft.minebot.ai.task.BlockHalf;
+import net.famzangl.minecraft.minebot.ai.task.RunOnceTask;
 import net.famzangl.minecraft.minebot.ai.task.TaskOperations;
 import net.famzangl.minecraft.minebot.ai.task.WaitTask;
 import net.famzangl.minecraft.minebot.ai.task.inventory.GetOnHotBarTask;
@@ -44,7 +45,7 @@ public class AirbridgeStrategy extends TaskStrategy {
 			.getLogger(AirbridgeStrategy.class);
 
 	private static final int LAG_TEST_DELAY = 15;
-	private static final int BLOCK_PLACE_DELAY = 4;
+	private static final int BLOCK_PLACE_DELAY = 3;
 
 	private static final BlockItemFilter SLABS_FILTER = new BlockItemFilter(
 			BlockSets.LOWER_SLABS);
@@ -84,10 +85,33 @@ public class AirbridgeStrategy extends TaskStrategy {
 		}
 	}
 
+	private static final class DynamicWaitTask extends AITask {
+		private long startTime = 0;
+
+		@Override
+		public void runTick(AIHelper h, TaskOperations o) {
+		}
+
+		@Override
+		public boolean isFinished(AIHelper h) {
+			return h.getMinecraft().theWorld.getTotalWorldTime() >= startTime + LAG_TEST_DELAY;
+		}
+
+		public AITask getTrigger() {
+			return new RunOnceTask() {
+				@Override
+				protected void runOnce(AIHelper h, TaskOperations o) {
+					startTime = h.getMinecraft().theWorld.getTotalWorldTime();
+				}
+			};
+		}
+	}
 	private class BuildHalfslabVisitor implements AreaVisitor {
+
 
 		private final BlockPos buildPos;
 		private final BlockPos beforeBuild;
+		private final DynamicWaitTask waitTask = new DynamicWaitTask();
 
 		public BuildHalfslabVisitor(BlockPos buildPos, BlockPos beforeBuild) {
 			this.buildPos = buildPos;
@@ -103,6 +127,14 @@ public class AirbridgeStrategy extends TaskStrategy {
 			addTask(getBuildHafslabTask(pos, buildPos,
 					beforeBuild));
 			addTask(new WaitTask(BLOCK_PLACE_DELAY));
+			
+			if (buildPos.add(0, -1, 0).equals(pos)) {
+				addTask(waitTask.getTrigger());
+			}
+		}
+
+		public AITask getWaitTask() {
+			return waitTask;
 		}
 
 	}
@@ -197,10 +229,11 @@ public class AirbridgeStrategy extends TaskStrategy {
 			if ((buildPos.getX() & 1) == (buildPos.getZ() & 1)) {
 				toPlace = new ReverseAcceptingArea(toPlace);
 			}
-			toPlace.accept(new BuildHalfslabVisitor(buildPos, beforeBuild), world);
+			BuildHalfslabVisitor buildHalfslabVisitor = new BuildHalfslabVisitor(buildPos, beforeBuild);
+			toPlace.accept(buildHalfslabVisitor, world);
 
 			// wait for the server to sync. If block disappears, we don't fall.
-			addTask(new WaitTask(LAG_TEST_DELAY - BLOCK_PLACE_DELAY));
+			addTask(buildHalfslabVisitor.getWaitTask());
 		} else if (isHalfslabAt(world, buildPos)) {
 			// walk
 			addTask(new WalkTowardsTask(buildPos.getX(), buildPos.getZ(), null));
