@@ -39,8 +39,11 @@ import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.Item.ToolMaterial;
 import net.minecraft.item.ItemAxe;
+import net.minecraft.item.ItemBow;
 import net.minecraft.item.ItemFishingRod;
+import net.minecraft.item.ItemHoe;
 import net.minecraft.item.ItemPickaxe;
+import net.minecraft.item.ItemShears;
 import net.minecraft.item.ItemSpade;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemSword;
@@ -120,6 +123,9 @@ public class ToolRater {
 			} else if (itemStack.getItem() instanceof ItemTool) {
 				ItemTool itemTool = (ItemTool) itemStack.getItem();
 				return itemTool.getToolMaterial() == toolMaterial;
+			} else if (itemStack.getItem() instanceof ItemHoe) {
+				ItemHoe itemTool = (ItemHoe) itemStack.getItem();
+				return itemTool.getMaterialName().equals(toolMaterial.toString());
 			} else {
 				return false;
 			}
@@ -135,7 +141,9 @@ public class ToolRater {
 	public enum ToolType implements ItemFilter {
 		SWORD("sword", ItemSword.class), AXE("axe", ItemAxe.class), PICKAXE(
 				"pickaxe", ItemPickaxe.class), SPADE("shovel", ItemSpade.class), FISHING_ROD(
-				"fishingrod", ItemFishingRod.class);
+				"fishingrod", ItemFishingRod.class), BOW("bow", ItemBow.class), HOE(
+				"hoe", ItemHoe.class), SHEARS(
+						"shears", ItemShears.class);
 
 		private final Class<? extends Item> itemClass;
 		private final String name;
