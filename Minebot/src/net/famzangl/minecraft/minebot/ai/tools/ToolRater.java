@@ -175,7 +175,7 @@ public class ToolRater {
 		FILTERS.put("wood", new ItemMaterial(ToolMaterial.WOOD));
 		FILTERS.put("stone", new ItemMaterial(ToolMaterial.STONE));
 		FILTERS.put("gold", new ItemMaterial(ToolMaterial.GOLD));
-		FILTERS.put("emerald", new ItemMaterial(ToolMaterial.IRON));
+		FILTERS.put("iron", new ItemMaterial(ToolMaterial.IRON));
 		FILTERS.put("diamond", new ItemMaterial(ToolMaterial.EMERALD));
 		for (ToolType tt : ToolType.values()) {
 			FILTERS.put(tt.getName(), tt);
