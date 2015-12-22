@@ -16,14 +16,26 @@
  *******************************************************************************/
 package net.famzangl.minecraft.minebot.ai.net;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.Marker;
+import org.apache.logging.log4j.MarkerManager;
+import org.lwjgl.Sys;
+
 import net.famzangl.minecraft.minebot.ai.AIController;
+import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.command.AIChatController;
+import net.famzangl.minecraft.minebot.ai.scripting.ChatMessage;
 import net.famzangl.minecraft.minebot.ai.utils.PrivateFieldUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.client.main.GameConfiguration;
 import net.minecraft.client.network.NetHandlerPlayClient;
 import net.minecraft.entity.Entity;
 import net.minecraft.network.NetworkManager;
@@ -31,6 +43,7 @@ import net.minecraft.network.Packet;
 import net.minecraft.network.play.INetHandlerPlayClient;
 import net.minecraft.network.play.client.C01PacketChatMessage;
 import net.minecraft.network.play.client.C14PacketTabComplete;
+import net.minecraft.network.play.server.S02PacketChat;
 import net.minecraft.network.play.server.S21PacketChunkData;
 import net.minecraft.network.play.server.S23PacketBlockChange;
 import net.minecraft.network.play.server.S24PacketBlockAction;
@@ -41,11 +54,54 @@ import net.minecraft.network.play.server.S2APacketParticles;
 import net.minecraft.network.play.server.S3APacketTabComplete;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumParticleTypes;
+import net.minecraft.util.IChatComponent;
+import akka.io.Tcp.Message;
 
 import com.mojang.authlib.GameProfile;
 
 public class MinebotNetHandler extends NetHandlerPlayClient implements
 		NetworkHelper {
+	private static final Marker MARKER_CHAT = MarkerManager
+			.getMarker("chat");
+	private static final Marker MARKER_FISH = MarkerManager
+			.getMarker("fish");
+	private static final Marker MARKER_COMPLETE = MarkerManager
+			.getMarker("complete");
+	private static final Logger LOGGER = LogManager.getLogger(MinebotNetHandler.class);
+
+	public static class PersistentChat {
+
+		private final IChatComponent message;
+
+		private final boolean chat;
+
+		private final long time = System.currentTimeMillis();
+
+		public PersistentChat(S02PacketChat packetIn) {
+			chat = packetIn.isChat();
+			message = packetIn.func_148915_c();
+		}
+
+		public IChatComponent getMessage() {
+			return message;
+		}
+
+		public boolean isChat() {
+			return chat;
+		}
+
+		public long getTime() {
+			return time;
+		}
+
+		@Override
+		public String toString() {
+			return "PersistentChat [message=" + message + ", chat=" + chat
+					+ "]";
+		}
+
+	}
+
 	private static final double MAX_FISH_DISTANCE = 10;
 
 	private final ConcurrentLinkedQueue<BlockPos> foundFishPositions = new ConcurrentLinkedQueue<BlockPos>();
@@ -54,9 +110,13 @@ public class MinebotNetHandler extends NetHandlerPlayClient implements
 
 	private String lastSendTabComplete;
 
+	private final ArrayList<PersistentChat> chatMessages = new ArrayList<PersistentChat>();
+	private Minecraft mcIn;
+
 	public MinebotNetHandler(Minecraft mcIn, GuiScreen p_i46300_2_,
 			NetworkManager p_i46300_3_, GameProfile p_i46300_4_) {
 		super(mcIn, p_i46300_2_, p_i46300_3_, p_i46300_4_);
+		this.mcIn = mcIn;
 	}
 
 	@Override
@@ -109,7 +169,7 @@ public class MinebotNetHandler extends NetHandlerPlayClient implements
 						netHandler.getNetworkManager(),
 						netHandler.getGameProfile());
 				netHandler.getNetworkManager().setNetHandler(handler);
-				System.out.println("Minebot network handler injected.");
+				LOGGER.info("Minebot network handler injected.");
 				return handler;
 			} else {
 				return (NetworkHelper) netHandler;
@@ -126,6 +186,7 @@ public class MinebotNetHandler extends NetHandlerPlayClient implements
 				double x = packetIn.getXCoordinate();
 				double y = packetIn.getYCoordinate();
 				double z = packetIn.getZCoordinate();
+				LOGGER.trace(MARKER_FISH, "fish particle (?) at " + new BlockPos(x, y, z));
 				// foundFishPositions.add(new BlockPos(x, y, z));
 				// System.out.println("NetHandler: fish at " + new BlockPos(x,
 				// y, z) + ", packet: " +
@@ -150,7 +211,7 @@ public class MinebotNetHandler extends NetHandlerPlayClient implements
 			double y = packetIn.func_149211_e();
 			double z = packetIn.func_149210_f();
 			foundFishPositions.add(new BlockPos(x, y, z));
-			System.out.println("NetHandler: fish at " + new BlockPos(x, y, z));
+			LOGGER.trace(MARKER_FISH, "fish at " + new BlockPos(x, y, z));
 		}
 		super.handleSoundEffect(packetIn);
 	}
@@ -162,16 +223,17 @@ public class MinebotNetHandler extends NetHandlerPlayClient implements
 				return false;
 			} else if (expectedPos.getDistance(next.getX() + 0.5,
 					next.getY() + 0.5, next.getZ() + 0.5) < MAX_FISH_DISTANCE) {
+				LOGGER.trace(MARKER_FISH, "found fish for " + expectedPos + ": " + next);
 				return true;
 			} else {
-				System.out.println("Found a fish bite at " + next
+				LOGGER.trace(MARKER_FISH, "Found a fish bite at " + next
 						+ " but fishing at " + expectedPos + ".");
 			}
 		}
 	}
 
 	public void resetFishState() {
-		System.out.println("NetHandler: reset");
+		LOGGER.trace(MARKER_FISH, "reset");
 		foundFishPositions.clear();
 	}
 
@@ -225,5 +287,18 @@ public class MinebotNetHandler extends NetHandlerPlayClient implements
 	@Override
 	public void removeChunkChangeListener(ChunkListener l) {
 		listeners.remove(l);
+	}
+
+	@Override
+	public void handleChat(S02PacketChat packetIn) {
+		if (mcIn.isCallingFromMinecraftThread()) {
+			LOGGER.trace(MARKER_CHAT, "Received chat package: " + packetIn.hashCode() + ": " + packetIn.func_148915_c());
+			chatMessages.add(new PersistentChat(packetIn));
+		} // else: super passes it on to mc thread.
+		super.handleChat(packetIn);
+	}
+
+	public List<PersistentChat> getChatMessages() {
+		return Collections.unmodifiableList(chatMessages);
 	}
 }
