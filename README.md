@@ -5,17 +5,18 @@ Minebot is a mod for minecraft that takes control of the player and automaticall
 
 Minebot is written to be played on normal minecraft in survival mode. Creative mode and some mods partially work but are not targeted.
 
-The bot is controlled by giving it commands using the chat line. For advanced uses, it can be controlled using simple scripts or the Javascript API.
+The bot is controlled by giving it commands using the chat line. For advanced uses, it can be controlled using [simple scripts](https://github.com/michaelzangl/minebot/wiki/Run) or the [Javascript API](https://github.com/michaelzangl/minebot/wiki/Javascript-API).
 
-Have a look at the wiki to see how to use the bot.
+Have a look at the [Getting Started Wiki Page](https://github.com/michaelzangl/minebot/wiki) to see how to use the bot.
 
 This repo also contains an independent bow aiming helper.
 
-Installing
+Download + Installing
 ==========
 
-Get the most current release:
-https://github.com/michaelzangl/minebot/releases
+Install [Forge mod loader](http://files.minecraftforge.net/#Downloads).
+
+Get the latest [release](https://github.com/michaelzangl/minebot/releases).
 
 Extract the ZIP file and put the jar files in your minecraft mods directory.
 
