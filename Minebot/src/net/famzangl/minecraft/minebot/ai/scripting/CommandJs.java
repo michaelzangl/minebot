@@ -19,10 +19,19 @@ package net.famzangl.minecraft.minebot.ai.scripting;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.Marker;
+import org.apache.logging.log4j.MarkerManager;
 
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.command.AIChatController;
@@ -34,9 +43,16 @@ import net.famzangl.minecraft.minebot.ai.strategy.AIStrategy;
 import net.famzangl.minecraft.minebot.ai.strategy.AIStrategy.TickResult;
 import net.famzangl.minecraft.minebot.ai.task.error.StringTaskError;
 import net.famzangl.minecraft.minebot.ai.task.error.TaskError;
+import net.famzangl.minecraft.minebot.ai.utils.PrivateFieldUtils;
+import net.minecraft.launchwrapper.LaunchClassLoader;
 
 @AICommand(name = "minebot", helpText = "Execute a javascript file.")
 public class CommandJs {
+	private static final Marker MARKER_ENGINE = MarkerManager
+			.getMarker("engine");
+	private static final Marker MARKER_SYNC = MarkerManager
+			.getMarker("sync");
+	private static final Logger LOGGER = LogManager.getLogger(CommandJs.class);
 
 	public static class ScriptStrategy {
 		private final AIStrategy strategy;
@@ -65,9 +81,51 @@ public class CommandJs {
 		void tickDone();
 
 		void pauseForStrategy();
+
+		ScriptEngine getEngine();
 	}
 
 	public static class ScriptRunner implements Runnable, TickProvider {
+		private static final class StrategyTicker implements Runnable {
+			private TickResult result;
+			private AIHelper helper;
+			private AIStrategy activeStrategy;
+
+			public StrategyTicker(AIHelper helper, AIStrategy activeStrategy) {
+				super();
+				this.helper = helper;
+				this.activeStrategy = activeStrategy;
+			}
+
+			@Override
+			public synchronized void run() {
+				try {
+					result = activeStrategy.gameTick(helper);
+				} finally {
+					if (result == null) {
+						LOGGER.error("Strategy returned null: "
+								+ activeStrategy);
+						result = TickResult.ABORT;
+					}
+					this.notifyAll();
+				}
+			}
+			
+			public AIHelper getHelper() {
+				return helper;
+			}
+
+			public synchronized TickResult getResult() {
+				while (result == null) {
+					try {
+						this.wait();
+					} catch (InterruptedException e) {
+					}
+				}
+				return result;
+			}
+		}
+
 		private String description = "Running script";
 		private final File fileName;
 		private boolean finished;
@@ -82,6 +140,9 @@ public class CommandJs {
 		private AIStrategy activeStrategy;
 		private final Object activeStrategyMutex = new Object();
 		private TaskError error;
+		private final Object errorMutex = new Object();
+		private ScriptEngine engine;
+		private StrategyTicker pendingTicker;
 
 		public ScriptRunner(File file) {
 			this.fileName = file;
@@ -96,13 +157,7 @@ public class CommandJs {
 					}
 				}
 				ScriptEngineManager manager = new ScriptEngineManager(null);
-				ScriptEngine engine = manager.getEngineByName("JavaScript");
-				if (engine == null) {
-					engine = manager.getEngineByName("nashorn");
-				}
-				if (engine == null) {
-					throw new ScriptException("No Javascript engine was found.");
-				}
+				engine = generateScriptEngine(manager);
 				FileReader fis;
 				try {
 					fis = new FileReader(fileName);
@@ -118,12 +173,53 @@ public class CommandJs {
 						+ System.getProperty("java.vendor") + " on "
 						+ System.getProperty("os.name"));
 				e.printStackTrace();
-				synchronized (tickHelperMutex) {
+				synchronized (errorMutex) {
 					error = new StringTaskError(e.getMessage());
 				}
 			} finally {
 				finished = true;
 				tickDone();
+			}
+		}
+
+		private ScriptEngine generateScriptEngine(ScriptEngineManager manager)
+				throws ScriptException {
+			LOGGER.trace(MARKER_ENGINE,
+					"Creating javascript engine. Class loader hirarchy:");
+			ClassLoader cl = getClass().getClassLoader();
+			while (cl != null) {
+				LOGGER.trace(MARKER_ENGINE, "  - " + cl);
+				if (cl instanceof LaunchClassLoader) {
+					cl = PrivateFieldUtils.getFieldValue(cl,
+							LaunchClassLoader.class, ClassLoader.class);
+				} else {
+					cl = cl.getParent();
+				}
+			}
+
+			ScriptEngine nashorn = manager.getEngineByName("nashorn");
+			if (nashorn != null) {
+				fixLaunchClassLoader();
+				return nashorn;
+			}
+
+			LOGGER.warn(MARKER_ENGINE,
+					"Could not create any nashorn engine. Falling back to JavaScript.");
+			ScriptEngine js = manager.getEngineByName("JavaScript");
+			if (js != null) {
+				return js;
+			}
+
+			LOGGER.error(MARKER_ENGINE, "Could not create any engine.");
+			throw new ScriptException("No Javascript engine was found.");
+		}
+
+		private void fixLaunchClassLoader() {
+			if (getClass().getClassLoader() instanceof LaunchClassLoader) {
+				LaunchClassLoader loader = (LaunchClassLoader) getClass()
+						.getClassLoader();
+				// allows you to extend Minebot classes.
+				loader.addClassLoaderExclusion("jdk.nashorn.");
 			}
 		}
 
@@ -141,22 +237,14 @@ public class CommandJs {
 		 * @return
 		 */
 		public TickResult runForTick(AIHelper helper) {
-			synchronized (tickHelperMutex) {
-				printError();
+			printError();
+			AIStrategy strat;
 
-				synchronized (activeStrategyMutex) {
-					if (activeStrategy != null) {
-						TickResult tickResult = activeStrategy.gameTick(helper);
-						if (tickResult == TickResult.NO_MORE_WORK
-								|| tickResult == TickResult.ABORT) {
-							activeStrategy.setActive(false, helper);
-							activeStrategy = null;
-							activeStrategyMutex.notifyAll();
-						} else {
-							return tickResult;
-						}
-					}
-				}
+			TickResult tickResult = runStrategyGameTick(helper);
+			if (tickResult != null) {
+				return tickResult;
+			}
+			synchronized (tickHelperMutex) {
 				if (scriptWaitingForTick) {
 					tickHelper = helper;
 					scriptInsideTick = true;
@@ -176,15 +264,18 @@ public class CommandJs {
 		}
 
 		private void printError() {
-			if (error != null) {
-				AIChatController.addChatLine("JS Error: " + error.getMessage());
-				error = null;
+			synchronized (errorMutex) {
+				if (error != null) {
+					AIChatController.addChatLine("JS Error: " + error.getMessage());
+					error = null;
+				}
 			}
 		}
 
 		@Override
 		public void tickDone() {
 			synchronized (tickHelperMutex) {
+				LOGGER.error(MARKER_SYNC, "Script requests that we resume.");
 				printError();
 				scriptInsideTick = false;
 				scriptWaitingForTick = false;
@@ -196,6 +287,7 @@ public class CommandJs {
 		@Override
 		public AIHelper getHelper() {
 			synchronized (tickHelperMutex) {
+				LOGGER.error(MARKER_SYNC, "Synchronize to getting script helper.");
 				if (stopped) {
 					throw new RuntimeException("Stop.");
 				}
@@ -225,6 +317,7 @@ public class CommandJs {
 		@Override
 		public void setActiveStrategy(ScriptStrategy strategy, AIHelper helper) {
 			synchronized (activeStrategyMutex) {
+				LOGGER.error(MARKER_SYNC, "Change strategy to " + strategy);
 				if (activeStrategy != null) {
 					activeStrategy.setActive(false, helper);
 				}
@@ -245,6 +338,13 @@ public class CommandJs {
 		public void pauseForStrategy() {
 			synchronized (activeStrategyMutex) {
 				while (activeStrategy != null) {
+					if (pendingTicker != null) {
+						LOGGER.error(MARKER_SYNC, "Handling strategy tick in js thread.");
+						tickHelper = pendingTicker.getHelper();
+						pendingTicker.run();
+						tickHelper = null;
+						pendingTicker = null;
+					}
 					try {
 						activeStrategyMutex.wait();
 					} catch (InterruptedException e) {
@@ -253,8 +353,36 @@ public class CommandJs {
 			}
 		}
 
+		private TickResult runStrategyGameTick(AIHelper helper) {
+			StrategyTicker ticker;
+			synchronized (activeStrategyMutex) {
+				if (activeStrategy == null) {
+					return null;
+				}
+				// We need to dispatch a activeStrategy.gameTick(helper) on the
+				// JS thread.
+				ticker = new StrategyTicker(helper, activeStrategy);
+				pendingTicker = ticker;
+				activeStrategyMutex.notifyAll();
+			}
+			TickResult tickResult = ticker.getResult();
+			if (tickResult == TickResult.NO_MORE_WORK
+					|| tickResult == TickResult.ABORT) {
+				setActiveStrategy(null, helper);
+				return null;
+			}
+			return tickResult;
+		}
+
 		public TaskError getError() {
-			return error;
+			synchronized (errorMutex) {
+				return error;
+			}
+		}
+
+		@Override
+		public ScriptEngine getEngine() {
+			return engine;
 		}
 	}
 
@@ -267,7 +395,7 @@ public class CommandJs {
 
 		@Override
 		protected void onActivate(AIHelper helper) {
-			Thread scriptThread = new Thread(scriptRunner);
+			Thread scriptThread = new Thread(scriptRunner, "minebot-js");
 			scriptThread.start();
 			super.onActivate(helper);
 		}

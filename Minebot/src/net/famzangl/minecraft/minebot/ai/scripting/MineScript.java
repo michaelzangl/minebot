@@ -20,17 +20,22 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Scanner;
+
+import javax.script.ScriptException;
 
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.command.AIChatController;
 import net.famzangl.minecraft.minebot.ai.command.UnknownCommandException;
 import net.famzangl.minecraft.minebot.ai.commands.CommandRun;
+import net.famzangl.minecraft.minebot.ai.net.MinebotNetHandler.PersistentChat;
 import net.famzangl.minecraft.minebot.ai.scripting.CommandJs.RunScriptStrategy;
 import net.famzangl.minecraft.minebot.ai.scripting.CommandJs.ScriptStrategy;
 import net.famzangl.minecraft.minebot.ai.scripting.CommandJs.TickProvider;
+import net.famzangl.minecraft.minebot.ai.strategy.AIStrategy;
 import net.famzangl.minecraft.minebot.ai.strategy.InventoryDefinition;
 import net.famzangl.minecraft.minebot.ai.strategy.RunFileStrategy;
 import net.famzangl.minecraft.minebot.ai.strategy.StackStrategy;
@@ -56,7 +61,8 @@ public class MineScript {
 	}
 
 	private AIHelper waitForTick() {
-		return tickProvider.getHelper();
+		AIHelper helper = tickProvider.getHelper();
+		return helper;
 	}
 
 	/**
@@ -124,6 +130,22 @@ public class MineScript {
 	public void displayChat(String message) {
 		AIChatController.addChatLine(message);
 	}
+	
+	private ChatMessage[] chatMessageCache = new ChatMessage[0];
+	
+	public ChatMessage[] getChatMessages() throws ScriptException {
+		List<PersistentChat> messages = waitForTick().getNetworkHelper().getChatMessages();
+		int len = messages.size();
+		if (len > chatMessageCache.length) {
+			int oldLength = chatMessageCache.length;
+			chatMessageCache = Arrays.copyOf(chatMessageCache, len);
+			for (int i = oldLength;i < len; i++) {
+				PersistentChat m = messages.get(i);
+				chatMessageCache[i] = new ChatMessage(m, tickProvider.getEngine());
+			}
+		}
+		return chatMessageCache;
+	}
 
 	public boolean isAlive() {
 		return waitForTick().isAlive();
@@ -142,10 +164,18 @@ public class MineScript {
 				waitForTick().getMinecraft().thePlayer.inventory);
 	}
 
-	public ScriptStrategy stack(ScriptStrategy... strats) {
+	public ScriptStrategy stack(Object... strats) {
 		StrategyStack stack = new StrategyStack();
-		for (ScriptStrategy s : strats) {
-			stack.addStrategy(s.getStrategy());
+		for (Object s : strats) {
+			AIStrategy strategy;
+			if (s instanceof ScriptStrategy) {
+				strategy = ((ScriptStrategy) s).getStrategy();
+			} else if (s instanceof AIStrategy) {
+				strategy = (AIStrategy) s;
+			} else {
+				throw new IllegalArgumentException("Class " + s.getClass() + " is not strategy.");
+			}
+			stack.addStrategy(strategy);
 		}
 		return new ScriptStrategy(new StackStrategy(stack));
 	}
@@ -153,6 +183,15 @@ public class MineScript {
 	public void doNothing() {
 		tickProvider.setActiveStrategy(null, waitForTick());
 		tickProvider.tickDone();
+		try {
+			// Hope that main thread exits tick.
+			Thread.sleep(5);
+		} catch (InterruptedException e) {
+		}
+	}
+
+	public void doStrategy(AIStrategy strategy) {
+		doStrategy(new ScriptStrategy(strategy));
 	}
 
 	public void doStrategy(ScriptStrategy strategy) {
@@ -210,6 +249,10 @@ public class MineScript {
 			throw new UnsupportedOperationException("Persistence dir is not writeable.");
 		} catch (UnsupportedEncodingException e) {
 		}
+	}
+	
+	public void getJSON(String key, String value) {
+		//TODO
 	}
 
 	private File getPersistenceFile(String key) {

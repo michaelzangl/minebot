@@ -60,4 +60,8 @@ public class EntityPos {
 	public double distance(EntityPos other) {
 		return Pos.length(other.x - x, other.y - y, other.z - z);
 	}
+	
+	public double distance(double x, double y, double z) {
+		return Pos.length(this.x - x, this.y - y, this.z - z);
+	}
 }
