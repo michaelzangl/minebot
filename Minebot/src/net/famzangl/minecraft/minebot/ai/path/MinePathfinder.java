@@ -89,26 +89,38 @@ public abstract class MinePathfinder extends MovePathFinder {
 	}
 
 	@Override
-	protected boolean runSearch(BlockPos playerPosition) {
+	protected final boolean runSearch(BlockPos playerPosition) {
 		// lazy init
 		if (points == null) {
 			points = getPointsProvider();
+			if (points == null) {
+				throw new NullPointerException("No points map provided.");
+			}
 		}
 		if (factors == null) {
 			factors = getFactorProvider();
-		}
-		for (ResourceLocation k : (Set<ResourceLocation>) Block.blockRegistry
-				.getKeys()) {
-			int id = Block.getIdFromBlock((Block) Block.blockRegistry
-					.getObject(k));
-			// TODO: Do this better...
-			float f = factors.get(id * 16);
-			if (f > 0) {
-				headAllowedBlocks.intersectWith(new BlockSet(id));
-				footAllowedBlocks.intersectWith(new BlockSet(id));
+			if (factors == null) {
+				throw new NullPointerException("No points map provided.");
+			}
+			for (ResourceLocation k : (Set<ResourceLocation>) Block.blockRegistry
+					.getKeys()) {
+				int id = Block.getIdFromBlock((Block) Block.blockRegistry
+						.getObject(k));
+				// TODO: Do this better...
+				float f = factors.get(id * 16);
+				if (f > 0) {
+					headAllowedBlocks.intersectWith(new BlockSet(id));
+					footAllowedBlocks.intersectWith(new BlockSet(id));
+				}
 			}
 		}
+		
+		onPreRunSearch(playerPosition);
+		
 		return super.runSearch(playerPosition);
+	}
+
+	protected void onPreRunSearch(BlockPos playerPosition) {
 	}
 
 	protected abstract BlockFloatMap getFactorProvider();

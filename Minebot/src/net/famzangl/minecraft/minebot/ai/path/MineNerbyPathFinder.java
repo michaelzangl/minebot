@@ -31,7 +31,7 @@ public class MineNerbyPathFinder extends MineBySettingsPathFinder {
 	}
 
 	@Override
-	protected boolean runSearch(BlockPos playerPosition) {
+	protected void onPreRunSearch(BlockPos playerPosition) {
 		playerX = playerPosition.getX();
 		playerY = playerPosition.getY();
 		playerZ = playerPosition.getZ();
@@ -42,8 +42,7 @@ public class MineNerbyPathFinder extends MineBySettingsPathFinder {
 		System.out.println("Scanned " + alreadyScanned.cardinality()
 				+ " blocks, found " + possiblePositions.cardinality()
 				+ " ores.");
-
-		return super.runSearch(playerPosition);
+		super.onPreRunSearch(playerPosition);
 	}
 
 	private void findPossiblePositionsAround(BlockPos add) {

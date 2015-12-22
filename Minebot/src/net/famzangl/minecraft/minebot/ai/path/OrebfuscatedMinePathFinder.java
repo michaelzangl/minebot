@@ -37,11 +37,11 @@ public class OrebfuscatedMinePathFinder extends MineBySettingsPathFinder {
 			16, 21, 46, 48, 49, 56, 73, 82, 129, 13, 87, 88, 112, 153);
 	private static final BlockSet visibleMakingBlocks = new BlockSet(
 			Blocks.gravel, Blocks.dirt).unionWith(targetBlocks).invert();
-
+	
 	@Override
-	protected boolean runSearch(BlockPos playerPosition) {
+	protected void onPreRunSearch(BlockPos playerPosition) {
 		this.searchCenter = playerPosition;
-		return super.runSearch(playerPosition);
+		super.onPreRunSearch(playerPosition);
 	}
 
 	@Override
