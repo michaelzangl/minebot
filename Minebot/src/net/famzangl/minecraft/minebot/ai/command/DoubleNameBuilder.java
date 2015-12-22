@@ -31,7 +31,7 @@ public class DoubleNameBuilder extends ParameterBuilder {
 		list.add(new ArgumentDefinition("Number", annot.description()) {
 			@Override
 			public boolean couldEvaluateAgainst(String string) {
-				return string.matches("^[+-]?(\\d+\\.?\\d*|\\.\\d+)$");
+				return string.matches("^[+-]?(\\d+\\.?\\d*|\\.\\d+)([eE]-?\\d+)?$");
 			}
 		});
 	}
