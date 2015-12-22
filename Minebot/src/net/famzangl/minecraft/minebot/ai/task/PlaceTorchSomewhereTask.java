@@ -100,9 +100,8 @@ public class PlaceTorchSomewhereTask extends AITask {
 
 	private boolean placeWasSuccessful(AIHelper h) {
 		final PosAndDir place = getNextPlace(h);
-		boolean success = place == null || lastAttempt != null
-				&& Block.isEqualTo(h.getBlock(lastAttempt), Blocks.torch);
-		return success;
+		return place == null || lastAttempt != null
+				&& BlockSets.TORCH.isAt(h.getWorld(), lastAttempt);
 	}
 
 	private PosAndDir getNextPlace(AIHelper h) {
@@ -117,8 +116,6 @@ public class PlaceTorchSomewhereTask extends AITask {
 					}
 				}
 			}
-			System.out.println("Placing torch somewhere there: "
-					+ attemptOnPositions);
 		}
 
 		while (!attemptOnPositions.isEmpty()
