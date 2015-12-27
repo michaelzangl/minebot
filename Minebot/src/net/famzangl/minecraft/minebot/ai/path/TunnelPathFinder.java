@@ -238,10 +238,11 @@ public class TunnelPathFinder extends AlongTrackPathFinder {
 		addTask(new DestroyInRangeTask(area));
 
 		final boolean isTorchStep = stepNumber % 8 == 0;
-		if (torches.right && isTorchStep) {
+		// TODO: Only check for right torch.
+		if (torches.right && isTorchStep && !containsTorches(tunnelArea)) {
 			addTorchesTask(currentPos, -dz, dx);
 		}
-		if (torches.left && isTorchStep) {
+		if (torches.left && isTorchStep && !containsTorches(tunnelArea)) {
 			addTorchesTask(currentPos, dz, -dx);
 		}
 		if (torches.floor && isTorchStep && !containsTorches(tunnelArea)) {
