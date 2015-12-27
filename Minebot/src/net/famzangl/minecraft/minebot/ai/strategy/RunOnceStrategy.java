@@ -32,11 +32,22 @@ public abstract class RunOnceStrategy extends AIStrategy {
 	protected TickResult onGameTick(AIHelper helper) {
 		if (!wasRun) {
 			wasRun = true;
-			this.singleRun(helper);
+			return this.doSingleRun(helper);
 		}
 		return TickResult.NO_MORE_WORK;
 	}
 
+	protected TickResult doSingleRun(AIHelper helper) {
+		this.singleRun(helper);
+		return TickResult.NO_MORE_WORK;
+	}
+
+	/**
+	 * The code that should be run once. If you want to modify game state in
+	 * this method, use {@link RunOneTickStrategy}.
+	 * 
+	 * @param helper
+	 */
 	protected abstract void singleRun(AIHelper helper);
 
 	@Override
