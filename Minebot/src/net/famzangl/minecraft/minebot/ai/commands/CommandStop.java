@@ -53,13 +53,13 @@ public class CommandStop {
 			@AICommandParameter(type = ParameterType.FIXED, fixedName = "stop", description = "") String nameArg,
 			@AICommandParameter(type = ParameterType.FIXED, fixedName = "on", description = "") String nameArg2,
 			@AICommandParameter(type = ParameterType.FIXED, fixedName = "death", description = "") String nameArg3,
-			@AICommandParameter(type = ParameterType.FIXED, fixedName = "force", description = "", optional = true) String force) {
+			@AICommandParameter(type = ParameterType.FIXED, fixedName = "force", description = "ignored", optional = true) String ignored) {
 		return new StopOnConditionStrategy(new StopCondition() {
 			@Override
 			public boolean shouldStop(AIHelper helper) {
 				return !helper.isAlive();
 			}
-		}, force != null, "death");
+		}, true, "death");
 	}
 
 	@AICommandInvocation()
