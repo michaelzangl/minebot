@@ -106,13 +106,17 @@ public class SneakAndPlaceTask extends AITask {
 	}
 
 	protected boolean isFacingRightBlock(AIHelper h) {
-		return h.isFacingBlock(getFromPos(), inDirection);
+		return h.isFacingBlock(getPositionToPlaceOn(), inDirection);
 	}
 
 	protected boolean faceBlock(AIHelper h, TaskOperations o) {
-		return h.faceSideOf(getFromPos(), inDirection);
+		return h.faceSideOf(getPositionToPlaceOn(), inDirection);
 	}
 
+	protected BlockPos getPositionToPlaceOn() {
+		return startStandPosition.add(0, -1, 0);
+	}
+	
 	protected BlockPos getFromPos() {
 		return startStandPosition;
 	}

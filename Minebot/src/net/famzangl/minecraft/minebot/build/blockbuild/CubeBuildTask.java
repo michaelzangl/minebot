@@ -48,7 +48,7 @@ public abstract class CubeBuildTask extends BuildTask {
 			return new UpwardsMoveTask(forPosition.add(0, 1, 0), blockFilter);
 		} else {
 			return new SneakAndPlaceTask(forPosition.add(0, 1, 0), blockFilter,
-					relativeFromPos, getMinHeightToBuild());
+					forPosition.add(relativeFromPos), getMinHeightToBuild());
 		}
 	}
 
