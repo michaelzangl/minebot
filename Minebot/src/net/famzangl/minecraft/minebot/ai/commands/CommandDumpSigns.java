@@ -15,6 +15,7 @@ import net.famzangl.minecraft.minebot.ai.command.AICommandParameter;
 import net.famzangl.minecraft.minebot.ai.command.ParameterType;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSet;
 import net.famzangl.minecraft.minebot.ai.strategy.AIStrategy;
+import net.famzangl.minecraft.minebot.ai.strategy.RunOnceStrategy;
 import net.famzangl.minecraft.minebot.settings.MinebotSettings;
 import net.minecraft.block.BlockSign;
 import net.minecraft.init.Blocks;
@@ -33,24 +34,18 @@ public class CommandDumpSigns {
 			@AICommandParameter(type = ParameterType.FIXED, fixedName = "signs", description = "") String nameArg2,
 			@AICommandParameter(type = ParameterType.NUMBER, description = "distance", optional = true) Integer distanceArg) {
 		final int distance = distanceArg == null ? 100 : distanceArg;
-		return new AIStrategy() {
-			boolean exported;
-
+		return new RunOnceStrategy() {
 			@Override
-			protected TickResult onGameTick(AIHelper helper) {
-				if (!exported) {
-					final File dir = MinebotSettings.getDataDirFile("dumps");
-					dir.mkdirs();
-					final DateFormat df = new SimpleDateFormat(
-							"yyyy-MM-dd-HH-mm-ss");
-					final String date = df.format(Calendar.getInstance()
-							.getTime());
+			protected void singleRun(AIHelper helper) {
+				final File dir = MinebotSettings.getDataDirFile("dumps");
+				dir.mkdirs();
+				final DateFormat df = new SimpleDateFormat(
+						"yyyy-MM-dd-HH-mm-ss");
+				final String date = df.format(Calendar.getInstance()
+						.getTime());
 
-					final File file = new File(dir, date + ".signdump.txt");
-					dumpSignsTo(helper, file, distance);
-					exported = true;
-				}
-				return TickResult.NO_MORE_WORK;
+				final File file = new File(dir, date + ".signdump.txt");
+				dumpSignsTo(helper, file, distance);
 			}
 
 			private void dumpSignsTo(AIHelper helper, File file, int distance) {
