@@ -16,7 +16,11 @@
  *******************************************************************************/
 package net.famzangl.minecraft.minebot.ai.task.inventory;
 
+import net.famzangl.minecraft.minebot.ai.command.BlockWithData;
+import net.famzangl.minecraft.minebot.ai.command.BlockWithDataOrDontcare;
+import net.famzangl.minecraft.minebot.ai.command.BlockWithDontcare;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 
 /**
@@ -40,7 +44,7 @@ public class ItemWithSubtype {
 	public ItemWithSubtype(int itemId, int itemDamage) {
 		this.itemId = itemId;
 		this.itemDamage = itemDamage;
-		this.hasSubtype = Item.getItemById(itemId).getHasSubtypes();
+		this.hasSubtype = getItem().getHasSubtypes();
 	}
 
 	@Override
@@ -83,7 +87,6 @@ public class ItemWithSubtype {
 	}
 
 	public ItemWithSubtype withSubtype(String string) {
-		
 		int subtype;
 		if (string.matches("\\d{1,3}")) {
 			subtype = Integer.parseInt(string);
@@ -94,6 +97,25 @@ public class ItemWithSubtype {
 			throw new IllegalArgumentException("Could not parse subtype: " + string);
 		}
 		return withSubtype(subtype);
+	}
+
+	public Item getItem() {
+		return Item.getItemById(itemId);
+	}
+	
+	public BlockWithDataOrDontcare getBlockType() {
+		Item item = getItem();
+		if (item instanceof ItemBlock) {
+			ItemBlock itemBlock = (ItemBlock) item;
+			if (hasSubtype) {
+				int meta = getItem().getMetadata(itemDamage);
+				return new BlockWithData(itemBlock.block, meta);
+			} else {
+				return new BlockWithDontcare(itemBlock.block);
+			}
+		} else {
+			return null;
+		}
 	}
 	
 	/**

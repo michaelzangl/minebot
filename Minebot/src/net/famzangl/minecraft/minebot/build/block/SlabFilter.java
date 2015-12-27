@@ -30,14 +30,8 @@ public class SlabFilter extends BlockItemFilter {
 	private final SlabType type;
 
 	public SlabFilter(SlabType type) {
-		super(type.slabBlock);
+		super(type.getBlock());
 		this.type = type;
-	}
-
-	@Override
-	protected boolean matchesItem(ItemStack itemStack, ItemBlock item) {
-		return super.matchesItem(itemStack, item)
-				&& (itemStack.getItemDamage() & 7) == type.meta;
 	}
 
 	@Override

@@ -16,6 +16,7 @@
  *******************************************************************************/
 package net.famzangl.minecraft.minebot.ai;
 
+import net.famzangl.minecraft.minebot.ai.command.BlockWithData;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSet;
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
@@ -33,7 +34,6 @@ public class ColoredBlockItemFilter extends BlockItemFilter {
 	public static final BlockSet COLORABLE_BLOCKS = new BlockSet(Blocks.wool,
 			Blocks.stained_hardened_clay, Blocks.stained_glass,
 			Blocks.stained_glass_pane, Blocks.carpet);
-	private final int colorMeta;
 
 	// /**
 	// * Right names for sheep wool and most blocks.
@@ -68,55 +68,16 @@ public class ColoredBlockItemFilter extends BlockItemFilter {
 	}
 
 	public ColoredBlockItemFilter(Block matched, EnumDyeColor color) {
-		super(matched);
-		colorMeta = color.getMetadata();
+		super(new BlockWithData(matched, color.getMetadata()));
 		if (COLORABLE_BLOCKS.contains(matched)) {
 			throw new IllegalArgumentException();
 		}
 	}
 
 	@Override
-	protected boolean matchesItem(ItemStack itemStack, ItemBlock item) {
-		return super.matchesItem(itemStack, item)
-				&& itemStack.getItemDamage() == colorMeta;
-	}
-
-	@Override
 	public String toString() {
-		return "ColoredBlockItemFilter [colorMeta=" + colorMeta + ", "
+		return "ColoredBlockItemFilter ["
 				+ super.toString() + "]";
-	}
-
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = super.hashCode();
-		result = prime * result + colorMeta;
-		return result;
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj) {
-			return true;
-		}
-		if (!super.equals(obj)) {
-			return false;
-		}
-		if (getClass() != obj.getClass()) {
-			return false;
-		}
-		final ColoredBlockItemFilter other = (ColoredBlockItemFilter) obj;
-		if (colorMeta != other.colorMeta) {
-			return false;
-		}
-		return true;
-	}
-
-	@Override
-	public String getDescription() {
-		return EnumDyeColor.values()[colorMeta].getName() + " "
-				+ super.getDescription();
 	}
 
 }

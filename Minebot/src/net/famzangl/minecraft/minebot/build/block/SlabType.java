@@ -16,6 +16,7 @@
  *******************************************************************************/
 package net.famzangl.minecraft.minebot.build.block;
 
+import net.famzangl.minecraft.minebot.ai.command.BlockWithData;
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
 
@@ -48,5 +49,9 @@ public enum SlabType {
 		this.slabBlock = slabBlock;
 		this.doubleBlock = doubleBlock;
 		this.meta = meta;
+	}
+
+	public BlockWithData getBlock() {
+		return new BlockWithData(slabBlock, meta);
 	}
 }
