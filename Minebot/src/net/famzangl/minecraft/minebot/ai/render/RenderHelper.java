@@ -17,9 +17,13 @@
 package net.famzangl.minecraft.minebot.ai.render;
 
 import net.famzangl.minecraft.minebot.ai.AIHelper;
+import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.WorldRenderer;
+import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import net.minecraft.client.renderer.vertex.VertexFormat;
+import net.minecraft.client.renderer.vertex.VertexFormatElement;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.BlockPos;
 import net.minecraftforge.fml.common.gameevent.TickEvent.RenderTickEvent;
@@ -37,10 +41,13 @@ public class RenderHelper {
 	private static final double MAX = 1.05;
 	private static final double MIN = -0.05;
 
-	private boolean hadBlend;
+    public static final VertexFormat VF = new VertexFormat();
+    static {
+        VF.setElement(new VertexFormatElement(0, VertexFormatElement.EnumType.FLOAT, VertexFormatElement.EnumUsage.POSITION, 3));
+        VF.setElement(new VertexFormatElement(0, VertexFormatElement.EnumType.UBYTE, VertexFormatElement.EnumUsage.COLOR, 4));
+    }
 
 	public void renderStart(RenderTickEvent event, AIHelper helper) {
-		final Tessellator tessellator = Tessellator.getInstance();
 		final Entity player = helper.getMinecraft().getRenderViewEntity();
 		final double x = player.lastTickPosX
 				+ (player.posX - player.lastTickPosX) * event.renderTickTime;
@@ -49,42 +56,53 @@ public class RenderHelper {
 		final double z = player.lastTickPosZ
 				+ (player.posZ - player.lastTickPosZ) * event.renderTickTime;
 
-		GL11.glBlendFunc(GL11.GL_DST_COLOR, GL11.GL_SRC_COLOR);
-		GL11.glDisable(GL11.GL_TEXTURE_2D);
-
-		OpenGlHelper.glBlendFunc(774, 768, 1, 0);
-		GL11.glColor4f(1.0F, 1.0F, 1.0F, 0.5F);
-		GL11.glPushMatrix();
-		GL11.glPolygonOffset(-3.0F, -3.0F);
-		GL11.glEnable(GL11.GL_POLYGON_OFFSET_FILL);
-		GL11.glEnable(GL11.GL_ALPHA_TEST);
-		hadBlend = GL11.glIsEnabled(GL11.GL_BLEND);
-		GL11.glEnable(GL11.GL_BLEND);
-		tessellator.getWorldRenderer().startDrawingQuads();
-		tessellator.getWorldRenderer().setTranslation(-x, -y, -z);
+		preRender();
+        Tessellator tessellator = Tessellator.getInstance();
+        WorldRenderer worldrenderer = tessellator.getWorldRenderer();
+        worldrenderer.setVertexFormat(VF);
+        worldrenderer.setTranslation(-x, -y, -z);
+        worldrenderer.startDrawingQuads();
+       // worldrenderer.markDirty();
 	}
 
+    private void preRender()
+    {
+        GlStateManager.disableTexture2D();
+        GlStateManager.enableBlend();
+        GlStateManager.tryBlendFuncSeparate(GL11.GL_DST_COLOR, GL11.GL_SRC_COLOR, 1, 0);
+
+        GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+        GlStateManager.doPolygonOffset(-3.0F, -3.0F);
+        GlStateManager.enablePolygonOffset();
+        GlStateManager.alphaFunc(516, 0.1F);
+        GlStateManager.enableAlpha();
+        GlStateManager.pushMatrix();
+    }
+
+    private void postRender()
+    {
+        GlStateManager.disableAlpha();
+        GlStateManager.doPolygonOffset(0.0F, 0.0F);
+        GlStateManager.disablePolygonOffset();
+        GlStateManager.enableAlpha();
+        GlStateManager.depthMask(true);
+        GlStateManager.popMatrix();
+        GlStateManager.disableBlend();
+        GlStateManager.enableTexture2D();
+    }
 	protected void renderEnd() {
 		final Tessellator tessellator = Tessellator.getInstance();
-
+        WorldRenderer worldrenderer = tessellator.getWorldRenderer();
 		tessellator.draw();
-		tessellator.getWorldRenderer().setTranslation(0.0D, 0.0D, 0.0D);
-		GL11.glDisable(GL11.GL_ALPHA_TEST);
-		GL11.glPolygonOffset(0.0F, 0.0F);
-		GL11.glDisable(GL11.GL_POLYGON_OFFSET_FILL);
-		GL11.glEnable(GL11.GL_ALPHA_TEST);
-		if (!hadBlend) {
-			GL11.glDisable(GL11.GL_BLEND);
-		}
-		GL11.glEnable(GL11.GL_TEXTURE_2D);
-		GL11.glDepthMask(true);
-		GL11.glPopMatrix();
+		worldrenderer.setTranslation(0.0D, 0.0D, 0.0D);
+		postRender();
 	}
 
 	protected void renderMarker(BlockPos m, float r, float g, float b, float a) {
 		final Tessellator tessellator = Tessellator.getInstance();
-		tessellator.getWorldRenderer().setColorRGBA_F(r, g, b, a);
-		renderMarkerP(tessellator.getWorldRenderer(), m.getX(), m.getY(), m.getZ());
+		WorldRenderer renderer = tessellator.getWorldRenderer();
+		renderer.setColorRGBA_F(r, g, b, a);
+		renderMarkerP(renderer, m.getX(), m.getY(), m.getZ());
 	}
 
 	private void renderMarkerP(WorldRenderer worldRenderer, int x, int y, int z) {

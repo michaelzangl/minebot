@@ -26,6 +26,7 @@ import net.famzangl.minecraft.minebot.ai.command.AIChatController;
 import net.famzangl.minecraft.minebot.ai.command.IAIControllable;
 import net.famzangl.minecraft.minebot.ai.net.MinebotNetHandler;
 import net.famzangl.minecraft.minebot.ai.net.NetworkHelper;
+import net.famzangl.minecraft.minebot.ai.profiler.InterceptingProfiler;
 import net.famzangl.minecraft.minebot.ai.render.BuildMarkerRenderer;
 import net.famzangl.minecraft.minebot.ai.render.PosMarkerRenderer;
 import net.famzangl.minecraft.minebot.ai.strategy.AIStrategy;
@@ -115,7 +116,7 @@ public class AIController extends AIHelper implements IAIControllable {
 	}
 
 	private boolean dead;
-	private AIStrategy currentStrategy;
+	private volatile AIStrategy currentStrategy;
 
 	private AIStrategy deactivatedStrategy;
 
@@ -134,6 +135,8 @@ public class AIController extends AIHelper implements IAIControllable {
 
 	private BuildMarkerRenderer buildMarkerRenderer;
 	private NetworkHelper networkHelper;
+	private InterceptingProfiler profilerHelper;
+	private RenderTickEvent activeDrawEvent;
 
 	public AIController() {
 		AIChatController.getRegistry().setControlled(this);
@@ -142,6 +145,14 @@ public class AIController extends AIHelper implements IAIControllable {
 	@SubscribeEvent
 	public void connect(ClientConnectedToServerEvent e) {
 		networkHelper = MinebotNetHandler.inject(this, e.manager, e.handler);
+		profilerHelper = InterceptingProfiler.inject(getMinecraft());
+		// Hook into net.minecraft.client.renderer.RenderGlobal.drawBlockDamageTexture(Tessellator, WorldRenderer, Entity, float)
+		profilerHelper.addLisener("hand", new Runnable() {
+			@Override
+			public void run() {
+				drawMakers();
+			}
+		});
 	}
 
 	/**
@@ -327,10 +338,14 @@ public class AIController extends AIHelper implements IAIControllable {
 	 * @param event
 	 */
 	@SubscribeEvent
-	public void drawMarkers(RenderTickEvent event) {
-		if (event.phase != Phase.END) {
+	public void beforeDrawMarkers(RenderTickEvent event) {
+		if (event.phase != Phase.START) {
 			return;
 		}
+		activeDrawEvent = event;
+	}
+	
+	public void drawMakers() {
 		final Entity view = getMinecraft().getRenderViewEntity();
 		if (!(view instanceof EntityPlayerSP)) {
 			return;
@@ -341,17 +356,17 @@ public class AIController extends AIHelper implements IAIControllable {
 			if (markerRenderer == null) {
 				markerRenderer = new PosMarkerRenderer(1, 0, 0);
 			}
-			markerRenderer.render(event, this, pos1, pos2);
+			markerRenderer.render(activeDrawEvent, this, pos1, pos2);
 		} else if (player.getHeldItem() != null
 				&& player.getHeldItem().getItem() == Items.stick) {
 			if (buildMarkerRenderer == null) {
 				buildMarkerRenderer = new BuildMarkerRenderer();
 			}
-			buildMarkerRenderer.render(event, this);
+			buildMarkerRenderer.render(activeDrawEvent, this);
 		}
 		AIStrategy strat = currentStrategy;
 		if (strat != null) {
-			strat.drawMarkers(event, this);
+			strat.drawMarkers(activeDrawEvent, this);
 		}
 	}
 
