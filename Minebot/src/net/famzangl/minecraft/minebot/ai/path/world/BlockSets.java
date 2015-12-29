@@ -144,13 +144,13 @@ public class BlockSets {
 
 	public static final BlockSet SAFE_CEILING = STAIRS
 			.unionWith(FEET_CAN_WALK_THROUGH).unionWith(SIMPLE_CUBE)
-			.unionWith(AIR).unionWith(new BlockSet(Blocks.vine));
+			.unionWith(AIR).unionWith(new BlockSet(Blocks.vine, Blocks.cactus));
 
 	/**
 	 * Blocks you need to destroy but that are then safe.
 	 */
 	public static final BlockSet SAFE_AFTER_DESTRUCTION = new BlockSet(
-			Blocks.vine);
+			Blocks.vine, Blocks.cactus);
 
 	/**
 	 * Blocks that are considered indestructable and should be avoided.
