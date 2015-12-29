@@ -22,6 +22,8 @@ public class BuildTaskFactories {
 
 	static {
 		register(new BlockBuildTaskFactory());
+		register(new LogBuildTaskFactory());
+		register(new SlabBuildTaskFactory());
 	}
 	
 	public static void register(BuildTaskFactory factory) {

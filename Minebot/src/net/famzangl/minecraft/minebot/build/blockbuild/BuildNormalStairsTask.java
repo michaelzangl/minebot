@@ -27,26 +27,25 @@ import net.minecraft.init.Blocks;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
 
-public class BuildNormalStairsTask extends CubeBuildTask {
+public class BuildNormalStairsTask extends AbstractBuildTask {
 
-	public static final BlockSet BLOCKS = new BlockSet( Blocks.acacia_stairs,
+	public static final BlockSet BLOCKS = new BlockSet(Blocks.acacia_stairs,
 			Blocks.birch_stairs, Blocks.brick_stairs, Blocks.dark_oak_stairs,
 			Blocks.jungle_stairs, Blocks.nether_brick_stairs,
 			Blocks.oak_stairs, Blocks.sandstone_stairs, Blocks.spruce_stairs,
 			Blocks.stone_brick_stairs, Blocks.stone_stairs,
-			Blocks.quartz_stairs );
+			Blocks.quartz_stairs);
 	private final EnumFacing upwardsDirection;
 	private final boolean inverted;
 	private final Block stairs;
 
 	public static enum Half {
-		UPPER,
-		LOWER
+		UPPER, LOWER
 	}
 
 	public BuildNormalStairsTask(BlockPos forPosition, Block stairs,
 			EnumFacing upwardsDirection, Half half) {
-		super(forPosition, new BlockItemFilter(stairs));
+		super(forPosition);
 		this.stairs = stairs;
 		this.upwardsDirection = upwardsDirection;
 		this.inverted = half == Half.UPPER;
@@ -59,17 +58,22 @@ public class BuildNormalStairsTask extends CubeBuildTask {
 	}
 
 	@Override
+	protected BlockItemFilter getItemToPlaceFilter() {
+		return new BlockItemFilter(stairs);
+	}
+
+	@Override
 	public AITask getPlaceBlockTask(BlockPos relativeFromPos) {
 		final BlockHalf side = inverted ? BlockHalf.UPPER_HALF
 				: BlockHalf.LOWER_HALF;
 		if (!isStandablePlace(relativeFromPos)) {
 			return null;
 		} else if (relativeFromPos.equals(FROM_GROUND)) {
-			return new JumpingPlaceBlockAtSideTask(forPosition.add(0,1,0), blockFilter,
-					upwardsDirection.getOpposite(), side);
+			return new JumpingPlaceBlockAtSideTask(forPosition.add(0, 1, 0),
+					getItemToPlaceFilter(), upwardsDirection.getOpposite(), side);
 		} else {
-			return new SneakAndPlaceAtSideTask(forPosition.add(0,1,0), blockFilter,
-					relativeFromPos, getMinHeightToBuild(),
+			return new SneakAndPlaceAtSideTask(forPosition.add(0, 1, 0),
+					getItemToPlaceFilter(), relativeFromPos, getMinHeightToBuild(),
 					upwardsDirection.getOpposite(), side);
 		}
 	}
@@ -77,7 +81,7 @@ public class BuildNormalStairsTask extends CubeBuildTask {
 	@Override
 	public String toString() {
 		return "BuildNormalStairsTask [upwardsDirection=" + upwardsDirection
-				+ ", inverted=" + inverted + ", blockFilter=" + blockFilter
+				+ ", inverted=" + inverted + ", blockFilter=" + getItemToPlaceFilter()
 				+ ", forPosition=" + forPosition + "]";
 	}
 

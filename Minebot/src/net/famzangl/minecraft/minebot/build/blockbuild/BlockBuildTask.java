@@ -24,7 +24,7 @@ import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.BlockPos;
 
-public class BlockBuildTask extends CubeBuildTask {
+public class BlockBuildTask extends AbstractBuildTask {
 
 	public static final BlockSet BLOCKS = new BlockSet(Blocks.dirt,
 			Blocks.stone, Blocks.cobblestone, Blocks.beacon, Blocks.bookshelf,
@@ -40,19 +40,19 @@ public class BlockBuildTask extends CubeBuildTask {
 			Blocks.redstone_block, Blocks.redstone_lamp, Blocks.redstone_ore,
 			Blocks.sand, Blocks.stonebrick, Blocks.tnt, Blocks.planks,
 			Blocks.wool, Blocks.stained_glass, Blocks.stained_hardened_clay);
-	private final BlockWithDataOrDontcare blockToPlace;
+	protected final BlockWithDataOrDontcare blockToPlace;
 
 	public BlockBuildTask(BlockPos forPosition,
 			BlockWithDataOrDontcare blockToPlace) {
-		super(forPosition, new BlockItemFilter(blockToPlace.toBlockSet()));
+		super(forPosition);
 		this.blockToPlace = blockToPlace;
 	}
 
 	@Override
-	public String toString() {
-		return "BlockBuildTask [blockFilter=" + blockFilter + ", forPosition="
-				+ forPosition + "]";
+	protected BlockItemFilter getItemToPlaceFilter() {
+		return new BlockItemFilter(blockToPlace.toBlockSet());
 	}
+	
 
 	@Override
 	public BuildTask withPositionAndRotation(BlockPos add, int rotateSteps,

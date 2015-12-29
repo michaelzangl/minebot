@@ -26,13 +26,10 @@ import net.famzangl.minecraft.minebot.ai.task.move.UpwardsMoveTask;
 import net.famzangl.minecraft.minebot.ai.task.place.SneakAndPlaceTask;
 import net.minecraft.util.BlockPos;
 
-public abstract class CubeBuildTask extends BuildTask {
+public abstract class AbstractBuildTask extends BuildTask {
 
-	protected final BlockItemFilter blockFilter;
-
-	protected CubeBuildTask(BlockPos forPosition, BlockItemFilter blockFilter) {
+	protected AbstractBuildTask(BlockPos forPosition) {
 		super(forPosition);
-		this.blockFilter = blockFilter;
 	}
 
 	protected static final BlockPos FROM_GROUND = Pos.ZERO;
@@ -45,12 +42,14 @@ public abstract class CubeBuildTask extends BuildTask {
 		if (!isStandablePlace(relativeFromPos)) {
 			return null;
 		} else if (relativeFromPos.equals(FROM_GROUND)) {
-			return new UpwardsMoveTask(forPosition.add(0, 1, 0), blockFilter);
+			return new UpwardsMoveTask(forPosition.add(0, 1, 0), getItemToPlaceFilter());
 		} else {
-			return new SneakAndPlaceTask(forPosition.add(0, 1, 0), blockFilter,
+			return new SneakAndPlaceTask(forPosition.add(0, 1, 0), getItemToPlaceFilter(),
 					forPosition.add(relativeFromPos), getMinHeightToBuild());
 		}
 	}
+	
+	protected abstract BlockItemFilter getItemToPlaceFilter();
 
 	protected double getMinHeightToBuild() {
 		return forPosition.getY() + getBlockHeight();
@@ -76,7 +75,7 @@ public abstract class CubeBuildTask extends BuildTask {
 
 	@Override
 	public ItemFilter getRequiredItem() {
-		return blockFilter;
+		return getItemToPlaceFilter();
 	}
 
 }

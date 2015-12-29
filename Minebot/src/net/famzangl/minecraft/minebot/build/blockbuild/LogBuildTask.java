@@ -18,9 +18,15 @@ package net.famzangl.minecraft.minebot.build.blockbuild;
 
 import net.famzangl.minecraft.minebot.Pos;
 import net.famzangl.minecraft.minebot.ai.BlockItemFilter;
+import net.famzangl.minecraft.minebot.ai.command.BlockWithData;
+import net.famzangl.minecraft.minebot.ai.command.BlockWithDataOrDontcare;
+import net.famzangl.minecraft.minebot.ai.path.world.BlockMetaSet;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSet;
 import net.famzangl.minecraft.minebot.build.block.LogItemFilter;
 import net.famzangl.minecraft.minebot.build.block.WoodType;
+import net.famzangl.minecraft.minebot.build.block.WoodType.LogDirection;
+import net.minecraft.block.BlockLog;
+import net.minecraft.block.BlockLog.EnumAxis;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
@@ -31,36 +37,37 @@ import net.minecraft.util.EnumFacing;
  * @author michael
  *
  */
-public class LogBuildTask extends CubeBuildTask {
-
-	public static final BlockSet BLOCKS = new BlockSet(Blocks.log,
-			Blocks.log2);
+public class LogBuildTask extends BlockBuildTask {
+	public static final BlockSet NORMAL_LOGS;
+	static {
+		BlockMetaSet logs = new BlockMetaSet();
+		for (LogDirection d : LogDirection.values()) {
+			logs = logs.unionWith(d.blocks);
+		}
+		NORMAL_LOGS = logs;
+	}
 	public static final BlockPos[] UP_DOWN_POS = new BlockPos[] { Pos.ZERO };
 	public static final BlockPos[] NORTH_SOUTH_POS = new BlockPos[] {
 			new BlockPos(0, 1, 1), new BlockPos(0, 1, -1) };
 	public static final BlockPos[] EAST_WEST_POS = new BlockPos[] {
 			new BlockPos(1, 1, 0), new BlockPos(-1, 1, 0) };
-	private final EnumFacing dir;
 
-	public LogBuildTask(BlockPos forPosition, WoodType logType,
-			EnumFacing direction) {
-		this(forPosition, new LogItemFilter(logType), direction);
+	public LogBuildTask(BlockPos forPosition,
+			BlockWithDataOrDontcare blockWithMeta) {
+		super(forPosition, blockWithMeta);
 	}
 
-	private LogBuildTask(BlockPos forPosition, BlockItemFilter logItemFilter,
-			EnumFacing direction) {
-		super(forPosition, logItemFilter);
-		dir = direction;
+	@Override
+	protected BlockItemFilter getItemToPlaceFilter() {
+		return new LogItemFilter(WoodType.getFor(blockToPlace));
 	}
 
 	@Override
 	public BlockPos[] getStandablePlaces() {
-		switch (dir) {
-		case EAST:
-		case WEST:
+		switch (LogDirection.forData(blockToPlace)) {
+		case X:
 			return EAST_WEST_POS;
-		case SOUTH:
-		case NORTH:
+		case Z:
 			return NORTH_SOUTH_POS;
 		default:
 			return UP_DOWN_POS;
@@ -70,11 +77,9 @@ public class LogBuildTask extends CubeBuildTask {
 	@Override
 	public BuildTask withPositionAndRotation(BlockPos add, int rotateSteps,
 			MirrorDirection mirror) {
-		EnumFacing newDir = dir;
-		for (int i = 0; i < rotateSteps; i++) {
-			newDir = newDir.rotateY();
-		}
-
-		return new LogBuildTask(add, blockFilter, newDir);
+		LogDirection oldDir = LogDirection.forData(blockToPlace);
+		LogDirection newDir = rotateSteps % 2 == 0 ? oldDir : oldDir.rotateY();
+		WoodType wt = WoodType.getFor(blockToPlace);
+		return new LogBuildTask(add, wt.getBlockWithMeta(newDir));
 	}
 }

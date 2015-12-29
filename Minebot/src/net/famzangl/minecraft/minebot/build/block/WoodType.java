@@ -16,9 +16,14 @@
  *******************************************************************************/
 package net.famzangl.minecraft.minebot.build.block;
 
+import net.famzangl.minecraft.minebot.ai.command.BlockWithData;
+import net.famzangl.minecraft.minebot.ai.command.BlockWithDataOrDontcare;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockMetaSet;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSet;
+import net.famzangl.minecraft.minebot.build.block.WoodType.LogDirection;
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockLog;
+import net.minecraft.block.BlockLog.EnumAxis;
 import net.minecraft.block.BlockPlanks.EnumType;
 import net.minecraft.init.Blocks;
 
@@ -36,6 +41,45 @@ public enum WoodType {
 			EnumType.JUNGLE), ACACIA(Blocks.log2, 0, EnumType.ACACIA), DARK_OAK(
 			Blocks.log2, 1, EnumType.DARK_OAK);
 
+	public enum LogDirection {
+		X(BlockLog.EnumAxis.X, 1 << 2), Y(BlockLog.EnumAxis.Y, 0), Z(
+				BlockLog.EnumAxis.Z, 2 << 2);
+
+		public final int higherBits;
+		public final EnumAxis axis;
+		public final BlockSet blocks;
+
+		private LogDirection(EnumAxis axis, int higherBits) {
+			this.axis = axis;
+			this.higherBits = higherBits;
+			BlockMetaSet set = new BlockMetaSet();
+			for (WoodType w : WoodType.values()) {
+				set = set.unionWith(w.block, w.lowerBits + higherBits);
+			}
+			blocks = set;
+		}
+
+		public static LogDirection forData(BlockWithDataOrDontcare block) {
+			for (LogDirection d : LogDirection.values()) {
+				if (block.containedIn(d.blocks)) {
+					return d;
+				}
+			}
+			throw new IllegalArgumentException("Illegal Log Block: " + block);
+		}
+
+		public LogDirection rotateY() {
+			switch (this) {
+			case X:
+				return Z;
+			case Z:
+				return X;
+			default:
+				return this;
+			}
+		}
+	}
+
 	public final Block block;
 	public final int lowerBits;
 	public final EnumType plankType;
@@ -46,13 +90,34 @@ public enum WoodType {
 		this.plankType = plankType;
 	}
 
+	private boolean matches(BlockWithDataOrDontcare block2) {
+		return block2.containedIn(getLogBlocks());
+	}
+
 	/**
 	 * Returns a block set with all blocks of this type.
 	 * 
 	 * @return
 	 */
 	public BlockSet getLogBlocks() {
-		return new BlockMetaSet(block, lowerBits).unionWith(block,
-				lowerBits | 0x4).unionWith(block, lowerBits | 0x8);
+		BlockMetaSet set = new BlockMetaSet();
+		for (LogDirection a : LogDirection.values()) {
+			set = set.unionWith(block, a.higherBits + lowerBits);
+		}
+		return set;
+	}
+
+	public static WoodType getFor(BlockWithDataOrDontcare block2) {
+		for (WoodType t : values()) {
+			if (t.matches(block2)) {
+				return t;
+			}
+		}
+
+		throw new IllegalArgumentException("Cannot convert to log: " + block2);
+	}
+
+	public BlockWithData getBlockWithMeta(LogDirection direction) {
+		return new BlockWithData(block, lowerBits | direction.higherBits);
 	}
 }

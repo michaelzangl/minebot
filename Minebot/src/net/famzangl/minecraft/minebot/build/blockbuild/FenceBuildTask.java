@@ -24,7 +24,7 @@ import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.BlockPos;
 
-public class FenceBuildTask extends CubeBuildTask {
+public class FenceBuildTask extends AbstractBuildTask {
 
 	public static final BlockPos[] STANDABLE = new BlockPos[] { new BlockPos(-1, 1, 0),
 			new BlockPos(0, 1, -1), new BlockPos(1, 1, 0), new BlockPos(0, 1, 1), };
@@ -35,11 +35,15 @@ public class FenceBuildTask extends CubeBuildTask {
 	private final BlockWithDataOrDontcare fenceBlock;
 
 	public FenceBuildTask(BlockPos forPosition, BlockWithDataOrDontcare fenceBlock) {
-		super(forPosition, new BlockItemFilter(fenceBlock.toBlockSet()));
+		super(forPosition);
 		if (!BLOCKS.contains(fenceBlock)) {
 			throw new IllegalArgumentException();
 		}
 		this.fenceBlock = fenceBlock;
+	}
+	@Override
+	protected BlockItemFilter getItemToPlaceFilter() {
+		return new BlockItemFilter(fenceBlock.toBlockSet());
 	}
 
 	@Override

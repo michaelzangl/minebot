@@ -16,6 +16,8 @@
  *******************************************************************************/
 package net.famzangl.minecraft.minebot.build.blockbuild;
 
+import net.famzangl.minecraft.minebot.ai.BlockItemFilter;
+import net.famzangl.minecraft.minebot.ai.command.BlockWithDataOrDontcare;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSet;
 import net.famzangl.minecraft.minebot.ai.task.AITask;
 import net.famzangl.minecraft.minebot.ai.task.BlockHalf;
@@ -23,20 +25,32 @@ import net.famzangl.minecraft.minebot.ai.task.place.JumpingPlaceAtHalfTask;
 import net.famzangl.minecraft.minebot.ai.task.place.SneakAndPlaceAtHalfTask;
 import net.famzangl.minecraft.minebot.build.block.SlabFilter;
 import net.famzangl.minecraft.minebot.build.block.SlabType;
+import net.minecraft.block.BlockSlab;
+import net.minecraft.block.BlockSlab.EnumBlockHalf;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.BlockPos;
 
-public class BuildHalfslabTask extends CubeBuildTask {
+public class SlabBuildTask extends BlockBuildTask {
 
-	public static final BlockSet BLOCKS = new BlockSet ( Blocks.stone_slab,
-			Blocks.wooden_slab );
-	private final BlockHalf side;
+	public static final BlockSet BLOCKS = SlabType.BLOCKS;
 	private final SlabType slabType;
 
-	public BuildHalfslabTask(BlockPos forPosition, SlabType slabType, BlockHalf up) {
-		super(forPosition, new SlabFilter(slabType));
-		this.slabType = slabType;
-		this.side = up;
+	public SlabBuildTask(BlockPos forPosition, BlockWithDataOrDontcare block) {
+		super(forPosition, block);
+		this.slabType = SlabType.getForSlabBlock(block);
+	}
+	
+	protected BlockHalf getHalf() {
+		if (slabType.getBlock().containedIn(blockToPlace.toBlockSet())) {
+			return BlockHalf.LOWER_HALF;
+		} else {
+			return BlockHalf.UPPER_HALF;
+		}
+	}
+
+	@Override
+	protected BlockItemFilter getItemToPlaceFilter() {
+		return new SlabFilter(slabType);
 	}
 
 	@Override
@@ -45,27 +59,29 @@ public class BuildHalfslabTask extends CubeBuildTask {
 			throw new IllegalArgumentException("Cannot build standing there: "
 					+ relativeFromPos);
 		} else if (relativeFromPos.equals(FROM_GROUND)) {
-			return new JumpingPlaceAtHalfTask(forPosition.add(0,1,0), blockFilter, side);
+			return new JumpingPlaceAtHalfTask(forPosition.add(0, 1, 0),
+					getItemToPlaceFilter(), getHalf());
 		} else {
-			return new SneakAndPlaceAtHalfTask(forPosition.add(0,1,0), blockFilter,
-					forPosition.add(relativeFromPos), getMinHeightToBuild(), side);
+			return new SneakAndPlaceAtHalfTask(forPosition.add(0, 1, 0),
+					getItemToPlaceFilter(), forPosition.add(relativeFromPos),
+					getMinHeightToBuild(), getHalf());
 		}
 	}
 
 	@Override
 	protected double getBlockHeight() {
-		return side == BlockHalf.LOWER_HALF ? .5 : 1;
+		return getHalf() == BlockHalf.LOWER_HALF ? .5 : 1;
 	}
 
 	@Override
 	public String toString() {
-		return "BuildHalfslabTask [side=" + side + ", blockFilter="
-				+ blockFilter + ", forPosition=" + forPosition + "]";
+		return "BuildHalfslabTask [side=" + getHalf() + ", blockFilter="
+				+ getItemToPlaceFilter() + ", forPosition=" + forPosition + "]";
 	}
 
 	@Override
 	public BuildTask withPositionAndRotation(BlockPos add, int rotateSteps,
 			MirrorDirection mirror) {
-		return new BuildHalfslabTask(add, slabType, side);
+		return new SlabBuildTask(add, blockToPlace);
 	}
 }

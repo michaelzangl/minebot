@@ -34,9 +34,9 @@ import net.famzangl.minecraft.minebot.ai.task.inventory.GetOnHotBarTask;
 import net.famzangl.minecraft.minebot.build.WalkTowardsTask;
 import net.famzangl.minecraft.minebot.build.block.SlabFilter;
 import net.famzangl.minecraft.minebot.build.block.SlabType;
+import net.famzangl.minecraft.minebot.build.blockbuild.AbstractBuildTask;
 import net.famzangl.minecraft.minebot.build.blockbuild.BlockBuildTask;
-import net.famzangl.minecraft.minebot.build.blockbuild.BuildHalfslabTask;
-import net.famzangl.minecraft.minebot.build.blockbuild.CubeBuildTask;
+import net.famzangl.minecraft.minebot.build.blockbuild.SlabBuildTask;
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.BlockPos;
@@ -121,7 +121,7 @@ public class BuildWayPathfinder extends AlongTrackPathFinder {
 			}
 
 			final BlockPos first = getPos(0, -1);
-			final AITask placeTask = new BuildHalfslabTask(first, FLOOR,
+			final AITask placeTask = new SlabBuildTask(first, FLOOR,
 					BlockHalf.LOWER_HALF).getPlaceBlockTask(currentPos
 					.subtract(first));
 			addTask(placeTask);
@@ -132,7 +132,7 @@ public class BuildWayPathfinder extends AlongTrackPathFinder {
 
 			for (int i = 1; i < width; i++) {
 				final BlockPos current = getPos(i, -1);
-				addTask(new BuildHalfslabTask(current, FLOOR,
+				addTask(new SlabBuildTask(current, FLOOR,
 						BlockHalf.LOWER_HALF)
 						.getPlaceBlockTask(getPos(i - 1, 0).subtract(current)));
 			}
@@ -176,13 +176,13 @@ public class BuildWayPathfinder extends AlongTrackPathFinder {
 		}
 
 		protected final void addNearSide() {
-			final CubeBuildTask task = new BlockBuildTask(getPos(-1, -1),
+			final AbstractBuildTask task = new BlockBuildTask(getPos(-1, -1),
 					new BlockWithDontcare(BRIDGE_SIDE));
 			addTask(task.getPlaceBlockTask(getPos(1, 1).subtract(getPos(0, 0))));
 		}
 
 		protected final void addFarSide() {
-			final CubeBuildTask task = new BlockBuildTask(getPos(width, -1),
+			final AbstractBuildTask task = new BlockBuildTask(getPos(width, -1),
 					new BlockWithDontcare(BRIDGE_SIDE));
 			addTask(task
 					.getPlaceBlockTask(getPos(-1, 1).subtract(getPos(0, 0))));

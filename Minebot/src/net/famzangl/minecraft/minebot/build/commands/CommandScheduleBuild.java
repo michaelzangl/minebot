@@ -30,7 +30,7 @@ import net.famzangl.minecraft.minebot.ai.task.BlockHalf;
 import net.famzangl.minecraft.minebot.build.block.SlabType;
 import net.famzangl.minecraft.minebot.build.block.WoodType;
 import net.famzangl.minecraft.minebot.build.blockbuild.BlockBuildTask;
-import net.famzangl.minecraft.minebot.build.blockbuild.BuildHalfslabTask;
+import net.famzangl.minecraft.minebot.build.blockbuild.SlabBuildTask;
 import net.famzangl.minecraft.minebot.build.blockbuild.BuildNormalStairsTask;
 import net.famzangl.minecraft.minebot.build.blockbuild.BuildNormalStairsTask.Half;
 import net.famzangl.minecraft.minebot.build.blockbuild.BuildTask;
@@ -38,7 +38,6 @@ import net.famzangl.minecraft.minebot.build.blockbuild.FenceBuildTask;
 import net.famzangl.minecraft.minebot.build.blockbuild.LogBuildTask;
 import net.famzangl.minecraft.minebot.build.blockbuild.StandingSignBuildTask;
 import net.famzangl.minecraft.minebot.build.blockbuild.StandingSignBuildTask.SignDirection;
-import net.famzangl.minecraft.minebot.build.blockbuild.WoodBuildTask;
 import net.minecraft.block.Block;
 import net.minecraft.item.EnumDyeColor;
 import net.minecraft.util.BlockPos;
@@ -48,7 +47,7 @@ import net.minecraft.util.EnumFacing;
 public class CommandScheduleBuild {
 
 	public static final BlockSet SIMPLE_WHITELIST = BlockBuildTask.BLOCKS
-			.unionWith(FenceBuildTask.BLOCKS);
+			.unionWith(FenceBuildTask.BLOCKS).unionWith(LogBuildTask.NORMAL_LOGS);
 
 	public static final class RunSimpleFilter extends BlockFilter {
 		@Override
@@ -66,6 +65,8 @@ public class CommandScheduleBuild {
 
 		if (BlockBuildTask.BLOCKS.contains(blockToPlace)) {
 			addTask(helper, new BlockBuildTask(forPosition, blockToPlace));
+		} else if (LogBuildTask.NORMAL_LOGS.contains(blockToPlace)) {
+			addTask(helper, new LogBuildTask(forPosition, blockToPlace));
 		} else if (FenceBuildTask.BLOCKS.contains(blockToPlace)) {
 			addTask(helper, new FenceBuildTask(forPosition, blockToPlace));
 		} else {
@@ -98,27 +99,27 @@ public class CommandScheduleBuild {
 //		return null;
 //	}
 
-	public static final class WoodBlockFilter extends BlockFilter {
-		@Override
-		public boolean matches(BlockWithDataOrDontcare b) {
-			return WoodBuildTask.BLOCKS.contains(b);
-		}
-	}
+//	public static final class WoodBlockFilter extends BlockFilter {
+//		@Override
+//		public boolean matches(BlockWithDataOrDontcare b) {
+//			return WoodBuildTask.BLOCKS.contains(b);
+//		}
+//	}
 
-	@AICommandInvocation()
-	public static AIStrategy run(
-			AIHelper helper,
-			@AICommandParameter(type = ParameterType.FIXED, fixedName = "schedule", description = "") String nameArg,
-			@AICommandParameter(type = ParameterType.POSITION, description = "Where to place it (relative is to your current pos)") BlockPos forPosition,
-			@AICommandParameter(type = ParameterType.BLOCK_NAME, description = "The block type to place", blockFilter = WoodBlockFilter.class) Block blockToPlace,
-			@AICommandParameter(type = ParameterType.ENUM, description = "The wood subtype to place") WoodType woodType) {
-		if (WoodBuildTask.BLOCKS.contains(blockToPlace)) {
-			addTask(helper, new WoodBuildTask(forPosition, woodType));
-		} else {
-			throw new CommandEvaluationException("Cannot build " + blockToPlace);
-		}
-		return null;
-	}
+//	@AICommandInvocation()
+//	public static AIStrategy run(
+//			AIHelper helper,
+//			@AICommandParameter(type = ParameterType.FIXED, fixedName = "schedule", description = "") String nameArg,
+//			@AICommandParameter(type = ParameterType.POSITION, description = "Where to place it (relative is to your current pos)") BlockPos forPosition,
+//			@AICommandParameter(type = ParameterType.BLOCK_NAME, description = "The block type to place", blockFilter = WoodBlockFilter.class) Block blockToPlace,
+//			@AICommandParameter(type = ParameterType.ENUM, description = "The wood subtype to place") WoodType woodType) {
+//		if (WoodBuildTask.BLOCKS.contains(blockToPlace)) {
+//			addTask(helper, new WoodBuildTask(forPosition, woodType));
+//		} else {
+//			throw new CommandEvaluationException("Cannot build " + blockToPlace);
+//		}
+//		return null;
+//	}
 
 	public static final class LogBlockFilter extends BlockFilter {
 		@Override
@@ -127,21 +128,21 @@ public class CommandScheduleBuild {
 		}
 	}
 
-	@AICommandInvocation()
-	public static AIStrategy run(
-			AIHelper helper,
-			@AICommandParameter(type = ParameterType.FIXED, fixedName = "schedule", description = "") String nameArg,
-			@AICommandParameter(type = ParameterType.POSITION, description = "Where to place it (relative is to your current pos)") BlockPos forPosition,
-			@AICommandParameter(type = ParameterType.BLOCK_NAME, description = "The block", blockFilter = LogBlockFilter.class) Block blockToPlace,
-			@AICommandParameter(type = ParameterType.ENUM, description = "The type of wood logs") WoodType woodType,
-			@AICommandParameter(type = ParameterType.ENUM, description = "The direction the log is facing") EnumFacing direction) {
-		if (LogBuildTask.BLOCKS.contains(blockToPlace)) {
-			addTask(helper, new LogBuildTask(forPosition, woodType, direction));
-		} else {
-			throw new CommandEvaluationException("Cannot build " + blockToPlace);
-		}
-		return null;
-	}
+//	@AICommandInvocation()
+//	public static AIStrategy run(
+//			AIHelper helper,
+//			@AICommandParameter(type = ParameterType.FIXED, fixedName = "schedule", description = "") String nameArg,
+//			@AICommandParameter(type = ParameterType.POSITION, description = "Where to place it (relative is to your current pos)") BlockPos forPosition,
+//			@AICommandParameter(type = ParameterType.BLOCK_NAME, description = "The block", blockFilter = LogBlockFilter.class) Block blockToPlace,
+//			@AICommandParameter(type = ParameterType.ENUM, description = "The type of wood logs") WoodType woodType,
+//			@AICommandParameter(type = ParameterType.ENUM, description = "The direction the log is facing") EnumFacing direction) {
+//		if (LogBuildTask.BLOCKS.contains(blockToPlace)) {
+//			addTask(helper, new LogBuildTask(forPosition, woodType, direction));
+//		} else {
+//			throw new CommandEvaluationException("Cannot build " + blockToPlace);
+//		}
+//		return null;
+//	}
 
 	public static final class StairsBlockFilter extends BlockFilter {
 		@Override
@@ -172,7 +173,7 @@ public class CommandScheduleBuild {
 	public static final class SlabBlockFilter extends BlockFilter {
 		@Override
 		public boolean matches(BlockWithDataOrDontcare b) {
-			return BuildHalfslabTask.BLOCKS.contains(b);
+			return SlabBuildTask.BLOCKS.contains(b);
 		}
 	}
 
@@ -184,8 +185,8 @@ public class CommandScheduleBuild {
 			@AICommandParameter(type = ParameterType.BLOCK_NAME, description = "The block", blockFilter = SlabBlockFilter.class) BlockWithDataOrDontcare blockToPlace,
 			@AICommandParameter(type = ParameterType.ENUM, description = "The subtype of slabs to place") SlabType type,
 			@AICommandParameter(type = ParameterType.ENUM, description = "If a upper or lower half should be placed") BlockHalf side) {
-		if (BuildHalfslabTask.BLOCKS.contains(blockToPlace)) {
-			addTask(helper, new BuildHalfslabTask(forPosition, type, side));
+		if (SlabBuildTask.BLOCKS.contains(blockToPlace)) {
+			addTask(helper, new SlabBuildTask(forPosition, type, side));
 		} else {
 			throw new CommandEvaluationException("Cannot build " + blockToPlace);
 		}

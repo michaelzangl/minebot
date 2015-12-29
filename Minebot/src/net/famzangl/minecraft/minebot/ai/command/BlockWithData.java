@@ -10,6 +10,8 @@ import net.famzangl.minecraft.minebot.ai.ColoredBlockItemFilter;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockMetaSet;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSet;
 import net.famzangl.minecraft.minebot.ai.task.inventory.ItemWithSubtype;
+import net.famzangl.minecraft.minebot.build.block.WoodType;
+import net.famzangl.minecraft.minebot.build.block.WoodType.LogDirection;
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.EnumDyeColor;
@@ -28,8 +30,8 @@ import net.minecraft.item.EnumDyeColor;
 public class BlockWithData extends BlockWithDataOrDontcare {
 
 	private static class NicerMetaValue {
-		BlockSet forBlocks;
-		String[] values;
+		private final BlockSet forBlocks;
+		private final String[] values;
 
 		public NicerMetaValue(BlockSet forBlocks, String[] values) {
 			super();
@@ -47,6 +49,9 @@ public class BlockWithData extends BlockWithDataOrDontcare {
 		}
 	}
 
+	private static final String[] LOG_AXIS_NAMES = new String[] { "y", "x",
+			"z", "none" };
+
 	private static ArrayList<NicerMetaValue> nicerMeta = new ArrayList<BlockWithData.NicerMetaValue>();
 
 	static {
@@ -56,6 +61,23 @@ public class BlockWithData extends BlockWithDataOrDontcare {
 		}
 		nicerMeta.add(new NicerMetaValue(
 				ColoredBlockItemFilter.COLORABLE_BLOCKS, colors));
+
+		String[] plankTypes = new String[16];
+		String[] log = new String[16];
+		String[] log2 = new String[16];
+		for (WoodType woodType : WoodType.values()) {
+			plankTypes[woodType.plankType.getMetadata()] = woodType.plankType
+					.toString();
+			String[] logArray = woodType.block == Blocks.log ? log : log2;
+			for (LogDirection d : LogDirection.values()) {
+				logArray[d.higherBits + woodType.lowerBits] = woodType.plankType
+						.toString() + ":" + d.axis.toString();
+			}
+		}
+		nicerMeta.add(new NicerMetaValue(new BlockSet(Blocks.planks),
+				plankTypes));
+		nicerMeta.add(new NicerMetaValue(new BlockSet(Blocks.log), log));
+		nicerMeta.add(new NicerMetaValue(new BlockSet(Blocks.log2), log2));
 	}
 
 	static BlockWithDataOrDontcare fromNiceMeta(Block block, String meta) {
@@ -123,6 +145,7 @@ public class BlockWithData extends BlockWithDataOrDontcare {
 	public int getBlockWithMeta() {
 		return blockIdWithMeta;
 	}
+
 	public ItemWithSubtype getItemType() {
 		return new ItemWithSubtype(getBlockId(), getMetaValue());
 	}
