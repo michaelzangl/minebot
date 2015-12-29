@@ -104,7 +104,7 @@ public class BlockSets {
 	 * away from them for now.
 	 */
 	public static final BlockSet HEAD_CAN_WALK_TRHOUGH = new BlockSet(
-			Blocks.air, Blocks.double_plant, Blocks.cocoa).unionWith(TORCH);
+			Blocks.air, Blocks.double_plant, Blocks.reeds).unionWith(TORCH);
 
 	public static final BlockSet FEET_CAN_WALK_THROUGH = explicitFootWalkableBlocks
 			.unionWith(HEAD_CAN_WALK_TRHOUGH);
@@ -176,6 +176,9 @@ public class BlockSets {
 	}
 
 	public static final BlockSet UPPER_SLABS;
+
+	public static final BlockSet WATER = new BlockSet(Blocks.water, Blocks.flowing_water);
+
 	static {
 		BlockSet upper = BlockSets.EMPTY;
 		for (int i = 0; i < 8; i++) {

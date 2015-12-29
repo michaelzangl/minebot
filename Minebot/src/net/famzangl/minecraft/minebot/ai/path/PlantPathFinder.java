@@ -46,7 +46,7 @@ public class PlantPathFinder extends MovePathFinder {
 			Blocks.grass);
 
 	public enum PlantType {
-		ANY(FARMLAND, Items.wheat_seeds, Items.carrot, Items.potato), WHEAT(
+		NORMAL(FARMLAND, Items.wheat_seeds, Items.carrot, Items.potato), WHEAT(
 				FARMLAND, Items.wheat_seeds), CARROT(FARMLAND, Items.carrot), POTATO(
 				FARMLAND, Items.potato), NETHERWART(NETHERWART_FARMLAND,
 				Items.nether_wart);

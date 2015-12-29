@@ -23,26 +23,31 @@ import net.famzangl.minecraft.minebot.ai.command.AICommandParameter;
 import net.famzangl.minecraft.minebot.ai.command.ParameterType;
 import net.famzangl.minecraft.minebot.ai.command.SafeStrategyRule;
 import net.famzangl.minecraft.minebot.ai.path.PlantPathFinder;
+import net.famzangl.minecraft.minebot.ai.path.SugarCanePathFinder;
 import net.famzangl.minecraft.minebot.ai.path.PlantPathFinder.PlantType;
 import net.famzangl.minecraft.minebot.ai.strategy.AIStrategy;
 import net.famzangl.minecraft.minebot.ai.strategy.PathFinderStrategy;
 
 @AICommand(helpText = "Plants plants\n" + "Uses a hoe if needed.", name = "minebot")
 public class CommandPlant {
-	@AICommandInvocation(safeRule = SafeStrategyRule.DEFEND)
-	public static AIStrategy run(
-			AIHelper helper,
-			@AICommandParameter(type = ParameterType.FIXED, fixedName = "plant", description = "") String nameArg) {
-		return new PathFinderStrategy(
-				new PlantPathFinder(PlantType.ANY), "Planting");
-	}
 
 	@AICommandInvocation(safeRule = SafeStrategyRule.DEFEND)
 	public static AIStrategy run(
 			AIHelper helper,
 			@AICommandParameter(type = ParameterType.FIXED, fixedName = "plant", description = "") String nameArg,
-			@AICommandParameter(type = ParameterType.ENUM, description = "plant type") PlantType type) {
+			@AICommandParameter(type = ParameterType.ENUM, description = "plant type", optional = true) PlantType type) {
+		PlantType type2 = type == null ? PlantType.NORMAL : type;
 		return new PathFinderStrategy(
-				new PlantPathFinder(type), "Planting");
+				new PlantPathFinder(type2), "Planting " + type2.toString().toLowerCase());
 	}
+	
+	@AICommandInvocation(safeRule = SafeStrategyRule.DEFEND)
+	public static AIStrategy run(
+			AIHelper helper,
+			@AICommandParameter(type = ParameterType.FIXED, fixedName = "plant", description = "") String nameArg,
+			@AICommandParameter(type = ParameterType.FIXED, fixedName = "sugar_cane", description = "") String nameArg2) {
+		return new PathFinderStrategy(
+				new SugarCanePathFinder(), "Planting sugar cane");
+	}
+
 }
