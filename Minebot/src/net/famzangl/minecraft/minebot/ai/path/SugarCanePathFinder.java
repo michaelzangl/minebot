@@ -15,7 +15,7 @@ import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
 
 public class SugarCanePathFinder extends MovePathFinder {
-	private static final BlockSet SAND = new BlockSet(Blocks.sand);
+	private static final BlockSet SUGAR_CANE_GROUND = new BlockSet(Blocks.sand, Blocks.grass, Blocks.dirt);
 	private static final BlockSet SUGAR_CANE = new BlockSet(Blocks.reeds);
 
 	@Override
@@ -38,7 +38,7 @@ public class SugarCanePathFinder extends MovePathFinder {
 	private boolean isSugarCanePlantPlace(int x, int y, int z) {
 		if (!BlockSets.AIR.isAt(world, x, y, z)
 				|| !BlockSets.AIR.isAt(world, x, y + 1, z)
-				|| !SAND.isAt(world, x, y - 1, z)) {
+				|| !SUGAR_CANE_GROUND.isAt(world, x, y - 1, z)) {
 			// not on sand
 			return false;
 		}
