@@ -121,8 +121,7 @@ public class BuildWayPathfinder extends AlongTrackPathFinder {
 			}
 
 			final BlockPos first = getPos(0, -1);
-			final AITask placeTask = new SlabBuildTask(first, FLOOR,
-					BlockHalf.LOWER_HALF).getPlaceBlockTask(currentPos
+			final AITask placeTask = new SlabBuildTask(first, FLOOR.getBlock()).getPlaceBlockTask(currentPos
 					.subtract(first));
 			addTask(placeTask);
 
@@ -132,8 +131,7 @@ public class BuildWayPathfinder extends AlongTrackPathFinder {
 
 			for (int i = 1; i < width; i++) {
 				final BlockPos current = getPos(i, -1);
-				addTask(new SlabBuildTask(current, FLOOR,
-						BlockHalf.LOWER_HALF)
+				addTask(new SlabBuildTask(current, FLOOR.getBlock())
 						.getPlaceBlockTask(getPos(i - 1, 0).subtract(current)));
 			}
 
