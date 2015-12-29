@@ -21,6 +21,7 @@ import net.famzangl.minecraft.minebot.ai.command.AIChatController;
 import net.famzangl.minecraft.minebot.ai.command.AICommand;
 import net.famzangl.minecraft.minebot.ai.command.AICommandInvocation;
 import net.famzangl.minecraft.minebot.ai.command.AICommandParameter;
+import net.famzangl.minecraft.minebot.ai.command.BlockWithDataOrDontcare;
 import net.famzangl.minecraft.minebot.ai.command.ParameterType;
 import net.famzangl.minecraft.minebot.ai.command.SafeStrategyRule;
 import net.famzangl.minecraft.minebot.ai.path.ClearAreaPathfinder;
@@ -68,6 +69,7 @@ public class CommandClearArea {
 	public static AIStrategy run(
 			AIHelper helper,
 			@AICommandParameter(type = ParameterType.FIXED, fixedName = "clear", description = "") String nameArg,
+			@AICommandParameter(type = ParameterType.BLOCK_NAME, description = "restrict to block", optional = true) BlockWithDataOrDontcare block,
 			@AICommandParameter(type = ParameterType.ENUM, description = "clear mode", optional = true) ClearMode mode) {
 		final BlockPos pos1 = helper.getPos1();
 		final BlockPos pos2 = helper.getPos2();
@@ -75,7 +77,7 @@ public class CommandClearArea {
 			AIChatController.addChatLine("Set positions first.");
 			return null;
 		} else {
-			return new ClearAreaStrategy(new ClearAreaPathfinder(pos1, pos2,
+			return new ClearAreaStrategy(new ClearAreaPathfinder(pos1, pos2, block,
 					mode == null ? ClearMode.VISIT_EVERY_POS : mode));
 		}
 	}

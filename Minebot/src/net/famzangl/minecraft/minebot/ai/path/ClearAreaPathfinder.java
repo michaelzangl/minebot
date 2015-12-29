@@ -17,6 +17,7 @@
 package net.famzangl.minecraft.minebot.ai.path;
 
 import net.famzangl.minecraft.minebot.ai.AIHelper;
+import net.famzangl.minecraft.minebot.ai.command.BlockWithDataOrDontcare;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSet;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSets;
 import net.famzangl.minecraft.minebot.ai.path.world.WorldData;
@@ -44,10 +45,21 @@ public class ClearAreaPathfinder extends MovePathFinder {
 	private final BlockCuboid area;
 	private ClearMode mode;
 
-	public ClearAreaPathfinder(BlockPos pos1, BlockPos pos2, ClearMode mode) {
+	private static final BlockSet CLEARED_BLOCKS = new BlockSet(Blocks.air,
+			Blocks.torch);
+
+	private final BlockSet clearedBlocks;
+
+	public ClearAreaPathfinder(BlockPos pos1, BlockPos pos2,
+			BlockWithDataOrDontcare block, ClearMode mode) {
 		this.mode = mode;
 		area = new BlockCuboid(pos1, pos2);
 		topY = area.getMax().getY();
+		if (block == null) {
+			clearedBlocks = CLEARED_BLOCKS;
+		} else {
+			clearedBlocks = block.toBlockSet().invert();
+		}
 	}
 
 	@Override
@@ -83,17 +95,13 @@ public class ClearAreaPathfinder extends MovePathFinder {
 
 	private boolean isTemporaryCleared(int x, int y, int z) {
 		return isClearedBlock(world, x, y, z);
-		// || foundPositions.contains(new BlockPos(x, y, z));
 	}
 
 	private boolean isInArea(int x, int y, int z) {
 		return area.contains(world, x, y, z);
 	}
 
-	private static final BlockSet clearedBlocks = new BlockSet(Blocks.air,
-			Blocks.torch);
-
-	protected static boolean isClearedBlock(WorldData world, int x, int y, int z) {
+	protected boolean isClearedBlock(WorldData world, int x, int y, int z) {
 		return clearedBlocks.isAt(world, x, y, z);
 	}
 
@@ -129,7 +137,7 @@ public class ClearAreaPathfinder extends MovePathFinder {
 		return area.getVolume();
 	}
 
-	private static class AreaTopVisitor implements AreaVisitor {
+	private class AreaTopVisitor implements AreaVisitor {
 		private int count = 0;
 		private int newTopY;
 
