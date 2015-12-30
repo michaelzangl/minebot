@@ -34,7 +34,7 @@ public class ThrowFishingRodTask extends AITask {
 	@Override
 	public void runTick(AIHelper h, TaskOperations o) {
 		ToolRater settings = MinebotSettings.getSettings().getFishingRater();
-		if (h.selectToolFor(null, new ToolRater(ToolRater.ToolType.FISHING_ROD)) > 0) {
+		if (h.selectToolFor(null, settings) > 0) {
 			time--;
 			if (time == 2) {
 				h.overrideUseItem();
