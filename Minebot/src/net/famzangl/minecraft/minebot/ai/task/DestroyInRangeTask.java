@@ -156,9 +156,7 @@ public class DestroyInRangeTask extends AITask implements CanPrefaceAndDestroy {
 			}
 
 			if (isFacingAcceptableBlock(h, n, h.isFacing(facingPos))) {
-				ToolRater settings = MinebotSettings.getSettings()
-						.getToolRater();
-				h.selectToolFor(n, settings);
+				h.selectToolFor(n);
 				h.overrideAttack();
 				facingAttempts = 0;
 			} else {
