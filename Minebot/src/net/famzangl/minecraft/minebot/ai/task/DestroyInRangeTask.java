@@ -131,8 +131,8 @@ public class DestroyInRangeTask extends AITask implements CanPrefaceAndDestroy {
 
 	private boolean isSafeFallingBlock(WorldData world, int x, int y, int z) {
 		return BlockSets.FALLING.isAt(world, x, y, z)
-				&& (BlockSets.FEET_CAN_WALK_THROUGH.isAt(world, x, y + 1, z) || isSafeToDestroy(
-						world, x, y + 1, z));
+				&& (/*BlockSets.FEET_CAN_WALK_THROUGH.isAt(world, x, y + 1, z) || */ isSafeToDestroy(
+						world, x, y, z));
 	}
 
 	@Override
