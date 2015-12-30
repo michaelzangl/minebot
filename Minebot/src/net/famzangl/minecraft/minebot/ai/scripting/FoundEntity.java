@@ -69,4 +69,11 @@ public class FoundEntity extends EntityPos {
 			return null;
 		}
 	}
+
+	@Override
+	public String toString() {
+		return "FoundEntity [x=" + x + ", y=" + y + ", z=" + z
+				+ ", getTypeName()=" + getTypeName() + ", getName()="
+				+ getName() + "]";
+	}
 }

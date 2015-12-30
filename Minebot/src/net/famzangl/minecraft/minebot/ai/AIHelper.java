@@ -498,16 +498,70 @@ public abstract class AIHelper {
 		}
 		return false;
 	}
+	
+	public static class ToolRaterResult {
+		private final int bestSlot;
+		private final float bestSlotRating;
+		
+		public ToolRaterResult(int bestSlot, float bestSlotRating) {
+			super();
+			this.bestSlot = bestSlot;
+			this.bestSlotRating = bestSlotRating;
+		}
+
+		public int getBestSlot() {
+			return bestSlot;
+		}
+
+		public float getBestSlotRating() {
+			return bestSlotRating;
+		}
+
+		public boolean wasSuccessful() {
+			return bestSlotRating > 0;
+		}
+
+		@Override
+		public int hashCode() {
+			final int prime = 31;
+			int result = 1;
+			result = prime * result + bestSlot;
+			result = prime * result + Float.floatToIntBits(bestSlotRating);
+			return result;
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			if (this == obj)
+				return true;
+			if (obj == null)
+				return false;
+			if (getClass() != obj.getClass())
+				return false;
+			ToolRaterResult other = (ToolRaterResult) obj;
+			if (bestSlot != other.bestSlot)
+				return false;
+			if (Float.floatToIntBits(bestSlotRating) != Float
+					.floatToIntBits(other.bestSlotRating))
+				return false;
+			return true;
+		}
+
+		@Override
+		public String toString() {
+			return "ToolRaterResult [bestSlot=" + bestSlot
+					+ ", bestSlotRating=" + bestSlotRating + "]";
+		}
+	}
 
 	/**
 	 * Selects a good tool for mining the given Block.
 	 * 
 	 * @param pos
 	 */
-	public void selectToolFor(final BlockPos pos) {
-		ToolRater toolRater = new ToolRater();
-		toolRater.addRater(ToolRater.getToolMatchesRater());
-		selectToolFor(pos, toolRater);
+	public ToolRaterResult selectToolFor(final BlockPos pos) {
+		ToolRater toolRater = MinebotSettings.getSettings().getToolRater();
+		return selectToolFor(pos, toolRater);
 	}
 
 	/**
@@ -517,7 +571,13 @@ public abstract class AIHelper {
 	 * @param ToolRater
 	 *            the tool rater that rates the tool.
 	 */
-	public float selectToolFor(final BlockPos pos, ToolRater rater) {
+	public ToolRaterResult selectToolFor(final BlockPos pos, ToolRater rater) {
+		ToolRaterResult res = searchToolFor(pos, rater);
+		mc.thePlayer.inventory.currentItem = res.getBestSlot();
+		return res;
+	}
+	
+	public ToolRaterResult searchToolFor(final BlockPos pos, ToolRater rater) {
 		int bestRatingSlot = mc.thePlayer.inventory.currentItem;
 		if (bestRatingSlot < 0 || bestRatingSlot >= 9) {
 			bestRatingSlot = 0;
@@ -534,8 +594,7 @@ public abstract class AIHelper {
 			}
 		}
 
-		mc.thePlayer.inventory.currentItem = bestRatingSlot;
-		return bestRating;
+		return new ToolRaterResult(bestRatingSlot, bestRating);
 	}
 
 	/**
@@ -550,8 +609,7 @@ public abstract class AIHelper {
 		}
 
 		if (isFacingBlock(pos)) {
-			ToolRater settings = MinebotSettings.getSettings().getToolRater();
-			selectToolFor(pos, settings);
+			selectToolFor(pos);
 			overrideAttack();
 		}
 	}

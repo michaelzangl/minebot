@@ -26,8 +26,14 @@ public class ToolRaterAdapter implements JsonSerializer<ToolRater>,
 			JsonObject obj = json.getAsJsonObject();
 			ToolRater rater = new ToolRater();
 			for (Entry<String, JsonElement> e : obj.entrySet()) {
-				BlockFloatMap map = context.<BlockFloatMap> deserialize(
-						e.getValue(), BlockFloatMap.class);
+				BlockFloatMap map;
+				if (e.getValue().isJsonPrimitive()) {
+					map = new BlockFloatMap();
+					map.setDefault(e.getValue().getAsFloat());
+				} else {
+					map = context.<BlockFloatMap> deserialize(e.getValue(),
+							BlockFloatMap.class);
+				}
 				rater.addRater(e.getKey(), map);
 			}
 			return rater;

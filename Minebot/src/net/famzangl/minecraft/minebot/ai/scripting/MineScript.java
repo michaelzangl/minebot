@@ -20,14 +20,21 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Scanner;
 
+import javax.script.Invocable;
+import javax.script.ScriptEngine;
 import javax.script.ScriptException;
 
 import net.famzangl.minecraft.minebot.ai.AIHelper;
+import net.famzangl.minecraft.minebot.ai.AIHelper.ToolRaterResult;
 import net.famzangl.minecraft.minebot.ai.command.AIChatController;
 import net.famzangl.minecraft.minebot.ai.command.UnknownCommandException;
 import net.famzangl.minecraft.minebot.ai.commands.CommandRun;
@@ -41,10 +48,22 @@ import net.famzangl.minecraft.minebot.ai.strategy.RunFileStrategy;
 import net.famzangl.minecraft.minebot.ai.strategy.StackStrategy;
 import net.famzangl.minecraft.minebot.ai.strategy.StrategyStack;
 import net.famzangl.minecraft.minebot.ai.strategy.WalkTowardsStrategy;
+import net.famzangl.minecraft.minebot.ai.tools.ToolRater;
+import net.minecraft.command.CommandException;
+import net.minecraft.command.ICommandSender;
+import net.minecraft.command.PlayerSelector;
+import net.minecraft.command.CommandResultStats.Type;
+import net.minecraft.command.server.CommandTestFor;
+import net.minecraft.command.server.CommandTestForBlock;
 import net.minecraft.entity.Entity;
+import net.minecraft.nbt.JsonToNBT;
+import net.minecraft.nbt.NBTException;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.BlockPos;
+import net.minecraft.util.IChatComponent;
 import net.minecraft.util.Vec3;
+import net.minecraft.world.World;
 
 /**
  * The minescript object that is exported to js.
@@ -76,7 +95,8 @@ public class MineScript {
 	public ScriptStrategy safeStrategy(String command, Object... arguments)
 			throws UnknownCommandException {
 		return new ScriptStrategy(AIChatController.getRegistry()
-				.evaluateCommandWithSaferule(waitForTick(), command, toStringArray(arguments)));
+				.evaluateCommandWithSaferule(waitForTick(), command,
+						toStringArray(arguments)));
 	}
 
 	/**
@@ -88,9 +108,10 @@ public class MineScript {
 	public ScriptStrategy strategy(String command, Object... arguments)
 			throws UnknownCommandException {
 		return new ScriptStrategy(AIChatController.getRegistry()
-				.evaluateCommand(waitForTick(), command, toStringArray(arguments)));
+				.evaluateCommand(waitForTick(), command,
+						toStringArray(arguments)));
 	}
-	
+
 	private String[] toStringArray(Object[] arguments) {
 		String[] strs = new String[arguments.length];
 		for (int i = 0; i < arguments.length; i++) {
@@ -107,41 +128,143 @@ public class MineScript {
 	public WrappedBlockPos getPlayerBlockPosition() {
 		return new WrappedBlockPos(waitForTick().getPlayerPosition());
 	}
-	
+
 	public FoundEntity getPlayer() {
 		return new FoundEntity(waitForTick().getMinecraft().thePlayer);
 	}
 
-	public FoundEntity[] getEntities(Class clazz, double range) {
+	/**
+	 * 
+	 * @param entityDescr
+	 * @return An array of found entities.
+	 * @throws ScriptException
+	 */
+	public Object getEntities(String entityDescr) throws ScriptException {
+		return getEntities(entityDescr, null);
+	}
+
+	/**
+	 * See the testfor command.
+	 * 
+	 * @param entityDescr
+	 * @param nbtO
+	 * @return An array of found entities.
+	 * @throws ScriptException
+	 */
+	public Object getEntities(String entityDescr, Object nbtO)
+			throws ScriptException {
 		AIHelper helper = waitForTick();
-		Vec3 p = helper.getMinecraft().thePlayer.getPositionEyes(1);
-		AxisAlignedBB box = new AxisAlignedBB(p.xCoord - range,
-				p.yCoord - range, p.zCoord - range, p.xCoord + range, p.yCoord
-						+ range, p.zCoord + range);
-		List<Entity> es = helper.getMinecraft().theWorld.getEntitiesWithinAABB(
-				clazz, box);
-		FoundEntity[] res = new FoundEntity[es.size()];
-		for (int i = 0; i < res.length; i++) {
-			res[i] = new FoundEntity(es.get(i));
+		List<Entity> entities = PlayerSelector.matchEntities(
+				new ICommandSender() {
+					@Override
+					public void setCommandStat(Type type, int amount) {
+						throw new UnsupportedOperationException();
+					}
+
+					@Override
+					public boolean sendCommandFeedback() {
+						throw new UnsupportedOperationException();
+					}
+
+					@Override
+					public Vec3 getPositionVector() {
+						throw new UnsupportedOperationException();
+					}
+
+					@Override
+					public BlockPos getPosition() {
+						return helper.getMinecraft().thePlayer.getPosition();
+					}
+
+					@Override
+					public String getName() {
+						throw new UnsupportedOperationException();
+					}
+
+					@Override
+					public World getEntityWorld() {
+						return helper.getWorld().getBackingWorld();
+					}
+
+					@Override
+					public IChatComponent getDisplayName() {
+						throw new UnsupportedOperationException();
+					}
+
+					@Override
+					public Entity getCommandSenderEntity() {
+						return helper.getMinecraft().thePlayer;
+					}
+
+					@Override
+					public boolean canUseCommand(int permLevel,
+							String commandName) {
+						return true;
+					}
+
+					@Override
+					public void addChatMessage(IChatComponent message) {
+						// Only called for errors.
+						throw new RuntimeException(message.toString());
+					}
+				}, entityDescr, Entity.class);
+
+		NBTTagCompound nbt = null;
+		if (nbtO != null) {
+			String nbtS = jsonify(nbtO);
+			try {
+				nbt = JsonToNBT.func_180713_a(nbtS);
+			} catch (NBTException e1) {
+				throw new ScriptException(e1);
+			}
 		}
-		return res;
+		ArrayList<FoundEntity> foundEntities = new ArrayList<>();
+		for (Entity e : entities) {
+			if (nbt != null) {
+				NBTTagCompound nbttagcompound1 = new NBTTagCompound();
+				e.writeToNBT(nbttagcompound1);
+
+				if (!CommandTestForBlock.func_175775_a(nbt, nbttagcompound1,
+						true)) {
+					continue;
+				}
+			}
+			foundEntities.add(new FoundEntity(e));
+		}
+
+		return toJSArray(foundEntities);
+	}
+
+	private Object toJSArray(List<?> entities) throws ScriptException {
+		try {
+			ScriptEngine engine = tickProvider.getEngine();
+			Object array = engine.eval("[]");
+			for (Object e : entities) {
+				((Invocable) engine).invokeMethod(array, "push", e);
+			}
+			return array;
+		} catch (NoSuchMethodException e1) {
+			throw new ScriptException(e1);
+		}
 	}
 
 	public void displayChat(String message) {
 		AIChatController.addChatLine(message);
 	}
-	
+
 	private ChatMessage[] chatMessageCache = new ChatMessage[0];
-	
+
 	public ChatMessage[] getChatMessages() throws ScriptException {
-		List<PersistentChat> messages = waitForTick().getNetworkHelper().getChatMessages();
+		List<PersistentChat> messages = waitForTick().getNetworkHelper()
+				.getChatMessages();
 		int len = messages.size();
 		if (len > chatMessageCache.length) {
 			int oldLength = chatMessageCache.length;
 			chatMessageCache = Arrays.copyOf(chatMessageCache, len);
-			for (int i = oldLength;i < len; i++) {
+			for (int i = oldLength; i < len; i++) {
 				PersistentChat m = messages.get(i);
-				chatMessageCache[i] = new ChatMessage(m, tickProvider.getEngine());
+				chatMessageCache[i] = new ChatMessage(m,
+						tickProvider.getEngine());
 			}
 		}
 		return chatMessageCache;
@@ -173,7 +296,8 @@ public class MineScript {
 			} else if (s instanceof AIStrategy) {
 				strategy = (AIStrategy) s;
 			} else {
-				throw new IllegalArgumentException("Class " + s.getClass() + " is not strategy.");
+				throw new IllegalArgumentException("Class " + s.getClass()
+						+ " is not strategy.");
 			}
 			stack.addStrategy(strategy);
 		}
@@ -215,6 +339,26 @@ public class MineScript {
 		tickProvider.tickDone();
 	}
 
+	public ToolRaterResult searchTool(Object toolRaterO) throws ScriptException {
+		String toolRater = jsonify(toolRaterO);
+		ToolRater rater = ToolRater.createToolRaterFromJson(toolRater);
+		return waitForTick().searchToolFor(null, rater);
+	}
+
+	private String jsonify(Object toolRaterO) throws ScriptException {
+		if (toolRaterO instanceof String) {
+			return (String) toolRaterO;
+		} else {
+			Invocable inv = (Invocable) tickProvider.getEngine();
+			try {
+				return inv.invokeMethod(tickProvider.getEngine().eval("JSON"),
+						"stringify", toolRaterO).toString();
+			} catch (NoSuchMethodException e) {
+				throw new ScriptException(e);
+			}
+		}
+	}
+
 	/**
 	 * Get a value from disk.
 	 * 
@@ -249,13 +393,14 @@ public class MineScript {
 			writer.print(value);
 			writer.close();
 		} catch (FileNotFoundException e) {
-			throw new UnsupportedOperationException("Persistence dir is not writeable.");
+			throw new UnsupportedOperationException(
+					"Persistence dir is not writeable.");
 		} catch (UnsupportedEncodingException e) {
 		}
 	}
-	
+
 	public void getJSON(String key, String value) {
-		//TODO
+		// TODO
 	}
 
 	private File getPersistenceFile(String key) {

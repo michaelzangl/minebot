@@ -2,6 +2,8 @@ package net.famzangl.minecraft.minebot.ai.tools;
 
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.Reader;
+import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Hashtable;
@@ -287,30 +289,17 @@ public class ToolRater {
 		return "ToolRater [raters=" + raters + "]";
 	}
 
-	/**
-	 * Gets a simple rater that returns 2 if the tool matches, 1 otherwise.
-	 * 
-	 * @return
-	 */
-	public static Rater getToolMatchesRater() {
-		BlockFloatMap values = new BlockFloatMap();
-		values.setDefault(2);
-		return new MatchesRater("", values);
+	public static ToolRater createToolRaterFromJson(String json) {
+		return createToolRaterByJson(new StringReader(json));
+	}
+	
+	public static ToolRater createDefaultRater() {
+		InputStream res = ToolRater.class.getResourceAsStream("tools.json");
+		return createToolRaterByJson(new InputStreamReader(res));
 	}
 
-	public static ToolRater createDefaultRater() {
+	private static ToolRater createToolRaterByJson(Reader reader) {
 		Gson gson = MinebotSettings.getGson();
-		InputStream res = ToolRater.class.getResourceAsStream("tools.json");
-		return gson.fromJson(new InputStreamReader(res), ToolRater.class);
-		// ToolRater rater = new ToolRater();
-		// BlockFloatMap map = new BlockFloatMap();
-		// BlockFloatMap map2 = new BlockFloatMap();
-		// map.setDefault(2);
-		// map2.setDefault(1.01f);
-		// map2.setBlock(Blocks.leaves, .99f);
-		// map2.setBlock(Blocks.leaves2, .99f);
-		// rater.addRater(getRater("is_enchanted", map));
-		// rater.addRater(getRater("matches", map2));
-		// return rater;
+		return gson.fromJson(reader, ToolRater.class);
 	}
 }
