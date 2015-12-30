@@ -225,12 +225,11 @@ public class CommandDefinition {
 			params[parameter] = builders.get(parameter).getParameter(helper,
 					argsPart);
 		}
+		Object result = null;
 		try {
-			final Object result = method.invoke(null, params);
+			result = method.invoke(null, params);
 			if (result instanceof AIStrategy) {
 				return (AIStrategy) result;
-			} else {
-				return null;
 			}
 		} catch (final IllegalAccessException e) {
 			doThrow(e);
@@ -241,7 +240,7 @@ public class CommandDefinition {
 			final Throwable exception = e.getTargetException();
 			doThrow(exception);
 		}
-		return null;
+		throw new CommandEvaluationException("No AI strategy was created.  Result was: " + result);
 	}
 
 	private void dumIAE(IllegalArgumentException e, Object[] params) {

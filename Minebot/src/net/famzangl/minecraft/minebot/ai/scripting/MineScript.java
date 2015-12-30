@@ -195,6 +195,9 @@ public class MineScript {
 	}
 
 	public void doStrategy(ScriptStrategy strategy) {
+		if (strategy == null) {
+			throw new NullPointerException();
+		}
 		tickProvider.setActiveStrategy(strategy, waitForTick());
 		tickProvider.tickDone();
 		tickProvider.pauseForStrategy();

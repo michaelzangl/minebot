@@ -58,6 +58,9 @@ public class CommandJs {
 		private final AIStrategy strategy;
 
 		public ScriptStrategy(AIStrategy strategy) {
+			if (strategy == null) {
+				throw new NullPointerException();
+			}
 			this.strategy = strategy;
 		}
 
@@ -68,6 +71,12 @@ public class CommandJs {
 		public boolean hasFailed() {
 			return strategy.hasFailed();
 		}
+
+		@Override
+		public String toString() {
+			return "ScriptStrategy [strategy=" + strategy + "]";
+		}
+		
 	}
 
 	public interface TickProvider {

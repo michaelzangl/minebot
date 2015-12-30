@@ -26,6 +26,7 @@ import net.famzangl.minecraft.minebot.ai.command.CommandEvaluationException;
 import net.famzangl.minecraft.minebot.ai.command.ParameterType;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSet;
 import net.famzangl.minecraft.minebot.ai.strategy.AIStrategy;
+import net.famzangl.minecraft.minebot.ai.strategy.RunOnceStrategy;
 import net.famzangl.minecraft.minebot.ai.task.BlockHalf;
 import net.famzangl.minecraft.minebot.build.block.SlabType;
 import net.famzangl.minecraft.minebot.build.block.WoodType;
@@ -51,6 +52,19 @@ public class CommandScheduleBuild {
 			.unionWith(LogBuildTask.NORMAL_LOGS)
 			.unionWith(SlabBuildTask.BLOCKS);
 
+	private static final class ScheduleTaskStrategy extends RunOnceStrategy {
+		private final BuildTask task;
+
+		private ScheduleTaskStrategy(BuildTask task) {
+			this.task = task;
+		}
+
+		@Override
+		protected void singleRun(AIHelper helper) {
+			addTask(helper, task);
+		}
+	}
+
 	public static final class RunSimpleFilter extends BlockFilter {
 		@Override
 		public boolean matches(BlockWithDataOrDontcare b) {
@@ -64,19 +78,19 @@ public class CommandScheduleBuild {
 			@AICommandParameter(type = ParameterType.FIXED, fixedName = "schedule", description = "") String nameArg,
 			@AICommandParameter(type = ParameterType.POSITION, description = "Where to place it (relative is to your current pos)") BlockPos forPosition,
 			@AICommandParameter(type = ParameterType.BLOCK_NAME, description = "The block", blockFilter = RunSimpleFilter.class) BlockWithDataOrDontcare blockToPlace) {
-
+		final BuildTask task;
 		if (BlockBuildTask.BLOCKS.contains(blockToPlace)) {
-			addTask(helper, new BlockBuildTask(forPosition, blockToPlace));
+			task = new BlockBuildTask(forPosition, blockToPlace);
 		} else if (LogBuildTask.NORMAL_LOGS.contains(blockToPlace)) {
-			addTask(helper, new LogBuildTask(forPosition, blockToPlace));
+			task = new LogBuildTask(forPosition, blockToPlace);
 		} else if (FenceBuildTask.BLOCKS.contains(blockToPlace)) {
-			addTask(helper, new FenceBuildTask(forPosition, blockToPlace));
+			task = new FenceBuildTask(forPosition, blockToPlace);
 		} else if (SlabBuildTask.BLOCKS.contains(blockToPlace)) {
-			addTask(helper, new SlabBuildTask(forPosition, blockToPlace));
+			task = new SlabBuildTask(forPosition, blockToPlace);
 		} else {
 			throw new CommandEvaluationException("Cannot build " + blockToPlace);
 		}
-		return null;
+		return new ScheduleTaskStrategy(task);
 	}
 
 	// public static final class RunColoredFilter extends BlockFilter {
@@ -218,12 +232,12 @@ public class CommandScheduleBuild {
 			@AICommandParameter(type = ParameterType.STRING, description = "The third line. Replace space with §.", optional = true) String text3,
 			@AICommandParameter(type = ParameterType.STRING, description = "The fourth line. Replace space with §.", optional = true) String text4) {
 		if (StandingSignBuildTask.BLOCKS.contains(blockToPlace)) {
-			addTask(helper, new StandingSignBuildTask(forPosition, direction,
-					new String[] { text1, text2, text3, text4 }));
+			StandingSignBuildTask task = new StandingSignBuildTask(forPosition, direction,
+					new String[] { text1, text2, text3, text4 });
+			return new ScheduleTaskStrategy(task);
 		} else {
 			throw new CommandEvaluationException("Cannot build " + blockToPlace);
 		}
-		return null;
 	}
 
 	private static void addTask(AIHelper helper, BuildTask blockBuildTask) {

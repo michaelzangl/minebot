@@ -22,18 +22,34 @@ import net.famzangl.minecraft.minebot.ai.command.AICommandInvocation;
 import net.famzangl.minecraft.minebot.ai.command.AICommandParameter;
 import net.famzangl.minecraft.minebot.ai.command.ParameterType;
 import net.famzangl.minecraft.minebot.ai.strategy.AIStrategy;
+import net.famzangl.minecraft.minebot.ai.strategy.RunOnceStrategy;
 import net.minecraft.util.BlockPos;
 
 @AICommand(helpText = "Set bounding position manually.", name = "minebuild")
 public class CommandSetPos {
+
+	private static final class SetPositionStrategy extends RunOnceStrategy {
+		private final BlockPos pos;
+		private final boolean pos2;
+
+		private SetPositionStrategy(BlockPos pos, boolean pos2) {
+			this.pos = pos;
+			this.pos2 = pos2;
+		}
+
+		@Override
+		protected void singleRun(AIHelper helper) {
+			helper.setPosition(pos == null ? helper.getPlayerPosition() : pos,
+					pos2);
+		}
+	}
 
 	@AICommandInvocation()
 	public static AIStrategy run1(
 			AIHelper helper,
 			@AICommandParameter(type = ParameterType.FIXED, fixedName = "pos1", description = "") String nameArg,
 			@AICommandParameter(type = ParameterType.POSITION, description = "The position", optional = true) BlockPos pos) {
-		setPos(helper, pos, false);
-		return null;
+		return setPos(pos, false);
 	}
 
 	@AICommandInvocation()
@@ -41,11 +57,10 @@ public class CommandSetPos {
 			AIHelper helper,
 			@AICommandParameter(type = ParameterType.FIXED, fixedName = "pos2", description = "") String nameArg,
 			@AICommandParameter(type = ParameterType.POSITION, description = "The position", optional = true) BlockPos pos) {
-		setPos(helper, pos, true);
-		return null;
+		return setPos(pos, true);
 	}
 
-	private static void setPos(AIHelper helper, BlockPos pos, boolean b) {
-		helper.setPosition(pos == null ? helper.getPlayerPosition() : pos, b);
+	private static AIStrategy setPos(final BlockPos pos, final boolean pos2) {
+		return new SetPositionStrategy(pos, pos2);
 	}
 }
