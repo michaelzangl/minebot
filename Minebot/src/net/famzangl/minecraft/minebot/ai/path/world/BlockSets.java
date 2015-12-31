@@ -11,9 +11,8 @@ import net.minecraft.util.BlockPos;
  */
 public class BlockSets {
 
-
 	public static final BlockSet EMPTY = new BlockSet(new int[0]);
-	
+
 	/**
 	 * Blocks we can just walk over/next to without problems.
 	 */
@@ -127,10 +126,10 @@ public class BlockSets {
 			Blocks.anvil, Blocks.cobblestone_wall, Blocks.cactus, Blocks.reeds,
 			Blocks.web, Blocks.glass_pane, Blocks.bed, Blocks.enchanting_table,
 			Blocks.waterlily, Blocks.brewing_stand, Blocks.vine, Blocks.chest,
-			Blocks.tripwire, Blocks.tripwire_hook,
+			Blocks.trapped_chest, Blocks.tripwire, Blocks.tripwire_hook,
 			Blocks.wooden_pressure_plate, Blocks.stone_pressure_plate,
-			Blocks.wooden_button, Blocks.stone_button, Blocks.monster_egg).unionWith(FENCE)
-			.unionWith(FENCE_GATE);
+			Blocks.wooden_button, Blocks.stone_button, Blocks.monster_egg)
+			.unionWith(FENCE).unionWith(FENCE_GATE);
 
 	/**
 	 * Blocks that form a solid ground.
@@ -155,8 +154,9 @@ public class BlockSets {
 	/**
 	 * Blocks that are considered indestructable and should be avoided.
 	 */
-	public static final BlockSet INDESTRUCTABLE = new BlockSet(Blocks.bedrock, Blocks.barrier, Blocks.obsidian);
-	
+	public static final BlockSet INDESTRUCTABLE = new BlockSet(Blocks.bedrock,
+			Blocks.barrier, Blocks.obsidian);
+
 	/**
 	 * All leaves. FIXME: Only consider leaves that do not decay as safe ground.
 	 */
@@ -177,13 +177,15 @@ public class BlockSets {
 
 	public static final BlockSet UPPER_SLABS;
 
-	public static final BlockSet WATER = new BlockSet(Blocks.water, Blocks.flowing_water);
+	public static final BlockSet WATER = new BlockSet(Blocks.water,
+			Blocks.flowing_water);
 
 	static {
 		BlockSet upper = BlockSets.EMPTY;
 		for (int i = 0; i < 8; i++) {
 			upper = upper.unionWith(new BlockMetaSet(Blocks.stone_slab, i + 8));
-			upper = upper.unionWith(new BlockMetaSet(Blocks.wooden_slab, i + 8));
+			upper = upper
+					.unionWith(new BlockMetaSet(Blocks.wooden_slab, i + 8));
 		}
 		upper = upper.unionWith(new BlockMetaSet(Blocks.stone_slab2, 8));
 		UPPER_SLABS = upper;
