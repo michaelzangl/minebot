@@ -153,7 +153,7 @@ public class MineScript {
 	 */
 	public Object getEntities(String entityDescr, Object nbtO)
 			throws ScriptException {
-		AIHelper helper = waitForTick();
+		final AIHelper helper = waitForTick();
 		List<Entity> entities = PlayerSelector.matchEntities(
 				new ICommandSender() {
 					@Override
@@ -218,7 +218,7 @@ public class MineScript {
 				throw new ScriptException(e1);
 			}
 		}
-		ArrayList<FoundEntity> foundEntities = new ArrayList<>();
+		ArrayList<FoundEntity> foundEntities = new ArrayList<FoundEntity>();
 		for (Entity e : entities) {
 			if (nbt != null) {
 				NBTTagCompound nbttagcompound1 = new NBTTagCompound();
