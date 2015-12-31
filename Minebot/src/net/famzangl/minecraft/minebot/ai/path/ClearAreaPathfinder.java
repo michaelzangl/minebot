@@ -130,7 +130,11 @@ public class ClearAreaPathfinder extends MovePathFinder {
 
 	@Override
 	protected int materialDistance(int x, int y, int z, boolean asFloor) {
-		return isInArea(x, y, z) ? 0 : super.materialDistance(x, y, z, asFloor);
+		return isToBeClearedMaterial(x, y, z) ? 0 : super.materialDistance(x, y, z, asFloor);
+	}
+
+	private boolean isToBeClearedMaterial(int x, int y, int z) {
+		return isInArea(x, y, z) && !clearedBlocks.isAt(world, x, y, z);
 	}
 
 	public int getAreaSize() {
