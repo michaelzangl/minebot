@@ -38,6 +38,7 @@ import net.famzangl.minecraft.minebot.ai.utils.RandUtils;
 import net.famzangl.minecraft.minebot.build.BuildManager;
 import net.famzangl.minecraft.minebot.map.MapReader;
 import net.famzangl.minecraft.minebot.settings.MinebotSettings;
+import net.famzangl.minecraft.minebot.settings.SaferuleSettings;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockFence;
 import net.minecraft.block.BlockFenceGate;
@@ -83,8 +84,17 @@ public abstract class AIHelper {
 	private static final double SNEAK_OFFSET = .2;
 	private static final double WALK_PER_STEP = 4.3 / 20;
 	private static final double MIN_DISTANCE_ERROR = 0.05;
-	private static final float MAX_PITCH_CHANGE = 20.0f;
-	private static final float MAX_YAW_CHANGE = 22.5f;
+	private static final float MAX_PITCH_CHANGE;
+	private static final float MAX_YAW_CHANGE;
+	private static final boolean ALLOW_TOP_OF_WORLD_HIT;
+	
+	static {
+		SaferuleSettings settings = MinebotSettings.getSettings().getSaferules();
+		MAX_PITCH_CHANGE = settings.getMaxPitchChangeDegrees();
+		MAX_YAW_CHANGE = settings.getMaxYawChangeDegrees();
+		ALLOW_TOP_OF_WORLD_HIT = settings.isAllowTopOfWorldHit();
+	}
+	
 	private static Minecraft mc = Minecraft.getMinecraft();
 	/**
 	 * A world that never gets a delta applied to it.
@@ -111,6 +121,10 @@ public abstract class AIHelper {
 
 	protected MapReader activeMapReader;
 
+	public AIHelper() {
+		
+	}
+	
 	/**
 	 * A random number in a range, that does not exactly hit the sides.
 	 * 
@@ -345,8 +359,7 @@ public abstract class AIHelper {
 	}
 
 	private boolean allowTopOfWorldHit() {
-		// TODO Use a preference for this.
-		return false;
+		return ALLOW_TOP_OF_WORLD_HIT;
 	}
 
 	public boolean isFacingBlock(BlockPos pos, EnumFacing blockSide,

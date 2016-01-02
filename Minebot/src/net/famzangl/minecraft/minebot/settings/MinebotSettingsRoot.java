@@ -36,4 +36,8 @@ public class MinebotSettingsRoot {
 	public ToolRater getFishingRater() {
 		return fishingRater;
 	}
+	
+	public SaferuleSettings getSaferules() {
+		return saferules;
+	}
 }
