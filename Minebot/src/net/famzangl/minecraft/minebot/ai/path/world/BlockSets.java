@@ -90,7 +90,7 @@ public class BlockSets {
 			Blocks.melon_stem, Blocks.carpet, Blocks.double_plant,
 			Blocks.red_mushroom, Blocks.brown_mushroom, Blocks.redstone_wire,
 			Blocks.sapling, Blocks.snow_layer, Blocks.nether_wart,
-			Blocks.standing_sign, Blocks.wall_sign).unionWith(RAILS);
+			Blocks.standing_sign, Blocks.wall_sign, Blocks.deadbush).unionWith(RAILS);
 
 	/**
 	 * Torches.
