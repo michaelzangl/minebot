@@ -252,6 +252,27 @@ public abstract class AIHelper {
 		return minecraftWorld;
 	}
 
+	/**
+	 * Gets the required angular change to face a given point.
+	 * @param x
+	 * @param y
+	 * @param z
+	 * @return
+	 */
+	public double getRequiredAngularChangeTo(double x, double y, double z) {
+		final double d0 = x - mc.thePlayer.posX;
+		final double d1 = z - mc.thePlayer.posZ;
+		final double d2 = y - mc.thePlayer.posY - mc.thePlayer.getEyeHeight();
+		final double d3 = d0 * d0 + d2 * d2 + d1 * d1;
+
+		if (d3 < 2.500000277905201E-7D) {
+			return 0;
+		}
+		
+		Vec3 playerLook = mc.thePlayer.getLookVec().normalize();
+		return Math.acos(playerLook.dotProduct(new Vec3(d0, d1, d2).normalize()));
+	}
+	
 	public boolean isFacing(Vec3 vec) {
 		return isFacing(vec.xCoord, vec.yCoord, vec.zCoord);
 	}
@@ -330,12 +351,6 @@ public abstract class AIHelper {
 	private float fullRotations(float yaw) {
 		return (float) (((int) (yaw / (Math.PI * 2))) * Math.PI * 2);
 	}
-
-	/*
-	 * public void moveTo(int x, int y, int z) { face(x + .5, mc.thePlayer.posY,
-	 * z + .5); MovementInput i = new MovementInput(); i.moveForward = 0.8f;
-	 * overrideMovement(i); }
-	 */
 
 	public boolean isFacingBlock(BlockPos pos) {
 		return isFacingBlock(pos.getX(), pos.getY(), pos.getZ());
@@ -1129,4 +1144,5 @@ public abstract class AIHelper {
 	public MapReader getActiveMapReader() {
 		return activeMapReader;
 	}
+
 }

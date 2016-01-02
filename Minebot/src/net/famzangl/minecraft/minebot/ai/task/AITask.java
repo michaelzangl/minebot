@@ -20,6 +20,7 @@ import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.path.world.RecordingWorld;
 import net.famzangl.minecraft.minebot.ai.path.world.WorldWithDelta;
 import net.famzangl.minecraft.minebot.ai.strategy.TaskStrategy;
+import net.minecraftforge.fml.common.gameevent.TickEvent.RenderTickEvent;
 
 /**
  * This is a specific task that the {@link TaskStrategy} should work on.
@@ -129,6 +130,9 @@ public abstract class AITask {
 	 * Called whenever this task was canceled.
 	 */
 	public void onCanceled() {
+	}
+
+	public void drawMarkers(RenderTickEvent event, AIHelper helper) {
 	}
 
 }

@@ -115,7 +115,7 @@ public class MovePathFinder extends PathFinderField {
 	// protected final BlockSet forbiddenBlocks;
 	private TaskReceiver receiver;
 
-	private BlockPos currentTarget;
+	private volatile BlockPos currentTarget;
 
 	public MovePathFinder() {
 		super();

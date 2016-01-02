@@ -31,7 +31,7 @@ import net.minecraft.util.BlockPos;
 
 public class ClearAreaPathfinder extends MovePathFinder {
 	public enum ClearMode {
-		VISIT_EVERY_POS(6, 0), CLEAR_3X2X3(5, 1);
+		VISIT_EVERY_POS(6, 0), CLEAR_3X5X3(5, 1), CLEAR_3X2X3(2, 1), CLEAR_5X4X5(4, 2);
 
 		public final int maxHeight, maxExtendXZ;
 

@@ -30,6 +30,7 @@ import net.famzangl.minecraft.minebot.ai.task.TaskOperations;
 import net.famzangl.minecraft.minebot.ai.task.error.StringTaskError;
 import net.famzangl.minecraft.minebot.ai.task.error.TaskError;
 import net.minecraft.util.BlockPos;
+import net.minecraftforge.fml.common.gameevent.TickEvent.RenderTickEvent;
 
 /**
  * This is a strategy that always queries for new tasks to do and then executes
@@ -53,6 +54,7 @@ public abstract class TaskStrategy extends AIStrategy implements
 
 	private final LinkedList<TaskError> lastErrors = new LinkedList<TaskError>();
 	private int taskTimeout;
+	private volatile AITask activeTask;
 
 	@Override
 	protected void onDeactivate(AIHelper helper) {
@@ -132,6 +134,7 @@ public abstract class TaskStrategy extends AIStrategy implements
 	@Override
 	protected TickResult onGameTick(AIHelper helper) {
 		if (desyncTimer > 0) {
+			activeTask = null;
 			// clear the tasks
 			for (AITask t : tasks) {
 				t.onCanceled();
@@ -144,6 +147,7 @@ public abstract class TaskStrategy extends AIStrategy implements
 		}
 
 		if (searchNewTasks) {
+			activeTask = null;
 			searchAndPrintTasks(helper);
 			if (tasks.isEmpty()) {
 				System.out.println("No more tasks found.");
@@ -153,6 +157,7 @@ public abstract class TaskStrategy extends AIStrategy implements
 			searchNewTasks = false;
 		} else if (tasks.isEmpty()) {
 			searchNewTasks = true;
+			activeTask = null;
 			return TickResult.TICK_AGAIN;
 		}
 
@@ -162,6 +167,7 @@ public abstract class TaskStrategy extends AIStrategy implements
 			tasks.removeFirst();
 			System.out.println("Next will be: " + tasks.peekFirst());
 			taskTimeout = 0;
+			activeTask = null;
 			return TickResult.TICK_AGAIN;
 		} else {
 			int tickTimeout = task.getGameTickTimeout(helper);
@@ -170,12 +176,14 @@ public abstract class TaskStrategy extends AIStrategy implements
 						"Task timed out. It should have been completed in "
 								+ (tickTimeout / 20f) + "s"));
 				System.out.println("Task was: " + task);
+				activeTask = null;
 				return TickResult.TICK_HANDLED;
 			} else {
 				temporaryHelper = helper;
 				task.runTick(helper, this);
 				temporaryHelper = null;
 				taskTimeout++;
+				activeTask = task;
 				return TickResult.TICK_HANDLED;
 			}
 		}
@@ -211,6 +219,15 @@ public abstract class TaskStrategy extends AIStrategy implements
 	 */
 	public boolean isDesync() {
 		return desyncTimer > 0;
+	}
+	
+	@Override
+	public void drawMarkers(RenderTickEvent event, AIHelper helper) {
+		AITask activeTask2 = activeTask;
+		if (activeTask2 != null) {
+			activeTask2.drawMarkers(event, helper);
+		}
+		super.drawMarkers(event, helper);
 	}
 
 }

@@ -33,15 +33,8 @@ public class DestroyLogInRange extends DestroyInRangeTask {
 		}
 	}
 
-	@Override
-	protected boolean isFacingAcceptableBlock(AIHelper h, BlockPos n, boolean isFacingRightDirection) {
-		MovingObjectPosition hit = h.getObjectMouseOver();
-		if (isFacingRightDirection && hit != null && hit.typeOfHit == MovingObjectType.BLOCK) {
-			BlockPos pos = hit.getBlockPos();
-			return pos.equals(n)
-					|| (LEAVES_OR_LOGS.isAt(
-							h.getWorld(), pos) && BlockSets.LOGS.isAt(h.getWorld(), n));
-		}
-		return super.isFacingAcceptableBlock(h, n, isFacingRightDirection);
+	protected boolean isAcceptedFacingPos(AIHelper h, BlockPos n, BlockPos pos) {
+		return (LEAVES_OR_LOGS.isAt(
+						h.getWorld(), pos) && BlockSets.LOGS.isAt(h.getWorld(), n));
 	}
 }

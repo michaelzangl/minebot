@@ -25,13 +25,17 @@ import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSets;
 import net.famzangl.minecraft.minebot.ai.path.world.WorldData;
 import net.famzangl.minecraft.minebot.ai.path.world.WorldWithDelta;
+import net.famzangl.minecraft.minebot.ai.render.PosMarkerRenderer;
 import net.famzangl.minecraft.minebot.ai.tools.ToolRater;
 import net.famzangl.minecraft.minebot.ai.utils.BlockArea;
 import net.famzangl.minecraft.minebot.ai.utils.BlockArea.AreaVisitor;
 import net.famzangl.minecraft.minebot.ai.utils.BlockCuboid;
 import net.famzangl.minecraft.minebot.settings.MinebotSettings;
 import net.minecraft.util.BlockPos;
+import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.Vec3;
+import net.minecraft.util.MovingObjectPosition.MovingObjectType;
+import net.minecraftforge.fml.common.gameevent.TickEvent.RenderTickEvent;
 
 /**
  * Destroys all Blocks in a given area. Individual blocks can be excluded, see
@@ -79,10 +83,13 @@ public class DestroyInRangeTask extends AITask implements CanPrefaceAndDestroy {
 	}
 
 	private int facingAttempts;
+	private volatile BlockPos currentAttemptingPos;
 	private final ArrayList<BlockPos> failedBlocks = new ArrayList<BlockPos>();
 	private BlockArea range;
 	private Vec3 facingPos;
 	private BlockPos lastFacingFor;
+
+	private final PosMarkerRenderer renderer = new PosMarkerRenderer(0, 0, 255);
 
 	/**
 	 * Create a new {@link DestroyInRangeTask}.
@@ -101,17 +108,34 @@ public class DestroyInRangeTask extends AITask implements CanPrefaceAndDestroy {
 	}
 
 	private BlockPos getNextToDestruct(AIHelper h) {
+		if (currentAttemptingPos != null
+				&& !noDestructionRequired(h.getWorld(),
+						currentAttemptingPos.getX(),
+						currentAttemptingPos.getY(),
+						currentAttemptingPos.getZ())) {
+			return currentAttemptingPos;
+		}
 		ClosestBlockFinder f = new ClosestBlockFinder(h);
 		range.accept(f, h.getWorld());
-		return f.next;
+		currentAttemptingPos = f.next;
+		return currentAttemptingPos;
 	}
 
 	private double rate(AIHelper h, int x, int y, int z) {
 		if (noDestructionRequired(h.getWorld(), x, y, z)) {
 			return -1;
 		} else {
-			return h.getMinecraft().thePlayer.getDistanceSq(x + .5,
-					y + .5 - h.getMinecraft().thePlayer.getEyeHeight(), z + .5);
+			double distance = h.getMinecraft().thePlayer.getDistance(x + .5, y
+					+ .5 - h.getMinecraft().thePlayer.getEyeHeight(), z + .5);
+			// 0..1
+			double change = h
+					.getRequiredAngularChangeTo(x + .5, y + .5, z + .5)
+					/ Math.PI;
+			if (change > .20) {
+				distance += (change - .20) * 1.5;
+			}
+
+			return distance;
 		}
 	}
 
@@ -131,8 +155,10 @@ public class DestroyInRangeTask extends AITask implements CanPrefaceAndDestroy {
 
 	private boolean isSafeFallingBlock(WorldData world, int x, int y, int z) {
 		return BlockSets.FALLING.isAt(world, x, y, z)
-				&& (/*BlockSets.FEET_CAN_WALK_THROUGH.isAt(world, x, y + 1, z) || */ isSafeToDestroy(
-						world, x, y, z));
+				&& (/*
+					 * BlockSets.FEET_CAN_WALK_THROUGH.isAt(world, x, y + 1, z)
+					 * ||
+					 */isSafeToDestroy(world, x, y, z));
 	}
 
 	@Override
@@ -155,8 +181,9 @@ public class DestroyInRangeTask extends AITask implements CanPrefaceAndDestroy {
 				lastFacingFor = n;
 			}
 
-			if (isFacingAcceptableBlock(h, n, h.isFacing(facingPos))) {
-				h.selectToolFor(n);
+			BlockPos p = checkFacingAcceptableBlock(h, n, h.isFacing(facingPos));
+			if (p != null) {
+				h.selectToolFor(p);
 				h.overrideAttack();
 				facingAttempts = 0;
 			} else {
@@ -166,9 +193,23 @@ public class DestroyInRangeTask extends AITask implements CanPrefaceAndDestroy {
 		}
 	}
 
-	protected boolean isFacingAcceptableBlock(AIHelper h, BlockPos n,
-			boolean isFacingRightDirection) {
-		return h.isFacingBlock(n);
+	protected boolean isAcceptedFacingPos(AIHelper h, BlockPos n, BlockPos pos) {
+		return !noDestructionRequired(h.getWorld(), pos.getX(), pos.getY(),
+				pos.getZ());
+	}
+
+	protected BlockPos checkFacingAcceptableBlock(AIHelper h, BlockPos n, boolean isFacingRightDirection) {
+		MovingObjectPosition hit = h.getObjectMouseOver();
+		if (isFacingRightDirection && hit != null && hit.typeOfHit == MovingObjectType.BLOCK) {
+			BlockPos pos = hit.getBlockPos();
+			if (isAcceptedFacingPos(h, n, pos)) {
+				return pos;
+			}
+		}
+		if (h.isFacingBlock(n)) {
+			return n;
+		}
+		return null;
 	}
 
 	@Override
@@ -205,5 +246,14 @@ public class DestroyInRangeTask extends AITask implements CanPrefaceAndDestroy {
 		// FIXME Check which blocks are really destroyed / fail if they are not.
 		range.accept(new ApplyToDelta(), world);
 		return true;
+	}
+
+	@Override
+	public void drawMarkers(RenderTickEvent event, AIHelper helper) {
+		BlockPos currentAttemptingPos2 = currentAttemptingPos;
+		if (currentAttemptingPos2 != null) {
+			renderer.render(event, helper, currentAttemptingPos2);
+		}
+		super.drawMarkers(event, helper);
 	}
 }
