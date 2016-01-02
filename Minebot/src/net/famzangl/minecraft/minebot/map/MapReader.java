@@ -758,8 +758,9 @@ public class MapReader implements ChunkListener {
 		int newLook = niceDegrees(playerSP == null ? 0
 				: (int) playerSP.rotationYaw);
 		mapDisplay.setPosition(newPlayer, newLook);
+		mapDisplay.setMarks(helper.getPos1(), helper.getPos2());
 
-		// TODO: Draw minx/maxx and highlighted blocks.
+		// TODO: Draw highlighted blocks.
 	}
 
 	private void checkIsAlive(AIHelper helper) {

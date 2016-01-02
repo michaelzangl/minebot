@@ -8,6 +8,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
+import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
@@ -225,6 +226,11 @@ public class MapDisplay extends JPanel implements FollowPlayerListener {
 
 	private boolean mapCenterFollowsPlayer = true;
 
+	private final Object markPositionMutex = new Object();
+
+	private BlockPos mark1;
+	private BlockPos mark2;
+
 	@Override
 	public void paint(Graphics g) {
 		super.paint(g);
@@ -277,6 +283,25 @@ public class MapDisplay extends JPanel implements FollowPlayerListener {
 		}
 
 		drawPlayer(g);
+		drawMarks(g);
+	}
+
+	private void drawMarks(Graphics g) {
+		synchronized (markPositionMutex) {
+			if (mark1 != null && mark2 != null) {
+				int x1 = blockToPanelX(mark1.getX());
+				int y1 = blockToPanelY(mark1.getZ());
+				int x2 = blockToPanelX(mark2.getX());
+				int y2 = blockToPanelY(mark2.getZ());
+				int size = Math.max(1, BASE_PIXEL / blocksPerBasePixel);
+				g.setColor(new Color(203, 19, 19, 200));
+				g.drawRect(Math.min(x1, x2), Math.min(y1, y2), Math.abs(x1 - x2) + size, Math.abs(y1 - y2) + size);
+				g.setColor(new Color(203, 19, 19, 100));
+				g.fillRect(x1, y1, size, size);
+				g.setColor(new Color(203, 80, 19, 100));
+				g.fillRect(x2, y2, size, size);
+			}
+		}
 	}
 
 	private void drawPlayer(Graphics g) {
@@ -404,5 +429,12 @@ public class MapDisplay extends JPanel implements FollowPlayerListener {
 
 	public float getScale() {
 		return ((float) blocksPerBasePixel / BASE_PIXEL);
+	}
+
+	public void setMarks(BlockPos pos1, BlockPos pos2) {
+		synchronized (markPositionMutex) {
+			mark1 = pos1;
+			mark2 = pos2;
+		}
 	}
 }
