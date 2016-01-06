@@ -28,6 +28,7 @@ import net.famzangl.minecraft.minebot.ai.path.ClearAreaPathfinder;
 import net.famzangl.minecraft.minebot.ai.path.ClearAreaPathfinder.ClearMode;
 import net.famzangl.minecraft.minebot.ai.strategy.AIStrategy;
 import net.famzangl.minecraft.minebot.ai.strategy.PathFinderStrategy;
+import net.famzangl.minecraft.minebot.ai.utils.BlockCuboid;
 import net.minecraft.util.BlockPos;
 
 @AICommand(helpText = "Clears the selected area.", name = "minebuild")
@@ -71,14 +72,23 @@ public class CommandClearArea {
 			@AICommandParameter(type = ParameterType.FIXED, fixedName = "clear", description = "") String nameArg,
 			@AICommandParameter(type = ParameterType.BLOCK_NAME, description = "restrict to block", optional = true) BlockWithDataOrDontcare block,
 			@AICommandParameter(type = ParameterType.ENUM, description = "clear mode", optional = true) ClearMode mode) {
+		BlockCuboid area =  getArea(helper);
+		if (area != null)  {
+			return new ClearAreaStrategy(new ClearAreaPathfinder(area, block,
+					mode == null ? ClearMode.VISIT_EVERY_POS : mode));
+		} else {
+			return null;
+		}
+	}
+	
+	public static BlockCuboid getArea(AIHelper helper) {
 		final BlockPos pos1 = helper.getPos1();
 		final BlockPos pos2 = helper.getPos2();
 		if (pos1 == null || pos2 == null) {
 			AIChatController.addChatLine("Set positions first.");
 			return null;
 		} else {
-			return new ClearAreaStrategy(new ClearAreaPathfinder(pos1, pos2, block,
-					mode == null ? ClearMode.VISIT_EVERY_POS : mode));
+			return new BlockCuboid(pos1, pos2);
 		}
 	}
 }

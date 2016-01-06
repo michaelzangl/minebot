@@ -25,6 +25,7 @@ import net.famzangl.minecraft.minebot.ai.commands.CommandDumpSigns;
 import net.famzangl.minecraft.minebot.ai.commands.CommandEat;
 import net.famzangl.minecraft.minebot.ai.commands.CommandEnchant;
 import net.famzangl.minecraft.minebot.ai.commands.CommandFeed;
+import net.famzangl.minecraft.minebot.ai.commands.CommandFillArea;
 import net.famzangl.minecraft.minebot.ai.commands.CommandFish;
 import net.famzangl.minecraft.minebot.ai.commands.CommandGet;
 import net.famzangl.minecraft.minebot.ai.commands.CommandLoad;
@@ -120,6 +121,7 @@ public class AIChatController {
 
 		registerCommand(CommandBuild.class);
 		registerCommand(CommandClearArea.class);
+		registerCommand(CommandFillArea.class);
 		registerCommand(CommandReset.class);
 		registerCommand(CommandScheduleBuild.class);
 		registerCommand(CommandSetPos.class);

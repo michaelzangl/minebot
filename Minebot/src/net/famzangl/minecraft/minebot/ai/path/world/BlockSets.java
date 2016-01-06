@@ -180,6 +180,8 @@ public class BlockSets {
 	public static final BlockSet WATER = new BlockSet(Blocks.water,
 			Blocks.flowing_water);
 
+	public static final BlockSet TREE_BLOCKS = LOGS.unionWith(LEAVES);
+
 	static {
 		BlockSet upper = BlockSets.EMPTY;
 		for (int i = 0; i < 8; i++) {

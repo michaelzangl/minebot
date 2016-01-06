@@ -50,21 +50,16 @@ public class ClearAreaPathfinder extends MovePathFinder {
 
 	private final BlockSet clearedBlocks;
 
-	public ClearAreaPathfinder(BlockPos pos1, BlockPos pos2,
+	public ClearAreaPathfinder(BlockCuboid area,
 			BlockWithDataOrDontcare block, ClearMode mode) {
+		this.area = area;
 		this.mode = mode;
-		area = new BlockCuboid(pos1, pos2);
 		topY = area.getMax().getY();
 		if (block == null) {
 			clearedBlocks = CLEARED_BLOCKS;
 		} else {
 			clearedBlocks = block.toBlockSet().invert();
 		}
-	}
-
-	@Override
-	protected void noPathFound() {
-		super.noPathFound();
 	}
 
 	@Override

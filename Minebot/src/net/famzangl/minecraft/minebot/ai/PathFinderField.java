@@ -284,20 +284,19 @@ public class PathFinderField implements Comparator<Integer> {
 			setVisited(currentNode);
 		}
 		if (pqEmpty()) {
-			LOGGER.debug(MARKER_PATH, "Path found to %s", currentDest + "");
+			LOGGER.debug(MARKER_PATH, "Path found to " + currentDest);
 			if (currentDest != null) {
 				planPathTo(currentDest.destNode, cx, cy, cz);
 				terminated();
 			} else {
-				noPathFound();
 				terminated();
+				noPathFound();
 			}
 			return true;
 		} else {
 			LOGGER.debug(
 					MARKER_PATH,
-					"Warning: Path finding needs more time. Just got %d iterations.",
-					iteration);
+					"Warning: Path finding needs more time. Just got " + iteration + " iterations.");
 			pqStats();
 
 			return false;
@@ -311,8 +310,7 @@ public class PathFinderField implements Comparator<Integer> {
 			min = Math.min(min, getDistance(i));
 			max = Math.max(max, getDistance(i));
 		}
-		LOGGER.debug(MARKER_PATH, "Current priority queue range: %d to %d",
-				min, max);
+		LOGGER.debug(MARKER_PATH, "Current priority queue range: " + min + " to " + max);
 	}
 
 	private boolean hasTimeLeft(long startTime) {
