@@ -161,7 +161,7 @@ public class AirbridgeStrategy extends TaskStrategy {
 	@Override
 	public String toString() {
 		return "AirbridgeStrategy [start=" + start + ", direction=" + direction
-				+ "]";
+				+ ", length=" + length + "]";
 	}
 
 	private BlockCuboid getSidewardsArea(BlockPos center) {
@@ -201,7 +201,7 @@ public class AirbridgeStrategy extends TaskStrategy {
 			steps++;
 		}
 		LOGGER.trace(MARKER_PROGRESS, "Suggesting next build position: "
-				+ buildPos + " ater " + steps + " steps");
+				+ buildPos + " after " + steps + " steps");
 
 		if (beforeBuild == null) {
 			BlockPos before = buildPos.subtract(direction.getDirectionVec());
@@ -211,11 +211,21 @@ public class AirbridgeStrategy extends TaskStrategy {
 				addTask(new WalkTowardsTask(before.getX(), before.getZ(), null));
 				LOGGER.trace(MARKER_PROGRESS, "Standing on a cliff. Walk back to: " + before);
 			} else {
-				// cannot handle this.
-				AIChatController.addChatLine("Please stand on a half slab.");
+				//Kristopher Mueller -- The Following help texts added to address a user incorrectly calling /minebot airbridge 'width'
+				if(this.toLeft == 1 || this.toRight == 1) {
+					AIChatController.addChatLine("First Build a 1x3 half-slab platform and stand on the middle block.");
+				} else if(this.toLeft == 2 || this.toRight == 2) {
+					AIChatController.addChatLine("First Build a 1x5 half-slab platform and stand on the middle block.");
+				} else if(this.toLeft == 3 || this.toRight == 3) {
+					AIChatController.addChatLine("First Build a 1x7 half-slab platform and stand on the middle block.");	
+				} else {
+					// cannot handle this.
+					AIChatController.addChatLine("Please stand on a half slab.");
+				
 				LOGGER.info(MARKER_PROGRESS,
 						"No valid half slab found. Required area is: "
 								+ getSidewardsArea(buildPos.add(0, -1, 0)));
+				}
 			}
 			return;
 		}
@@ -247,7 +257,7 @@ public class AirbridgeStrategy extends TaskStrategy {
 	}
 
 	private boolean isInLength(BlockPos pos) {
-		return length < 0 || start.distanceSq(pos) + .5 < length * length;
+		return length < 0 || start.distanceSq(pos) + .5 < length * length;		
 	}
 
 	private boolean isHalfslabAt(WorldData world, BlockPos buildPos) {
