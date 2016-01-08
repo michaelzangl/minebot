@@ -10,7 +10,7 @@ import net.famzangl.minecraft.minebot.ai.strategy.AIStrategy;
 import net.famzangl.minecraft.minebot.ai.strategy.AirbridgeStrategy;
 import net.minecraft.util.EnumFacing;
 
-@AICommand(helpText = "Build a tunnel with the given profile", name = "minebot")
+@AICommand(helpText = "Builds an airbridge using the half-slabs in your inventory.", name = "minebot")
 public class CommandAirbridge {
 	public enum AirbridgeWidth {
 		SMALL(0,0),
@@ -30,9 +30,9 @@ public class CommandAirbridge {
 	public static AIStrategy run(
 			AIHelper helper,
 			@AICommandParameter(type = ParameterType.FIXED, fixedName = "airbridge", description = "") String nameArg,
-			@AICommandParameter(type = ParameterType.ENUM, description = "direction", optional = true) EnumFacing inDirection,
-			@AICommandParameter(type = ParameterType.NUMBER, description = "max length", optional = true) Integer length,
-			@AICommandParameter(type = ParameterType.ENUM, description = "width", optional = true) AirbridgeWidth width) {
+			@AICommandParameter(type = ParameterType.ENUM, description = "direction: North, South, East, West", optional = true) EnumFacing inDirection,
+			@AICommandParameter(type = ParameterType.NUMBER, description = "max distance to travel", optional = true) Integer length,
+			@AICommandParameter(type = ParameterType.ENUM, description = "small, wide, wider, maximum", optional = true) AirbridgeWidth width) {
 		if (width == null) {
 			width = AirbridgeWidth.SMALL;
 		}
