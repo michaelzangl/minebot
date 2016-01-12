@@ -22,6 +22,7 @@ import java.util.Collection;
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.command.AICommandParameter.AnyBlockFilter;
 import net.famzangl.minecraft.minebot.ai.command.AICommandParameter.BlockFilter;
+import net.famzangl.minecraft.minebot.ai.command.BlockWithDataOrDontcare.IllegalBlockNameException;
 import net.minecraft.util.ResourceLocation;
 
 public class BlockNameBuilder extends ParameterBuilder {
@@ -53,14 +54,26 @@ public class BlockNameBuilder extends ParameterBuilder {
 
 		@Override
 		public boolean couldEvaluateAgainst(String string) {
-			BlockWithDataOrDontcare block = BlockWithDataOrDontcare.getFromString(string);
-			return block != null && blockFilter.matches(block);
+			try {
+				BlockWithDataOrDontcare block = BlockWithDataOrDontcare.getFromString(string);
+				return blockFilter.matches(block);
+			} catch (IllegalBlockNameException e) {
+				return false;
+			}
 		}
 
 		@Override
 		public void getTabCompleteOptions(String currentStart,
 				Collection<String> addTo) {
 			super.getTabCompleteOptions(currentStart, addTo);
+			
+			for (String s : BlockWithDataOrDontcare.getAllStrings()) {
+				String noPrefix = s.replaceFirst("^minecraft:", "");
+				if (s.startsWith(currentStart) || noPrefix.startsWith(currentStart)) {
+					addTo.add(noPrefix);
+				}
+			}
+			
 //			@SuppressWarnings("unchecked")
 			// BIG TODO: Get a list of all blocks for tab complete.
 //			final Set<ResourceLocation> keys = Block.blockRegistry.getKeys();

@@ -113,7 +113,7 @@ public class BlockWithData extends BlockWithDataOrDontcare {
 		return getBlockString() + ":" + getMetaString();
 	}
 
-	private String getMetaString() {
+	protected String getMetaString() {
 		int value = getMetaValue();
 		int blockId = getBlockId();
 		for (NicerMetaValue n : nicerMeta) {

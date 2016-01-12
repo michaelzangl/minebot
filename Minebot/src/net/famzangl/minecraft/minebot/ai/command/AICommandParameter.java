@@ -21,6 +21,9 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import net.famzangl.minecraft.minebot.ai.path.world.BlockSet;
+import net.minecraft.init.Blocks;
+
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.PARAMETER)
 public @interface AICommandParameter {
@@ -40,6 +43,15 @@ public @interface AICommandParameter {
 		}
 	}
 	
+	public static class SurvivalBlockFilter extends BlockFilter {
+		private static final BlockSet NON_SURVIVAL_BLOCKS = new BlockSet(Blocks.air, Blocks.command_block);
+
+		@Override
+		public boolean matches(BlockWithDataOrDontcare b) {
+			return !NON_SURVIVAL_BLOCKS.contains(b);
+		}
+	}
+	
 	ParameterType type();
 
 	String description();
@@ -48,7 +60,7 @@ public @interface AICommandParameter {
 	
 	boolean optional() default false;
 
-	Class<? extends BlockFilter> blockFilter() default AnyBlockFilter.class;
+	Class<? extends BlockFilter> blockFilter() default SurvivalBlockFilter.class;
 
 	String relativeToSettingsFile() default "";
 }
