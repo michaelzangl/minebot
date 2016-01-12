@@ -19,6 +19,11 @@ package net.famzangl.minecraft.minebot.ai.strategy;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.Marker;
+import org.apache.logging.log4j.MarkerManager;
+
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.command.AIChatController;
 import net.famzangl.minecraft.minebot.ai.path.TaskReceiver;
@@ -41,6 +46,11 @@ import net.minecraftforge.fml.common.gameevent.TickEvent.RenderTickEvent;
  */
 public abstract class TaskStrategy extends AIStrategy implements
 		TaskOperations, TaskReceiver {
+	private static final Marker MARKER_PREFACING = MarkerManager
+			.getMarker("preface");
+	private static final Marker MARKER_TASK = MarkerManager
+			.getMarker("task");
+	private static final Logger LOGGER = LogManager.getLogger(AIStrategy.class);
 	private static final int MAX_LOOKAHEAD = 9;
 	private static final int DESYNC_TIME = 5;
 	// Maximum distance for aiming at blocks to destroy.
@@ -72,8 +82,8 @@ public abstract class TaskStrategy extends AIStrategy implements
 
 	@Override
 	public void desync(TaskError error) {
-		System.out.println("Desync. This is an error. Did the server lag?");
-		System.out.println("Error: " + error);
+		LOGGER.error(MARKER_TASK, "Task sent desync. This is an error. Did the server lag?");
+		LOGGER.error(MARKER_TASK, "Error: " + error);
 		Thread.dumpStack();
 
 		if (!LESS_ERRORS || !lastErrors.contains(error)) {
@@ -91,7 +101,7 @@ public abstract class TaskStrategy extends AIStrategy implements
 		boolean found = false;
 		for (int i = 1; i < MAX_LOOKAHEAD && i < tasks.size() && !found; i++) {
 			final AITask task = tasks.get(i);
-			// System.out.println("Prefetching with: " + task);
+			LOGGER.trace(MARKER_PREFACING, "Prefetching with: " + task);
 			if (tasks.get(i).getClass()
 					.isAnnotationPresent(SkipWhenSearchingPrefetch.class)) {
 				continue;
@@ -109,10 +119,8 @@ public abstract class TaskStrategy extends AIStrategy implements
 						break;
 					}
 				}
-				// System.out.println("Prefacing: " + found + " for " +
-				// positions);
 			} else {
-				// System.out.println("Prefetching showstopper: " + task);
+				LOGGER.trace(MARKER_PREFACING, "Prefetching showstopper: " + task);
 				break;
 			}
 		}
@@ -140,7 +148,7 @@ public abstract class TaskStrategy extends AIStrategy implements
 				t.onCanceled();
 			}
 			tasks.clear();
-			System.out.println("Waiting because of desync... " + desyncTimer);
+			LOGGER.debug(MARKER_TASK, "Waiting because of desync... " + desyncTimer);
 			desyncTimer--;
 			// pause for a tick, to reset all buttons, jump, ...
 			return TickResult.TICK_HANDLED;
@@ -150,7 +158,7 @@ public abstract class TaskStrategy extends AIStrategy implements
 			activeTask = null;
 			searchAndPrintTasks(helper);
 			if (tasks.isEmpty()) {
-				System.out.println("No more tasks found.");
+				LOGGER.debug(MARKER_TASK, "No more tasks found.");
 				return TickResult.NO_MORE_WORK;
 			}
 			taskTimeout = 0;
@@ -163,19 +171,19 @@ public abstract class TaskStrategy extends AIStrategy implements
 
 		final AITask task = tasks.peekFirst();
 		if (task.isFinished(helper)) {
-			System.out.println("Task done: " + task);
+			LOGGER.trace(MARKER_TASK,"Task done: " + task);
 			tasks.removeFirst();
-			System.out.println("Next will be: " + tasks.peekFirst());
+			LOGGER.debug(MARKER_TASK,"Next task will be: " + tasks.peekFirst());
 			taskTimeout = 0;
 			activeTask = null;
 			return TickResult.TICK_AGAIN;
 		} else {
 			int tickTimeout = task.getGameTickTimeout(helper);
 			if (taskTimeout > tickTimeout) {
+				LOGGER.error(MARKER_TASK, "Task timeout for: " + task);
 				desync(new StringTaskError(
 						"Task timed out. It should have been completed in "
 								+ (tickTimeout / 20f) + "s"));
-				System.out.println("Task was: " + task);
 				activeTask = null;
 				return TickResult.TICK_HANDLED;
 			} else {
@@ -192,7 +200,7 @@ public abstract class TaskStrategy extends AIStrategy implements
 	private void searchAndPrintTasks(AIHelper helper) {
 		searchTasks(helper);
 		if (!tasks.isEmpty()) {
-			System.out.println("Found " + tasks.size() + " tasks, first task: "
+			LOGGER.trace(MARKER_TASK, "Found " + tasks.size() + " tasks, first task: "
 					+ tasks.peekFirst());
 		}
 	}

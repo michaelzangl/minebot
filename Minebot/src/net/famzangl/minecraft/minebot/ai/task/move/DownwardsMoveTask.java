@@ -57,7 +57,6 @@ public class DownwardsMoveTask extends AITask {
 			h.faceAndDestroy(pos.add(0, 1, 0));
 		} else if (!BlockSets.AIR.isAt(world, pos)) {
 			if (!h.isStandingOn(pos.add(0, 1, 0))) {
-				System.out.println("Not standing on the right block.");
 				o.desync(new PositionTaskError(pos.add(0, 1, 0)));
 			}
 			if (hardBlocks.isAt(world, pos)) {

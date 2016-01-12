@@ -21,6 +21,9 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import org.apache.logging.log4j.Marker;
+import org.apache.logging.log4j.MarkerManager;
+
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSets;
 import net.famzangl.minecraft.minebot.ai.path.world.WorldData;
@@ -43,6 +46,7 @@ import net.minecraftforge.fml.common.gameevent.TickEvent.RenderTickEvent;
  *
  */
 public class DestroyInRangeTask extends AITask implements CanPrefaceAndDestroy {
+	private static final Marker MARKER_DESTROY_IN_RANGE = MarkerManager.getMarker("destroy_in_range");
 	private class ClosestBlockFinder implements AreaVisitor {
 		BlockPos next = null;
 		double currentMin = Float.POSITIVE_INFINITY;
@@ -64,6 +68,7 @@ public class DestroyInRangeTask extends AITask implements CanPrefaceAndDestroy {
 
 	private class ApplyToDelta implements AreaVisitor {
 
+
 		public ApplyToDelta() {
 		}
 
@@ -72,8 +77,13 @@ public class DestroyInRangeTask extends AITask implements CanPrefaceAndDestroy {
 			if (isSafeToDestroy(world, x, y, z)) {
 				// FIXME: Use generics instead of cast.
 				((WorldWithDelta) world).setBlock(x, y, z, 0, 0);
+				y++;
+				while (isSafeFallingBlock(world, x, y, z)) {
+					((WorldWithDelta) world).setBlock(x, y, z, 0, 0);
+					y++;
+				}
 			} else {
-				System.out.println("No destruction for " + x + "," + y + ","
+				LOGGER.error(MARKER_DESTROY_IN_RANGE, "Cannot destroy for " + x + "," + y + ","
 						+ z + ", block is: " + world.getBlockId(x, y, z));
 			}
 		}

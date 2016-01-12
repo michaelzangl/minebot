@@ -16,6 +16,9 @@
  *******************************************************************************/
 package net.famzangl.minecraft.minebot.ai.task.place;
 
+import org.apache.logging.log4j.Marker;
+import org.apache.logging.log4j.MarkerManager;
+
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.ItemFilter;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSets;
@@ -34,6 +37,7 @@ import net.minecraft.util.EnumFacing;
  *
  */
 public class JumpingPlaceAtHalfTask extends JumpingPlaceBlockAtFloorTask {
+	private static final Marker MARKER_JUMPING_PLACE_HALF = MarkerManager.getMarker("jumping_place_half");
 
 	public final static EnumFacing[] TRY_FOR_LOWER = new EnumFacing[] {
 			EnumFacing.DOWN, EnumFacing.EAST, EnumFacing.NORTH,
@@ -70,7 +74,7 @@ public class JumpingPlaceAtHalfTask extends JumpingPlaceBlockAtFloorTask {
 	}
 
 	protected boolean faceSideBlock(AIHelper h, EnumFacing dir) {
-		System.out.println("Facing side " + dir);
+		LOGGER.trace(MARKER_JUMPING_PLACE_HALF, "Facing side " + dir);
 		BlockPos facingBlock = getPlaceAtPos().offset(dir);
 		if (BlockSets.AIR.isAt(h.getWorld(), facingBlock)) {
 			return false;

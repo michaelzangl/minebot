@@ -16,6 +16,9 @@
  *******************************************************************************/
 package net.famzangl.minecraft.minebot.ai.task.inventory;
 
+import org.apache.logging.log4j.Marker;
+import org.apache.logging.log4j.MarkerManager;
+
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.ItemFilter;
 import net.famzangl.minecraft.minebot.ai.task.AITask;
@@ -37,6 +40,7 @@ import net.minecraft.network.play.client.C16PacketClientStatus;
  */
 @SkipWhenSearchingPrefetch
 public class GetOnHotBarTask extends AITask {
+	private static final Marker MARKER_GET_ON_HOTBAR = MarkerManager.getMarker("get_on_hotbar");
 	private final ItemFilter itemFiler;
 	private boolean inventoryOpened;
 
@@ -63,7 +67,7 @@ public class GetOnHotBarTask extends AITask {
 						|| !itemFiler.matches(stack)) {
 					continue;
 				}
-				System.out.println("Swapping inventory slot " + i);
+				LOGGER.trace(MARKER_GET_ON_HOTBAR, "Swapping inventory slot " + i);
 				swap(h, screen, i);
 				h.getMinecraft().displayGuiScreen(null);
 				break;
