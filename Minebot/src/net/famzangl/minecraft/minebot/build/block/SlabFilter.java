@@ -17,8 +17,6 @@
 package net.famzangl.minecraft.minebot.build.block;
 
 import net.famzangl.minecraft.minebot.ai.BlockItemFilter;
-import net.minecraft.item.ItemBlock;
-import net.minecraft.item.ItemStack;
 
 /**
  * A filter that filters for half slabs.

@@ -47,8 +47,7 @@ public class PutOnCraftingTableTask extends MoveInInventoryTask {
 		ItemStack[] mainInventory = h.getMinecraft().thePlayer.inventory.mainInventory;
 		int inventorySlot = -1;
 		for (int i = 0; i < mainInventory.length; i++) {
-			if (mainInventory[i] != null
-					&& new ItemWithSubtype(mainInventory[i]).equals(item)) {
+			if (item.equals(ItemWithSubtype.fromStack(mainInventory[i]))) {
 				inventorySlot = i;
 			}
 		}
@@ -56,13 +55,9 @@ public class PutOnCraftingTableTask extends MoveInInventoryTask {
 			return -1;
 		}
 
-		// Offset: 10 blocks.
-		int iSlot = 1 + inventorySlot;
-		if (inventorySlot < 9) {
-			iSlot += 9 * 4;
-		}
-		return iSlot;
+		return 10 + convertPlayerInventorySlot(inventorySlot);
 	}
+
 
 	@Override
 	protected int getToStack(AIHelper h) {

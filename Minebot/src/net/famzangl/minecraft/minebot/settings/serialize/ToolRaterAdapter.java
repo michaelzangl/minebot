@@ -4,7 +4,6 @@ import java.lang.reflect.Type;
 import java.util.Map.Entry;
 
 import net.famzangl.minecraft.minebot.ai.path.world.BlockFloatMap;
-import net.famzangl.minecraft.minebot.ai.path.world.BlockSet;
 import net.famzangl.minecraft.minebot.ai.tools.ToolRater;
 import net.famzangl.minecraft.minebot.ai.tools.rate.Rater;
 

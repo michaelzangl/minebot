@@ -117,6 +117,23 @@ public class ItemWithSubtype {
 			return null;
 		}
 	}
+
+	public ItemStack getFakeMCStack(int size) {
+		Item item = getItem();
+		if (item == null) {
+			throw new NullPointerException("Could not find item " + itemId);
+		}
+		ItemStack stack = new ItemStack(item);
+		stack.stackSize = size;
+		if (stack.getHasSubtypes()) {
+			stack.setItemDamage(itemDamage);
+		}
+		return stack;
+	}
+	
+	public static ItemWithSubtype fromStack(ItemStack stack) {
+		return stack == null ? null : new ItemWithSubtype(stack);
+	}
 	
 	/**
 	 * Convert a name to an item id. Always sets the subtype to 0.

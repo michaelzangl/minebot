@@ -27,22 +27,15 @@ import net.famzangl.minecraft.minebot.ai.command.ParameterType;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSet;
 import net.famzangl.minecraft.minebot.ai.strategy.AIStrategy;
 import net.famzangl.minecraft.minebot.ai.strategy.RunOnceStrategy;
-import net.famzangl.minecraft.minebot.ai.task.BlockHalf;
-import net.famzangl.minecraft.minebot.build.block.SlabType;
-import net.famzangl.minecraft.minebot.build.block.WoodType;
 import net.famzangl.minecraft.minebot.build.blockbuild.BlockBuildTask;
-import net.famzangl.minecraft.minebot.build.blockbuild.SlabBuildTask;
 import net.famzangl.minecraft.minebot.build.blockbuild.BuildNormalStairsTask;
-import net.famzangl.minecraft.minebot.build.blockbuild.BuildNormalStairsTask.Half;
 import net.famzangl.minecraft.minebot.build.blockbuild.BuildTask;
 import net.famzangl.minecraft.minebot.build.blockbuild.FenceBuildTask;
 import net.famzangl.minecraft.minebot.build.blockbuild.LogBuildTask;
+import net.famzangl.minecraft.minebot.build.blockbuild.SlabBuildTask;
 import net.famzangl.minecraft.minebot.build.blockbuild.StandingSignBuildTask;
 import net.famzangl.minecraft.minebot.build.blockbuild.StandingSignBuildTask.SignDirection;
-import net.minecraft.block.Block;
-import net.minecraft.item.EnumDyeColor;
 import net.minecraft.util.BlockPos;
-import net.minecraft.util.EnumFacing;
 
 @AICommand(helpText = "Schedules a build task.", name = "minebuild")
 public class CommandScheduleBuild {

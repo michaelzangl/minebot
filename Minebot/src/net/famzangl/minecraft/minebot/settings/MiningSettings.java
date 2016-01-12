@@ -1,7 +1,6 @@
 package net.famzangl.minecraft.minebot.settings;
 
 import net.famzangl.minecraft.minebot.ai.path.world.BlockFloatMap;
-import net.famzangl.minecraft.minebot.ai.path.world.BlockSet;
 import net.minecraft.init.Blocks;
 
 @MinebotSettingObject

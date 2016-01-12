@@ -1,10 +1,6 @@
 package net.famzangl.minecraft.minebot.ai.path.world;
 
-import org.apache.commons.lang3.tuple.Pair;
-
 import net.minecraft.block.Block;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.init.Blocks;
 
 /**
  * A set of blocks, filterable by meta.

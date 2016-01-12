@@ -1,7 +1,6 @@
 package net.famzangl.minecraft.minebot.ai.enchanting;
 
 import net.famzangl.minecraft.minebot.ai.AIHelper;
-import net.famzangl.minecraft.minebot.ai.ItemFilter;
 import net.famzangl.minecraft.minebot.ai.strategy.TintStrategy;
 import net.famzangl.minecraft.minebot.ai.task.inventory.PutItemInContainerTask;
 import net.minecraft.client.gui.GuiEnchantment;

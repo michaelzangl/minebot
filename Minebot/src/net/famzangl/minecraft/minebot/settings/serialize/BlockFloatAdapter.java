@@ -6,7 +6,6 @@ import java.util.Map.Entry;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockFloatMap;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSet;
 import net.minecraft.block.Block;
-import net.minecraft.client.util.JsonException;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonDeserializationContext;

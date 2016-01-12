@@ -16,7 +16,6 @@
  *******************************************************************************/
 package net.famzangl.minecraft.minebot.ai;
 
-import scala.annotation.meta.getter;
 import net.minecraft.item.ItemStack;
 
 /**

@@ -16,16 +16,11 @@
  *******************************************************************************/
 package net.famzangl.minecraft.minebot.build.reverse.factories;
 
-import java.util.ArrayList;
-
 import net.famzangl.minecraft.minebot.ai.command.BlockWithDataOrDontcare;
-import net.famzangl.minecraft.minebot.ai.path.world.BlockSet;
-import net.famzangl.minecraft.minebot.ai.path.world.BlockSets;
 import net.famzangl.minecraft.minebot.ai.path.world.WorldData;
 import net.famzangl.minecraft.minebot.build.blockbuild.BuildTask;
 import net.famzangl.minecraft.minebot.build.reverse.TaskDescription;
 import net.famzangl.minecraft.minebot.build.reverse.UnsupportedBlockException;
-import net.minecraft.init.Blocks;
 import net.minecraft.util.BlockPos;
 
 

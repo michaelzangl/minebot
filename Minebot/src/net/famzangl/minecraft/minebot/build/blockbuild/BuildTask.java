@@ -16,23 +16,11 @@
  *******************************************************************************/
 package net.famzangl.minecraft.minebot.build.blockbuild;
 
-import net.famzangl.minecraft.minebot.Pos;
 import net.famzangl.minecraft.minebot.ai.AIHelper;
-import net.famzangl.minecraft.minebot.ai.ColoredBlockItemFilter;
 import net.famzangl.minecraft.minebot.ai.ItemFilter;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSets;
-import net.famzangl.minecraft.minebot.ai.path.world.WorldData;
 import net.famzangl.minecraft.minebot.ai.task.AITask;
-import net.famzangl.minecraft.minebot.ai.task.place.JumpingPlaceAtHalfTask;
-import net.famzangl.minecraft.minebot.build.block.SlabType;
-import net.famzangl.minecraft.minebot.build.block.WoodType;
-import net.famzangl.minecraft.minebot.build.blockbuild.BuildNormalStairsTask.Half;
-import net.famzangl.minecraft.minebot.build.reverse.TaskDescription;
-import net.minecraft.block.Block;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.item.EnumDyeColor;
 import net.minecraft.util.BlockPos;
-import net.minecraft.util.EnumFacing;
 
 public abstract class BuildTask {
 

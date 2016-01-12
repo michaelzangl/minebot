@@ -16,9 +16,7 @@
  *******************************************************************************/
 package net.famzangl.minecraft.minebot.ai.path;
 
-import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockFloatMap;
-import net.minecraft.block.Block;
 import net.minecraft.util.EnumFacing;
 
 public class MineBySettingsPathFinder extends MinePathfinder {

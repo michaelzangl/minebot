@@ -20,8 +20,12 @@ import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.task.AITask;
 import net.famzangl.minecraft.minebot.ai.task.TaskOperations;
 import net.famzangl.minecraft.minebot.ai.task.error.StringTaskError;
+import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.item.ItemStack;
+
+import org.apache.logging.log4j.Marker;
+import org.apache.logging.log4j.MarkerManager;
 
 /**
  * Take the resulting items from the crafting/enchanting/... table.
@@ -30,6 +34,8 @@ import net.minecraft.item.ItemStack;
  *
  */
 public class TakeResultItem extends AITask {
+	private static final Marker MARKER_TAKE_RESULT = MarkerManager
+			.getMarker("take_result");
 	private final Class<? extends GuiContainer> containerClass;
 	private final int slot;
 	private boolean tookItem;
@@ -46,25 +52,30 @@ public class TakeResultItem extends AITask {
 
 	@Override
 	public void runTick(AIHelper h, TaskOperations o) {
-		if (!containerClass.isInstance(h.getMinecraft().currentScreen)) {
-			System.out.println("Screen not opened.");
+		GuiScreen currentScreen = h.getMinecraft().currentScreen;
+		if (!containerClass.isInstance(currentScreen)) {
+			LOGGER.error(
+					MARKER_TAKE_RESULT,
+					"Screen not opened. Expected one of "
+							+ containerClass.getCanonicalName() + " but got "
+							+ currentScreen);
 			o.desync(new StringTaskError("No screen opened."));
 			tookItem = true;
 			return;
 		}
-		final GuiContainer screen = (GuiContainer) h.getMinecraft().currentScreen;
+		final GuiContainer screen = (GuiContainer) currentScreen;
 		if (screen.inventorySlots.getSlot(slot).getHasStack()
 				&& shouldTakeStack(screen.inventorySlots.getSlot(slot)
 						.getStack())) {
 			h.getMinecraft().playerController.windowClick(
 					screen.inventorySlots.windowId, slot, 0, 1,
 					h.getMinecraft().thePlayer);
-			System.out.println("Taking item");
+			LOGGER.trace(MARKER_TAKE_RESULT, "Taking item");
 			tookItem = true;
 			return;
 		} else {
 			o.desync(new StringTaskError("No good stack in slot."));
-			System.out.println("No good stack in slot " + slot + ".");
+			LOGGER.error(MARKER_TAKE_RESULT, "No good stack in slot " + slot + ".");
 			return;
 		}
 	}

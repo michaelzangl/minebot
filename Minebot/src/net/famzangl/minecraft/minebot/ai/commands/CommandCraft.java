@@ -27,7 +27,6 @@ import net.famzangl.minecraft.minebot.ai.path.world.BlockSet;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSets;
 import net.famzangl.minecraft.minebot.ai.strategy.AIStrategy;
 import net.famzangl.minecraft.minebot.ai.strategy.CraftStrategy;
-import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
 
 @AICommand(helpText = "Crafts items of the given type.", name = "minebot")

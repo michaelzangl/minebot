@@ -9,10 +9,6 @@ import java.util.Scanner;
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.command.AIChatController;
 import net.famzangl.minecraft.minebot.ai.command.IAIControllable;
-import net.famzangl.minecraft.minebot.ai.strategy.AIStrategy;
-import net.famzangl.minecraft.minebot.ai.strategy.StackStrategy;
-import net.famzangl.minecraft.minebot.ai.strategy.StrategyStack;
-import net.famzangl.minecraft.minebot.ai.strategy.AIStrategy.TickResult;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiChat;
 

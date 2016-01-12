@@ -18,18 +18,13 @@ package net.famzangl.minecraft.minebot.build.blockbuild;
 
 import net.famzangl.minecraft.minebot.Pos;
 import net.famzangl.minecraft.minebot.ai.BlockItemFilter;
-import net.famzangl.minecraft.minebot.ai.command.BlockWithData;
 import net.famzangl.minecraft.minebot.ai.command.BlockWithDataOrDontcare;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockMetaSet;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSet;
 import net.famzangl.minecraft.minebot.build.block.LogItemFilter;
 import net.famzangl.minecraft.minebot.build.block.WoodType;
 import net.famzangl.minecraft.minebot.build.block.WoodType.LogDirection;
-import net.minecraft.block.BlockLog;
-import net.minecraft.block.BlockLog.EnumAxis;
-import net.minecraft.init.Blocks;
 import net.minecraft.util.BlockPos;
-import net.minecraft.util.EnumFacing;
 
 /**
  * Build a log. Logs can be placed in 3 directions.

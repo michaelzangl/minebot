@@ -24,11 +24,6 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Map.Entry;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.Marker;
-import org.apache.logging.log4j.MarkerManager;
-
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.command.BlockWithDataOrDontcare;
 import net.famzangl.minecraft.minebot.ai.enchanting.CloseScreenTask;
@@ -53,6 +48,11 @@ import net.minecraft.item.crafting.CraftingManager;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.item.crafting.ShapedRecipes;
 import net.minecraft.util.BlockPos;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.Marker;
+import org.apache.logging.log4j.MarkerManager;
 
 /**
  * Use the crafting table.
@@ -392,7 +392,7 @@ public class CraftStrategy extends PathFinderStrategy {
 		private int countInInventory(ItemWithSubtype itemWithSubtype) {
 			int count = 0;
 			for (ItemStack s : helper.getMinecraft().thePlayer.inventory.mainInventory) {
-				if (s != null && itemWithSubtype.equals(new ItemWithSubtype(s))) {
+				if (itemWithSubtype.equals(ItemWithSubtype.fromStack(s))) {
 					count += s.stackSize;
 				}
 			}

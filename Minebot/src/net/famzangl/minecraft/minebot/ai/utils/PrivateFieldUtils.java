@@ -19,8 +19,6 @@ package net.famzangl.minecraft.minebot.ai.utils;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 
-import net.minecraft.item.ItemStack;
-
 /**
  * Utils for accessing private fields of objects.
  * 

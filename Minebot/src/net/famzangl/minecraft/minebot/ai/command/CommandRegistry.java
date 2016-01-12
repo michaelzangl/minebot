@@ -26,12 +26,6 @@ import java.util.Hashtable;
 import java.util.LinkedHashSet;
 import java.util.List;
 
-import org.apache.commons.lang3.StringUtils;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.Marker;
-import org.apache.logging.log4j.MarkerManager;
-
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.net.MinebotNetHandler;
 import net.famzangl.minecraft.minebot.ai.strategy.AIStrategy;
@@ -44,11 +38,15 @@ import net.famzangl.minecraft.minebot.ai.strategy.PlaceTorchStrategy;
 import net.famzangl.minecraft.minebot.ai.strategy.PlayerComesActionStrategy;
 import net.famzangl.minecraft.minebot.ai.strategy.StackStrategy;
 import net.famzangl.minecraft.minebot.ai.strategy.StrategyStack;
-import net.minecraft.command.ServerCommandManager;
 import net.minecraft.network.ThreadQuickExitException;
 import net.minecraft.network.play.server.S3APacketTabComplete;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.BlockPos;
+
+import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.Marker;
+import org.apache.logging.log4j.MarkerManager;
 
 public class CommandRegistry {
 

@@ -19,19 +19,10 @@ package net.famzangl.minecraft.minebot.ai.scripting;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.Marker;
-import org.apache.logging.log4j.MarkerManager;
 
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.command.AIChatController;
@@ -45,6 +36,11 @@ import net.famzangl.minecraft.minebot.ai.task.error.StringTaskError;
 import net.famzangl.minecraft.minebot.ai.task.error.TaskError;
 import net.famzangl.minecraft.minebot.ai.utils.PrivateFieldUtils;
 import net.minecraft.launchwrapper.LaunchClassLoader;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.Marker;
+import org.apache.logging.log4j.MarkerManager;
 
 @AICommand(name = "minebot", helpText = "Execute a javascript file.")
 public class CommandJs {

@@ -17,31 +17,23 @@
 package net.famzangl.minecraft.minebot.settings;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.lang.reflect.Field;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Date;
-import java.util.List;
-import java.util.Properties;
-
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonParseException;
-import com.google.gson.JsonSyntaxException;
 
 import net.famzangl.minecraft.minebot.ai.path.world.BlockFloatMap;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSet;
 import net.famzangl.minecraft.minebot.ai.tools.ToolRater;
-import net.famzangl.minecraft.minebot.settings.FieldValidation.FieldValidator;
 import net.famzangl.minecraft.minebot.settings.serialize.BlockFloatAdapter;
 import net.famzangl.minecraft.minebot.settings.serialize.BlockSetAdapter;
 import net.famzangl.minecraft.minebot.settings.serialize.ToolRaterAdapter;
-import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
+
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonParseException;
 
 /**
  * This wraps a minebot setting file and provides convenient access to the

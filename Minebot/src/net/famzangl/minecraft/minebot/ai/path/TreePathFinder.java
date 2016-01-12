@@ -20,7 +20,6 @@ import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSet;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSets;
 import net.famzangl.minecraft.minebot.ai.path.world.WorldData;
-import net.famzangl.minecraft.minebot.ai.strategy.TaskStrategy;
 import net.famzangl.minecraft.minebot.ai.task.AITask;
 import net.famzangl.minecraft.minebot.ai.task.DestroyInRangeTask;
 import net.famzangl.minecraft.minebot.ai.task.DestroyLogInRange;
@@ -34,9 +33,6 @@ import net.famzangl.minecraft.minebot.ai.task.place.PlantSaplingTask;
 import net.famzangl.minecraft.minebot.ai.utils.BlockCounter;
 import net.famzangl.minecraft.minebot.ai.utils.BlockCuboid;
 import net.famzangl.minecraft.minebot.build.block.WoodType;
-import net.famzangl.minecraft.minebot.map.MapDisplay.PlayerState;
-import net.minecraft.block.Block;
-import net.minecraft.init.Blocks;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
 

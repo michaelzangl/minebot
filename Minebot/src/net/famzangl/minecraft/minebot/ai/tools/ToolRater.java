@@ -8,25 +8,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Hashtable;
 import java.util.List;
-import java.util.Map.Entry;
-import java.util.Scanner;
-import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.logging.log4j.core.config.plugins.ResolverUtil.IsA;
-
-import com.google.common.base.Predicate;
-import com.google.gson.Gson;
-import com.google.gson.JsonElement;
-
 import net.famzangl.minecraft.minebot.ai.ItemFilter;
-import net.famzangl.minecraft.minebot.ai.ItemFilter.OrItemFilter;
-import net.famzangl.minecraft.minebot.ai.ItemFilter.AndItemFilter;
-import net.famzangl.minecraft.minebot.ai.ItemFilter.NotItemFilter;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockFloatMap;
-import net.famzangl.minecraft.minebot.ai.path.world.BlockSet;
-import net.famzangl.minecraft.minebot.ai.tools.ToolRater.ToolType;
 import net.famzangl.minecraft.minebot.ai.tools.rate.AndRater;
 import net.famzangl.minecraft.minebot.ai.tools.rate.EnchantmentRater;
 import net.famzangl.minecraft.minebot.ai.tools.rate.FilterRater;
@@ -37,7 +23,6 @@ import net.famzangl.minecraft.minebot.ai.tools.rate.OrRater;
 import net.famzangl.minecraft.minebot.ai.tools.rate.Rater;
 import net.famzangl.minecraft.minebot.settings.MinebotSettings;
 import net.minecraft.enchantment.Enchantment;
-import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.Item.ToolMaterial;
 import net.minecraft.item.ItemAxe;
@@ -50,6 +35,8 @@ import net.minecraft.item.ItemSpade;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemSword;
 import net.minecraft.item.ItemTool;
+
+import com.google.gson.Gson;
 
 /**
  * This class rates tools.

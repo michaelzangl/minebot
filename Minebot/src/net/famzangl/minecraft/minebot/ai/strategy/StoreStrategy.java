@@ -18,7 +18,6 @@ package net.famzangl.minecraft.minebot.ai.strategy;
 
 import java.util.ArrayList;
 
-import net.famzangl.minecraft.minebot.Pos;
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.enchanting.CloseScreenTask;
 import net.famzangl.minecraft.minebot.ai.scanner.BlockRangeFinder;
@@ -71,7 +70,7 @@ public class StoreStrategy extends PathFinderStrategy {
 		
 		@Override
 		protected float rateDestination(int distance, int x, int y, int z) {
-			ArrayList<ChestData> chests = chestBlockHandler.getReachableForPos(new Pos(
+			ArrayList<ChestData> chests = chestBlockHandler.getReachableForPos(new BlockPos(
 					x, y, z));
 			if (chests != null) {
 				for (ChestData c : chests) {

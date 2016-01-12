@@ -1,15 +1,8 @@
 package net.famzangl.minecraft.minebot.ai.strategy;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.Marker;
-import org.apache.logging.log4j.MarkerManager;
-
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.BlockItemFilter;
 import net.famzangl.minecraft.minebot.ai.command.AIChatController;
-import net.famzangl.minecraft.minebot.ai.path.world.BlockMetaSet;
-import net.famzangl.minecraft.minebot.ai.path.world.BlockSet;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSets;
 import net.famzangl.minecraft.minebot.ai.path.world.WorldData;
 import net.famzangl.minecraft.minebot.ai.task.AITask;
@@ -18,19 +11,20 @@ import net.famzangl.minecraft.minebot.ai.task.RunOnceTask;
 import net.famzangl.minecraft.minebot.ai.task.TaskOperations;
 import net.famzangl.minecraft.minebot.ai.task.WaitTask;
 import net.famzangl.minecraft.minebot.ai.task.inventory.GetOnHotBarTask;
-import net.famzangl.minecraft.minebot.ai.task.move.AlignToGridTask;
 import net.famzangl.minecraft.minebot.ai.task.move.WalkTowardsTask;
 import net.famzangl.minecraft.minebot.ai.task.place.SneakAndPlaceAtHalfTask;
-import net.famzangl.minecraft.minebot.ai.task.place.SneakAndPlaceAtSideTask;
 import net.famzangl.minecraft.minebot.ai.utils.BlockArea;
 import net.famzangl.minecraft.minebot.ai.utils.BlockArea.AreaVisitor;
 import net.famzangl.minecraft.minebot.ai.utils.BlockCuboid;
 import net.famzangl.minecraft.minebot.ai.utils.BlockFilteredArea;
 import net.famzangl.minecraft.minebot.ai.utils.ReverseAcceptingArea;
-import net.famzangl.minecraft.minebot.build.block.SlabFilter;
-import net.minecraft.init.Blocks;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.Marker;
+import org.apache.logging.log4j.MarkerManager;
 
 /**
  * Build a bridge through the air.

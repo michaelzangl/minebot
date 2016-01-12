@@ -1,16 +1,14 @@
 package net.famzangl.minecraft.minebot.ai.path.world;
 
+import net.famzangl.minecraft.minebot.ai.utils.RandUtils;
+import net.minecraft.util.BlockPos;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Vec3;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.MarkerManager;
-
-import net.famzangl.minecraft.minebot.ai.AIHelper;
-import net.famzangl.minecraft.minebot.ai.utils.RandUtils;
-import net.minecraft.block.Block;
-import net.minecraft.util.BlockPos;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.Vec3;
 
 public class BlockBounds {
 	private static final Marker MARKER_BOUNDS_PROBLEM = MarkerManager

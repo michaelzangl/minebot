@@ -1,7 +1,6 @@
 package net.famzangl.minecraft.minebot.settings.serialize;
 
 import java.lang.reflect.Type;
-import java.util.BitSet;
 
 import net.famzangl.minecraft.minebot.ai.command.BlockNameBuilder;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockMetaSet;

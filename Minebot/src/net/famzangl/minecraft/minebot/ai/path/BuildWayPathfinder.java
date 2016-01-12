@@ -26,7 +26,6 @@ import net.famzangl.minecraft.minebot.ai.command.BlockWithDontcare;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSet;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSets;
 import net.famzangl.minecraft.minebot.ai.task.AITask;
-import net.famzangl.minecraft.minebot.ai.task.BlockHalf;
 import net.famzangl.minecraft.minebot.ai.task.DestroyInRangeTask;
 import net.famzangl.minecraft.minebot.ai.task.PlaceBlockTask;
 import net.famzangl.minecraft.minebot.ai.task.PlaceTorchSomewhereTask;

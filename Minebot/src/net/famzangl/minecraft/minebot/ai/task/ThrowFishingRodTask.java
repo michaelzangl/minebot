@@ -17,10 +17,8 @@
 package net.famzangl.minecraft.minebot.ai.task;
 
 import net.famzangl.minecraft.minebot.ai.AIHelper;
-import net.famzangl.minecraft.minebot.ai.ClassItemFilter;
 import net.famzangl.minecraft.minebot.ai.tools.ToolRater;
 import net.famzangl.minecraft.minebot.settings.MinebotSettings;
-import net.minecraft.item.ItemFishingRod;
 
 public class ThrowFishingRodTask extends AITask {
 

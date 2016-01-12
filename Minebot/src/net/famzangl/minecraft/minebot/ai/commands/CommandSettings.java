@@ -11,12 +11,9 @@ import net.famzangl.minecraft.minebot.ai.command.AICommand;
 import net.famzangl.minecraft.minebot.ai.command.AICommandInvocation;
 import net.famzangl.minecraft.minebot.ai.command.AICommandParameter;
 import net.famzangl.minecraft.minebot.ai.command.ParameterType;
-import net.famzangl.minecraft.minebot.ai.command.SafeStrategyRule;
 import net.famzangl.minecraft.minebot.ai.strategy.AIStrategy;
 import net.famzangl.minecraft.minebot.ai.strategy.RunOnceStrategy;
-import net.famzangl.minecraft.minebot.ai.strategy.ShearStrategy;
 import net.famzangl.minecraft.minebot.settings.MinebotSettings;
-import net.minecraft.item.EnumDyeColor;
 
 @AICommand(helpText = "Edit settings.", name = "minebot")
 public class CommandSettings {

@@ -1,14 +1,12 @@
 package net.famzangl.minecraft.minebot.map;
 
 import java.awt.Color;
-import java.awt.Container;
 import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
-import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
@@ -22,7 +20,6 @@ import net.famzangl.minecraft.minebot.map.MapReader.MultiModeImage;
 import net.famzangl.minecraft.minebot.map.MapReader.WriteableImage;
 import net.famzangl.minecraft.minebot.map.PlayerPositionLabel.FollowPlayerListener;
 import net.minecraft.util.BlockPos;
-import net.minecraft.util.MapPopulator;
 
 /**
  * This panel displays the map.

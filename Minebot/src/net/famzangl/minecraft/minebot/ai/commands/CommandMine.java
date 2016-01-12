@@ -31,7 +31,6 @@ import net.famzangl.minecraft.minebot.ai.path.OrebfuscatedMinePathFinder;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSet;
 import net.famzangl.minecraft.minebot.ai.strategy.AIStrategy;
 import net.famzangl.minecraft.minebot.ai.strategy.PathFinderStrategy;
-import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
 
 @AICommand(helpText = "Mines for ores.\n"

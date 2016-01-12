@@ -16,24 +16,42 @@
  *******************************************************************************/
 package net.famzangl.minecraft.minebot.ai.commands;
 
-import java.io.File;
-
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.command.AICommand;
 import net.famzangl.minecraft.minebot.ai.command.AICommandInvocation;
 import net.famzangl.minecraft.minebot.ai.command.AICommandParameter;
 import net.famzangl.minecraft.minebot.ai.command.ParameterType;
+import net.famzangl.minecraft.minebot.ai.command.SafeStrategyRule;
 import net.famzangl.minecraft.minebot.ai.strategy.AIStrategy;
-import net.famzangl.minecraft.minebot.ai.strategy.RunFileStrategy;
+import net.famzangl.minecraft.minebot.ai.strategy.FurnaceStrategy;
+import net.famzangl.minecraft.minebot.ai.strategy.FurnaceStrategy.FurnaceTaskList;
 
-@AICommand(helpText = "Run build commands from a file.", name = "minebuild")
-public class CommandLoad {
+@AICommand(helpText = "Put/get from furnace.", name = "minebot")
+public class CommandFurnace {
+	public enum FurnaceTodo {
+		ALL(new FurnaceTaskList(true, true, true)), TAKE(new FurnaceTaskList(
+				false, false, true)), PUTFUEL(new FurnaceTaskList(false, true,
+				false)), PUTBURNABLE(new FurnaceTaskList(true, false, false));
+		FurnaceTaskList list;
 
-	@AICommandInvocation()
+		private FurnaceTodo(FurnaceTaskList list) {
+			this.list = list;
+		}
+
+		public FurnaceTaskList getTaskList() {
+			return list;
+		}
+	}
+
+	@AICommandInvocation(safeRule = SafeStrategyRule.DEFEND)
 	public static AIStrategy run(
 			AIHelper helper,
-			@AICommandParameter(type = ParameterType.FIXED, fixedName = "load", description = "") String nameArg,
-			@AICommandParameter(type = ParameterType.FILE, relativeToSettingsFile = "build", description = "") File file) {
-		return new RunFileStrategy(file);
+			@AICommandParameter(type = ParameterType.FIXED, fixedName = "furnace", description = "") String nameArg,
+			@AICommandParameter(type = ParameterType.ENUM, description = "What to do with the furnace", optional = true) FurnaceTodo task) {
+		if (task == null) {
+			task = FurnaceTodo.ALL;
+		}
+		return new FurnaceStrategy(task.getTaskList());
 	}
+
 }

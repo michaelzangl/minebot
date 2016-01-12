@@ -1,7 +1,6 @@
 package net.famzangl.minecraft.minebot.ai.tools.rate;
 
 import net.famzangl.minecraft.minebot.ai.path.world.BlockFloatMap;
-import net.famzangl.minecraft.minebot.ai.tools.ToolRater;
 import net.minecraft.item.ItemStack;
 
 public class OrRater extends Rater {

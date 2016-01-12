@@ -1,7 +1,5 @@
 package net.famzangl.minecraft.minebot.ai.scripting;
 
-import java.util.Date;
-
 import javax.script.ScriptEngine;
 import javax.script.ScriptException;
 

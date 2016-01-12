@@ -1,7 +1,5 @@
 package net.famzangl.minecraft.minebot.ai.commands;
 
-import java.io.File;
-
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.command.AICommand;
 import net.famzangl.minecraft.minebot.ai.command.AICommandInvocation;

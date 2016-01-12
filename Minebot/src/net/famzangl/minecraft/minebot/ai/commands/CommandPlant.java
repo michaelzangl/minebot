@@ -23,8 +23,8 @@ import net.famzangl.minecraft.minebot.ai.command.AICommandParameter;
 import net.famzangl.minecraft.minebot.ai.command.ParameterType;
 import net.famzangl.minecraft.minebot.ai.command.SafeStrategyRule;
 import net.famzangl.minecraft.minebot.ai.path.PlantPathFinder;
-import net.famzangl.minecraft.minebot.ai.path.SugarCanePathFinder;
 import net.famzangl.minecraft.minebot.ai.path.PlantPathFinder.PlantType;
+import net.famzangl.minecraft.minebot.ai.path.SugarCanePathFinder;
 import net.famzangl.minecraft.minebot.ai.strategy.AIStrategy;
 import net.famzangl.minecraft.minebot.ai.strategy.PathFinderStrategy;
 

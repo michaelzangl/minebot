@@ -16,11 +16,6 @@
  *******************************************************************************/
 package net.famzangl.minecraft.minebot.ai.commands;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.Marker;
-import org.apache.logging.log4j.MarkerManager;
-
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.command.AICommand;
 import net.famzangl.minecraft.minebot.ai.command.AICommandInvocation;
@@ -30,10 +25,7 @@ import net.famzangl.minecraft.minebot.ai.command.ParameterType;
 import net.famzangl.minecraft.minebot.ai.command.SafeStrategyRule;
 import net.famzangl.minecraft.minebot.ai.path.FillAreaPathfinder;
 import net.famzangl.minecraft.minebot.ai.strategy.AIStrategy;
-import net.famzangl.minecraft.minebot.ai.strategy.InventoryDefinition;
 import net.famzangl.minecraft.minebot.ai.strategy.PathFinderStrategy;
-import net.famzangl.minecraft.minebot.ai.strategy.UnstoreStrategy;
-import net.famzangl.minecraft.minebot.ai.strategy.UnstoreStrategy.Wishlist;
 import net.famzangl.minecraft.minebot.ai.utils.BlockCuboid;
 import net.famzangl.minecraft.minebot.build.commands.CommandClearArea;
 

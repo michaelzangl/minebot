@@ -16,12 +16,10 @@
  *******************************************************************************/
 package net.famzangl.minecraft.minebot.ai;
 
-import net.famzangl.minecraft.minebot.ai.command.BlockWithData;
 import net.famzangl.minecraft.minebot.ai.command.BlockWithDataOrDontcare;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSet;
 import net.famzangl.minecraft.minebot.ai.task.inventory.ItemWithSubtype;
 import net.minecraft.block.Block;
-import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 
 /**

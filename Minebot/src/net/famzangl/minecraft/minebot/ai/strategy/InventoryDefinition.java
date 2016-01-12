@@ -19,6 +19,7 @@ package net.famzangl.minecraft.minebot.ai.strategy;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import net.famzangl.minecraft.minebot.ai.task.inventory.ItemWithSubtype;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -55,21 +56,16 @@ public class InventoryDefinition {
 			this.itemId = itemId;
 			this.damageValue = damageValue;
 		}
-
-		public ItemStack getFakeMcStack() {
+		public ItemWithSubtype getItem() {
 			if (itemId == 0) {
 				return null;
 			}
-			Item item = Item.getItemById(itemId);
-			if (item == null) {
-				throw new NullPointerException("Could not find item " + itemId);
-			}
-			ItemStack stack = new ItemStack(item);
-			stack.stackSize = this.amount;
-			if (stack.getHasSubtypes()) {
-				stack.setItemDamage(damageValue);
-			}
-			return stack;
+			return new ItemWithSubtype(itemId, damageValue);
+		}
+
+		public ItemStack getFakeMcStack() {
+			ItemWithSubtype item = getItem();
+			return item == null ? null : item.getFakeMCStack(this.amount);
 		}
 
 		public boolean isEmpty() {

@@ -181,6 +181,7 @@ public class BlockSets {
 			Blocks.flowing_water);
 
 	public static final BlockSet TREE_BLOCKS = LOGS.unionWith(LEAVES);
+	public static final BlockSet FURNACE = new BlockSet(Blocks.furnace, Blocks.lit_furnace);
 
 	static {
 		BlockSet upper = BlockSets.EMPTY;

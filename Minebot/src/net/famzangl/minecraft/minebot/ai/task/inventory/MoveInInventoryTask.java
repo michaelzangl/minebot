@@ -23,6 +23,9 @@ import net.famzangl.minecraft.minebot.ai.task.error.StringTaskError;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.inventory.Slot;
 
+import org.apache.logging.log4j.Marker;
+import org.apache.logging.log4j.MarkerManager;
+
 /**
  * Move a given amount from one slot to an other, empty slot in the current open
  * container/inventory.
@@ -32,6 +35,7 @@ import net.minecraft.inventory.Slot;
  */
 public abstract class MoveInInventoryTask extends AITask {
 
+	private static final Marker MARKER_MOVE = MarkerManager.getMarker("move");
 	private boolean moveDone;
 
 	private int delay;
@@ -90,7 +94,7 @@ public abstract class MoveInInventoryTask extends AITask {
 							.size()
 					|| toStack >= screen.inventorySlots.inventoryItemStacks
 							.size()) {
-				System.out.println("Attempet to move : " + fromStack + " -> "
+				LOGGER.error("Attempet to move : " + fromStack + " -> "
 						+ toStack);
 				o.desync(new StringTaskError("Invalid item move specification."));
 				return;
@@ -98,13 +102,16 @@ public abstract class MoveInInventoryTask extends AITask {
 			Slot from = screen.inventorySlots.getSlot(fromStack);
 			if (getSlotContentCount(from) <= 0) {
 				o.desync(new StringTaskError("Nothing in source slot."));
+				LOGGER.error(MARKER_MOVE, "Attempted to move from slot "
+						+ fromStack + " but it was empty (" + from.slotNumber
+						+ ", " + from.getStack() + ")");
 				return;
 			}
 
 			Slot to = screen.inventorySlots.getSlot(toStack);
 			int amount = getMissingAmount(h, getSlotContentCount(to));
-			System.out.println("Move " + amount + " from " + fromStack + " to "
-					+ toStack);
+			LOGGER.debug(MARKER_MOVE, "Move " + amount + " from " + fromStack
+					+ " to " + toStack);
 
 			int limit = Math.min(to.getSlotStackLimit(), from.getStack()
 					.getMaxStackSize());
@@ -115,7 +122,7 @@ public abstract class MoveInInventoryTask extends AITask {
 				missing -= moveAll(h, from, to);
 			}
 
-			System.out.println("Still missing (1): " + missing);
+			LOGGER.debug("Still missing (1): " + missing);
 			if (getSlotContentCount(from) - getSlotContentCount(from) / 2 <= missing
 					&& getSlotContentCount(from) > 0) {
 				missing -= moveHalf(h, from, to);
@@ -171,4 +178,12 @@ public abstract class MoveInInventoryTask extends AITask {
 		return slot.getHasStack() ? slot.getStack().stackSize : 0;
 	}
 
+	protected static int convertPlayerInventorySlot(int inventorySlot) {
+		// Offset: 10 blocks.
+		if (inventorySlot < 9) {
+			return inventorySlot + 9 * 3;
+		} else {
+			return inventorySlot - 9;
+		}
+	}
 }

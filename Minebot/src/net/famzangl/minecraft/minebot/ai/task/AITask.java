@@ -22,6 +22,9 @@ import net.famzangl.minecraft.minebot.ai.path.world.WorldWithDelta;
 import net.famzangl.minecraft.minebot.ai.strategy.TaskStrategy;
 import net.minecraftforge.fml.common.gameevent.TickEvent.RenderTickEvent;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 /**
  * This is a specific task that the {@link TaskStrategy} should work on.
  * 
@@ -29,6 +32,11 @@ import net.minecraftforge.fml.common.gameevent.TickEvent.RenderTickEvent;
  *
  */
 public abstract class AITask {
+	/**
+	 * A logger that can be used by all tasks. Use your own marker to mark your messages.
+	 */
+	protected static final Logger LOGGER = LogManager
+			.getLogger(AITask.class);
 
 	private int gameTickTimeoutByBlockDestruction = -1;
 
