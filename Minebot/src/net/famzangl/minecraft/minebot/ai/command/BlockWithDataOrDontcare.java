@@ -94,7 +94,7 @@ public abstract class BlockWithDataOrDontcare {
 
 	public static ArrayList<String> getAllStrings() {
 		Set<ResourceLocation> keys = Block.blockRegistry.getKeys();
-		ArrayList<String> strings = new ArrayList<>();
+		ArrayList<String> strings = new ArrayList<String>();
 		for (ResourceLocation k : keys) {
 			// candidate found
 			strings.add(k.toString());
