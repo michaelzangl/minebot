@@ -17,11 +17,38 @@ import net.famzangl.minecraft.minebot.ai.utils.BlockCuboid;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.BlockPos;
+import net.minecraft.util.Vec3i;
 
 @AICommand(helpText = "Some performance/... tests.", name = "minebot")
 public class CommandTestMinectaft {
 	private static final int TEST_RUNS = 50;
 
+	public static final class MutableBlockPos extends BlockPos {
+            public int x;
+            public int y;
+            public int z;
+
+            private MutableBlockPos()
+            {
+                super(0, 0, 0);
+            }
+
+            public int getX()
+            {
+                return this.x;
+            }
+
+            public int getY()
+            {
+                return this.y;
+            }
+
+            public int getZ()
+            {
+                return this.z;
+            }
+        }
+    
 	@AICommandInvocation()
 	public static AIStrategy run(
 			AIHelper helper,
@@ -38,6 +65,8 @@ public class CommandTestMinectaft {
 						helper.getMinecraft().theWorld);
 				accessBlocksAroundPlayer(helper.getWorld());
 				accessNativeBlocksAroundPlayerLoop(helper.getWorld(),
+						helper.getMinecraft().theWorld);
+				accessNativeBlocksAroundPlayerLoopMutableBP(helper.getWorld(),
 						helper.getMinecraft().theWorld);
 				accessBlocksAroundPlayerLoop(helper.getWorld());
 				accessBlockSetAroundPlayer(helper.getWorld());
@@ -140,6 +169,32 @@ public class CommandTestMinectaft {
 			}
 		}
 		done("accessNativeBlocksAroundPlayerLoop", start);
+	}
+
+	private static void accessNativeBlocksAroundPlayerLoopMutableBP(WorldData world,
+			WorldClient theWorld) {
+		BlockCuboid area = blocksAroundPlayer(world);
+		int minX = area.getMin().getX();
+		int minY = area.getMin().getY();
+		int minZ = area.getMin().getZ();
+		int maxX = area.getMax().getX();
+		int maxY = area.getMax().getY();
+		int maxZ = area.getMax().getZ();
+		long start = start();
+		MutableBlockPos p = new MutableBlockPos();
+		for (int i = 0; i < TEST_RUNS; i++) {
+			for (int y = minY; y <= maxY; y++) {
+				for (int x = minX; x <= maxX; x++) {
+					for (int z = minZ; z <= maxZ; z++) {
+						p.x = x;
+						p.y = y;
+						p.z = z;
+						theWorld.getBlockState(p);
+					}
+				}
+			}
+		}
+		done("accessNativeBlocksAroundPlayerLoopMutableBP", start);
 	}
 
 	private static void accessBlockSetAroundPlayer(WorldData world) {
