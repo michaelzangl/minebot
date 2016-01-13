@@ -323,7 +323,15 @@ public class MineScript {
 	}
 
 	public void setDescription(String description) {
-		tickProvider.setDescription(description);
+		tickProvider.getDescription().setDescription(description);
+	}
+	
+	public void setAddScriptNameToDescription(boolean val) {
+		tickProvider.getDescription().setAddFileName(val);
+	}
+	
+	public void setAddStrategyToDescription(boolean val) {
+		tickProvider.getDescription().setAddStrategyDescription(val);
 	}
 
 	public void serverCommand(String command) {
