@@ -16,6 +16,11 @@
  *******************************************************************************/
 package net.famzangl.minecraft.minebot.ai;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.Marker;
+import org.apache.logging.log4j.MarkerManager;
+
 import net.minecraft.client.settings.KeyBinding;
 
 /**
@@ -25,6 +30,9 @@ import net.minecraft.client.settings.KeyBinding;
  * 
  */
 public final class InteractAlways extends KeyBinding {
+	private static final Marker MARKER_KEY = MarkerManager.getMarker("key");
+	private static final Logger LOGGER = LogManager
+			.getLogger(InteractAlways.class);
 	private boolean isPressed;
 
 	InteractAlways(String p_i45001_1_, int p_i45001_2_, String p_i45001_3_,
@@ -32,7 +40,7 @@ public final class InteractAlways extends KeyBinding {
 		super(p_i45001_1_, p_i45001_2_, p_i45001_3_);
 		isPressed = pressed;
 	}
-	
+
 	@Override
 	public boolean isKeyDown() {
 		return true;
@@ -42,7 +50,8 @@ public final class InteractAlways extends KeyBinding {
 	public boolean isPressed() {
 		final boolean ret = isPressed;
 		if (isPressed) {
-			System.out.println("Sending key press event.");
+			LOGGER.debug(MARKER_KEY, "Sending key isPressed() for "
+					+ getKeyCode());
 		}
 		isPressed = false;
 		return ret;

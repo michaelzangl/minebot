@@ -23,6 +23,12 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Date;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.Marker;
+import org.apache.logging.log4j.MarkerManager;
+
+import net.famzangl.minecraft.minebot.ai.InteractAlways;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockFloatMap;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSet;
 import net.famzangl.minecraft.minebot.ai.tools.ToolRater;
@@ -43,6 +49,10 @@ import com.google.gson.JsonParseException;
  * 
  */
 public class MinebotSettings {
+	private static final Marker MARKER_SETTINGS = MarkerManager
+			.getMarker("settings");
+	private static final Logger LOGGER = LogManager.getLogger(MinebotSettings.class);
+	
 	private static final MinebotSettings INSTANCE = new MinebotSettings();
 
 	private static final MinebotSettingsRoot defaultSettings = new MinebotSettingsRoot();
@@ -63,19 +73,19 @@ public class MinebotSettings {
 			settings = null;
 			try {
 				settingsLastModified = settingsFile.lastModified();
-				System.out.println("Loading " + settingsFile.getAbsolutePath()
+				LOGGER.debug(MARKER_SETTINGS, "Loading " + settingsFile.getAbsolutePath()
 						+ " ... (date: " + new Date(settingsLastModified) + ")");
 				Gson gson = getGson();
 				settings = gson.fromJson(new FileReader(settingsFile),
 						MinebotSettingsRoot.class);
 				validateAfterLoad(settings);
 			} catch (final IOException e) {
-				System.err.println("Could not read settings file: " + e.getMessage());
+				LOGGER.error(MARKER_SETTINGS, "Could not read settings file: " + e.getMessage());
 			} catch (final JsonParseException e) {
-				System.err.println("Error in settings file:" + e.getMessage());
+				LOGGER.error(MARKER_SETTINGS, "Error in settings file:" + e.getMessage());
 			}
 			if (settings == null) {
-				System.err.println("Fall back to default settings.");
+				LOGGER.info(MARKER_SETTINGS, "Fall back to default settings.");
 				settings = defaultSettings;
 			}
 		}
@@ -92,7 +102,7 @@ public class MinebotSettings {
 
 		File settingsFile = getSettingsFile();
 		try {
-			System.out.println("Writing " + settingsFile.getAbsolutePath()
+			LOGGER.trace(MARKER_SETTINGS, "Writing " + settingsFile.getAbsolutePath()
 					+ " ...");
 			Gson gson = getGson();
 			PrintWriter writer = new PrintWriter(settingsFile);
@@ -126,12 +136,12 @@ public class MinebotSettings {
 
 	public static File getDataDir() {
 		File dir = new File(Minecraft.getMinecraft().mcDataDir, "minebot");
-		System.out.println("Data directory: " + dir);
+		LOGGER.trace(MARKER_SETTINGS, "Data directory: " + dir);
 		if (!dir.isDirectory()) {
 			try {
 				return new MinebotDirectoryCreator().createDirectory(dir);
 			} catch (IOException e) {
-				System.err.println("Could not create settings directory.");
+				LOGGER.error(MARKER_SETTINGS, "Could not create settings directory.");
 				e.printStackTrace();
 			}
 		}

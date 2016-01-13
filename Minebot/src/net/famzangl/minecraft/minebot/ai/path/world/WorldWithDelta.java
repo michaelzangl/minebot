@@ -3,12 +3,23 @@ package net.famzangl.minecraft.minebot.ai.path.world;
 import java.util.Arrays;
 import java.util.Hashtable;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.Marker;
+import org.apache.logging.log4j.MarkerManager;
+
+import net.famzangl.minecraft.minebot.settings.MinebotSettings;
 import net.minecraft.block.Block;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.Vec3;
 
 public class WorldWithDelta extends WorldData {
+	private static final Marker MARKER_WORLD_DELTA = MarkerManager
+			.getMarker("worlddata");
+	private static final Logger LOGGER = LogManager
+			.getLogger(WorldWithDelta.class);
+
 	private Hashtable<Long, ChunkWithDelta> chunkDeltas = new Hashtable<Long, ChunkWithDelta>();
 
 	private BlockPos playerPosition;
@@ -41,14 +52,15 @@ public class WorldWithDelta extends WorldData {
 					final int lz = z & 15;
 					int replacementId = replacements[ly << 8 | lz << 4 | lx] & 0xffff;
 					if (replacementId != NOT_REPLACED) {
-//						System.out.println("Sending replacement for " + x + "," + y + "," + z);
 						return replacementId;
 					}
 				}
 			}
 
 			if (blockStorage == null) {
-//				System.out.println("Chunk delta fall through: load block storage.");
+				LOGGER.trace(MARKER_WORLD_DELTA,
+						"Chunk delta fall through: load block storage for ("
+								+ chunkX + "," + chunkZ + ")");
 				blockStorage = theWorld.getChunkFromChunkCoords(chunkX, chunkZ)
 						.getBlockStorageArray();
 			}
@@ -81,7 +93,8 @@ public class WorldWithDelta extends WorldData {
 	public WorldWithDelta(WorldData currentWorld) {
 		super(currentWorld.theWorld, null);
 		if (currentWorld instanceof WorldWithDelta) {
-			throw new IllegalArgumentException("Cannot make a delta of a delta.");
+			throw new IllegalArgumentException(
+					"Cannot make a delta of a delta.");
 		}
 		this.currentWorld = currentWorld;
 		this.playerPosition = currentWorld.getPlayerPosition();
@@ -122,8 +135,9 @@ public class WorldWithDelta extends WorldData {
 	}
 
 	private void setBlockIdAndMeta(int x, int y, int z, int blockWithMeta) {
-		System.out.println("Setblock at (" + x + "," + y + "," + z + ") with "
-				+ (blockWithMeta >> 4) + ":" + (blockWithMeta & 0xf));
+		LOGGER.trace(MARKER_WORLD_DELTA, "Setblock at (" + x + "," + y + ","
+				+ z + ") with " + (blockWithMeta >> 4) + ":"
+				+ (blockWithMeta & 0xf));
 		int chunkX = x >> 4;
 		int chunkZ = z >> 4;
 
@@ -141,14 +155,16 @@ public class WorldWithDelta extends WorldData {
 	public BlockPos getPlayerPosition() {
 		return playerPosition;
 	}
-	
+
 	@Override
 	public Vec3 getExactPlayerPosition() {
-		return new Vec3(playerPosition.getX() + .5, playerPosition.getY(), playerPosition.getZ() + .5);
+		return new Vec3(playerPosition.getX() + .5, playerPosition.getY(),
+				playerPosition.getZ() + .5);
 	}
 
 	public void setPlayerPosition(BlockPos playerPosition) {
-		System.out.println("Set player position: " + playerPosition);
+		LOGGER.trace(MARKER_WORLD_DELTA, "Set player position: "
+				+ playerPosition);
 		this.playerPosition = playerPosition;
 	}
 
