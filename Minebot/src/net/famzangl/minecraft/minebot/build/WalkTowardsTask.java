@@ -47,6 +47,7 @@ public class WalkTowardsTask extends AITask {
 	private static final BlockItemFilter CARPET = new BlockItemFilter(CARPETS);
 	private final BlockPos fromPos;
 	private final BlockPos nextPos;
+	private final boolean placeCarpets;
 
 	private AITask subTask;
 
@@ -54,8 +55,13 @@ public class WalkTowardsTask extends AITask {
 	private boolean wasStandingOnDest;
 
 	public WalkTowardsTask(BlockPos fromPos, BlockPos nextPos) {
+		this(fromPos, nextPos, true);
+	}
+	
+	public WalkTowardsTask(BlockPos fromPos, BlockPos nextPos, boolean placeCarpets) {
 		this.fromPos = fromPos;
 		this.nextPos = nextPos;
+		this.placeCarpets = placeCarpets;
 	}
 
 	@Override
@@ -79,7 +85,7 @@ public class WalkTowardsTask extends AITask {
 					Math.max(carpetY + 1, fromPos.getY()), fromPos.getZ());
 			final double destHeight = h.realBlockTopY(nextPos.getX(),
 					nextPos.getY(), nextPos.getZ());
-			if (carpetBuildHeight < destHeight - 1) {
+			if (carpetBuildHeight < destHeight - 1 && placeCarpets) {
 				System.out.println("Moving upwards. Carpets are at " + carpetY);
 				final int floorY = Math.max(carpetY, fromPos.getY() - 1);
 				BlockPos floor = new BlockPos(fromPos.getX(), floorY,

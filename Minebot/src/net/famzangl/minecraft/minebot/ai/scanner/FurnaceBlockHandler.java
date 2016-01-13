@@ -1,6 +1,23 @@
+/*******************************************************************************
+ * This file is part of Minebot.
+ *
+ * Minebot is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Minebot is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Minebot.  If not, see <http://www.gnu.org/licenses/>.
+ *******************************************************************************/
 package net.famzangl.minecraft.minebot.ai.scanner;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Map.Entry;
 
@@ -36,9 +53,13 @@ public class FurnaceBlockHandler extends RangeBlockHandler<FurnaceData> {
 		}
 
 		public boolean couldPutFuel(ItemWithSubtype item) {
-			return isFuel(item)
-					&& (setFuelItem == null || setFuelItem.equals(item)
-							&& !isFullFuel);
+			if (!isFuel(item)) {
+				return false;
+			} else if (setFuelItem != null && !setFuelItem.equals(item)) {
+				return false;
+			} else {
+				return setFuelItem == null || !isFullFuel;
+			}
 		}
 
 		private static boolean isFuel(ItemWithSubtype item) {
@@ -54,8 +75,7 @@ public class FurnaceBlockHandler extends RangeBlockHandler<FurnaceData> {
 				return false;
 			if (setResultItem != null && !setResultItem.equals(item))
 				return false;
-			return setBurnItem == null || setBurnItem.equals(item)
-					&& !isFullBurn;
+			return setBurnItem == null || !isFullBurn;
 		}
 
 		public boolean couldTake() {
@@ -92,7 +112,7 @@ public class FurnaceBlockHandler extends RangeBlockHandler<FurnaceData> {
 
 	}
 
-	private final Hashtable<BlockPos, FurnaceData> found = new Hashtable<BlockPos, FurnaceData>();
+	private final HashMap<BlockPos, FurnaceData> found = new HashMap<BlockPos, FurnaceData>();
 
 	@Override
 	public BlockSet getIds() {

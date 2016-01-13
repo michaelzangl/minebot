@@ -14,35 +14,27 @@
  * You should have received a copy of the GNU General Public License
  * along with Minebot.  If not, see <http://www.gnu.org/licenses/>.
  *******************************************************************************/
-package net.famzangl.minecraft.minebot.ai.scanner;
+package net.famzangl.minecraft.minebot.ai.path;
 
-import net.famzangl.minecraft.minebot.ai.path.MovePathFinder;
-import net.famzangl.minecraft.minebot.ai.path.WalkingPathfinder;
-import net.famzangl.minecraft.minebot.settings.MinebotSettingsRoot;
-import net.famzangl.minecraft.minebot.settings.PathfindingSetting;
 import net.minecraft.util.BlockPos;
 
-public class BlockRangeFinder extends WalkingPathfinder {
-	protected BlockRangeScanner rangeScanner;
+public class GoToPathfinder extends WalkingPathfinder {
+	private final BlockPos position;
+
+	public GoToPathfinder(BlockPos position) {
+		this.position = position;
+	}
 	
-	public BlockRangeFinder() {
+	@Override
+	protected boolean runSearch(BlockPos playerPosition) {
+		if (playerPosition.equals(position)) {
+			return true;
+		}
+		return super.runSearch(playerPosition);
 	}
 
 	@Override
-	protected boolean runSearch(BlockPos playerPosition) {
-		if (rangeScanner == null) {
-			rangeScanner = constructScanner(playerPosition);
-			//TODO: Pass on a synchronized world instance...
-			rangeScanner.startAsync(world);
-			return false;
-		} else if (!rangeScanner.isScaningFinished()) {
-			return false;
-		} else {
-			return super.runSearch(playerPosition);
-		}
-	}
-
-	protected BlockRangeScanner constructScanner(BlockPos playerPosition) {
-		return new BlockRangeScanner(playerPosition);
+	protected float rateDestination(int distance, int x, int y, int z) {
+		return position.getX() == x && position.getY() == y && position.getZ() == z ? 1 : -1;
 	}
 }

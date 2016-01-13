@@ -248,21 +248,19 @@ public class MovePathFinder extends PathFinderField {
 			}
 			final BlockPos peeked = path.peekFirst();
 			if (stepsAdded > 0) {
-				System.out.println("Shortcut from " + currentPos + " to "
-						+ nextPos);
-				addTask(new WalkTowardsTask(nextPos.getX(), nextPos.getZ(),
-						currentPos));
+				addHorizontalFastMove(currentPos, nextPos);
 			} else if (moveDirection == EnumFacing.UP && peeked != null
 					&& nextPos.subtract(peeked).getY() == 0) {
-				// Combine upwards-sidewards.
-				// System.out.println("Next direction is: "
-				// + direction(nextPos, peeked));
-				addTask(new JumpMoveTask(peeked, nextPos.getX(), nextPos.getZ()));
+				addJumpMoveTask(currentPos, peeked);
 				nextPos = peeked;
 				path.removeFirst();
-			} else if (nextPos.getY() > currentPos.getY()) {
+			} else if (nextPos.getY() > currentPos.getY()
+					&& nextPos.getX() == currentPos.getX()
+					&& nextPos.getZ() == currentPos.getZ()) {
 				addTask(new UpwardsMoveTask(nextPos, new BlockItemFilter(
 						upwardsBuildBlocks)));
+			} else if (nextPos.getY() > currentPos.getY()) {
+				addJumpMoveTask(currentPos, nextPos);
 			} else if (nextPos.getY() < currentPos.getY()
 					&& nextPos.getX() == currentPos.getX()
 					&& nextPos.getZ() == currentPos.getZ()) {
@@ -274,6 +272,17 @@ public class MovePathFinder extends PathFinderField {
 		}
 		currentTarget = currentPos;
 		addTasksForTarget(currentPos);
+	}
+
+	private void addJumpMoveTask(BlockPos nextPos, final BlockPos peeked) {
+		addTask(new JumpMoveTask(peeked, nextPos.getX(), nextPos.getZ()));
+	}
+
+	private void addHorizontalFastMove(BlockPos currentPos, BlockPos nextPos) {
+		System.out.println("Shortcut from " + currentPos + " to "
+				+ nextPos);
+		addTask(new WalkTowardsTask(nextPos.getX(), nextPos.getZ(),
+				currentPos));
 	}
 
 	/**
@@ -328,16 +337,23 @@ public class MovePathFinder extends PathFinderField {
 			distance += materialDistance(toX, toY + 2, toZ, false);
 			distance += materialDistance(toX, toY + 1, toZ, false);
 			distance += materialDistance(toX, toY, toZ, true);
+			distance += 1;
+		} else if (fromY > toY && (toX != getX(from) || toY != getY(from))) {
+			// sideward up
+			distance += materialDistance(getX(from), toY + 1, getZ(from), false);
+			distance += materialDistance(toX, toY + 1, toZ, false);
+			distance += materialDistance(toX, toY, toZ, true);
+			distance += 1;
 		} else {
 			if (fromY >= toY) {
 				distance += materialDistance(toX, toY, toZ, true);
 			} else {
-				distance += 1;
+				distance += 2;
 			}
 			if (fromY <= toY) {
 				distance += materialDistance(toX, toY + 1, toZ, false);
 			} else {
-				distance += 1;
+				distance += 2;
 			}
 		}
 		return distance;

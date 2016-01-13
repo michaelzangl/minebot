@@ -143,7 +143,6 @@ public class ForBuildPathFinder extends MovePathFinder {
 			addTask(new WalkTowardsTask(currentPos, nextPos));
 			currentPos = nextPos;
 		}
-		noPathFound = true;
 	}
 
 	@Override

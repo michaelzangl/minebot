@@ -117,6 +117,7 @@ public class FurnaceStrategy extends PathFinderStrategy {
 
 		@Override
 		public void runTick(AIHelper h, TaskOperations o) {
+			f.update(h);
 			if (shouldMove(h)) {
 				moved = true;
 			}

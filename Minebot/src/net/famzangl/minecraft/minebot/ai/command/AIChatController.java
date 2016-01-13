@@ -35,6 +35,7 @@ import net.famzangl.minecraft.minebot.ai.commands.CommandLoad;
 import net.famzangl.minecraft.minebot.ai.commands.CommandLookAt;
 import net.famzangl.minecraft.minebot.ai.commands.CommandLumberjack;
 import net.famzangl.minecraft.minebot.ai.commands.CommandMine;
+import net.famzangl.minecraft.minebot.ai.commands.CommandPathfind;
 import net.famzangl.minecraft.minebot.ai.commands.CommandPause;
 import net.famzangl.minecraft.minebot.ai.commands.CommandPlant;
 import net.famzangl.minecraft.minebot.ai.commands.CommandRenderMap;
@@ -99,16 +100,18 @@ public class AIChatController {
 		registerCommand(CommandShear.class);
 		registerCommand(CommandPause.class);
 		registerCommand(CommandStore.class);
+		registerCommand(CommandFurnace.class);
+		registerCommand(CommandGet.class);
+		registerCommand(CommandCraft.class);
 		registerCommand(CommandEnchant.class);
 		registerCommand(CommandEat.class);
 		registerCommand(CommandRespawn.class);
-		registerCommand(CommandGet.class);
-		registerCommand(CommandCraft.class);
 		registerCommand(CommandXPFarm.class);
-		registerCommand(CommandWalk.class);
 		registerCommand(CommandAirbridge.class);
+		
+		registerCommand(CommandWalk.class);
 		registerCommand(CommandLookAt.class);
-		registerCommand(CommandFurnace.class);
+		registerCommand(CommandPathfind.class);
 
 		registerCommand(CommandKill.class);
 		registerCommand(CommandFish.class);
