@@ -6,6 +6,7 @@ import net.famzangl.minecraft.minebot.ai.command.AICommand;
 import net.famzangl.minecraft.minebot.ai.command.AICommandInvocation;
 import net.famzangl.minecraft.minebot.ai.command.AICommandParameter;
 import net.famzangl.minecraft.minebot.ai.command.ParameterType;
+import net.famzangl.minecraft.minebot.ai.path.world.Pos;
 import net.famzangl.minecraft.minebot.ai.strategy.AIStrategy;
 import net.famzangl.minecraft.minebot.ai.strategy.RunOnceStrategy;
 import net.minecraft.util.BlockPos;
@@ -53,9 +54,10 @@ public class CommandExpand {
 			} else {
 				old = pos1;
 			}
-			helper.setPosition(old.add(dir), usePos2);
-			AIChatController.addChatLine("Set position " + (usePos2 ? 1 : 2)
-					+ " from " + old + " to " + old.add(dir));
+			BlockPos newPos = old.offset(direction, amount);
+			helper.setPosition(newPos, usePos2);
+			AIChatController.addChatLine("Set position " + (usePos2 ? 2 : 1)
+					+ " from " + Pos.niceString(old) + " to " + Pos.niceString(newPos));
 		}
 	}
 

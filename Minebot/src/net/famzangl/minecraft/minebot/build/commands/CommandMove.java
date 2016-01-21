@@ -19,12 +19,12 @@ package net.famzangl.minecraft.minebot.build.commands;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.famzangl.minecraft.minebot.Pos;
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.command.AICommand;
 import net.famzangl.minecraft.minebot.ai.command.AICommandInvocation;
 import net.famzangl.minecraft.minebot.ai.command.AICommandParameter;
 import net.famzangl.minecraft.minebot.ai.command.ParameterType;
+import net.famzangl.minecraft.minebot.ai.path.world.Pos;
 import net.famzangl.minecraft.minebot.ai.strategy.AIStrategy;
 import net.famzangl.minecraft.minebot.build.blockbuild.BuildTask;
 import net.famzangl.minecraft.minebot.build.blockbuild.MirrorDirection;
@@ -45,7 +45,8 @@ public class CommandMove {
 		private final MirrorDirection mirror;
 		private boolean moved;
 
-		private MoveStrategy(BlockPos relative, Rotate rotate, MirrorDirection mirror) {
+		private MoveStrategy(BlockPos relative, Rotate rotate,
+				MirrorDirection mirror) {
 			this.relative = relative;
 			this.rotate = rotate;
 			this.mirror = mirror;
@@ -60,7 +61,8 @@ public class CommandMove {
 		protected TickResult onGameTick(AIHelper helper) {
 			if (!moved) {
 				final ArrayList<BuildTask> tasks = new ArrayList<BuildTask>();
-				final BlockPos center = getCenter(helper.buildManager.getScheduled());
+				final BlockPos center = getCenter(helper.buildManager
+						.getScheduled());
 				while (helper.buildManager.peekNextTask() != null) {
 					final BuildTask next = helper.buildManager.popNextTask();
 					BlockPos nextPos = next.getForPosition().add(relative);
@@ -70,11 +72,12 @@ public class CommandMove {
 					}
 					if (mirror == MirrorDirection.EAST_WEST) {
 						// mirror on x axes
-						nextPos = new Pos(center.getX() * 2 - nextPos.getX(), nextPos.getY(),
+						nextPos = new BlockPos(center.getX() * 2
+								- nextPos.getX(), nextPos.getY(),
 								nextPos.getZ());
 					} else if (mirror == MirrorDirection.NORTH_SOUTH) {
-						nextPos = new Pos(nextPos.getX(), nextPos.getY(), center.getZ() * 2
-								- nextPos.getZ());
+						nextPos = new BlockPos(nextPos.getX(), nextPos.getY(),
+								center.getZ() * 2 - nextPos.getZ());
 					}
 
 					final BuildTask task = next.withPositionAndRotation(
@@ -109,9 +112,7 @@ public class CommandMove {
 	}
 
 	public enum Rotate {
-		CLOCKWISE(1),
-		COUNTERCLOCKWISE(3),
-		HALF(2);
+		CLOCKWISE(1), COUNTERCLOCKWISE(3), HALF(2);
 		public final int r;
 
 		private Rotate(int r) {
@@ -121,11 +122,14 @@ public class CommandMove {
 		public BlockPos apply(BlockPos blockPos) {
 			switch (this) {
 			case CLOCKWISE:
-				return new BlockPos(-blockPos.getZ(), blockPos.getY(), blockPos.getX());
+				return new BlockPos(-blockPos.getZ(), blockPos.getY(),
+						blockPos.getX());
 			case COUNTERCLOCKWISE:
-				return new BlockPos(blockPos.getZ(), blockPos.getY(), -blockPos.getX());
+				return new BlockPos(blockPos.getZ(), blockPos.getY(),
+						-blockPos.getX());
 			case HALF:
-				return new BlockPos(-blockPos.getX(), blockPos.getY(), -blockPos.getZ());
+				return new BlockPos(-blockPos.getX(), blockPos.getY(),
+						-blockPos.getZ());
 			default:
 				return blockPos;
 			}

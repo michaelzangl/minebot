@@ -21,10 +21,10 @@ import java.util.BitSet;
 import java.util.Collections;
 import java.util.Hashtable;
 
-import net.famzangl.minecraft.minebot.Pos;
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSet;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSets;
+import net.famzangl.minecraft.minebot.ai.path.world.Pos;
 import net.famzangl.minecraft.minebot.ai.path.world.WorldWithDelta;
 import net.famzangl.minecraft.minebot.ai.task.DestroyInRangeTask;
 import net.famzangl.minecraft.minebot.ai.task.PlaceTorchSomewhereTask;
@@ -282,11 +282,11 @@ public class TunnelPathFinder extends AlongTrackPathFinder {
 
 	private void addTorchesTask(BlockPos currentPos, int dirX, int dirZ) {
 		final ArrayList<BlockPos> positions = new ArrayList<BlockPos>();
-		positions.add(new Pos(currentPos.getX() + dirX * addToSide, currentPos
+		positions.add(new BlockPos(currentPos.getX() + dirX * addToSide, currentPos
 				.getY() + 1, currentPos.getZ() + dirZ * addToSide));
 
 		for (int i = addToSide; i >= 0; i--) {
-			positions.add(new Pos(currentPos.getX() + dirX * i, currentPos
+			positions.add(new BlockPos(currentPos.getX() + dirX * i, currentPos
 					.getY(), currentPos.getZ() + dirZ * i));
 		}
 		addTask(new PlaceTorchSomewhereTask(positions,

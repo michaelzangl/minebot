@@ -21,7 +21,6 @@ import java.util.Collection;
 import java.util.Hashtable;
 import java.util.Map.Entry;
 
-import net.famzangl.minecraft.minebot.Pos;
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.enchanting.CloseScreenTask;
 import net.famzangl.minecraft.minebot.ai.enchanting.PutItemInTableTask;
@@ -29,6 +28,7 @@ import net.famzangl.minecraft.minebot.ai.enchanting.PutLapisInTableTask;
 import net.famzangl.minecraft.minebot.ai.enchanting.SelectEnchantmentTask;
 import net.famzangl.minecraft.minebot.ai.enchanting.TakeEnchantedItemTask;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSet;
+import net.famzangl.minecraft.minebot.ai.path.world.Pos;
 import net.famzangl.minecraft.minebot.ai.path.world.WorldData;
 import net.famzangl.minecraft.minebot.ai.scanner.BlockRangeFinder;
 import net.famzangl.minecraft.minebot.ai.scanner.BlockRangeScanner;
@@ -97,7 +97,7 @@ public class EnchantStrategy extends PathFinderStrategy {
 		@Override
 		protected float rateDestination(int distance, int x, int y, int z) {
 			ArrayList<EnchantingTableData> tables = h
-					.getReachableForPos(new Pos(x, y, z));
+					.getReachableForPos(new BlockPos(x, y, z));
 			return tables != null && tables.size() > 0 ? distance : -1;
 		}
 

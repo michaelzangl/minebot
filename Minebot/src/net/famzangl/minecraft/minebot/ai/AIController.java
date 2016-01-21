@@ -21,11 +21,11 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.Hashtable;
 import java.util.Map.Entry;
 
-import net.famzangl.minecraft.minebot.Pos;
 import net.famzangl.minecraft.minebot.ai.command.AIChatController;
 import net.famzangl.minecraft.minebot.ai.command.IAIControllable;
 import net.famzangl.minecraft.minebot.ai.net.MinebotNetHandler;
 import net.famzangl.minecraft.minebot.ai.net.NetworkHelper;
+import net.famzangl.minecraft.minebot.ai.path.world.Pos;
 import net.famzangl.minecraft.minebot.ai.profiler.InterceptingProfiler;
 import net.famzangl.minecraft.minebot.ai.render.BuildMarkerRenderer;
 import net.famzangl.minecraft.minebot.ai.render.PosMarkerRenderer;
@@ -38,6 +38,7 @@ import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.entity.Entity;
 import net.minecraft.init.Items;
+import net.minecraft.util.BlockPos;
 import net.minecraft.util.MouseHelper;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.common.FMLCommonHandler;
@@ -371,7 +372,7 @@ public class AIController extends AIHelper implements IAIControllable {
 	}
 
 	public void positionMarkEvent(int x, int y, int z, int side) {
-		final Pos pos = new Pos(x, y, z);
+		final BlockPos pos = new BlockPos(x, y, z);
 		setPosition(pos, nextPosIsPos2);
 		nextPosIsPos2 ^= true;
 	}

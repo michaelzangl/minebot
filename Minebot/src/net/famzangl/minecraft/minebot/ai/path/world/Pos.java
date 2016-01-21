@@ -14,25 +14,23 @@
  * You should have received a copy of the GNU General Public License
  * along with Minebot.  If not, see <http://www.gnu.org/licenses/>.
  *******************************************************************************/
-package net.famzangl.minecraft.minebot;
+package net.famzangl.minecraft.minebot.ai.path.world;
 
 import net.famzangl.minecraft.minebot.ai.scripting.EntityPos;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
 
 /**
- * A position consisting of integer x y and z coordinates. Uses mainly for block
- * positions.
+ * This class holds some useful methods to handle the {@link BlockPos}
  * 
- * @author michael
+ * @author Michael Zangl
  * 
  */
-public class Pos extends BlockPos {
+public class Pos {
 	
 	public static BlockPos ZERO = new BlockPos(0,0,0);
 
-	public Pos(int x, int y, int z) {
-		super(x, y, z);
+	private Pos() {
 	}
 
 	public static BlockPos fromDir(EnumFacing dir) {
@@ -57,15 +55,11 @@ public class Pos extends BlockPos {
 				p1.getZ(), p2.getZ()));
 	}
 
-	public double distance(Pos other) {
-		return length(other.getX() - getX(), other.getY() - getY(), other.getZ() - getZ());
-	}
-	
 	public static double length(double dx, double dy, double dz) {
 		return Math.sqrt(dx * dx + dy * dy + dz * dz);
 	}
-
-	public double distance(EntityPos other) {
-		return other.distance(this);
+	
+	public static String niceString(BlockPos pos) {
+		return pos.getX() + ", " + pos.getY() + ", " + pos.getZ();
 	}
 }

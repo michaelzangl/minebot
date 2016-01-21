@@ -16,11 +16,11 @@
  *******************************************************************************/
 package net.famzangl.minecraft.minebot.build.blockbuild;
 
-import net.famzangl.minecraft.minebot.Pos;
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.BlockItemFilter;
 import net.famzangl.minecraft.minebot.ai.ItemFilter;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSets;
+import net.famzangl.minecraft.minebot.ai.path.world.Pos;
 import net.famzangl.minecraft.minebot.ai.task.AITask;
 import net.famzangl.minecraft.minebot.ai.task.move.UpwardsMoveTask;
 import net.famzangl.minecraft.minebot.ai.task.place.SneakAndPlaceTask;

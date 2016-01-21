@@ -1,6 +1,6 @@
 package net.famzangl.minecraft.minebot.ai.utils;
 
-import net.famzangl.minecraft.minebot.Pos;
+import net.famzangl.minecraft.minebot.ai.path.world.Pos;
 import net.famzangl.minecraft.minebot.ai.path.world.WorldData;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;

@@ -21,8 +21,8 @@ import java.util.Collection;
 import java.util.Hashtable;
 import java.util.Map.Entry;
 
-import net.famzangl.minecraft.minebot.Pos;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSet;
+import net.famzangl.minecraft.minebot.ai.path.world.Pos;
 import net.famzangl.minecraft.minebot.ai.path.world.WorldData;
 import net.famzangl.minecraft.minebot.ai.scanner.BlockRangeScanner.BlockHandler;
 import net.minecraft.init.Blocks;
@@ -66,7 +66,7 @@ public abstract class RangeBlockHandler<ReachData> implements BlockHandler {
 				if (!THROUGH_REACHABLE.isAt(world, x, y, z)) {
 					dvertMax = dvert;
 				} else if (dvert > 1) {
-					Pos allowed = new Pos(x, y, z);
+					BlockPos allowed = new BlockPos(x, y, z);
 					addReachable(allowed, c);
 				}
 			}

@@ -22,9 +22,9 @@ import java.io.IOException;
 import java.io.PrintStream;
 
 import net.famzangl.minecraft.minebot.MinebotMod;
-import net.famzangl.minecraft.minebot.Pos;
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.command.AIChatController;
+import net.famzangl.minecraft.minebot.ai.path.world.Pos;
 import net.famzangl.minecraft.minebot.build.reverse.factories.BuildTaskFactories;
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;

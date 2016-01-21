@@ -16,11 +16,11 @@
  *******************************************************************************/
 package net.famzangl.minecraft.minebot.build.blockbuild;
 
-import net.famzangl.minecraft.minebot.Pos;
 import net.famzangl.minecraft.minebot.ai.BlockItemFilter;
 import net.famzangl.minecraft.minebot.ai.command.BlockWithDataOrDontcare;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockMetaSet;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSet;
+import net.famzangl.minecraft.minebot.ai.path.world.Pos;
 import net.famzangl.minecraft.minebot.build.block.LogItemFilter;
 import net.famzangl.minecraft.minebot.build.block.WoodType;
 import net.famzangl.minecraft.minebot.build.block.WoodType.LogDirection;

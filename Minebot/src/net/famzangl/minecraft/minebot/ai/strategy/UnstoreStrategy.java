@@ -19,9 +19,9 @@ package net.famzangl.minecraft.minebot.ai.strategy;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.famzangl.minecraft.minebot.Pos;
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.enchanting.CloseScreenTask;
+import net.famzangl.minecraft.minebot.ai.path.world.Pos;
 import net.famzangl.minecraft.minebot.ai.scanner.BlockRangeFinder;
 import net.famzangl.minecraft.minebot.ai.scanner.BlockRangeScanner;
 import net.famzangl.minecraft.minebot.ai.scanner.ChestBlockHandler;
@@ -187,7 +187,7 @@ public class UnstoreStrategy extends PathFinderStrategy {
 		@Override
 		protected float rateDestination(int distance, int x, int y, int z) {
 			ArrayList<ChestData> chests = chestBlockHandler
-					.getReachableForPos(new Pos(x, y, z));
+					.getReachableForPos(new BlockPos(x, y, z));
 			if (chests != null) {
 				for (ChestData c : chests) {
 					if (list.couldUseOneOf(c)) {

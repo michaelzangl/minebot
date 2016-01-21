@@ -20,10 +20,10 @@ import java.io.File;
 import java.util.List;
 import java.util.Random;
 
-import net.famzangl.minecraft.minebot.Pos;
 import net.famzangl.minecraft.minebot.ai.command.AIChatController;
 import net.famzangl.minecraft.minebot.ai.net.NetworkHelper;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockBounds;
+import net.famzangl.minecraft.minebot.ai.path.world.Pos;
 import net.famzangl.minecraft.minebot.ai.path.world.WorldData;
 import net.famzangl.minecraft.minebot.ai.strategy.AIStrategy;
 import net.famzangl.minecraft.minebot.ai.task.BlockHalf;
