@@ -88,13 +88,6 @@ public class PlantPathFinder extends MovePathFinder {
 
 	public PlantPathFinder(PlantType type) {
 		this.type = type;
-//		allowedGroundForUpwardsBlocks = allowedGroundBlocks;
-//		footAllowedBlocks = BlockSets.FEET_CAN_WALK_THROUGH;
-//		headAllowedBlocks = BlockSets.HEAD_CAN_WALK_TRHOUGH;
-//		footAllowedBlocks = footAllowedBlocks.intersectWith(forbiddenBlocks
-//				.invert());
-//		headAllowedBlocks = headAllowedBlocks.intersectWith(forbiddenBlocks
-//				.invert());
 	}
 	
 	@Override

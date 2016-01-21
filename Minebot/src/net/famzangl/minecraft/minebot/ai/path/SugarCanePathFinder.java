@@ -12,14 +12,9 @@ import net.minecraft.item.ItemReed;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
 
-public class SugarCanePathFinder extends MovePathFinder {
+public class SugarCanePathFinder extends WalkingPathfinder {
 	private static final BlockSet SUGAR_CANE_GROUND = new BlockSet(Blocks.sand, Blocks.grass, Blocks.dirt);
 	private static final BlockSet SUGAR_CANE = new BlockSet(Blocks.reeds);
-
-	@Override
-	protected PathfindingSetting loadSettings(MinebotSettingsRoot settingsRoot) {
-		return settingsRoot.getPathfinding().getPlanting();
-	}
 
 	@Override
 	protected float rateDestination(int distance, int x, int y, int z) {
@@ -27,7 +22,7 @@ public class SugarCanePathFinder extends MovePathFinder {
 				&& SUGAR_CANE.isAt(world, x, y + 1, z)) {
 			return super.rateDestination(distance, x, y, z);
 		} else if (isSugarCanePlantPlace(x, y, z)) {
-			return super.rateDestination(distance, x, y, z);
+			return super.rateDestination(distance, x, y, z) + 2;
 		} else {
 			return -1;
 		}
