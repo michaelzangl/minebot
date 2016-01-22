@@ -31,6 +31,13 @@ public class PlaceBlockAtFloorTask extends AITask {
 	private int faceTimer;
 	protected final BlockPos pos;
 
+	/**
+	 * 
+	 * @param pos
+	 *            The position we are standing on when placing the block. See {@link #getRelativePlaceAtY()}
+	 * @param filter
+	 *            What to place.
+	 */
 	public PlaceBlockAtFloorTask(BlockPos pos, ItemFilter filter) {
 		this.pos = pos;
 		this.filter = filter;
@@ -89,15 +96,14 @@ public class PlaceBlockAtFloorTask extends AITask {
 	}
 
 	protected void tryPlaceBlock(AIHelper h) {
-		if (isAtDesiredHeight(h)
-				&& isFacingRightBlock(h)) {
+		if (isAtDesiredHeight(h) && isFacingRightBlock(h)) {
 			h.overrideUseItem();
 		}
 	}
 
 	protected boolean isAtDesiredHeight(AIHelper h) {
-		return h.getMinecraft().thePlayer
-				.getEntityBoundingBox().minY >= getPlaceAtPos().getY();
+		return h.getMinecraft().thePlayer.getEntityBoundingBox().minY >= getPlaceAtPos()
+				.getY();
 	}
 
 	protected boolean isFacingRightBlock(AIHelper h) {

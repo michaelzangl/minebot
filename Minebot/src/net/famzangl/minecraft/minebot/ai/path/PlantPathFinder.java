@@ -23,6 +23,7 @@ import net.famzangl.minecraft.minebot.ai.path.world.BlockMetaSet;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSet;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSets;
 import net.famzangl.minecraft.minebot.ai.path.world.WorldData;
+import net.famzangl.minecraft.minebot.ai.path.world.WorldWithDelta;
 import net.famzangl.minecraft.minebot.ai.task.UseItemOnBlockAtTask;
 import net.famzangl.minecraft.minebot.ai.task.place.DestroyBlockTask;
 import net.famzangl.minecraft.minebot.ai.task.place.PlaceBlockAtFloorTask;
@@ -44,6 +45,28 @@ public class PlantPathFinder extends MovePathFinder {
 
 	private static final BlockSet FARMLANDABLE = new BlockSet(Blocks.dirt,
 			Blocks.grass);
+
+	private final class PlaceSeedsTask extends PlaceBlockAtFloorTask {
+		private final SeedFilter seedFilter;
+
+		private PlaceSeedsTask(BlockPos pos, SeedFilter filter) {
+			super(pos, filter);
+			seedFilter = filter;
+		}
+
+		@Override
+		protected boolean isAtDesiredHeight(AIHelper h) {
+			return true;
+		}
+
+		@Override
+		public boolean applyToDelta(WorldWithDelta world) {
+			Item anyPlaceItem = seedFilter.type.items[0];
+			Block b = Block.getBlockFromItem(anyPlaceItem);
+			world.setBlock(pos, Block.getIdFromBlock(b), 0);
+			return true;
+		}
+	}
 
 	public enum PlantType {
 		NORMAL(FARMLAND, Items.wheat_seeds, Items.carrot, Items.potato), WHEAT(
@@ -84,12 +107,27 @@ public class PlantPathFinder extends MovePathFinder {
 		}
 	}
 
+	private static class UseHoeTask extends UseItemOnBlockAtTask {
+
+		public UseHoeTask(BlockPos farmlandPos) {
+			super(new ClassItemFilter(ItemHoe.class), farmlandPos);
+		}
+
+		@Override
+		public boolean applyToDelta(WorldWithDelta world) {
+			if (FARMLANDABLE.isAt(world, getPos())) {
+				world.setBlock(getPos(), Blocks.farmland);
+			}
+			return true;
+		}
+	}
+
 	private final PlantType type;
 
 	public PlantPathFinder(PlantType type) {
 		this.type = type;
 	}
-	
+
 	@Override
 	protected PathfindingSetting loadSettings(MinebotSettingsRoot settingsRoot) {
 		return settingsRoot.getPathfinding().getPlanting();
@@ -119,7 +157,7 @@ public class PlantPathFinder extends MovePathFinder {
 		if (Block.getBlockById(blockWithMeta >> 4) instanceof BlockCrops) {
 			final int metadata = blockWithMeta & 0xf;
 			return metadata >= 7;
-		} else if (new BlockMetaSet(Blocks.nether_wart, 3).isAt(world, x, y,z)) {
+		} else if (new BlockMetaSet(Blocks.nether_wart, 3).isAt(world, x, y, z)) {
 			return true;
 		}
 		return false;
@@ -130,15 +168,9 @@ public class PlantPathFinder extends MovePathFinder {
 		if (BlockSets.AIR.isAt(world, currentPos)) {
 			BlockPos farmlandPos = currentPos.add(0, -1, 0);
 			if (!type.farmland.isAt(world, farmlandPos)) {
-				addTask(new UseItemOnBlockAtTask(new ClassItemFilter(
-						ItemHoe.class), farmlandPos));
+				addTask(new UseHoeTask(farmlandPos));
 			}
-			addTask(new PlaceBlockAtFloorTask(currentPos, new SeedFilter(type)) {
-				@Override
-				protected boolean isAtDesiredHeight(AIHelper h) {
-					return true;
-				}
-			});
+			addTask(new PlaceSeedsTask(currentPos, new SeedFilter(type)));
 		} else {
 			addTask(new DestroyBlockTask(currentPos));
 		}

@@ -20,6 +20,7 @@ import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSets;
 import net.famzangl.minecraft.minebot.ai.path.world.WorldWithDelta;
 import net.famzangl.minecraft.minebot.ai.task.AITask;
+import net.famzangl.minecraft.minebot.ai.task.DestroyInRangeTask;
 import net.famzangl.minecraft.minebot.ai.task.TaskOperations;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.BlockPos;
@@ -30,26 +31,9 @@ import net.minecraft.util.BlockPos;
  * @author michael
  *
  */
-public class DestroyBlockTask extends AITask {
-	private BlockPos pos;
+public class DestroyBlockTask extends DestroyInRangeTask {
 
 	public DestroyBlockTask(BlockPos pos) {
-		this.pos = pos;
-	}
-
-	@Override
-	public boolean isFinished(AIHelper h) {
-		return BlockSets.AIR.isAt(h.getWorld(), pos);
-	}
-
-	@Override
-	public void runTick(AIHelper h, TaskOperations o) {
-		h.faceAndDestroy(pos);
-	}
-
-	@Override
-	public boolean applyToDelta(WorldWithDelta world) {
-		world.setBlock(pos, Blocks.air);
-		return true;
+		super(pos, pos);
 	}
 }

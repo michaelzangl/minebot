@@ -54,4 +54,8 @@ public class UseItemOnBlockAtTask extends UseItemTask {
 	protected void notFacingBlock(AIHelper h) {
 		h.faceBlock(pos);
 	}
+	
+	public BlockPos getPos() {
+		return pos;
+	}
 }
