@@ -1,5 +1,8 @@
 package net.famzangl.minecraft.minebot.ai.path.world;
 
+import java.util.HashMap;
+import java.util.HashSet;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.Marker;
@@ -36,9 +39,15 @@ public class BlockBoundsCache {
 
 	public static void initialize() {
 		bounds = new BlockBounds[16 * 4096];
+		HashMap<BlockBounds, BlockBounds> usedBounds = new HashMap<BlockBounds, BlockBounds>();
+		usedBounds.put(BlockBounds.FULL_BLOCK, BlockBounds.FULL_BLOCK);
+		usedBounds.put(BlockBounds.LOWER_HALF_BLOCK, BlockBounds.LOWER_HALF_BLOCK);
+		usedBounds.put(BlockBounds.UPPER_HALF_BLOCK, BlockBounds.UPPER_HALF_BLOCK);
 		for (int i = 0; i < bounds.length; i++) {
 			try {
-				bounds[i] = attemptLoad(i);
+				BlockBounds bound = attemptLoad(i);
+				usedBounds.put(bound, bound);
+				bounds[i] = usedBounds.get(bound);
 			} catch (Throwable e) {
 				LOGGER.warn(MARKER_BOUNDS_PROBLEM,
 						"Could not create bounds for " + new BlockWithData(i));
