@@ -19,6 +19,7 @@ package net.famzangl.minecraft.minebot;
 import java.net.URISyntaxException;
 
 import net.famzangl.minecraft.minebot.ai.AIController;
+import net.famzangl.minecraft.minebot.ai.path.world.BlockBoundsCache;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
@@ -52,6 +53,7 @@ public class MinebotMod {
 	
 	@EventHandler
 	public void init(FMLInitializationEvent event) {
+		BlockBoundsCache.initialize();
 		FMLCommonHandler.instance().bus().register(new PlayerUpdateHandler());
 		final AIController controller = new AIController();
 		controller.initialize();

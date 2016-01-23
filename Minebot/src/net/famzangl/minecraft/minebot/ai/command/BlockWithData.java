@@ -10,8 +10,11 @@ import net.famzangl.minecraft.minebot.ai.task.inventory.ItemWithSubtype;
 import net.famzangl.minecraft.minebot.build.block.WoodType;
 import net.famzangl.minecraft.minebot.build.block.WoodType.LogDirection;
 import net.minecraft.block.Block;
+import net.minecraft.block.state.BlockState;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.EnumDyeColor;
+import net.minecraft.world.World;
 
 import org.apache.commons.lang3.ArrayUtils;
 
@@ -147,5 +150,9 @@ public class BlockWithData extends BlockWithDataOrDontcare {
 
 	public ItemWithSubtype getItemType() {
 		return new ItemWithSubtype(getBlockId(), getMetaValue());
+	}
+
+	public IBlockState getBlockState() {
+		return (IBlockState) Block.BLOCK_STATE_IDS.getByValue(blockIdWithMeta);
 	}
 }
