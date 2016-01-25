@@ -173,6 +173,24 @@ public class FurnaceStrategy extends PathFinderStrategy {
 
 	private static class FurnacePathFinder extends BlockRangeFinder {
 
+		private static final class UpdateFurnaceDataTask extends RunOnceTask {
+			private final FurnaceData f;
+
+			private UpdateFurnaceDataTask(FurnaceData f) {
+				this.f = f;
+			}
+
+			@Override
+			protected void runOnce(AIHelper h, TaskOperations o) {
+				GuiScreen gui = h.getMinecraft().currentScreen;
+				if (!(gui instanceof GuiFurnace)) {
+					o.desync(new StringTaskError("No furnace open"));
+				} else {
+					f.update((GuiFurnace) gui);
+				}
+			}
+		}
+
 		private final class TakeFurnaceResult extends TakeResultItem {
 			private final FurnaceData f;
 
@@ -262,17 +280,7 @@ public class FurnaceStrategy extends PathFinderStrategy {
 					}
 				});
 				addTask(new WaitTask(5));
-				addTask(new RunOnceTask() {
-					@Override
-					protected void runOnce(AIHelper h, TaskOperations o) {
-						GuiScreen gui = h.getMinecraft().currentScreen;
-						if (!(gui instanceof GuiFurnace)) {
-							o.desync(new StringTaskError("No furnace open"));
-						} else {
-							f.update((GuiFurnace) gui);
-						}
-					}
-				});
+				addTask(new UpdateFurnaceDataTask(f));
 
 				for (AITask t : furnaceTasks) {
 					addTask(t);
@@ -280,6 +288,7 @@ public class FurnaceStrategy extends PathFinderStrategy {
 						addTask(new ConditionalWaitTask(5, (WaitCondition) t));
 					}
 				}
+				addTask(new UpdateFurnaceDataTask(f));
 				addTask(new CloseScreenTask());
 			}
 		}

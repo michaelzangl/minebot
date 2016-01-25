@@ -38,7 +38,6 @@ import net.minecraft.util.BlockPos;
  * 
  */
 public class StoreStrategy extends PathFinderStrategy {
-	
 	private static class WaitIfNotFullTask extends WaitTask {
 
 		private final ItemStack s;
@@ -76,7 +75,7 @@ public class StoreStrategy extends PathFinderStrategy {
 				for (ChestData c : chests) {
 					for (ItemStack s : helper.getMinecraft().thePlayer.inventory.mainInventory) {
 						if (c.couldPutItem(s)) {
-							return distance;
+							return distance + chestBlockHandler.getExpectedPutRating(c.getPos(), s);
 						}
 					}
 				}

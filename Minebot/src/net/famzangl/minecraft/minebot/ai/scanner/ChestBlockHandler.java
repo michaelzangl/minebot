@@ -18,6 +18,7 @@ package net.famzangl.minecraft.minebot.ai.scanner;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
@@ -37,22 +38,34 @@ import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
 
 public class ChestBlockHandler extends RangeBlockHandler<ChestData> {
-
 	private static final BlockSet CHEST = new BlockSet(Blocks.chest,
 			Blocks.trapped_chest);
 
-	public static class ChestData {
-		private final BlockPos pos;
-		private final ArrayList<ItemFilter> allowedItems = new ArrayList<ItemFilter>();
-		private final ArrayList<ItemFilter> fullItems = new ArrayList<ItemFilter>();
-		private final ArrayList<ItemFilter> emptyItems = new ArrayList<ItemFilter>();
-		public BlockPos secondaryPos;
-		private final int chestBlockId;
+	public static class AbstractChestData {
+		protected final BlockPos pos;
+		private BlockPos secondaryPos;
+		protected final ArrayList<ItemFilter> allowedItems = new ArrayList<ItemFilter>();
+		protected final ArrayList<ItemFilter> fullItems = new ArrayList<ItemFilter>();
+		protected final ArrayList<ItemFilter> emptyItems = new ArrayList<ItemFilter>();
 
-		public ChestData(BlockPos pos, int chestBlockId) {
-			super();
+		public AbstractChestData(BlockPos pos) {
 			this.pos = pos;
-			this.chestBlockId = chestBlockId;
+		}
+
+		public BlockPos getPos() {
+			return pos;
+		}
+
+		public BlockPos getSecondaryPos() {
+			return secondaryPos;
+		}
+
+		public void setSecondaryPos(BlockPos secondaryPos) {
+			if (this.secondaryPos != null
+					&& !secondaryPos.equals(this.secondaryPos)) {
+				throw new IllegalStateException("Cannot update secondary pos.");
+			}
+			this.secondaryPos = secondaryPos;
 		}
 
 		public boolean isItemAllowed(ItemStack stack) {
@@ -69,12 +82,34 @@ public class ChestBlockHandler extends RangeBlockHandler<ChestData> {
 		}
 
 		public boolean couldTakeItem(ItemStack stack) {
+			return !isEmptyFor(stack) && isItemAllowed(stack);
+		}
+
+		private boolean isEmptyFor(ItemStack stack) {
 			for (ItemFilter f : emptyItems) {
 				if (f.matches(stack)) {
-					return false;
+					return true;
 				}
 			}
-			return isItemAllowed(stack);
+			return false;
+		}
+
+		public boolean isFullFor(ItemStack stack) {
+			for (ItemFilter f : fullItems) {
+				if (f.matches(stack)) {
+					return true;
+				}
+			}
+			return false;
+		}
+	}
+
+	public static class ChestData extends AbstractChestData {
+		private final int chestBlockId;
+
+		public ChestData(BlockPos pos, int chestBlockId) {
+			super(pos);
+			this.chestBlockId = chestBlockId;
 		}
 
 		@Override
@@ -110,14 +145,7 @@ public class ChestBlockHandler extends RangeBlockHandler<ChestData> {
 
 		public void allowItem(final ItemStack displayed) {
 			allowedItems.add(new SameItemFilter(displayed));
-		}
-
-		public BlockPos getPos() {
-			return pos;
-		}
-
-		public BlockPos getSecondaryPos() {
-			return secondaryPos;
+			persistentStatus.update(this);
 		}
 
 		public void markAsFullFor(ItemStack s, boolean full) {
@@ -125,6 +153,7 @@ public class ChestBlockHandler extends RangeBlockHandler<ChestData> {
 			if (full) {
 				fullItems.add(new SameItemFilter(s));
 			}
+			persistentStatus.update(this);
 		}
 
 		public void markAsEmptyFor(ItemStack s, boolean empty) {
@@ -132,6 +161,13 @@ public class ChestBlockHandler extends RangeBlockHandler<ChestData> {
 			if (empty) {
 				emptyItems.add(new SameItemFilter(s));
 			}
+			persistentStatus.update(this);
+		}
+
+		@Override
+		public void setSecondaryPos(BlockPos secondaryPos) {
+			super.setSecondaryPos(secondaryPos);
+			persistentStatus.update(this);
 		}
 
 		private void removeFrom(ArrayList<ItemFilter> list, ItemStack s) {
@@ -142,15 +178,6 @@ public class ChestBlockHandler extends RangeBlockHandler<ChestData> {
 					iterator.remove();
 				}
 			}
-		}
-
-		public boolean isFullFor(ItemStack stack) {
-			for (ItemFilter f : fullItems) {
-				if (f.matches(stack)) {
-					return true;
-				}
-			}
-			return false;
 		}
 
 		public boolean isOfType(int id) {
@@ -165,10 +192,38 @@ public class ChestBlockHandler extends RangeBlockHandler<ChestData> {
 		}
 	}
 
+	public static class PersistentChestStatus {
+		private final HashMap<BlockPos, AbstractChestData> chests = new HashMap<BlockPos, AbstractChestData>();
+
+		public void update(AbstractChestData data) {
+			chests.put(data.getPos(), data);
+			BlockPos secondaryPos = data.getSecondaryPos();
+			if (secondaryPos != null) {
+				chests.put(secondaryPos, data);
+			}
+		}
+
+		public void reset() {
+			chests.clear();
+		}
+
+		public boolean isEmptyFor(BlockPos pos, ItemStack stack) {
+			AbstractChestData data = chests.get(pos);
+			return data != null && data.isEmptyFor(stack);
+		}
+
+		public boolean isFullFor(BlockPos pos, ItemStack stack) {
+			AbstractChestData data = chests.get(pos);
+			return data != null && data.isFullFor(stack);
+		}
+	}
+
+	private static final PersistentChestStatus persistentStatus = new PersistentChestStatus();
+
 	/**
 	 * A table of chests.
 	 */
-	private final Hashtable<BlockPos, ChestData> chests = new Hashtable<BlockPos, ChestData>();
+	private final HashMap<BlockPos, ChestData> chests = new HashMap<BlockPos, ChestData>();
 
 	@Override
 	public BlockSet getIds() {
@@ -178,8 +233,8 @@ public class ChestBlockHandler extends RangeBlockHandler<ChestData> {
 	@Override
 	protected void addPositionToCache(WorldData world, BlockPos pos, ChestData c) {
 		super.addPositionToCache(world, pos, c);
-		if (c.secondaryPos != null) {
-			super.addPositionToCache(world, c.secondaryPos, c);
+		if (c.getSecondaryPos() != null) {
+			super.addPositionToCache(world, c.getSecondaryPos(), c);
 		}
 	}
 
@@ -200,8 +255,8 @@ public class ChestBlockHandler extends RangeBlockHandler<ChestData> {
 	private void scanForItemFrames(WorldData world, int x, int y, int z,
 			ChestData chest) {
 		BlockPos myPos = new BlockPos(x, y, z);
-		AxisAlignedBB abb = new AxisAlignedBB(x - 1, y, z - 1, x + 2,
-				y + 1, z + 2);
+		AxisAlignedBB abb = new AxisAlignedBB(x - 1, y, z - 1, x + 2, y + 1,
+				z + 2);
 		List<EntityItemFrame> frames = world.getBackingWorld()
 				.getEntitiesWithinAABB(EntityItemFrame.class, abb);
 		for (EntityItemFrame f : frames) {
@@ -229,7 +284,7 @@ public class ChestBlockHandler extends RangeBlockHandler<ChestData> {
 			if (attempted != null && attempted.isOfType(id)) {
 				chest = attempted;
 				if (!chest.pos.equals(pos)) {
-					chest.secondaryPos = pos;
+					chest.setSecondaryPos(pos);
 				}
 			}
 		}
@@ -248,5 +303,21 @@ public class ChestBlockHandler extends RangeBlockHandler<ChestData> {
 	 */
 	private EnumFacing getDirection(EntityItemFrame f) {
 		return f.field_174860_b;
+	}
+
+	public int getExpectedPutRating(BlockPos pos, ItemStack s) {
+		if (persistentStatus.isFullFor(pos, s)) {
+			return 10;
+		} else {
+			return 0;
+		}
+	}
+
+	public int getExpectedTakeRating(BlockPos pos, ItemStack s) {
+		if (persistentStatus.isEmptyFor(pos, s)) {
+			return 10;
+		} else {
+			return 0;
+		}
 	}
 }
