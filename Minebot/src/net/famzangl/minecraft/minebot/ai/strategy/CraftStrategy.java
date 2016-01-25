@@ -48,6 +48,7 @@ import net.minecraft.item.crafting.CraftingManager;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.item.crafting.ShapedRecipes;
 import net.minecraft.util.BlockPos;
+import net.minecraftforge.oredict.ShapedOreRecipe;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -96,27 +97,38 @@ public class CraftStrategy extends PathFinderStrategy {
 					}
 				}
 				LOGGER.trace(MARKER_RECIPE, "Slots " + Arrays.toString(slots));
-			}
-			// else if (r instanceof ShapedOreRecipe) { ShapedOreRecipe
-			// shapedRecipes = (ShapedOreRecipe) r; try { Field widthFiled =
-			// ShapedOreRecipe.class .getDeclaredField("width");
-			// widthFiled.setAccessible(true); int width =
-			// widthFiled.getInt(shapedRecipes); for (int x = 0; x < width; x++)
-			// { int height = shapedRecipes.getRecipeSize() / width; for (int y
-			// = 0; y < height; y++) { Object itemStack =
-			// shapedRecipes.getInput()[x + y width]; if (itemStack instanceof
-			// ItemStack) { this.slots[x][y] = new ItemWithSubtype( (ItemStack)
-			// itemStack); } else if (itemStack instanceof ArrayList) {
-			// ArrayList list = (ArrayList) itemStack; this.slots[x][y] = new
-			// ItemWithSubtype( (ItemStack) list.get(0)); } } } } catch
-			// (NoSuchFieldException e) { throw new
-			// IllegalArgumentException("Cannot access " + r); } catch
-			// (SecurityException e) { throw new
-			// IllegalArgumentException("Cannot access " + r); } catch
-			// (IllegalAccessException e) { throw new
-			// IllegalArgumentException("Cannot access " + r); }
-			// }
-			else {
+			} else if (r instanceof ShapedOreRecipe) {
+				ShapedOreRecipe shapedRecipes = (ShapedOreRecipe) r;
+				try {
+					// Width is the first integer field.
+					int width = PrivateFieldUtils.getField(shapedRecipes, ShapedOreRecipe.class, Integer.TYPE).getInt(shapedRecipes);
+					for (int x = 0; x < width; x++) {
+						int height = shapedRecipes.getRecipeSize() / width;
+						for (int y = 0; y < height; y++) {
+							Object itemStack = shapedRecipes.getInput()[x + y
+									* width];
+							if (itemStack instanceof ItemStack) {
+								this.slots[x][y] = new ItemWithSubtype(
+										(ItemStack) itemStack);
+							} else if (itemStack instanceof List) {
+								List list = (List) itemStack;
+								this.slots[x][y] = new ItemWithSubtype(
+										(ItemStack) list.get(0));
+								if (list.size() > 1) {
+									LOGGER.warn(MARKER_RECIPE, "Multiple items found, only using first: " + list);
+								}
+							} else if (itemStack != null) {
+								LOGGER.error(MARKER_RECIPE, "Cannot handle " + itemStack.getClass());
+								throw new IllegalArgumentException("Cannot handle " + itemStack.getClass());
+							}
+						}
+					}
+				} catch (SecurityException e) {
+					throw new IllegalArgumentException("Cannot access " + r);
+				} catch (IllegalAccessException e) {
+					throw new IllegalArgumentException("Cannot access " + r);
+				}
+			} else {
 				LOGGER.error(MARKER_RECIPE,
 						"An item recipe has been found but the item cannot be crafted. The class "
 								+ r.getClass().getCanonicalName()
@@ -173,7 +185,8 @@ public class CraftStrategy extends PathFinderStrategy {
 					list.add(ss, count);
 				}
 			}
-			LOGGER.trace(MARKER_RECIPE, "Items required for " + this + ": " + list);
+			LOGGER.trace(MARKER_RECIPE, "Items required for " + this + ": "
+					+ list);
 			return list;
 		}
 
@@ -400,7 +413,9 @@ public class CraftStrategy extends PathFinderStrategy {
 		}
 
 		/**
-		 * Gets an array of items that specifies how they need to be placed on the crafting grid.
+		 * Gets an array of items that specifies how they need to be placed on
+		 * the crafting grid.
+		 * 
 		 * @param h
 		 * @param possibilities
 		 * @return
@@ -409,7 +424,8 @@ public class CraftStrategy extends PathFinderStrategy {
 				List<CraftingPossibility> possibilities) {
 			for (CraftingPossibility p : possibilities) {
 				ItemWithSubtype[][] assignedSlots = new ItemWithSubtype[3][3];
-				// TODO: Order this in a better way. We need to have multiples of our item count first.
+				// TODO: Order this in a better way. We need to have multiples
+				// of our item count first.
 				for (ItemStack i : h.getMinecraft().thePlayer.inventory.mainInventory) {
 					if (i == null) {
 						continue;
@@ -422,7 +438,8 @@ public class CraftStrategy extends PathFinderStrategy {
 									&& assignedSlots[x][y] == null) {
 								assignedSlots[x][y] = item;
 								leftOver--;
-								LOGGER.trace("Placing at "+ x + "," + y + ": " + item);
+								LOGGER.trace("Placing at " + x + "," + y + ": "
+										+ item);
 							}
 						}
 					}
@@ -432,7 +449,8 @@ public class CraftStrategy extends PathFinderStrategy {
 					for (int y = 0; y < 3; y++) {
 						if (!p.goodForPosition(assignedSlots[x][y], x, y)) {
 							allGood = false;
-							LOGGER.warn(MARKER_RECIPE, "Placed wrong item at " + x + "," + y + ": " + assignedSlots[x][y]);
+							LOGGER.warn(MARKER_RECIPE, "Placed wrong item at "
+									+ x + "," + y + ": " + assignedSlots[x][y]);
 						}
 					}
 				}
@@ -440,7 +458,8 @@ public class CraftStrategy extends PathFinderStrategy {
 					return assignedSlots;
 				}
 			}
-			LOGGER.warn("Could not find any way to craft any of " + possibilities);
+			LOGGER.warn("Could not find any way to craft any of "
+					+ possibilities);
 			return null;
 		}
 
@@ -454,9 +473,10 @@ public class CraftStrategy extends PathFinderStrategy {
 	public CraftStrategy(int amount, int itemId, int subtype) {
 		this(amount, new ItemWithSubtype(itemId, subtype));
 	}
+
 	public CraftStrategy(int amount, ItemWithSubtype item) {
-		super(new CraftingTableFinder(new CraftingWish(amount,
-				item)), "Crafting");
+		super(new CraftingTableFinder(new CraftingWish(amount, item)),
+				"Crafting");
 	}
 
 	public CraftStrategy(int amount, BlockWithDataOrDontcare itemType) {
