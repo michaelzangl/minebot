@@ -103,6 +103,12 @@ public class BlockBoundsCache {
 			public boolean extendedLevelsInChunkCache() {
 				throw new UnsupportedOperationException();
 			}
+
+			@Override
+			public boolean isSideSolid(BlockPos pos, EnumFacing side,
+					boolean _default) {
+				throw new UnsupportedOperationException();
+			}
 		};
 		block.setBlockBoundsBasedOnState(world, Pos.ZERO);
 

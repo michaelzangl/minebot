@@ -189,7 +189,7 @@ public class MineScript {
 					}
 
 					@Override
-					public boolean canUseCommand(int permLevel,
+					public boolean canCommandSenderUseCommand(int permLevel,
 							String commandName) {
 						return true;
 					}
@@ -205,7 +205,7 @@ public class MineScript {
 		if (nbtO != null) {
 			String nbtS = jsonify(nbtO);
 			try {
-				nbt = JsonToNBT.func_180713_a(nbtS);
+				nbt = JsonToNBT.getTagFromJson(nbtS);
 			} catch (NBTException e1) {
 				throw new ScriptException(e1);
 			}
@@ -216,10 +216,11 @@ public class MineScript {
 				NBTTagCompound nbttagcompound1 = new NBTTagCompound();
 				e.writeToNBT(nbttagcompound1);
 
-				if (!CommandTestForBlock.func_175775_a(nbt, nbttagcompound1,
-						true)) {
-					continue;
-				}
+				// TODO: Where did that go?
+				// if (!CommandTestForBlock.(nbt, nbttagcompound1,
+				// true)) {
+				// continue;
+				// }
 			}
 			foundEntities.add(new FoundEntity(e));
 		}
@@ -325,11 +326,11 @@ public class MineScript {
 	public void setDescription(String description) {
 		tickProvider.getDescription().setDescription(description);
 	}
-	
+
 	public void setAddScriptNameToDescription(boolean val) {
 		tickProvider.getDescription().setAddFileName(val);
 	}
-	
+
 	public void setAddStrategyToDescription(boolean val) {
 		tickProvider.getDescription().setAddStrategyDescription(val);
 	}

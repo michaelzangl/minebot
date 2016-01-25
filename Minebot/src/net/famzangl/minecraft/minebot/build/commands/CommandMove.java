@@ -150,7 +150,7 @@ public class CommandMove {
 			@AICommandParameter(type = ParameterType.FIXED, fixedName = "move", description = "") String nameArg,
 			@AICommandParameter(type = ParameterType.ENUM, fixedName = "", description = "Direction") final EnumFacing dir,
 			@AICommandParameter(type = ParameterType.NUMBER, fixedName = "", description = "How much") final int howMuch) {
-		return new MoveStrategy(Pos.fromDir(dir).multiply(howMuch), null, null);
+		return new MoveStrategy(Pos.ZERO.offset(dir, howMuch), null, null);
 	}
 
 	@AICommandInvocation()

@@ -906,7 +906,7 @@ public abstract class AIHelper {
 	 */
 	@SuppressWarnings("unchecked")
 	public List<Entity> getEntities(int dist, Predicate<Entity> selector) {
-		return mc.theWorld.func_175674_a(
+		return mc.theWorld.getEntitiesInAABBexcluding(
 				mc.getRenderViewEntity(),
 				mc.getRenderViewEntity().getEntityBoundingBox()
 						.addCoord(-dist, -dist, -dist)

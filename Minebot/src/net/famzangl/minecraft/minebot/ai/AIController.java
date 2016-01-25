@@ -147,7 +147,9 @@ public class AIController extends AIHelper implements IAIControllable {
 	public void connect(ClientConnectedToServerEvent e) {
 		networkHelper = MinebotNetHandler.inject(this, e.manager, e.handler);
 		profilerHelper = InterceptingProfiler.inject(getMinecraft());
-		// Hook into net.minecraft.client.renderer.RenderGlobal.drawBlockDamageTexture(Tessellator, WorldRenderer, Entity, float)
+		// Hook into
+		// net.minecraft.client.renderer.RenderGlobal.drawBlockDamageTexture(Tessellator,
+		// WorldRenderer, Entity, float)
 		profilerHelper.addLisener("hand", new Runnable() {
 			@Override
 			public void run() {
@@ -264,35 +266,20 @@ public class AIController extends AIHelper implements IAIControllable {
 			doUngrab = false;
 		}
 
-		try {
-			// Dynamic 1.7.2 / 1.7.10 fix.
-			ScaledResolution res;
-			final Constructor<?> method = ScaledResolution.class
-					.getConstructors()[0];
-			final Object arg1 = method.getParameterTypes()[0] == Minecraft.class ? getMinecraft()
-					: getMinecraft().gameSettings;
-			res = (ScaledResolution) method.newInstance(arg1,
-					getMinecraft().displayWidth, getMinecraft().displayHeight);
+		ScaledResolution res = new ScaledResolution(getMinecraft());
 
-			String[] str;
-			synchronized (strategyDescrMutex) {
-				str = (strategyDescr == null ? "?" : strategyDescr).split("\n");
-			}
-			int y = 10;
-			for (String s : str) {
-				getMinecraft().fontRendererObj.drawStringWithShadow(
-						s,
-						res.getScaledWidth()
-								- getMinecraft().fontRendererObj
-										.getStringWidth(s) - 10, y, 16777215);
-				y += 15;
-			}
-		} catch (final InstantiationException e) {
-			e.printStackTrace();
-		} catch (final IllegalAccessException e) {
-			e.printStackTrace();
-		} catch (final InvocationTargetException e) {
-			e.printStackTrace();
+		String[] str;
+		synchronized (strategyDescrMutex) {
+			str = (strategyDescr == null ? "?" : strategyDescr).split("\n");
+		}
+		int y = 10;
+		for (String s : str) {
+			getMinecraft().fontRendererObj.drawStringWithShadow(
+					s,
+					res.getScaledWidth()
+							- getMinecraft().fontRendererObj.getStringWidth(s)
+							- 10, y, 16777215);
+			y += 15;
 		}
 	}
 
@@ -345,7 +332,7 @@ public class AIController extends AIHelper implements IAIControllable {
 		}
 		activeDrawEvent = event;
 	}
-	
+
 	public void drawMakers() {
 		final Entity view = getMinecraft().getRenderViewEntity();
 		if (!(view instanceof EntityPlayerSP)) {

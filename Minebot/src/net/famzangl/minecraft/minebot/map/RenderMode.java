@@ -54,7 +54,7 @@ public enum RenderMode {
 
 		@Override
 		public int getColor(WorldData world, Chunk chunk, int dx, int dz) {
-			int h = chunk.getHeight(dx & 0xf, dz & 0xf) + 1;
+			int h = chunk.getHeightValue(dx & 0xf, dz & 0xf) + 1;
 			while (h > 3
 					&& IGNORED_COVER_BLOCKS.contains(chunk.getBlock(dx, h, dz))) {
 				h--;
@@ -77,7 +77,7 @@ public enum RenderMode {
 	private static class MapRenderer implements RenderMode.IRenderer {
 		@Override
 		public int getColor(WorldData world, Chunk chunk, int dx, int dz) {
-			int h = chunk.getHeight(dx & 0xf, dz & 0xf) + 1;
+			int h = chunk.getHeightValue(dx & 0xf, dz & 0xf) + 1;
 			IBlockState state;
 			do {
 				--h;

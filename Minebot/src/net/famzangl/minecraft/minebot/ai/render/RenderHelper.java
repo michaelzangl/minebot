@@ -41,8 +41,8 @@ public class RenderHelper {
 
     public static final VertexFormat VF = new VertexFormat();
     static {
-        VF.setElement(new VertexFormatElement(0, VertexFormatElement.EnumType.FLOAT, VertexFormatElement.EnumUsage.POSITION, 3));
-        VF.setElement(new VertexFormatElement(0, VertexFormatElement.EnumType.UBYTE, VertexFormatElement.EnumUsage.COLOR, 4));
+        VF.addElement(new VertexFormatElement(0, VertexFormatElement.EnumType.FLOAT, VertexFormatElement.EnumUsage.POSITION, 3));
+        VF.addElement(new VertexFormatElement(0, VertexFormatElement.EnumType.UBYTE, VertexFormatElement.EnumUsage.COLOR, 4));
     }
 
 	public void renderStart(RenderTickEvent event, AIHelper helper) {
@@ -57,9 +57,8 @@ public class RenderHelper {
 		preRender();
         Tessellator tessellator = Tessellator.getInstance();
         WorldRenderer worldrenderer = tessellator.getWorldRenderer();
-        worldrenderer.setVertexFormat(VF);
         worldrenderer.setTranslation(-x, -y, -z);
-        worldrenderer.startDrawingQuads();
+        worldrenderer.begin(GL11.GL_QUADS, VF);
        // worldrenderer.markDirty();
 	}
 
@@ -99,39 +98,39 @@ public class RenderHelper {
 	protected void renderMarker(BlockPos m, float r, float g, float b, float a) {
 		final Tessellator tessellator = Tessellator.getInstance();
 		WorldRenderer renderer = tessellator.getWorldRenderer();
-		renderer.setColorRGBA_F(r, g, b, a);
+		renderer.color(r, g, b, a);
 		renderMarkerP(renderer, m.getX(), m.getY(), m.getZ());
 	}
 
 	private void renderMarkerP(WorldRenderer worldRenderer, int x, int y, int z) {
-		worldRenderer.addVertex(x + MIN, y + MAX, z + MIN);
-		worldRenderer.addVertex(x + MIN, y + MAX, z + MAX);
-		worldRenderer.addVertex(x + MAX, y + MAX, z + MAX);
-		worldRenderer.addVertex(x + MAX, y + MAX, z + MIN);
+		worldRenderer.pos(x + MIN, y + MAX, z + MIN);
+		worldRenderer.pos(x + MIN, y + MAX, z + MAX);
+		worldRenderer.pos(x + MAX, y + MAX, z + MAX);
+		worldRenderer.pos(x + MAX, y + MAX, z + MIN);
 
-		worldRenderer.addVertex(x + MIN, y + MIN, z + MIN);
-		worldRenderer.addVertex(x + MIN, y + MIN, z + MAX);
-		worldRenderer.addVertex(x + MIN, y + MAX, z + MAX);
-		worldRenderer.addVertex(x + MIN, y + MAX, z + MIN);
+		worldRenderer.pos(x + MIN, y + MIN, z + MIN);
+		worldRenderer.pos(x + MIN, y + MIN, z + MAX);
+		worldRenderer.pos(x + MIN, y + MAX, z + MAX);
+		worldRenderer.pos(x + MIN, y + MAX, z + MIN);
 
-		worldRenderer.addVertex(x + MAX, y + MAX, z + MIN);
-		worldRenderer.addVertex(x + MAX, y + MAX, z + MAX);
-		worldRenderer.addVertex(x + MAX, y + MIN, z + MAX);
-		worldRenderer.addVertex(x + MAX, y + MIN, z + MIN);
+		worldRenderer.pos(x + MAX, y + MAX, z + MIN);
+		worldRenderer.pos(x + MAX, y + MAX, z + MAX);
+		worldRenderer.pos(x + MAX, y + MIN, z + MAX);
+		worldRenderer.pos(x + MAX, y + MIN, z + MIN);
 
-		worldRenderer.addVertex(x + MIN, y + MIN, z + MIN);
-		worldRenderer.addVertex(x + MIN, y + MAX, z + MIN);
-		worldRenderer.addVertex(x + MAX, y + MAX, z + MIN);
-		worldRenderer.addVertex(x + MAX, y + MIN, z + MIN);
+		worldRenderer.pos(x + MIN, y + MIN, z + MIN);
+		worldRenderer.pos(x + MIN, y + MAX, z + MIN);
+		worldRenderer.pos(x + MAX, y + MAX, z + MIN);
+		worldRenderer.pos(x + MAX, y + MIN, z + MIN);
 
-		worldRenderer.addVertex(x + MIN, y + MAX, z + MAX);
-		worldRenderer.addVertex(x + MIN, y + MIN, z + MAX);
-		worldRenderer.addVertex(x + MAX, y + MIN, z + MAX);
-		worldRenderer.addVertex(x + MAX, y + MAX, z + MAX);
+		worldRenderer.pos(x + MIN, y + MAX, z + MAX);
+		worldRenderer.pos(x + MIN, y + MIN, z + MAX);
+		worldRenderer.pos(x + MAX, y + MIN, z + MAX);
+		worldRenderer.pos(x + MAX, y + MAX, z + MAX);
 
-		worldRenderer.addVertex(x + MIN, y + MIN, z + MAX);
-		worldRenderer.addVertex(x + MIN, y + MIN, z + MIN);
-		worldRenderer.addVertex(x + MAX, y + MIN, z + MIN);
-		worldRenderer.addVertex(x + MAX, y + MIN, z + MAX);
+		worldRenderer.pos(x + MIN, y + MIN, z + MAX);
+		worldRenderer.pos(x + MIN, y + MIN, z + MIN);
+		worldRenderer.pos(x + MAX, y + MIN, z + MIN);
+		worldRenderer.pos(x + MAX, y + MIN, z + MAX);
 	}
 }

@@ -11,17 +11,17 @@ buildscript {
         }
     }
     dependencies {
-        classpath 'net.minecraftforge.gradle:ForgeGradle:1.2-SNAPSHOT'
+        classpath 'net.minecraftforge.gradle:ForgeGradle:2.1-SNAPSHOT'
     }
 }
 
-apply plugin: 'fml'
+apply plugin: 'net.minecraftforge.gradle.forge'
 apply plugin: 'java'
 compileJava.options.encoding = 'UTF-8'
 
 
 minecraft {
-    version = "1.8-8.0.16.1021-1.8"
+    version = "1.8.9-11.15.0.1719"
     runDir = "eclipse"
 
     // the mappings can be changed at any time, and must be in the following format.
@@ -29,7 +29,7 @@ minecraft {
     // stable_#            stables are built at the discretion of the MCP team.
     // Use non-default mappings at your own risk. they may not allways work.
     // simply re-run your setup task after changing the mappings to update your workspace.
-    mappings = "snapshot_nodoc_20141130"
+    mappings = "stable_20"
 }
 
 

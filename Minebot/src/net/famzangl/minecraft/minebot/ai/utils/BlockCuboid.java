@@ -89,8 +89,7 @@ public class BlockCuboid extends BlockArea {
 	}
 
 	public BlockCuboid move(int amount, EnumFacing direction) {
-		BlockPos dir = new BlockPos(direction.getDirectionVec());
-		return move(dir.multiply(amount));
+		return move(Pos.ZERO.offset(direction, amount));
 	}
 
 	public BlockCuboid move(Vec3i vec) {

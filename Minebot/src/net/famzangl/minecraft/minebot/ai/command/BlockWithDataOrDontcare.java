@@ -72,10 +72,10 @@ public abstract class BlockWithDataOrDontcare {
 			return AIR;
 		}
 
-		Block block = (Block) Block.blockRegistry.getObject(matcher.group(1));
+		Block block = (Block) Block.blockRegistry.getObject(new ResourceLocation(matcher.group(1)));
 		if (block == null || block == Blocks.air) {
 			// minecraft:dirt case
-			block = (Block) Block.blockRegistry.getObject(blockWithMeta);
+			block = (Block) Block.blockRegistry.getObject(new ResourceLocation(blockWithMeta));
 			matcher = null;
 		}
 		if (block == null || block == Blocks.air) {

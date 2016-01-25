@@ -30,7 +30,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.core.LoggerContext;
 import org.apache.logging.log4j.core.config.Configuration;
 
-@Mod(modid = "minebot-mod", name = "Minebot", version = "0.3.0")
+@Mod(modid = "minebot-mod", name = "Minebot", version = "0.4")
 public class MinebotMod {
 	@Instance(value = "minebot-mod")
 	public static MinebotMod instance;
