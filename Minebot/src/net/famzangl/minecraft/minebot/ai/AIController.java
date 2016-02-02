@@ -130,8 +130,6 @@ public class AIController extends AIHelper implements IAIControllable {
 
 	private PosMarkerRenderer markerRenderer;
 
-	private boolean skipNextTick;
-
 	private MouseHelper oldMouseHelper;
 
 	private BuildMarkerRenderer buildMarkerRenderer;
@@ -176,11 +174,6 @@ public class AIController extends AIHelper implements IAIControllable {
 
 		LOGGER.debug(MARKER_STRATEGY, "Strategy game tick. World time: "
 				+ getMinecraft().theWorld.getTotalWorldTime());
-		if (skipNextTick) {
-			skipNextTick = false;
-			LOGGER.debug(MARKER_STRATEGY, "Tick skip was requested");
-			return;
-		}
 		testUngrabMode();
 		invalidateObjectMouseOver();
 		resetAllInputs();
@@ -189,6 +182,8 @@ public class AIController extends AIHelper implements IAIControllable {
 		if (ungrab.isPressed()) {
 			doUngrab = true;
 		}
+
+		getStats().setGameTickTimer(getWorld());
 
 		AIStrategy newStrat;
 		if (dead || stop.isPressed() || stop.isKeyDown()) {

@@ -33,6 +33,7 @@ import net.famzangl.minecraft.minebot.build.BuildManager;
 import net.famzangl.minecraft.minebot.map.MapReader;
 import net.famzangl.minecraft.minebot.settings.MinebotSettings;
 import net.famzangl.minecraft.minebot.settings.SaferuleSettings;
+import net.famzangl.minecraft.minebot.stats.StatsManager;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockFence;
 import net.minecraft.block.BlockFenceGate;
@@ -116,6 +117,8 @@ public abstract class AIHelper {
 	private boolean sprintKeyJustPressed;
 
 	protected MapReader activeMapReader;
+	
+	private final StatsManager stats = new StatsManager();
 
 	public AIHelper() {
 		
@@ -140,8 +143,12 @@ public abstract class AIHelper {
 	protected void invalidateChunkCache() {
 		if (minecraftWorld == null
 				|| mc.theWorld != minecraftWorld.getBackingWorld()) {
-			minecraftWorld = mc.theWorld == null ? null : new WorldData(
-					mc.theWorld, mc.thePlayer);
+			if (mc.theWorld == null) {
+				minecraftWorld = null;
+			} else {
+				minecraftWorld = new WorldData(
+						mc.theWorld, mc.thePlayer);
+			}
 		}
 		if (minecraftWorld != null) {
 			minecraftWorld.invalidateChunkCache();
@@ -635,6 +642,7 @@ public abstract class AIHelper {
 		if (isFacingBlock(pos)) {
 			selectToolFor(pos);
 			overrideAttack();
+			stats.markIntentionalBlockBreak(pos);
 		}
 	}
 
@@ -1139,6 +1147,10 @@ public abstract class AIHelper {
 
 	public MapReader getActiveMapReader() {
 		return activeMapReader;
+	}
+	
+	public StatsManager getStats() {
+		return stats;
 	}
 
 }

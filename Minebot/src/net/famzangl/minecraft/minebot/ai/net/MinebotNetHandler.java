@@ -35,7 +35,10 @@ import net.minecraft.network.play.INetHandlerPlayClient;
 import net.minecraft.network.play.client.C01PacketChatMessage;
 import net.minecraft.network.play.client.C14PacketTabComplete;
 import net.minecraft.network.play.server.S02PacketChat;
+import net.minecraft.network.play.server.S14PacketEntity;
 import net.minecraft.network.play.server.S21PacketChunkData;
+import net.minecraft.network.play.server.S22PacketMultiBlockChange;
+import net.minecraft.network.play.server.S22PacketMultiBlockChange.BlockUpdateData;
 import net.minecraft.network.play.server.S23PacketBlockChange;
 import net.minecraft.network.play.server.S24PacketBlockAction;
 import net.minecraft.network.play.server.S26PacketMapChunkBulk;
@@ -261,6 +264,14 @@ public class MinebotNetHandler extends NetHandlerPlayClient implements
 		blockChange(packetIn.getBlockPosition());
 		super.handleBlockAction(packetIn);
 	}
+	
+	@Override
+	public void handleMultiBlockChange(S22PacketMultiBlockChange packetIn) {
+		for (BlockUpdateData b : packetIn.getChangedBlocks()) {
+			blockChange(b.getPos());
+		}
+		super.handleMultiBlockChange(packetIn);
+	}
 
 	private void blockChange(BlockPos pos) {
 		int chunkPosX = pos.getX() >> 4;
@@ -295,5 +306,11 @@ public class MinebotNetHandler extends NetHandlerPlayClient implements
 
 	public List<PersistentChat> getChatMessages() {
 		return Collections.unmodifiableList(chatMessages);
+	}
+	
+	@Override
+	public void handleEntityMovement(S14PacketEntity packetIn) {
+		// TODO Auto-generated method stub
+		super.handleEntityMovement(packetIn);
 	}
 }

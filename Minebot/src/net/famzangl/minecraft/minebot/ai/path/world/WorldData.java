@@ -1,5 +1,7 @@
 package net.famzangl.minecraft.minebot.ai.path.world;
 
+import java.util.prefs.BackingStoreException;
+
 import net.famzangl.minecraft.minebot.ai.command.BlockWithData;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockTorch;
@@ -264,6 +266,10 @@ public class WorldData {
 
 	public BlockWithData getBlock(BlockPos position) {
 		return new BlockWithData(getBlockIdWithMeta(position));
+	}
+
+	public long getWorldTime() {
+		return theWorld.getTotalWorldTime();
 	}
 
 }

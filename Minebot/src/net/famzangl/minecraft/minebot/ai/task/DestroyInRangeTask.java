@@ -193,6 +193,7 @@ public class DestroyInRangeTask extends AITask implements CanPrefaceAndDestroy {
 			if (p != null) {
 				h.selectToolFor(p);
 				h.overrideAttack();
+				h.getStats().markIntentionalBlockBreak(p);
 				facingAttempts = 0;
 			} else {
 				h.face(facingPos);
