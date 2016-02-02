@@ -44,7 +44,6 @@ import net.minecraft.block.BlockSlab;
 import net.minecraft.block.BlockWall;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.entity.Entity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.BlockPos;
@@ -842,7 +841,11 @@ public abstract class AIHelper {
 	}
 
 	protected boolean userTookOver() {
-		// We might implement this some time...
+		for (KeyboardInputController key : keys.values()) {
+			if (key.wasPressedByUser()) {
+				return true;
+			}
+		}
 		return false;
 	}
 
