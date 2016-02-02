@@ -86,6 +86,10 @@ public enum RenderMode {
 					.getBlock().getMapColor(state) == MapColor.airColor)
 					&& h > 0);
 
+			if (state.getBlock() == Blocks.sandstone || state.getBlock() == Blocks.sandstone_stairs) {
+				return 0xffb4ad8a;
+			}
+			
 			MapColor color = (state.getBlock().getMapColor(state));
 			return getColor(color);
 		}
