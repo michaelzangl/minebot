@@ -228,6 +228,8 @@ public class AIController extends AIHelper implements IAIControllable {
 				strategyDescr = "";
 			}
 		}
+		
+		keyboardPostTick();
 		LOGGER.debug(MARKER_STRATEGY, "Strategy game tick done");
 
 		if (activeMapReader != null) {

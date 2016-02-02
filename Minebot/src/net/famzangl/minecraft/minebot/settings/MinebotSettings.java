@@ -28,7 +28,6 @@ import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.MarkerManager;
 
-import net.famzangl.minecraft.minebot.ai.InteractAlways;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockFloatMap;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSet;
 import net.famzangl.minecraft.minebot.ai.tools.ToolRater;

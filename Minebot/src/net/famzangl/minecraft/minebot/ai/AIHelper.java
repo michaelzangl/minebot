@@ -17,10 +17,13 @@
 package net.famzangl.minecraft.minebot.ai;
 
 import java.io.File;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
 
 import net.famzangl.minecraft.minebot.ai.command.AIChatController;
+import net.famzangl.minecraft.minebot.ai.input.KeyboardInputController;
+import net.famzangl.minecraft.minebot.ai.input.KeyboardInputController.KeyType;
 import net.famzangl.minecraft.minebot.ai.net.NetworkHelper;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockBounds;
 import net.famzangl.minecraft.minebot.ai.path.world.Pos;
@@ -106,22 +109,19 @@ public abstract class AIHelper {
 	protected BlockPos pos2 = null;
 
 	private MovementInput resetMovementInput;
-	private KeyBinding resetAttackKey;
-	private KeyBinding resetUseItemKey;
-	private boolean useItemKeyJustPressed;
-	private boolean attackKeyJustPressed;
+	
+	private HashMap<KeyType, KeyboardInputController> keys = new HashMap<KeyType, KeyboardInputController>();
+	
 	protected boolean doUngrab;
-	private KeyBinding resetSneakKey;
-	private boolean sneakKeyJustPressed;
-	private KeyBinding resetSprintKey;
-	private boolean sprintKeyJustPressed;
 
 	protected MapReader activeMapReader;
 	
 	private final StatsManager stats = new StatsManager();
 
 	public AIHelper() {
-		
+		for (KeyType key : KeyType.values()) {
+			keys.put(key, new KeyboardInputController(mc, key));
+		}
 	}
 	
 	/**
@@ -794,14 +794,7 @@ public abstract class AIHelper {
 	 * Presses the use item key in the next game tick.
 	 */
 	public void overrideUseItem() {
-		if (resetUseItemKey == null) {
-			resetUseItemKey = mc.gameSettings.keyBindUseItem;
-			// useItemKeyJustPressed |= resetUseItemKey.getIsKeyPressed();
-		}
-		mc.gameSettings.keyBindUseItem = new InteractAlways(
-				mc.gameSettings.keyBindAttack.getKeyDescription(), 501,
-				mc.gameSettings.keyBindAttack.getKeyCategory(),
-				!useItemKeyJustPressed);
+		overrideKey(KeyType.USE);
 	}
 
 	/**
@@ -809,49 +802,27 @@ public abstract class AIHelper {
 	 */
 	public void overrideAttack() {
 		if (mc.thePlayer.isUsingItem()) {
-			System.err
-					.println("WARNING: Player is currently using an item, but attack was requested.");
+			LOGGER.warn("WARNING: Player is currently using an item, but attack was requested.");
 		}
-		if (resetAttackKey == null) {
-			resetAttackKey = mc.gameSettings.keyBindAttack;
-			// if (resetAttackKey.getIsKeyPressed()) {
-			// System.out.println("Attack was pressed.");
-			// }
-			// This just made problems...
-			// attackKeyJustPressed |= resetAttackKey.getIsKeyPressed();
-		}
-		mc.gameSettings.keyBindAttack = new InteractAlways(
-				mc.gameSettings.keyBindAttack.getKeyDescription(), 502,
-				mc.gameSettings.keyBindAttack.getKeyCategory(),
-				!attackKeyJustPressed);
+		overrideKey(KeyType.ATTACK);
 	}
 
 	/**
 	 * Presses the sneak key in the next game step.
 	 */
 	public void overrideSneak() {
-		if (resetSneakKey == null) {
-			resetSneakKey = mc.gameSettings.keyBindSneak;
-			// sneakKeyJustPressed |= resetSneakKey.getIsKeyPressed();
-		}
-		mc.gameSettings.keyBindSneak = new InteractAlways(
-				mc.gameSettings.keyBindSneak.getKeyDescription(), 503,
-				mc.gameSettings.keyBindSneak.getKeyCategory(),
-				!sneakKeyJustPressed);
+		overrideKey(KeyType.SNEAK);
 	}
 
 	/**
 	 * Presses the sneak key in the next game step.
 	 */
 	public void overrideSprint() {
-		if (resetSprintKey == null) {
-			resetSprintKey = mc.gameSettings.keyBindSprint;
-			// sneakKeyJustPressed |= resetSneakKey.getIsKeyPressed();
-		}
-		mc.gameSettings.keyBindSprint = new InteractAlways(
-				mc.gameSettings.keyBindSprint.getKeyDescription(), 504,
-				mc.gameSettings.keyBindSprint.getKeyCategory(),
-				!sprintKeyJustPressed);
+		overrideKey(KeyType.SPRINT);
+	}
+
+	private void overrideKey(KeyType type) {
+		keys.get(type).overridePressed();
 	}
 
 	/**
@@ -862,40 +833,17 @@ public abstract class AIHelper {
 			mc.thePlayer.movementInput = resetMovementInput;
 			resetMovementInput = null;
 		}
-		attackKeyJustPressed = resetAttackKey != null;
-		if (resetAttackKey != null) {
-			mc.gameSettings.keyBindAttack = resetAttackKey;
-			resetAttackKey = null;
-		}
-		useItemKeyJustPressed = resetUseItemKey != null;
-		if (resetUseItemKey != null) {
-			mc.gameSettings.keyBindUseItem = resetUseItemKey;
-			resetUseItemKey = null;
-		}
-		sneakKeyJustPressed = resetSneakKey != null;
-		if (resetSneakKey != null) {
-			mc.gameSettings.keyBindSneak = resetSneakKey;
-			resetSneakKey = null;
-		}
-		sprintKeyJustPressed = resetSprintKey != null;
-		if (resetSprintKey != null) {
-			mc.gameSettings.keyBindSprint = resetSprintKey;
-			resetSprintKey = null;
+	}
+	
+	protected void keyboardPostTick() {
+		for (KeyboardInputController k : keys.values()) {
+			k.doTick();
 		}
 	}
 
 	protected boolean userTookOver() {
-		final MovementInput mi = resetMovementInput == null ? mc.thePlayer.movementInput
-				: resetMovementInput;
-		final KeyBinding attack = resetAttackKey == null ? mc.gameSettings.keyBindAttack
-				: resetAttackKey;
-		final KeyBinding use = resetUseItemKey == null ? mc.gameSettings.keyBindUseItem
-				: resetUseItemKey;
-		final KeyBinding sneak = resetSneakKey == null ? mc.gameSettings.keyBindSneak
-				: resetSneakKey;
-
-		return mi.moveForward != 0 || mi.moveStrafe != 0 || mi.jump
-				|| attack.isKeyDown() || use.isKeyDown() || sneak.isKeyDown();
+		// We might implement this some time...
+		return false;
 	}
 
 	/**
