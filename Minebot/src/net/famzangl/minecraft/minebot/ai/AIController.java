@@ -51,6 +51,7 @@ import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.MarkerManager;
 import org.lwjgl.input.Keyboard;
+import org.lwjgl.opengl.Display;
 
 /**
  * The main class that handles the bot.
@@ -132,6 +133,7 @@ public class AIController extends AIHelper implements IAIControllable {
 	private NetworkHelper networkHelper;
 	private InterceptingProfiler profilerHelper;
 	private RenderTickEvent activeDrawEvent;
+	private boolean displayWasActiveSinceUngrab;
 
 	public AIController() {
 		AIChatController.getRegistry().setControlled(this);
@@ -285,11 +287,13 @@ public class AIController extends AIHelper implements IAIControllable {
 			oldMouseHelper = getMinecraft().mouseHelper;
 		}
 		getMinecraft().mouseHelper = new UngrabMouseHelper();
+		displayWasActiveSinceUngrab = false;
 	}
 
 	private synchronized void testUngrabMode() {
+		displayWasActiveSinceUngrab &= Display.isActive();
 		if (oldMouseHelper != null) {
-			if (userTookOver()) {
+			if ((userTookOver() || !displayWasActiveSinceUngrab) && Display.isActive()) {
 				LOGGER.debug(MARKER_MOUSE, "Preparing to re-grab the mouse.");
 				// Tell minecraft what really happened.
 				getMinecraft().mouseHelper = oldMouseHelper;

@@ -31,7 +31,6 @@ public class CloseScreenTask extends AITask {
 	@Override
 	public void runTick(AIHelper h, TaskOperations o) {
 		h.getMinecraft().displayGuiScreen((GuiScreen) null);
-		h.getMinecraft().setIngameFocus();
 	}
 
 }
