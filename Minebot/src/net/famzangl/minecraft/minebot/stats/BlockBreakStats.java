@@ -21,8 +21,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import javax.swing.JLabel;
-
 import net.famzangl.minecraft.minebot.ai.command.BlockWithData;
 import net.famzangl.minecraft.minebot.ai.path.world.WorldData;
 import net.minecraft.util.BlockPos;

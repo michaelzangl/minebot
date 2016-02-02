@@ -24,7 +24,6 @@ import net.famzangl.minecraft.minebot.ai.command.BlockWithData;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSets;
 import net.famzangl.minecraft.minebot.ai.path.world.WorldData;
 import net.minecraft.util.BlockPos;
-import net.minecraft.world.WorldSettings.GameType;
 
 /**
  * This is the entry point for the stats.

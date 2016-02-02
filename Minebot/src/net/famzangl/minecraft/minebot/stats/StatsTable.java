@@ -16,10 +16,8 @@
  *******************************************************************************/
 package net.famzangl.minecraft.minebot.stats;
 
-import java.awt.Component;
 import java.awt.GridLayout;
 
-import javax.swing.BoxLayout;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
