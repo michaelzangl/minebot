@@ -16,13 +16,8 @@
  *******************************************************************************/
 package net.famzangl.minecraft.minebot.ai.path;
 
-import java.util.LinkedList;
-
-import net.famzangl.minecraft.minebot.ai.task.move.AlignToGridTask;
-import net.famzangl.minecraft.minebot.build.WalkTowardsTask;
 import net.famzangl.minecraft.minebot.settings.MinebotSettingsRoot;
 import net.famzangl.minecraft.minebot.settings.PathfindingSetting;
-import net.minecraft.util.BlockPos;
 
 /**
  * This is a special type of pathfinder that attempts to walk to the target

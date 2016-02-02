@@ -47,7 +47,6 @@ import net.famzangl.minecraft.minebot.ai.tools.ToolRater;
 import net.minecraft.command.CommandResultStats.Type;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.command.PlayerSelector;
-import net.minecraft.command.server.CommandTestForBlock;
 import net.minecraft.entity.Entity;
 import net.minecraft.nbt.JsonToNBT;
 import net.minecraft.nbt.NBTException;

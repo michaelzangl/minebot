@@ -3,16 +3,15 @@ package net.famzangl.minecraft.minebot.ai.path.world;
 import java.util.Arrays;
 import java.util.Hashtable;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.Marker;
-import org.apache.logging.log4j.MarkerManager;
-
-import net.famzangl.minecraft.minebot.settings.MinebotSettings;
 import net.minecraft.block.Block;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.Vec3;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.Marker;
+import org.apache.logging.log4j.MarkerManager;
 
 public class WorldWithDelta extends WorldData {
 	private static final Marker MARKER_WORLD_DELTA = MarkerManager

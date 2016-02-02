@@ -21,7 +21,6 @@ import java.util.List;
 
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.enchanting.CloseScreenTask;
-import net.famzangl.minecraft.minebot.ai.path.world.Pos;
 import net.famzangl.minecraft.minebot.ai.scanner.BlockRangeFinder;
 import net.famzangl.minecraft.minebot.ai.scanner.BlockRangeScanner;
 import net.famzangl.minecraft.minebot.ai.scanner.ChestBlockHandler;

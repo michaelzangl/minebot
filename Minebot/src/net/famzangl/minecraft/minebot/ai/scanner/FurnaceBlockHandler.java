@@ -18,7 +18,6 @@ package net.famzangl.minecraft.minebot.ai.scanner;
 
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Hashtable;
 import java.util.Map.Entry;
 
 import net.famzangl.minecraft.minebot.ai.AIHelper;

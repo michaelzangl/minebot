@@ -28,7 +28,6 @@ import net.famzangl.minecraft.minebot.ai.enchanting.PutLapisInTableTask;
 import net.famzangl.minecraft.minebot.ai.enchanting.SelectEnchantmentTask;
 import net.famzangl.minecraft.minebot.ai.enchanting.TakeEnchantedItemTask;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSet;
-import net.famzangl.minecraft.minebot.ai.path.world.Pos;
 import net.famzangl.minecraft.minebot.ai.path.world.WorldData;
 import net.famzangl.minecraft.minebot.ai.scanner.BlockRangeFinder;
 import net.famzangl.minecraft.minebot.ai.scanner.BlockRangeScanner;

@@ -35,7 +35,7 @@ import net.minecraft.network.play.INetHandlerPlayClient;
 import net.minecraft.network.play.client.C01PacketChatMessage;
 import net.minecraft.network.play.client.C14PacketTabComplete;
 import net.minecraft.network.play.server.S02PacketChat;
-import net.minecraft.network.play.server.S14PacketEntity;
+import net.minecraft.network.play.server.S08PacketPlayerPosLook;
 import net.minecraft.network.play.server.S21PacketChunkData;
 import net.minecraft.network.play.server.S22PacketMultiBlockChange;
 import net.minecraft.network.play.server.S22PacketMultiBlockChange.BlockUpdateData;
@@ -65,6 +65,8 @@ public class MinebotNetHandler extends NetHandlerPlayClient implements
 			.getMarker("fish");
 	private static final Marker MARKER_COMPLETE = MarkerManager
 			.getMarker("complete");
+	private static final Marker MARKER_POS = MarkerManager
+			.getMarker("pos");
 	private static final Logger LOGGER = LogManager.getLogger(MinebotNetHandler.class);
 
 	public static class PersistentChat {
@@ -309,8 +311,8 @@ public class MinebotNetHandler extends NetHandlerPlayClient implements
 	}
 	
 	@Override
-	public void handleEntityMovement(S14PacketEntity packetIn) {
-		// TODO Auto-generated method stub
-		super.handleEntityMovement(packetIn);
+	public void handlePlayerPosLook(S08PacketPlayerPosLook packetIn) {
+		LOGGER.trace(MARKER_POS, "Forced move to: " + packetIn.getX() + "," + packetIn.getZ());
+		super.handlePlayerPosLook(packetIn);
 	}
 }

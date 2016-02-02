@@ -16,17 +16,14 @@
  *******************************************************************************/
 package net.famzangl.minecraft.minebot.ai.input;
 
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.settings.GameSettings;
+import net.minecraft.client.settings.KeyBinding;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.MarkerManager;
-
-import com.sun.corba.se.impl.protocol.giopmsgheaders.KeyAddr;
-
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.settings.GameSettings;
-import net.minecraft.client.settings.KeyBinding;
-import net.minecraftforge.event.entity.minecart.MinecartCollisionEvent;
 
 /**
  * This class simulates a key pressed / not pressed.
@@ -135,5 +132,9 @@ public class KeyboardInputController {
 		}
 		wasOverride = isOverride;
 		isOverride = false;
+	}
+
+	public boolean wasPressedByUser() {
+		return !isOverride && !wasOverride && key.getBinding(mc).isKeyDown();
 	}
 }

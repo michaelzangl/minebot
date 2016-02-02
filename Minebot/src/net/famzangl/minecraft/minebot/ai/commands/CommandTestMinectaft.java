@@ -17,7 +17,6 @@ import net.famzangl.minecraft.minebot.ai.utils.BlockCuboid;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.BlockPos;
-import net.minecraft.util.Vec3i;
 
 @AICommand(helpText = "Some performance/... tests.", name = "minebot")
 public class CommandTestMinectaft {
