@@ -184,7 +184,7 @@ public class AIController extends AIHelper implements IAIControllable {
 		getStats().setGameTickTimer(getWorld());
 
 		AIStrategy newStrat;
-		if (dead || stop.isPressed() || stop.isKeyDown()) {
+		if (dead || isStopPressed()) {
 			// FIXME: Better way to determine of this stategy can be resumed.
 			if (deactivatedStrategy == null
 					&& !(currentStrategy instanceof RunOnceStrategy)) {
@@ -234,6 +234,10 @@ public class AIController extends AIHelper implements IAIControllable {
 			activeMapReader.tick(this);
 		}
 
+	}
+
+	private boolean isStopPressed() {
+		return stop.isPressed() || stop.isKeyDown() || Keyboard.isKeyDown(stop.getKeyCode());
 	}
 
 	private void deactivateCurrentStrategy() {
@@ -287,7 +291,7 @@ public class AIController extends AIHelper implements IAIControllable {
 			oldMouseHelper = getMinecraft().mouseHelper;
 		}
 		getMinecraft().mouseHelper = new UngrabMouseHelper();
-		displayWasActiveSinceUngrab = false;
+		displayWasActiveSinceUngrab = true;
 	}
 
 	private synchronized void testUngrabMode() {
