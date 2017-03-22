@@ -32,6 +32,9 @@ Building Minebot is straight forward. You need linux, git and the normal java de
 Developing Minebot
 ==================
 
+I won't develop this mod any further. Minecraft 1.8.9 is the last supported version.
+But I will be accepting PRs to this repository.
+
 I use eclipse for development. You should know how to set up and use Minecraft Forge.
 
 How to add a new command:
