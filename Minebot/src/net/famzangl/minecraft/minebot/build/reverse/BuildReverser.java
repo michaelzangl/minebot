@@ -131,19 +131,19 @@ public class BuildReverser {
 		BlockPos localPos = pos.subtract(minPos);
 		LOGGER.trace(MARKER_RECONSTRUCT, "Reconstructing block at " + pos);
 
-		final Block b = helper.getBlock(pos);
-		if (b != Blocks.air) {
+		final Block block = helper.getBlock(pos);
+		if (block != Blocks.air) {
 			try {
 				final TaskDescription taskString = BuildTaskFactories.getTaskFor(helper.getWorld(), pos) ;
 				LOGGER.trace(MARKER_RECONSTRUCT, "Resulting description: " + taskString);
-				field.setBlockAt(localPos, b, taskString);
+				field.setBlockAt(localPos, block, taskString);
 				out.println("/minebuild schedule ~" + localPos.getX() + " ~"
 						+ localPos.getY() + " ~" + localPos.getZ() + " "
 						+ taskString.getCommandArgs());
 			} catch (final UnsupportedBlockException e) {
 				out.println("# Missing: ~" + localPos.getX() + " ~"
 						+ localPos.getY() + " ~" + localPos.getZ() + " "
-						+ b.getLocalizedName());
+						+ block.getLocalizedName());
 				LOGGER.warn(MARKER_RECONSTRUCT, "Error: " + e.getMessage());
 				missingBlocks++;
 			}
