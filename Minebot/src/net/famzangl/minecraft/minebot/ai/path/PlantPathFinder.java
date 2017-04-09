@@ -62,8 +62,8 @@ public class PlantPathFinder extends MovePathFinder {
 		@Override
 		public boolean applyToDelta(WorldWithDelta world) {
 			Item anyPlaceItem = seedFilter.type.items[0];
-			Block b = Block.getBlockFromItem(anyPlaceItem);
-			world.setBlock(pos, Block.getIdFromBlock(b), 0);
+			Block block = Block.getBlockFromItem(anyPlaceItem);
+			world.setBlock(pos, Block.getIdFromBlock(block), 0);
 			return true;
 		}
 	}
