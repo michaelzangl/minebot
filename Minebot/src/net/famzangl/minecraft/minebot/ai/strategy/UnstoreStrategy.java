@@ -48,14 +48,14 @@ public class UnstoreStrategy extends PathFinderStrategy {
 			this.wantedInventory = wantedInventory;
 		}
 
-		public boolean couldUseOneOf(ChestData c) {
+		public boolean couldUseOneOf(ChestData chestData) {
 			for (int i = 0; i < 36; i++) {
 				InventorySlot slot = wantedInventory.getSlot(i);
 				if (slot.isEmpty() || noMoreWork[i]) {
 					continue;
 				}
 
-				if (c.couldTakeItem(slot.getFakeMcStack())) {
+				if (chestData.couldTakeItem(slot.getFakeMcStack())) {
 					return true;
 				}
 			}
@@ -63,11 +63,11 @@ public class UnstoreStrategy extends PathFinderStrategy {
 		}
 
 		public ArrayList<AITask> getTakeTasks(ItemStack[] mainInventory,
-				ChestData c) {
+				ChestData chestData) {
 			ArrayList<AITask> tasks = new ArrayList<AITask>();
 			for (int inventorySlot = 0; inventorySlot < 36; inventorySlot++) {
 				InventorySlot slot = wantedInventory.getSlot(inventorySlot);
-				if (slot.isEmpty() || !c.couldTakeItem(slot.getFakeMcStack())) {
+				if (slot.isEmpty() || !chestData.couldTakeItem(slot.getFakeMcStack())) {
 					continue;
 				}
 				if (mainInventory[inventorySlot] != null) {
@@ -87,13 +87,13 @@ public class UnstoreStrategy extends PathFinderStrategy {
 					}
 				}
 
-				tasks.add(getTask(inventorySlot, slot, c));
+				tasks.add(getTask(inventorySlot, slot, chestData));
 			}
 			return tasks;
 		}
 
 		private MoveInInventoryTask getTask(final int inventorySlot,
-				final InventorySlot slot, final ChestData c) {
+				final InventorySlot slot, final ChestData chestData) {
 			return new MoveInInventoryTask() {
 				private int fromStack = -2;
 
@@ -128,10 +128,10 @@ public class UnstoreStrategy extends PathFinderStrategy {
 								getSlotContentCount(screen.inventorySlots
 										.getSlot(getToStack(aiHelper))));
 						for (int i = 0; i < inventorySlots.size() - 36; i++) {
-							Slot s = inventorySlots.get(i);
-							if (filter.matches(s.getStack())) {
+							Slot inventorySlot = inventorySlots.get(i);
+							if (filter.matches(inventorySlot.getStack())) {
 								int rating = rateSize(aiHelper,
-										s.getStack().stackSize, missing);
+										inventorySlot.getStack().stackSize, missing);
 								if (rating > fromStackRating) {
 									fromStackRating = rating;
 									fromStack = i;
@@ -140,7 +140,7 @@ public class UnstoreStrategy extends PathFinderStrategy {
 						}
 						if (fromStack < 0) {
 							System.out.println("Empty stack.");
-							c.markAsEmptyFor(slot.getFakeMcStack(), true);
+							chestData.markAsEmptyFor(slot.getFakeMcStack(), true);
 						}
 					}
 
@@ -189,8 +189,8 @@ public class UnstoreStrategy extends PathFinderStrategy {
 			ArrayList<ChestData> chests = chestBlockHandler
 					.getReachableForPos(new BlockPos(x, y, z));
 			if (chests != null) {
-				for (ChestData c : chests) {
-					if (list.couldUseOneOf(c)) {
+				for (ChestData chestData : chests) {
+					if (list.couldUseOneOf(chestData)) {
 						return distance;
 					}
 				}
@@ -202,15 +202,15 @@ public class UnstoreStrategy extends PathFinderStrategy {
 		protected void addTasksForTarget(BlockPos currentPos) {
 			ArrayList<ChestData> chests = chestBlockHandler
 					.getReachableForPos(currentPos);
-			for (final ChestData c : chests) {
+			for (final ChestData chestData : chests) {
 				ItemStack[] inventory = helper.getMinecraft().thePlayer.inventory.mainInventory;
-				ArrayList<AITask> tasks = list.getTakeTasks(inventory, c);
+				ArrayList<AITask> tasks = list.getTakeTasks(inventory, chestData);
 
 				if (!tasks.isEmpty()) {
-					addTask(new OpenChestTask(c.getSecondaryPos(), c.getPos()));
+					addTask(new OpenChestTask(chestData.getSecondaryPos(), chestData.getPos()));
 					addTask(new WaitTask(5));
-					for (AITask t : tasks) {
-						addTask(t);
+					for (AITask aiTask : tasks) {
+						addTask(aiTask);
 						addTask(new WaitTask(5));
 					}
 					addTask(new CloseScreenTask());
