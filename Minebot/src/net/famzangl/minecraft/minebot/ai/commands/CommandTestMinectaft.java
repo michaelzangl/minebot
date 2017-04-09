@@ -85,21 +85,21 @@ public class CommandTestMinectaft {
 
 	private static void visitBlocksAroundPlayer(WorldData world) {
 		BlockArea area = blocksAroundPlayer(world);
-		AreaVisitor v = new AreaVisitor() {
+		AreaVisitor visitor = new AreaVisitor() {
 			@Override
 			public void visit(WorldData world, int x, int y, int z) {
 			}
 		};
 		long start = start();
 		for (int i = 0; i < TEST_RUNS; i++) {
-			area.accept(v, world);
+			area.accept(visitor, world);
 		}
 		done("visitBlocksAroundPlayer", start);
 	}
 
 	private static void accessBlocksAroundPlayer(WorldData world) {
 		BlockArea area = blocksAroundPlayer(world);
-		AreaVisitor v = new AreaVisitor() {
+		AreaVisitor visitor = new AreaVisitor() {
 			@Override
 			public void visit(WorldData world, int x, int y, int z) {
 				world.getBlockIdWithMeta(x, y, z);
@@ -107,7 +107,7 @@ public class CommandTestMinectaft {
 		};
 		long start = start();
 		for (int i = 0; i < TEST_RUNS; i++) {
-			area.accept(v, world);
+			area.accept(visitor, world);
 		}
 		done("accessBlocksAroundPlayer", start);
 	}
@@ -115,7 +115,7 @@ public class CommandTestMinectaft {
 	private static void accessNativeBlocksAroundPlayer(WorldData world,
 			final WorldClient theWorld) {
 		BlockArea area = blocksAroundPlayer(world);
-		AreaVisitor v = new AreaVisitor() {
+		AreaVisitor visitor = new AreaVisitor() {
 			@Override
 			public void visit(WorldData world, int x, int y, int z) {
 				theWorld.getBlockState(new BlockPos(x, y, z));
@@ -123,7 +123,7 @@ public class CommandTestMinectaft {
 		};
 		long start = start();
 		for (int i = 0; i < TEST_RUNS; i++) {
-			area.accept(v, world);
+			area.accept(visitor, world);
 		}
 		done("accessNativeBlocksAroundPlayer", start);
 	}
@@ -200,7 +200,7 @@ public class CommandTestMinectaft {
 	private static void accessBlockSetAroundPlayer(WorldData world) {
 		BlockArea area = blocksAroundPlayer(world);
 		final BlockSet set = BlockSets.SAFE_CEILING;
-		AreaVisitor v = new AreaVisitor() {
+		AreaVisitor visitor = new AreaVisitor() {
 			@Override
 			public void visit(WorldData world, int x, int y, int z) {
 				set.isAt(world, x, y, z);
@@ -208,7 +208,7 @@ public class CommandTestMinectaft {
 		};
 		long start = start();
 		for (int i = 0; i < TEST_RUNS; i++) {
-			area.accept(v, world);
+			area.accept(visitor, world);
 		}
 		done("accessBlockSetAroundPlayer", start);
 	}
@@ -219,7 +219,7 @@ public class CommandTestMinectaft {
 		BlockSet setC = BlockSets.SAFE_CEILING;
 		BlockMetaSet sand = new BlockMetaSet(Blocks.sand, 0);
 		final BlockSet set = setC.unionWith(sand);
-		AreaVisitor v = new AreaVisitor() {
+		AreaVisitor visitor = new AreaVisitor() {
 			@Override
 			public void visit(WorldData world, int x, int y, int z) {
 				set.isAt(world, x, y, z);
@@ -227,7 +227,7 @@ public class CommandTestMinectaft {
 		};
 		long start = start();
 		for (int i = 0; i < TEST_RUNS; i++) {
-			area.accept(v, world);
+			area.accept(visitor, world);
 		}
 		done("accessBlockMetaSetAroundPlayer", start);
 	}
@@ -235,7 +235,7 @@ public class CommandTestMinectaft {
 	private static void accessBlockSetAroundPlayerMultiple(WorldData world) {
 		BlockArea area = blocksAroundPlayer(world);
 		final BlockSet set = BlockSets.SAFE_CEILING;
-		AreaVisitor v = new AreaVisitor() {
+		AreaVisitor visitor = new AreaVisitor() {
 			@Override
 			public void visit(WorldData world, int x, int y, int z) {
 				set.isAt(world, x, y, z);
@@ -248,7 +248,7 @@ public class CommandTestMinectaft {
 		};
 		long start = start();
 		for (int i = 0; i < TEST_RUNS; i++) {
-			area.accept(v, world);
+			area.accept(visitor, world);
 		}
 		done("accessBlockSetAroundPlayerMultiple", start);
 	}
