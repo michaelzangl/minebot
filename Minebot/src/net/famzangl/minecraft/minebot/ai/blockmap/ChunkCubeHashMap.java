@@ -32,11 +32,11 @@ public class ChunkCubeHashMap<T> {
 	}
 
 	public static long getChunkCubeId(int blockX, int blockY, int blockZ) {
-		long l = (blockX >> 4) & 0xfffffffl;
-		l <<= 28;
-		l |= (blockZ >> 4) & 0xfffffffl;
-		l <<= 4;
-		l |= (blockY >> 4) & 0xf;
-		return l;
+		long id = (blockX >> 4) & 0xfffffffl;
+		id <<= 28;
+		id |= (blockZ >> 4) & 0xfffffffl;
+		id <<= 4;
+		id |= (blockY >> 4) & 0xf;
+		return id;
 	}
 }
