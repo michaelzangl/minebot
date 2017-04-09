@@ -46,20 +46,20 @@ public class TakeResultItem extends AITask {
 	}
 
 	@Override
-	public boolean isFinished(AIHelper h) {
+	public boolean isFinished(AIHelper aiHelper) {
 		return tookItem;
 	}
 
 	@Override
-	public void runTick(AIHelper h, TaskOperations o) {
-		GuiScreen currentScreen = h.getMinecraft().currentScreen;
+	public void runTick(AIHelper aiHelper, TaskOperations taskOperations) {
+		GuiScreen currentScreen = aiHelper.getMinecraft().currentScreen;
 		if (!containerClass.isInstance(currentScreen)) {
 			LOGGER.error(
 					MARKER_TAKE_RESULT,
 					"Screen not opened. Expected one of "
 							+ containerClass.getCanonicalName() + " but got "
 							+ currentScreen);
-			o.desync(new StringTaskError("No screen opened."));
+			taskOperations.desync(new StringTaskError("No screen opened."));
 			tookItem = true;
 			return;
 		}
@@ -67,14 +67,14 @@ public class TakeResultItem extends AITask {
 		if (screen.inventorySlots.getSlot(slot).getHasStack()
 				&& shouldTakeStack(screen.inventorySlots.getSlot(slot)
 						.getStack())) {
-			h.getMinecraft().playerController.windowClick(
+			aiHelper.getMinecraft().playerController.windowClick(
 					screen.inventorySlots.windowId, slot, 0, 1,
-					h.getMinecraft().thePlayer);
+					aiHelper.getMinecraft().thePlayer);
 			LOGGER.trace(MARKER_TAKE_RESULT, "Taking item");
 			tookItem = true;
 			return;
 		} else {
-			o.desync(new StringTaskError("No good stack in slot."));
+			taskOperations.desync(new StringTaskError("No good stack in slot."));
 			LOGGER.error(MARKER_TAKE_RESULT, "No good stack in slot " + slot + ".");
 			return;
 		}

@@ -43,8 +43,8 @@ public class PutOnCraftingTableTask extends MoveInInventoryTask {
 	}
 
 	@Override
-	protected int getFromStack(AIHelper h) {
-		ItemStack[] mainInventory = h.getMinecraft().thePlayer.inventory.mainInventory;
+	protected int getFromStack(AIHelper aiHelper) {
+		ItemStack[] mainInventory = aiHelper.getMinecraft().thePlayer.inventory.mainInventory;
 		int inventorySlot = -1;
 		for (int i = 0; i < mainInventory.length; i++) {
 			if (item.equals(ItemWithSubtype.fromStack(mainInventory[i]))) {
@@ -60,12 +60,12 @@ public class PutOnCraftingTableTask extends MoveInInventoryTask {
 
 
 	@Override
-	protected int getToStack(AIHelper h) {
+	protected int getToStack(AIHelper aiHelper) {
 		return craftingSlot + 1;
 	}
 
 	@Override
-	protected int getMissingAmount(AIHelper h, int currentCount) {
+	protected int getMissingAmount(AIHelper aiHelper, int currentCount) {
 		return itemCount - currentCount;
 	}
 }

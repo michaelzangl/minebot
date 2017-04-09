@@ -69,31 +69,31 @@ public class FaceAndInteractTask extends AITask {
 	}
 
 	@Override
-	public boolean isFinished(AIHelper h) {
+	public boolean isFinished(AIHelper aiHelper) {
 		final boolean collect = preferedAnimal instanceof EntityItem
 				|| preferedAnimal instanceof EntityXPOrb;
 		return collect ? preferedAnimal.getEntityBoundingBox().intersectsWith(
-				h.getMinecraft().thePlayer.getEntityBoundingBox()) : interacted;
+				aiHelper.getMinecraft().thePlayer.getEntityBoundingBox()) : interacted;
 	}
 
 	@Override
-	public void runTick(AIHelper h, TaskOperations o) {
-		final MovingObjectPosition position = h.getObjectMouseOver();
+	public void runTick(AIHelper aiHelper, TaskOperations taskOperations) {
+		final MovingObjectPosition position = aiHelper.getObjectMouseOver();
 		if (ticksRun > 2 && position != null
 				&& position.typeOfHit == MovingObjectType.ENTITY
 				&& alsoAcceptedAnimal.apply(position.entityHit)) {
-			doInteractWithCurrent(h);
+			doInteractWithCurrent(aiHelper);
 		} else {
-			final double speed = h.getMinecraft().thePlayer.motionX
-					* h.getMinecraft().thePlayer.motionX
-					+ h.getMinecraft().thePlayer.motionZ
-					* h.getMinecraft().thePlayer.motionZ;
-			h.face(preferedAnimal.posX, preferedAnimal.posY,
+			final double speed = aiHelper.getMinecraft().thePlayer.motionX
+					* aiHelper.getMinecraft().thePlayer.motionX
+					+ aiHelper.getMinecraft().thePlayer.motionZ
+					* aiHelper.getMinecraft().thePlayer.motionZ;
+			aiHelper.face(preferedAnimal.posX, preferedAnimal.posY,
 					preferedAnimal.posZ);
 			final MovementInput i = new MovementInput();
 			i.jump = speed < 0.01 && ticksRun > 8;
 			i.moveForward = 1;
-			h.overrideMovement(i);
+			aiHelper.overrideMovement(i);
 		}
 		ticksRun++;
 	}
@@ -101,13 +101,13 @@ public class FaceAndInteractTask extends AITask {
 	/**
 	 * Interacts with the current animal by either right or leftclicking.
 	 * 
-	 * @param h
+	 * @param aiHelper
 	 */
-	protected void doInteractWithCurrent(AIHelper h) {
+	protected void doInteractWithCurrent(AIHelper aiHelper) {
 		if (doRightClick) {
-			h.overrideUseItem();
+			aiHelper.overrideUseItem();
 		} else {
-			h.overrideAttack();
+			aiHelper.overrideAttack();
 		}
 		interacted = true;
 	}

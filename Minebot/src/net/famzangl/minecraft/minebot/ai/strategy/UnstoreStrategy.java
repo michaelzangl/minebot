@@ -98,13 +98,13 @@ public class UnstoreStrategy extends PathFinderStrategy {
 				private int fromStack = -2;
 
 				@Override
-				public boolean isFinished(AIHelper h) {
-					return noMoreWork[inventorySlot] || super.isFinished(h);
+				public boolean isFinished(AIHelper aiHelper) {
+					return noMoreWork[inventorySlot] || super.isFinished(aiHelper);
 				}
 
 				@Override
-				protected int getToStack(AIHelper h) {
-					GuiChest screen = (GuiChest) h.getMinecraft().currentScreen;
+				protected int getToStack(AIHelper aiHelper) {
+					GuiChest screen = (GuiChest) aiHelper.getMinecraft().currentScreen;
 					int slots = screen.inventorySlots.inventorySlots.size();
 					int iSlot;
 					if (inventorySlot < 9) {
@@ -116,21 +116,21 @@ public class UnstoreStrategy extends PathFinderStrategy {
 				}
 
 				@Override
-				protected int getFromStack(AIHelper h) {
+				protected int getFromStack(AIHelper aiHelper) {
 					if (fromStack == -2) {
 						fromStack = -1;
-						GuiChest screen = (GuiChest) h.getMinecraft().currentScreen;
+						GuiChest screen = (GuiChest) aiHelper.getMinecraft().currentScreen;
 						SameItemFilter filter = new SameItemFilter(
 								slot.getFakeMcStack());
 						List<Slot> inventorySlots = screen.inventorySlots.inventorySlots;
 						int fromStackRating = -1;
-						int missing = getMissingAmount(h,
+						int missing = getMissingAmount(aiHelper,
 								getSlotContentCount(screen.inventorySlots
-										.getSlot(getToStack(h))));
+										.getSlot(getToStack(aiHelper))));
 						for (int i = 0; i < inventorySlots.size() - 36; i++) {
 							Slot s = inventorySlots.get(i);
 							if (filter.matches(s.getStack())) {
-								int rating = rateSize(h,
+								int rating = rateSize(aiHelper,
 										s.getStack().stackSize, missing);
 								if (rating > fromStackRating) {
 									fromStackRating = rating;
@@ -147,7 +147,7 @@ public class UnstoreStrategy extends PathFinderStrategy {
 					return fromStack;
 				}
 
-				private int rateSize(AIHelper h, int stackSize, int missing) {
+				private int rateSize(AIHelper aiHelper, int stackSize, int missing) {
 					if (stackSize == missing) {
 						return 4;
 					} else if (stackSize == missing * 2) {
@@ -160,7 +160,7 @@ public class UnstoreStrategy extends PathFinderStrategy {
 				}
 
 				@Override
-				protected int getMissingAmount(AIHelper h, int currentCount) {
+				protected int getMissingAmount(AIHelper aiHelper, int currentCount) {
 					return -currentCount + slot.amount;
 				}
 			};

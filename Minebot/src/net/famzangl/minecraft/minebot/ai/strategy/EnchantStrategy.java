@@ -109,9 +109,9 @@ public class EnchantStrategy extends PathFinderStrategy {
 
 			addTask(new UseItemOnBlockAtTask(table.pos) {
 				@Override
-				public boolean isFinished(AIHelper h) {
-					return super.isFinished(h)
-							&& h.getMinecraft().currentScreen instanceof GuiEnchantment;
+				public boolean isFinished(AIHelper aiHelper) {
+					return super.isFinished(aiHelper)
+							&& aiHelper.getMinecraft().currentScreen instanceof GuiEnchantment;
 				};
 			});
 			addTask(new PutItemInTableTask());

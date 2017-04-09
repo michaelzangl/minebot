@@ -98,7 +98,7 @@ public class FurnaceStrategy extends PathFinderStrategy {
 			this.f = f;
 		}
 
-		protected abstract boolean shouldMove(AIHelper h);
+		protected abstract boolean shouldMove(AIHelper aiHelper);
 
 		@Override
 		public boolean shouldWait() {
@@ -106,33 +106,33 @@ public class FurnaceStrategy extends PathFinderStrategy {
 		}
 
 		@Override
-		protected int getMissingAmount(AIHelper h, int currentCount) {
+		protected int getMissingAmount(AIHelper aiHelper, int currentCount) {
 			return 64;
 		}
 
 		@Override
-		protected int getFromStack(AIHelper h) {
+		protected int getFromStack(AIHelper aiHelper) {
 			return convertPlayerInventorySlot(stackIndex) + 3;
 		}
 
 		@Override
-		public void runTick(AIHelper h, TaskOperations o) {
-			f.update(h);
-			if (shouldMove(h)) {
+		public void runTick(AIHelper aiHelper, TaskOperations taskOperations) {
+			f.update(aiHelper);
+			if (shouldMove(aiHelper)) {
 				moved = true;
 			}
-			super.runTick(h, o);
-			f.update(h);
+			super.runTick(aiHelper, taskOperations);
+			f.update(aiHelper);
 		}
 
-		protected ItemStack getStack(AIHelper h) {
-			return h.getMinecraft().thePlayer.inventory
+		protected ItemStack getStack(AIHelper aiHelper) {
+			return aiHelper.getMinecraft().thePlayer.inventory
 					.getStackInSlot(stackIndex);
 		}
 
 		@Override
-		public boolean isFinished(AIHelper h) {
-			return !shouldMove(h) || super.isFinished(h);
+		public boolean isFinished(AIHelper aiHelper) {
+			return !shouldMove(aiHelper) || super.isFinished(aiHelper);
 		}
 	}
 
@@ -144,13 +144,13 @@ public class FurnaceStrategy extends PathFinderStrategy {
 		}
 
 		@Override
-		protected int getToStack(AIHelper h) {
+		protected int getToStack(AIHelper aiHelper) {
 			return 0;
 		}
 
 		@Override
-		protected boolean shouldMove(AIHelper h) {
-			return list.couldPutItem(f, getStack(h));
+		protected boolean shouldMove(AIHelper aiHelper) {
+			return list.couldPutItem(f, getStack(aiHelper));
 		}
 	}
 
@@ -160,13 +160,13 @@ public class FurnaceStrategy extends PathFinderStrategy {
 		}
 
 		@Override
-		protected int getToStack(AIHelper h) {
+		protected int getToStack(AIHelper aiHelper) {
 			return 1;
 		}
 
 		@Override
-		protected boolean shouldMove(AIHelper h) {
-			return list.couldPutFuel(f, getStack(h));
+		protected boolean shouldMove(AIHelper aiHelper) {
+			return list.couldPutFuel(f, getStack(aiHelper));
 		}
 
 	}
@@ -181,10 +181,10 @@ public class FurnaceStrategy extends PathFinderStrategy {
 			}
 
 			@Override
-			protected void runOnce(AIHelper h, TaskOperations o) {
-				GuiScreen gui = h.getMinecraft().currentScreen;
+			protected void runOnce(AIHelper aiHelper, TaskOperations taskOperations) {
+				GuiScreen gui = aiHelper.getMinecraft().currentScreen;
 				if (!(gui instanceof GuiFurnace)) {
-					o.desync(new StringTaskError("No furnace open"));
+					taskOperations.desync(new StringTaskError("No furnace open"));
 				} else {
 					f.update((GuiFurnace) gui);
 				}
@@ -200,14 +200,14 @@ public class FurnaceStrategy extends PathFinderStrategy {
 			}
 
 			@Override
-			public boolean isFinished(AIHelper h) {
-				return !list.couldTake(f) || super.isFinished(h);
+			public boolean isFinished(AIHelper aiHelper) {
+				return !list.couldTake(f) || super.isFinished(aiHelper);
 			}
 
 			@Override
-			public void runTick(AIHelper h, TaskOperations o) {
-				super.runTick(h, o);
-				f.update(h);
+			public void runTick(AIHelper aiHelper, TaskOperations taskOperations) {
+				super.runTick(aiHelper, taskOperations);
+				f.update(aiHelper);
 			}
 		}
 
@@ -275,8 +275,8 @@ public class FurnaceStrategy extends PathFinderStrategy {
 			if (!furnaceTasks.isEmpty()) {
 				addTask(new UseItemOnBlockAtTask(f.getPos()) {
 					@Override
-					public boolean isFinished(AIHelper h) {
-						return h.getMinecraft().currentScreen instanceof GuiFurnace;
+					public boolean isFinished(AIHelper aiHelper) {
+						return aiHelper.getMinecraft().currentScreen instanceof GuiFurnace;
 					}
 				});
 				addTask(new WaitTask(5));

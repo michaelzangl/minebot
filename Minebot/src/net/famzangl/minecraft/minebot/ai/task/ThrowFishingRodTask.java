@@ -25,17 +25,17 @@ public class ThrowFishingRodTask extends AITask {
 	private int time = 4;
 	
 	@Override
-	public boolean isFinished(AIHelper h) {
-		return h.getMinecraft().thePlayer.fishEntity != null && time < 1;
+	public boolean isFinished(AIHelper aiHelper) {
+		return aiHelper.getMinecraft().thePlayer.fishEntity != null && time < 1;
 	}
 
 	@Override
-	public void runTick(AIHelper h, TaskOperations o) {
+	public void runTick(AIHelper aiHelper, TaskOperations taskOperations) {
 		ToolRater settings = MinebotSettings.getSettings().getFishingRater();
-		if (h.selectToolFor(null, settings).wasSuccessful()) {
+		if (aiHelper.selectToolFor(null, settings).wasSuccessful()) {
 			time--;
 			if (time == 2) {
-				h.overrideUseItem();
+				aiHelper.overrideUseItem();
 			}
 		}
 	}

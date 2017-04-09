@@ -51,10 +51,10 @@ public class TunnelPathFinder extends AlongTrackPathFinder {
 		}
 
 		@Override
-		protected void runOnce(AIHelper h, TaskOperations o) {
+		protected void runOnce(AIHelper aiHelper, TaskOperations taskOperations) {
 			finishedTunnels.set(stepNumber);
 			inQueueTunnels.clear(stepNumber);
-			o.faceAndDestroyForNextTask();
+			taskOperations.faceAndDestroyForNextTask();
 		}
 		
 		@Override
@@ -88,14 +88,14 @@ public class TunnelPathFinder extends AlongTrackPathFinder {
 		}
 
 		@Override
-		protected void runOnce(AIHelper h, TaskOperations o) {
+		protected void runOnce(AIHelper aiHelper, TaskOperations taskOperations) {
 			tunnelPositionStartCount.put(stepNumber,
 					getStartCount(stepNumber) + 1);
 
 			synchronized (currentStepNumberMutex) {
 				currentStepNumber = stepNumber;
 			}
-			o.faceAndDestroyForNextTask();
+			taskOperations.faceAndDestroyForNextTask();
 		}
 
 		@Override

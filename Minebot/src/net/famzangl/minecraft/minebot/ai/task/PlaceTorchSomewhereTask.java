@@ -84,33 +84,33 @@ public class PlaceTorchSomewhereTask extends AITask {
 	}
 
 	@Override
-	public boolean isFinished(AIHelper h) {
-		return isImpossible(h) || (placeWasSuccessful(h) && delayAfter == 0);
+	public boolean isFinished(AIHelper aiHelper) {
+		return isImpossible(aiHelper) || (placeWasSuccessful(aiHelper) && delayAfter == 0);
 	}
 
-	private boolean isImpossible(AIHelper h) {
+	private boolean isImpossible(AIHelper aiHelper) {
 		for (BlockPos p : places) {
-			if (BlockSets.AIR.isAt(h.getWorld(), p)) {
+			if (BlockSets.AIR.isAt(aiHelper.getWorld(), p)) {
 				return false;
 			}
 		}
 		return true;
 	}
 
-	private boolean placeWasSuccessful(AIHelper h) {
-		final PosAndDir place = getNextPlace(h);
+	private boolean placeWasSuccessful(AIHelper aiHelper) {
+		final PosAndDir place = getNextPlace(aiHelper);
 		return place == null || lastAttempt != null
-				&& BlockSets.TORCH.isAt(h.getWorld(), lastAttempt);
+				&& BlockSets.TORCH.isAt(aiHelper.getWorld(), lastAttempt);
 	}
 
-	private PosAndDir getNextPlace(AIHelper h) {
+	private PosAndDir getNextPlace(AIHelper aiHelper) {
 		if (attemptOnPositions == null) {
 			attemptOnPositions = new LinkedList<PlaceTorchSomewhereTask.PosAndDir>();
 			for (final BlockPos place : places) {
 				for (final EnumFacing d : preferedDirection) {
 					final PosAndDir current = new PosAndDir(place, d);
 					final BlockPos placeOn = current.getPlaceOn();
-					if (!BlockSets.AIR.isAt(h.getWorld(), placeOn)) {
+					if (!BlockSets.AIR.isAt(aiHelper.getWorld(), placeOn)) {
 						attemptOnPositions.add(current);
 					}
 				}
@@ -119,7 +119,7 @@ public class PlaceTorchSomewhereTask extends AITask {
 
 		while (!attemptOnPositions.isEmpty()
 				&& (attemptOnPositions.peekFirst().attemptsLeft <= 0 || !BlockSets.AIR
-						.isAt(h.getWorld(),
+						.isAt(aiHelper.getWorld(),
 								attemptOnPositions.peekFirst().place))) {
 			attemptOnPositions.removeFirst();
 		}
@@ -128,22 +128,22 @@ public class PlaceTorchSomewhereTask extends AITask {
 	}
 
 	@Override
-	public void runTick(AIHelper h, TaskOperations o) {
+	public void runTick(AIHelper aiHelper, TaskOperations taskOperations) {
 		if (delayAfter > 0) {
 			delayAfter--;
 			return;
 		}
 
 		final BlockItemFilter f = new BlockItemFilter(Blocks.torch);
-		if (!h.selectCurrentItem(f)) {
-			o.desync(new SelectTaskError(f));
+		if (!aiHelper.selectCurrentItem(f)) {
+			taskOperations.desync(new SelectTaskError(f));
 		}
 
-		final PosAndDir next = getNextPlace(h);
+		final PosAndDir next = getNextPlace(aiHelper);
 		final BlockPos placeOn = next.getPlaceOn();
-		h.faceSideOf(placeOn, next.dir.getOpposite());
-		if (h.isFacingBlock(placeOn, next.dir.getOpposite())) {
-			h.overrideUseItem();
+		aiHelper.faceSideOf(placeOn, next.dir.getOpposite());
+		if (aiHelper.isFacingBlock(placeOn, next.dir.getOpposite())) {
+			aiHelper.overrideUseItem();
 			delayAfter = 10;
 		}
 		next.attemptsLeft--;

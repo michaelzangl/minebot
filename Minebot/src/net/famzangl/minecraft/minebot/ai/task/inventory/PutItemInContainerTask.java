@@ -36,8 +36,8 @@ public abstract class PutItemInContainerTask extends AITask {
 	private boolean isFull;
 
 	@Override
-	public boolean isFinished(AIHelper h) {
-		final GuiContainer screen = (GuiContainer) h.getMinecraft().currentScreen;
+	public boolean isFinished(AIHelper aiHelper) {
+		final GuiContainer screen = (GuiContainer) aiHelper.getMinecraft().currentScreen;
 		return screen != null
 				&& placed
 				&& (slotToPlace < 0 || isFull || !screen.inventorySlots
@@ -45,26 +45,26 @@ public abstract class PutItemInContainerTask extends AITask {
 	}
 
 	@Override
-	public void runTick(AIHelper h, TaskOperations o) {
-		final GuiContainer screen = (GuiContainer) h.getMinecraft().currentScreen;
+	public void runTick(AIHelper aiHelper, TaskOperations taskOperations) {
+		final GuiContainer screen = (GuiContainer) aiHelper.getMinecraft().currentScreen;
 		if (screen == null) {
-			o.desync(new StringTaskError("Expected container to be open"));
+			taskOperations.desync(new StringTaskError("Expected container to be open"));
 			return;
 		}
-		slotToPlace = getStackToPut(h);
+		slotToPlace = getStackToPut(aiHelper);
 		placed = true;
 		if (slotToPlace < 0) {
 			System.out.println("No item to put.");
-			o.desync(new StringTaskError("No item to put in that slot."));
+			taskOperations.desync(new StringTaskError("No item to put in that slot."));
 		} else {
 			System.out.println("Moving from slot: " + slotToPlace);
 			Slot slot = screen.inventorySlots.getSlot(slotToPlace);
 			int oldContent, newContent = getSlotContentCount(slot);
 			do {
 				oldContent = newContent;
-				h.getMinecraft().playerController.windowClick(
+				aiHelper.getMinecraft().playerController.windowClick(
 						screen.inventorySlots.windowId, slotToPlace, 0, 1,
-						h.getMinecraft().thePlayer);
+						aiHelper.getMinecraft().thePlayer);
 				newContent = getSlotContentCount(slot);
 			} while (newContent != oldContent);
 			if (newContent > 0) {
@@ -81,6 +81,6 @@ public abstract class PutItemInContainerTask extends AITask {
 		return slot.getHasStack() ? slot.getStack().stackSize : 0;
 	}
 
-	protected abstract int getStackToPut(AIHelper h);
+	protected abstract int getStackToPut(AIHelper aiHelper);
 
 }

@@ -43,17 +43,17 @@ public class JumpMoveTask extends HorizontalMoveTask {
 	}
 
 	@Override
-	protected boolean doJump(AIHelper h) {
-		BlockPos player = h.getPlayerPosition();
+	protected boolean doJump(AIHelper aiHelper) {
+		BlockPos player = aiHelper.getPlayerPosition();
 		return player.getX() != pos.getX() || player.getZ() != pos.getZ();
 	}
 
 	@Override
-	public void runTick(AIHelper h, TaskOperations o) {
-		if (!BlockSets.HEAD_CAN_WALK_TRHOUGH.isAt(h.getWorld(), oldX, pos.getY() + 1, oldZ)) {
-			h.faceAndDestroy(toDestroyForJump());
+	public void runTick(AIHelper aiHelper, TaskOperations taskOperations) {
+		if (!BlockSets.HEAD_CAN_WALK_TRHOUGH.isAt(aiHelper.getWorld(), oldX, pos.getY() + 1, oldZ)) {
+			aiHelper.faceAndDestroy(toDestroyForJump());
 		} else {
-			super.runTick(h, o);
+			super.runTick(aiHelper, taskOperations);
 		}
 	}
 

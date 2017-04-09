@@ -47,17 +47,17 @@ public class OpenChestTask extends UseItemTask {
 	}
 
 	@Override
-	public boolean isFinished(AIHelper h) {
-		return h.getMinecraft().currentScreen instanceof GuiChest;
+	public boolean isFinished(AIHelper aiHelper) {
+		return aiHelper.getMinecraft().currentScreen instanceof GuiChest;
 	}
 
 	@Override
-	protected boolean isBlockAllowed(AIHelper h, BlockPos pos) {
+	protected boolean isBlockAllowed(AIHelper aiHelper, BlockPos pos) {
 		return p1 != null && p1.equals(pos) || p2 != null && p2.equals(pos);
 	}
 
 	@Override
-	protected void notFacingBlock(AIHelper h) {
+	protected void notFacingBlock(AIHelper aiHelper) {
 		attempts++;
 		attempts &= 15;
 		BlockPos pos;
@@ -69,6 +69,6 @@ public class OpenChestTask extends UseItemTask {
 		double dx = (attempts & 0x1) != 0 ? SIDE_DIST : 1 - SIDE_DIST;
 		double dy = (attempts & 0x2) != 0 ? BOTTOM : TOP;
 		double dz = (attempts & 0x4) != 0 ? SIDE_DIST : 1 - SIDE_DIST;
-		h.face(pos.getX() + dx, pos.getY() + dy, pos.getZ() + dz);
+		aiHelper.face(pos.getX() + dx, pos.getY() + dy, pos.getZ() + dz);
 	}
 }

@@ -42,13 +42,13 @@ public class SneakTowardsTask extends AITask {
 	}
 
 	@Override
-	public boolean isFinished(AIHelper h) {
+	public boolean isFinished(AIHelper aiHelper) {
 		// TODO Auto-generated method stub
 		return false;
 	}
 
 	@Override
-	public void runTick(AIHelper h, TaskOperations o) {
+	public void runTick(AIHelper aiHelper, TaskOperations taskOperations) {
 		// TODO Auto-generated method stub
 
 	}

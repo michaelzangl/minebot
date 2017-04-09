@@ -32,11 +32,11 @@ public class PutItemInTableTask extends PutItemInContainerTask {
 	private static final int TABLE_INV_OFFSET = 2;
 
 	@Override
-	protected int getStackToPut(AIHelper h) {
-		final GuiEnchantment screen = (GuiEnchantment) h.getMinecraft().currentScreen;
+	protected int getStackToPut(AIHelper aiHelper) {
+		final GuiEnchantment screen = (GuiEnchantment) aiHelper.getMinecraft().currentScreen;
 		for (int i = TABLE_INV_OFFSET; i < 9 * 4 + TABLE_INV_OFFSET; i++) {
 			final Slot slot = screen.inventorySlots.getSlot(i);
-			if (slot == null || !slot.canTakeStack(h.getMinecraft().thePlayer)) {
+			if (slot == null || !slot.canTakeStack(aiHelper.getMinecraft().thePlayer)) {
 				continue;
 			}
 			final ItemStack stack = slot.getStack();

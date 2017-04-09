@@ -339,8 +339,8 @@ public class CraftStrategy extends PathFinderStrategy {
 
 			addTask(new UseItemOnBlockAtTask(table.pos) {
 				@Override
-				protected boolean isBlockAllowed(AIHelper h, BlockPos pos) {
-					return h.getBlock(pos) == Blocks.crafting_table;
+				protected boolean isBlockAllowed(AIHelper aiHelper, BlockPos pos) {
+					return aiHelper.getBlock(pos) == Blocks.crafting_table;
 				}
 
 				@Override

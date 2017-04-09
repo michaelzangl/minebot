@@ -56,21 +56,21 @@ public class PlaceBlockTask extends AITask {
 	}
 
 	@Override
-	public boolean isFinished(AIHelper h) {
+	public boolean isFinished(AIHelper aiHelper) {
 		return attemptsLeft <= 0
-				|| Block.isEqualTo(h.getBlock(placeOn.offset(onSide)), block);
+				|| Block.isEqualTo(aiHelper.getBlock(placeOn.offset(onSide)), block);
 	}
 
 	@Override
-	public void runTick(AIHelper h, TaskOperations o) {
+	public void runTick(AIHelper aiHelper, TaskOperations taskOperations) {
 		final BlockItemFilter f = new BlockItemFilter(block);
-		if (!h.selectCurrentItem(f)) {
-			o.desync(new SelectTaskError(f));
+		if (!aiHelper.selectCurrentItem(f)) {
+			taskOperations.desync(new SelectTaskError(f));
 		}
 
-		h.faceSideOf(placeOn, onSide);
-		if (h.isFacingBlock(placeOn, onSide)) {
-			h.overrideUseItem();
+		aiHelper.faceSideOf(placeOn, onSide);
+		if (aiHelper.isFacingBlock(placeOn, onSide)) {
+			aiHelper.overrideUseItem();
 		}
 		attemptsLeft--;
 	}

@@ -7,16 +7,16 @@ public abstract class RunOnceTask extends AITask {
 	private boolean run;
 
 	@Override
-	public boolean isFinished(AIHelper h) {
+	public boolean isFinished(AIHelper aiHelper) {
 		return run;
 	}
 
 	@Override
-	public void runTick(AIHelper h, TaskOperations o) {
-		runOnce(h, o);
+	public void runTick(AIHelper aiHelper, TaskOperations taskOperations) {
+		runOnce(aiHelper, taskOperations);
 		run = true;
 	}
 
-	protected abstract void runOnce(AIHelper h, TaskOperations o);
+	protected abstract void runOnce(AIHelper aiHelper, TaskOperations taskOperations);
 
 }

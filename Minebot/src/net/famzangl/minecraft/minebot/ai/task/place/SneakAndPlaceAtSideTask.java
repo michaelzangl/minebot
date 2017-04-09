@@ -38,12 +38,12 @@ public class SneakAndPlaceAtSideTask extends SneakAndPlaceAtHalfTask {
 	}
 
 	@Override
-	protected boolean isFacingRightBlock(AIHelper h) {
-		if (h.getLookDirection() != lookingDirection) {
+	protected boolean isFacingRightBlock(AIHelper aiHelper) {
+		if (aiHelper.getLookDirection() != lookingDirection) {
 			System.out.println("Not the right dir!");
 			return false;
 		} else {
-			return super.isFacingRightBlock(h);
+			return super.isFacingRightBlock(aiHelper);
 		}
 	}
 

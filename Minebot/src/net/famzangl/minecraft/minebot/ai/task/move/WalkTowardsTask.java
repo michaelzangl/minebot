@@ -42,23 +42,23 @@ public class WalkTowardsTask extends AITask {
 	}
 
 	@Override
-	public boolean isFinished(AIHelper h) {
-		return h.arrivedAt(x + 0.5, z + 0.5);
+	public boolean isFinished(AIHelper aiHelper) {
+		return aiHelper.arrivedAt(x + 0.5, z + 0.5);
 	}
 
 	@Override
-	public void runTick(AIHelper h, TaskOperations o) {
+	public void runTick(AIHelper aiHelper, TaskOperations taskOperations) {
 		if (ensureOnPos != null) {
-			if (!h.isStandingOn(ensureOnPos)) {
-				o.desync(new PositionTaskError(ensureOnPos));
+			if (!aiHelper.isStandingOn(ensureOnPos)) {
+				taskOperations.desync(new PositionTaskError(ensureOnPos));
 			}
 			ensureOnPos = null;
 		}
 		if (startPosition == null) {
-			startPosition = h.getPlayerPosition();
+			startPosition = aiHelper.getPlayerPosition();
 		}
-		final boolean nextIsFacing = o.faceAndDestroyForNextTask();
-		h.walkTowards(x + 0.5, z + 0.5, false, !nextIsFacing);
+		final boolean nextIsFacing = taskOperations.faceAndDestroyForNextTask();
+		aiHelper.walkTowards(x + 0.5, z + 0.5, false, !nextIsFacing);
 	}
 	
 	@Override

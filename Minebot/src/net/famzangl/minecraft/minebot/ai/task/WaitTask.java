@@ -40,12 +40,12 @@ public class WaitTask extends AITask {
 	}
 
 	@Override
-	public boolean isFinished(AIHelper h) {
+	public boolean isFinished(AIHelper aiHelper) {
 		return ticks <= ticked;
 	}
 
 	@Override
-	public void runTick(AIHelper h, TaskOperations o) {
+	public void runTick(AIHelper aiHelper, TaskOperations taskOperations) {
 		ticked++;
 	}
 

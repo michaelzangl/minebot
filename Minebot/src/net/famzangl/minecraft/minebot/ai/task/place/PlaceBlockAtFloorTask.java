@@ -50,13 +50,13 @@ public class PlaceBlockAtFloorTask extends AITask {
 	/**
 	 * Check if we face the adjacent block in that direction.
 	 * 
-	 * @param h
+	 * @param aiHelper
 	 * @param dir
 	 * @return
 	 */
-	protected boolean isFacing(AIHelper h, EnumFacing dir) {
+	protected boolean isFacing(AIHelper aiHelper, EnumFacing dir) {
 		BlockPos facingBlock = getPlaceAtPos().offset(dir);
-		return h.isFacingBlock(facingBlock, dir.getOpposite(), getSide(dir));
+		return aiHelper.isFacingBlock(facingBlock, dir.getOpposite(), getSide(dir));
 	}
 
 	protected BlockHalf getSide(EnumFacing dir) {
@@ -68,46 +68,46 @@ public class PlaceBlockAtFloorTask extends AITask {
 	}
 
 	@Override
-	public boolean isFinished(AIHelper h) {
-		return !BlockSets.AIR.isAt(h.getWorld(), getPlaceAtPos());
+	public boolean isFinished(AIHelper aiHelper) {
+		return !BlockSets.AIR.isAt(aiHelper.getWorld(), getPlaceAtPos());
 	}
 
 	@Override
-	public void runTick(AIHelper h, TaskOperations o) {
+	public void runTick(AIHelper aiHelper, TaskOperations taskOperations) {
 		if (faceTimer > 0) {
 			faceTimer--;
 		}
-		if (BlockSets.AIR.isAt(h.getWorld(), getPlaceAtPos())) {
-			if (!h.selectCurrentItem(filter)) {
-				o.desync(new SelectTaskError(filter));
+		if (BlockSets.AIR.isAt(aiHelper.getWorld(), getPlaceAtPos())) {
+			if (!aiHelper.selectCurrentItem(filter)) {
+				taskOperations.desync(new SelectTaskError(filter));
 			} else {
 				if (faceTimer == 0) {
-					faceBlock(h, o);
+					faceBlock(aiHelper, taskOperations);
 					faceTimer = 2;
 				} else {
-					tryPlaceBlock(h);
+					tryPlaceBlock(aiHelper);
 				}
 			}
 		}
 	}
 
-	protected void faceBlock(AIHelper h, TaskOperations o) {
-		h.faceSideOf(getPlaceAtPos().offset(EnumFacing.DOWN), EnumFacing.UP);
+	protected void faceBlock(AIHelper aiHelper, TaskOperations o) {
+		aiHelper.faceSideOf(getPlaceAtPos().offset(EnumFacing.DOWN), EnumFacing.UP);
 	}
 
-	protected void tryPlaceBlock(AIHelper h) {
-		if (isAtDesiredHeight(h) && isFacingRightBlock(h)) {
-			h.overrideUseItem();
+	protected void tryPlaceBlock(AIHelper aiHelper) {
+		if (isAtDesiredHeight(aiHelper) && isFacingRightBlock(aiHelper)) {
+			aiHelper.overrideUseItem();
 		}
 	}
 
-	protected boolean isAtDesiredHeight(AIHelper h) {
-		return h.getMinecraft().thePlayer.getEntityBoundingBox().minY >= getPlaceAtPos()
+	protected boolean isAtDesiredHeight(AIHelper aiHelper) {
+		return aiHelper.getMinecraft().thePlayer.getEntityBoundingBox().minY >= getPlaceAtPos()
 				.getY();
 	}
 
-	protected boolean isFacingRightBlock(AIHelper h) {
-		return isFacing(h, EnumFacing.DOWN);
+	protected boolean isFacingRightBlock(AIHelper aiHelper) {
+		return isFacing(aiHelper, EnumFacing.DOWN);
 	}
 
 	@Override

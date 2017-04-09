@@ -65,45 +65,45 @@ public class WalkTowardsTask extends AITask {
 	}
 
 	@Override
-	public boolean isFinished(AIHelper h) {
+	public boolean isFinished(AIHelper aiHelper) {
 		return subTask == null
-				&& h.isStandingOn(nextPos.getX(), nextPos.getY(),
+				&& aiHelper.isStandingOn(nextPos.getX(), nextPos.getY(),
 						nextPos.getZ()) && carpets.isEmpty();
 		/* && getUpperCarpetY(h) < 0 */
 	}
 
 	@Override
-	public void runTick(AIHelper h, TaskOperations o) {
-		if (subTask != null && subTask.isFinished(h)) {
+	public void runTick(AIHelper aiHelper, TaskOperations taskOperations) {
+		if (subTask != null && subTask.isFinished(aiHelper)) {
 			subTask = null;
 		}
 		if (subTask != null) {
-			subTask.runTick(h, o);
+			subTask.runTick(aiHelper, taskOperations);
 		} else {
-			final int carpetY = getUpperCarpetY(h);
-			final double carpetBuildHeight = h.realBlockTopY(fromPos.getX(),
+			final int carpetY = getUpperCarpetY(aiHelper);
+			final double carpetBuildHeight = aiHelper.realBlockTopY(fromPos.getX(),
 					Math.max(carpetY + 1, fromPos.getY()), fromPos.getZ());
-			final double destHeight = h.realBlockTopY(nextPos.getX(),
+			final double destHeight = aiHelper.realBlockTopY(nextPos.getX(),
 					nextPos.getY(), nextPos.getZ());
 			if (carpetBuildHeight < destHeight - 1 && placeCarpets) {
 				System.out.println("Moving upwards. Carpets are at " + carpetY);
 				final int floorY = Math.max(carpetY, fromPos.getY() - 1);
 				BlockPos floor = new BlockPos(fromPos.getX(), floorY,
 						fromPos.getZ());
-				h.faceBlock(floor);
-				if (h.isFacingBlock(floor, EnumFacing.UP)) {
-					if (h.selectCurrentItem(CARPET)) {
-						h.overrideUseItem();
+				aiHelper.faceBlock(floor);
+				if (aiHelper.isFacingBlock(floor, EnumFacing.UP)) {
+					if (aiHelper.selectCurrentItem(CARPET)) {
+						aiHelper.overrideUseItem();
 						carpets.add(new BlockPos(fromPos.getX(), floorY + 1,
 								fromPos.getZ()));
 					} else {
-						o.desync(new SelectTaskError(CARPET));
+						taskOperations.desync(new SelectTaskError(CARPET));
 					}
 				}
 				final MovementInput i = new MovementInput();
 				i.jump = true;
-				h.overrideMovement(i);
-			} else if ((h.isStandingOn(nextPos.getX(), nextPos.getY(),
+				aiHelper.overrideMovement(i);
+			} else if ((aiHelper.isStandingOn(nextPos.getX(), nextPos.getY(),
 					nextPos.getZ()) || wasStandingOnDest)
 					&& !carpets.isEmpty()) {
 				// Destruct everything after arriving at dest. Then walk to dest
@@ -112,21 +112,21 @@ public class WalkTowardsTask extends AITask {
 				while (!carpets.isEmpty()) {
 					// Clean up carpets we already "lost"
 					final BlockPos last = carpets.getLast();
-					if (BlockSets.AIR.isAt(h.getWorld(), last)) {
+					if (BlockSets.AIR.isAt(aiHelper.getWorld(), last)) {
 						carpets.removeLast();
 					}
 				}
 
 				final int x = fromPos.getX() - nextPos.getX();
 				final int z = fromPos.getX() - nextPos.getX();
-				if (h.sneakFrom(nextPos, AIHelper.getDirectionForXZ(x, z))) {
+				if (aiHelper.sneakFrom(nextPos, AIHelper.getDirectionForXZ(x, z))) {
 					final BlockPos last = carpets.getLast();
-					h.faceAndDestroy(last);
+					aiHelper.faceAndDestroy(last);
 				}
 
 				wasStandingOnDest = true;
 			} else {
-				h.walkTowards(nextPos.getX() + 0.5, nextPos.getZ() + 0.5,
+				aiHelper.walkTowards(nextPos.getX() + 0.5, nextPos.getZ() + 0.5,
 						carpetBuildHeight < destHeight - 0.5);
 			}
 		}
@@ -135,15 +135,15 @@ public class WalkTowardsTask extends AITask {
 	/**
 	 * Gets the Y of the topmost carpet that was placed. -1 if there was none.
 	 * 
-	 * @param h
+	 * @param aiHelper
 	 * @return
 	 */
-	private int getUpperCarpetY(AIHelper h) {
+	private int getUpperCarpetY(AIHelper aiHelper) {
 		int upperCarpet = -1;
-		for (int y = BlockSets.AIR.unionWith(CARPETS).isAt(h.getWorld(), 
+		for (int y = BlockSets.AIR.unionWith(CARPETS).isAt(aiHelper.getWorld(),
 				fromPos) ? fromPos.getY() : fromPos.getY() + 1; y < nextPos
 				.getY(); y++) {
-			if (CARPETS.contains(h.getBlock(fromPos.getX(), y, fromPos.getZ()))) {
+			if (CARPETS.contains(aiHelper.getBlock(fromPos.getX(), y, fromPos.getZ()))) {
 				upperCarpet = y;
 			} else {
 				break;

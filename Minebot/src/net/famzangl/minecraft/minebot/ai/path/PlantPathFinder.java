@@ -55,7 +55,7 @@ public class PlantPathFinder extends MovePathFinder {
 		}
 
 		@Override
-		protected boolean isAtDesiredHeight(AIHelper h) {
+		protected boolean isAtDesiredHeight(AIHelper aiHelper) {
 			return true;
 		}
 

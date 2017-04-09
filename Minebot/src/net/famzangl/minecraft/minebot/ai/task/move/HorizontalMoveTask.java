@@ -48,27 +48,27 @@ public class HorizontalMoveTask extends AITask implements CanPrefaceAndDestroy {
 	}
 
 	@Override
-	public boolean isFinished(AIHelper h) {
-		return h.isStandingOn(pos);
+	public boolean isFinished(AIHelper aiHelper) {
+		return aiHelper.isStandingOn(pos);
 	}
 
 	@Override
-	public void runTick(AIHelper h, TaskOperations o) {
-		if (needDestroyHead(h.getWorld())) {
+	public void runTick(AIHelper aiHelper, TaskOperations taskOperations) {
+		if (needDestroyHead(aiHelper.getWorld())) {
 			BlockPos upper = pos.add(0, 1, 0);
-			if (hardBlocks.isAt(h.getWorld(), upper)) {
+			if (hardBlocks.isAt(aiHelper.getWorld(), upper)) {
 				hasObsidianUpper = true;
 			}
-			h.faceAndDestroyWithHangingBlock(pos.add(0, 1, 0));
+			aiHelper.faceAndDestroyWithHangingBlock(pos.add(0, 1, 0));
 		} else {
-			if (needDestroyFoot(h.getWorld())) {
-				if (hardBlocks.isAt(h.getWorld(), pos)) {
+			if (needDestroyFoot(aiHelper.getWorld())) {
+				if (hardBlocks.isAt(aiHelper.getWorld(), pos)) {
 					hasObsidianLower = true;
 				}
-				h.faceAndDestroyWithHangingBlock(pos);
+				aiHelper.faceAndDestroyWithHangingBlock(pos);
 			} else {
-				final boolean nextIsFacing = o.faceAndDestroyForNextTask();
-				h.walkTowards(pos.getX() + 0.5, pos.getZ() + 0.5, doJump(h),
+				final boolean nextIsFacing = taskOperations.faceAndDestroyForNextTask();
+				aiHelper.walkTowards(pos.getX() + 0.5, pos.getZ() + 0.5, doJump(aiHelper),
 						!nextIsFacing);
 			}
 		}
@@ -81,7 +81,7 @@ public class HorizontalMoveTask extends AITask implements CanPrefaceAndDestroy {
 //				+ (hasObsidianUpper ? OBSIDIAN_TIME : 0);
 //	}
 
-	protected boolean doJump(AIHelper h) {
+	protected boolean doJump(AIHelper aiHelper) {
 		return false;
 	}
 

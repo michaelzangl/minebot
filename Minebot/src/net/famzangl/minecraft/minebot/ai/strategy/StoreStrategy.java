@@ -50,8 +50,8 @@ public class StoreStrategy extends PathFinderStrategy {
 		}
 		
 		@Override
-		public boolean isFinished(AIHelper h) {
-			return super.isFinished(h) || c.isFullFor(s);
+		public boolean isFinished(AIHelper aiHelper) {
+			return super.isFinished(aiHelper) || c.isFullFor(s);
 		}
 	}
 	

@@ -47,9 +47,9 @@ public abstract class MoveInInventoryTask extends AITask {
 	 * 
 	 * @return
 	 */
-	protected abstract int getFromStack(AIHelper h);
+	protected abstract int getFromStack(AIHelper aiHelper);
 
-	protected abstract int getToStack(AIHelper h);
+	protected abstract int getToStack(AIHelper aiHelper);
 
 	/**
 	 * How many items should be moved. Mind that items may be put back (might be
@@ -59,7 +59,7 @@ public abstract class MoveInInventoryTask extends AITask {
 	 * 
 	 * @return
 	 */
-	protected abstract int getMissingAmount(AIHelper h, int currentCount);
+	protected abstract int getMissingAmount(AIHelper aiHelper, int currentCount);
 
 	/**
 	 * If not all items could be moved, this is called.
@@ -72,22 +72,22 @@ public abstract class MoveInInventoryTask extends AITask {
 	}
 
 	@Override
-	public boolean isFinished(AIHelper h) {
+	public boolean isFinished(AIHelper aiHelper) {
 		return moveDone;
 	}
 
 	@Override
-	public void runTick(AIHelper h, TaskOperations o) {
-		final GuiContainer screen = (GuiContainer) h.getMinecraft().currentScreen;
+	public void runTick(AIHelper aiHelper, TaskOperations taskOperations) {
+		final GuiContainer screen = (GuiContainer) aiHelper.getMinecraft().currentScreen;
 		if (screen == null) {
-			o.desync(new StringTaskError("Expected container to be open"));
+			taskOperations.desync(new StringTaskError("Expected container to be open"));
 			return;
 		}
 		if (delay > 0) {
 			delay--;
 		} else {
-			int fromStack = getFromStack(h);
-			int toStack = getToStack(h);
+			int fromStack = getFromStack(aiHelper);
+			int toStack = getToStack(aiHelper);
 			if (fromStack < 0
 					|| toStack < 0
 					|| fromStack >= screen.inventorySlots.inventoryItemStacks
@@ -96,12 +96,12 @@ public abstract class MoveInInventoryTask extends AITask {
 							.size()) {
 				LOGGER.error("Attempet to move : " + fromStack + " -> "
 						+ toStack);
-				o.desync(new StringTaskError("Invalid item move specification."));
+				taskOperations.desync(new StringTaskError("Invalid item move specification."));
 				return;
 			}
 			Slot from = screen.inventorySlots.getSlot(fromStack);
 			if (getSlotContentCount(from) <= 0) {
-				o.desync(new StringTaskError("Nothing in source slot."));
+				taskOperations.desync(new StringTaskError("Nothing in source slot."));
 				LOGGER.error(MARKER_MOVE, "Attempted to move from slot "
 						+ fromStack + " but it was empty (" + from.slotNumber
 						+ ", " + from.getStack() + ")");
@@ -109,7 +109,7 @@ public abstract class MoveInInventoryTask extends AITask {
 			}
 
 			Slot to = screen.inventorySlots.getSlot(toStack);
-			int amount = getMissingAmount(h, getSlotContentCount(to));
+			int amount = getMissingAmount(aiHelper, getSlotContentCount(to));
 			LOGGER.debug(MARKER_MOVE, "Move " + amount + " from " + fromStack
 					+ " to " + toStack);
 
@@ -119,15 +119,15 @@ public abstract class MoveInInventoryTask extends AITask {
 
 			while (getSlotContentCount(from) <= missing
 					&& getSlotContentCount(from) > 0) {
-				missing -= moveAll(h, from, to);
+				missing -= moveAll(aiHelper, from, to);
 			}
 
 			LOGGER.debug("Still missing (1): " + missing);
 			if (getSlotContentCount(from) - getSlotContentCount(from) / 2 <= missing
 					&& getSlotContentCount(from) > 0) {
-				missing -= moveHalf(h, from, to);
+				missing -= moveHalf(aiHelper, from, to);
 			} else if (missing > 0 && getSlotContentCount(from) > 0) {
-				missing -= moveStackPart(h, from, to, missing);
+				missing -= moveStackPart(aiHelper, from, to, missing);
 			} else if (missing > 0) {
 				missingItems(missing);
 			} else {
@@ -137,40 +137,40 @@ public abstract class MoveInInventoryTask extends AITask {
 		}
 	}
 
-	private int moveAll(AIHelper h, Slot from, Slot to) {
-		return moveStack(h, from, to, false);
+	private int moveAll(AIHelper aiHelper, Slot from, Slot to) {
+		return moveStack(aiHelper, from, to, false);
 	}
 
-	private int moveHalf(AIHelper h, Slot from, Slot to) {
-		return moveStack(h, from, to, true);
+	private int moveHalf(AIHelper aiHelper, Slot from, Slot to) {
+		return moveStack(aiHelper, from, to, true);
 	}
 
-	private int moveStack(AIHelper h, Slot from, Slot to,
+	private int moveStack(AIHelper aiHelper, Slot from, Slot to,
 			boolean rightclickOnStart) {
 		int oldCount = getSlotContentCount(to);
 
-		click(h, from.slotNumber, rightclickOnStart ? 1 : 0);
+		click(aiHelper, from.slotNumber, rightclickOnStart ? 1 : 0);
 
-		click(h, to.slotNumber, 0);
+		click(aiHelper, to.slotNumber, 0);
 		return getSlotContentCount(to) - oldCount;
 	}
 
-	private void click(AIHelper h, int slotNumber, int i) {
+	private void click(AIHelper aiHelper, int slotNumber, int i) {
 		System.out.println("Click on " + slotNumber + " using " + i);
-		final GuiContainer screen = (GuiContainer) h.getMinecraft().currentScreen;
-		h.getMinecraft().playerController.windowClick(
+		final GuiContainer screen = (GuiContainer) aiHelper.getMinecraft().currentScreen;
+		aiHelper.getMinecraft().playerController.windowClick(
 				screen.inventorySlots.windowId, slotNumber, i, 0,
-				h.getMinecraft().thePlayer);
+				aiHelper.getMinecraft().thePlayer);
 	}
 
-	private int moveStackPart(AIHelper h, Slot from, Slot to, int count) {
+	private int moveStackPart(AIHelper aiHelper, Slot from, Slot to, int count) {
 		int oldCount = getSlotContentCount(to);
 
-		click(h, from.slotNumber, 0);
+		click(aiHelper, from.slotNumber, 0);
 		for (int i = 0; i < count; i++) {
-			click(h, to.slotNumber, 1);
+			click(aiHelper, to.slotNumber, 1);
 		}
-		click(h, from.slotNumber, 0);
+		click(aiHelper, from.slotNumber, 0);
 		return getSlotContentCount(to) - oldCount;
 	}
 

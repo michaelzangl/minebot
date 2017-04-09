@@ -39,8 +39,8 @@ public class PutInChestTask extends PutItemInContainerTask {
 	}
 
 	@Override
-	protected int getStackToPut(AIHelper h) {
-		GuiChest screen = (GuiChest) h.getMinecraft().currentScreen;
+	protected int getStackToPut(AIHelper aiHelper) {
+		GuiChest screen = (GuiChest) aiHelper.getMinecraft().currentScreen;
 		int slots = screen.inventorySlots.inventorySlots.size();
 		int iSlot;
 		if (inventorySlot < 9) {

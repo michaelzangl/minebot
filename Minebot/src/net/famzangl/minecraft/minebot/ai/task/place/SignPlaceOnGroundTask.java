@@ -41,28 +41,28 @@ public class SignPlaceOnGroundTask extends PlaceBlockAtFloorTask {
 	}
 	
 	@Override
-	public boolean isFinished(AIHelper h) {
-		return super.isFinished(h) && textTask.isFinished(h);
+	public boolean isFinished(AIHelper aiHelper) {
+		return super.isFinished(aiHelper) && textTask.isFinished(aiHelper);
 	}
 
 	@Override
-	public void runTick(AIHelper h, TaskOperations o) {
-		if (super.isFinished(h)) {
-			textTask.runTick(h, o);
+	public void runTick(AIHelper aiHelper, TaskOperations taskOperations) {
+		if (super.isFinished(aiHelper)) {
+			textTask.runTick(aiHelper, taskOperations);
 		} else {
-			super.runTick(h, o);
+			super.runTick(aiHelper, taskOperations);
 		}
 	}
 	
 	@Override
-	protected void faceBlock(AIHelper h, TaskOperations o) {
+	protected void faceBlock(AIHelper aiHelper, TaskOperations o) {
 		// TODO Auto-generated method stub
-		super.faceBlock(h, o);
+		super.faceBlock(aiHelper, o);
 	}
 	
 	@Override
-	protected boolean isFacingRightBlock(AIHelper h) {
-		return super.isFacingRightBlock(h) && isGoodForDirection(h.getMinecraft().thePlayer.rotationYaw);
+	protected boolean isFacingRightBlock(AIHelper aiHelper) {
+		return super.isFacingRightBlock(aiHelper) && isGoodForDirection(aiHelper.getMinecraft().thePlayer.rotationYaw);
 	}
 
 	private boolean isGoodForDirection(float rotationYaw) {

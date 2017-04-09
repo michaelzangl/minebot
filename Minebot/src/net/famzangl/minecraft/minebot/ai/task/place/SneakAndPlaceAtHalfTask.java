@@ -78,8 +78,8 @@ public class SneakAndPlaceAtHalfTask extends SneakAndPlaceTask {
 			return pos.offset(direction);
 		}
 
-		public boolean isFacing(AIHelper h) {
-			return h.isFacingBlock(getPlaceOn(), direction.getOpposite(),
+		public boolean isFacing(AIHelper aiHelper) {
+			return aiHelper.isFacingBlock(getPlaceOn(), direction.getOpposite(),
 					blockHalf);
 		}
 
@@ -105,7 +105,7 @@ public class SneakAndPlaceAtHalfTask extends SneakAndPlaceTask {
 
 	private PlacingDirection[] dirs;
 
-	protected PlacingDirection[] getBuildDirs(AIHelper h) {
+	protected PlacingDirection[] getBuildDirs(AIHelper aiHelper) {
 		// we sort them by distance. This order is kept afterwards.
 		if (dirs == null) {
 			EnumFacing[] orders = createBuildDirsUnordered();
@@ -113,7 +113,7 @@ public class SneakAndPlaceAtHalfTask extends SneakAndPlaceTask {
 			for (int i = 0; i < orders.length; i++) {
 				EnumFacing f = orders[i];
 				dirs[i] = new PlacingDirection(positionToPlace, f, blockHalf,
-						h.getWorld());
+						aiHelper.getWorld());
 			}
 			Arrays.sort(dirs);
 		}
@@ -154,14 +154,14 @@ public class SneakAndPlaceAtHalfTask extends SneakAndPlaceTask {
 	}
 
 	@Override
-	protected boolean faceBlock(AIHelper h, TaskOperations o) {
-		final PlacingDirection[] dirs = getBuildDirs(h);
+	protected boolean faceBlock(AIHelper aiHelper, TaskOperations taskOperations) {
+		final PlacingDirection[] dirs = getBuildDirs(aiHelper);
 		attempts++;
 		boolean success = false;
 		for (int i = 0; i < dirs.length; i++) {
 			final PlacingDirection useSide = dirs[attempts / 10 % dirs.length];
 			if (useSide.canPlaceOn()) {
-				success = faceSideBlock(h, useSide);
+				success = faceSideBlock(aiHelper, useSide);
 				break;
 			} else {
 				attempts += 10;
@@ -170,7 +170,7 @@ public class SneakAndPlaceAtHalfTask extends SneakAndPlaceTask {
 			}
 		}
 		if (attempts > 90) {
-			o.desync(new StringTaskError("Could not face anywhere to place."));
+			taskOperations.desync(new StringTaskError("Could not face anywhere to place."));
 		}
 		return success;
 	}
@@ -181,12 +181,12 @@ public class SneakAndPlaceAtHalfTask extends SneakAndPlaceTask {
 				: positionToPlace;
 	}
 
-	private boolean faceSideBlock(AIHelper h, PlacingDirection direction) {
+	private boolean faceSideBlock(AIHelper aiHelper, PlacingDirection direction) {
 		if (facePos == null) {
 			facePos = direction.getRandomPoint(faceCentered);
 			faceCentered += .2;
 		}
-		if (h.face(facePos)) {
+		if (aiHelper.face(facePos)) {
 			facePos = null;
 			return true;
 		} else {
@@ -194,20 +194,20 @@ public class SneakAndPlaceAtHalfTask extends SneakAndPlaceTask {
 		}
 
 		// TODO: lookingDirection
-		// TODO: h.getMinecraft().thePlayer.posX -
+		// TODO: aiHelper.getMinecraft().thePlayer.posX -
 		// getPositionToPlaceAt().getX(),
-		// TODO: h.getMinecraft().thePlayer.posZ -
+		// TODO: aiHelper.getMinecraft().thePlayer.posZ -
 		// getPositionToPlaceAt().getZ(),
 	}
 
-	private boolean isFacing(AIHelper h, PlacingDirection d) {
-		return d.isFacing(h);
+	private boolean isFacing(AIHelper aiHelper, PlacingDirection d) {
+		return d.isFacing(aiHelper);
 	}
 
 	@Override
-	protected boolean isFacingRightBlock(AIHelper h) {
-		for (final PlacingDirection d : getBuildDirs(h)) {
-			if (isFacing(h, d)) {
+	protected boolean isFacingRightBlock(AIHelper aiHelper) {
+		for (final PlacingDirection d : getBuildDirs(aiHelper)) {
+			if (isFacing(aiHelper, d)) {
 				return true;
 			}
 		}
