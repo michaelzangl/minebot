@@ -99,11 +99,11 @@ public abstract class BlockWithDataOrDontcare {
 			// candidate found
 			strings.add(k.toString());
 
-			Block b = (Block) Block.blockRegistry.getObject(k);
+			Block block = (Block) Block.blockRegistry.getObject(k);
 			HashSet<IBlockState> states = new HashSet<IBlockState>();
 			for (int i = 0; i < 16; i++) {
 				try {
-				IBlockState state = b.getStateFromMeta(i);
+				IBlockState state = block.getStateFromMeta(i);
 				if (!states.contains(state)) {
 					states.add(state);
 				}
@@ -113,8 +113,8 @@ public abstract class BlockWithDataOrDontcare {
 			}
 			if (states.size() > 1) {
 				for (IBlockState state : states) {
-					BlockWithData withData = new BlockWithData(b,
-							b.getMetaFromState(state));
+					BlockWithData withData = new BlockWithData(block,
+							block.getMetaFromState(state));
 					strings.add(k + ":" + withData.getMetaString());
 				}
 			}
