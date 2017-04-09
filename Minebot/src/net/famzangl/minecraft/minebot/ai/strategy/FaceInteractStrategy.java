@@ -63,9 +63,9 @@ public abstract class FaceInteractStrategy extends AIStrategy {
 			ticksSlow = 0;
 		}
 
-		final MovingObjectPosition over = helper.getObjectMouseOver();
-		if (over != null && over.typeOfHit == MovingObjectType.ENTITY
-				&& doInteractWithCurrent(over.entityHit, helper)) {
+		final MovingObjectPosition position = helper.getObjectMouseOver();
+		if (position != null && position.typeOfHit == MovingObjectType.ENTITY
+				&& doInteractWithCurrent(position.entityHit, helper)) {
 			ticksRun = 0;
 		} else {
 			final double speed = helper.getMinecraft().thePlayer.motionX

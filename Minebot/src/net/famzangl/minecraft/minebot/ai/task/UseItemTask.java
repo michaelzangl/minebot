@@ -53,15 +53,15 @@ public abstract class UseItemTask extends AITask {
 				}
 			}
 
-			final MovingObjectPosition objectMouseOver = h.getObjectMouseOver();
-			if (objectMouseOver == null
-					|| objectMouseOver.typeOfHit != MovingObjectPosition.MovingObjectType.BLOCK) {
+			final MovingObjectPosition position = h.getObjectMouseOver();
+			if (position == null
+					|| position.typeOfHit != MovingObjectPosition.MovingObjectType.BLOCK) {
 				notFacingBlock(h);
 				return;
 			}
 			// Check is facing to make sure top facing check passed.
-			if (!h.isFacingBlock(objectMouseOver.getBlockPos())
-					|| !isBlockAllowed(h, objectMouseOver.getBlockPos())) {
+			if (!h.isFacingBlock(position.getBlockPos())
+					|| !isBlockAllowed(h, position.getBlockPos())) {
 				notFacingBlock(h);
 				return;
 			}

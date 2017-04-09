@@ -27,9 +27,9 @@ public class KillAnyMobTask extends AITask {
 
 	@Override
 	public boolean isFinished(AIHelper h) {
-		final MovingObjectPosition objectMouseOver = h.getObjectMouseOver();
-		return objectMouseOver == null
-				|| objectMouseOver.typeOfHit != MovingObjectPosition.MovingObjectType.ENTITY;
+		final MovingObjectPosition position = h.getObjectMouseOver();
+		return position == null
+				|| position.typeOfHit != MovingObjectPosition.MovingObjectType.ENTITY;
 	}
 
 	@Override

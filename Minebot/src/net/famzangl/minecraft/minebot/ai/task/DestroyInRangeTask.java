@@ -207,9 +207,9 @@ public class DestroyInRangeTask extends AITask implements CanPrefaceAndDestroy {
 	}
 
 	protected BlockPos checkFacingAcceptableBlock(AIHelper h, BlockPos n, boolean isFacingRightDirection) {
-		MovingObjectPosition hit = h.getObjectMouseOver();
-		if (isFacingRightDirection && hit != null && hit.typeOfHit == MovingObjectType.BLOCK) {
-			BlockPos pos = hit.getBlockPos();
+		MovingObjectPosition position = h.getObjectMouseOver();
+		if (isFacingRightDirection && position != null && position.typeOfHit == MovingObjectType.BLOCK) {
+			BlockPos pos = position.getBlockPos();
 			if (isAcceptedFacingPos(h, n, pos)) {
 				return pos;
 			}

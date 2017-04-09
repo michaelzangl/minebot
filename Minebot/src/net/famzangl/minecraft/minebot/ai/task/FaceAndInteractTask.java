@@ -78,10 +78,10 @@ public class FaceAndInteractTask extends AITask {
 
 	@Override
 	public void runTick(AIHelper h, TaskOperations o) {
-		final MovingObjectPosition over = h.getObjectMouseOver();
-		if (ticksRun > 2 && over != null
-				&& over.typeOfHit == MovingObjectType.ENTITY
-				&& alsoAcceptedAnimal.apply(over.entityHit)) {
+		final MovingObjectPosition position = h.getObjectMouseOver();
+		if (ticksRun > 2 && position != null
+				&& position.typeOfHit == MovingObjectType.ENTITY
+				&& alsoAcceptedAnimal.apply(position.entityHit)) {
 			doInteractWithCurrent(h);
 		} else {
 			final double speed = h.getMinecraft().thePlayer.motionX

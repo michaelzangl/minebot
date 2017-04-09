@@ -362,11 +362,11 @@ public abstract class AIHelper {
 	 * @return <code>true</code> if it is facing the Block.
 	 */
 	public boolean isFacingBlock(int x, int y, int z) {
-		final MovingObjectPosition o = getObjectMouseOver();
-		return o != null
-				&& o.typeOfHit == MovingObjectType.BLOCK
-				&& new BlockPos(x, y, z).equals(o.getBlockPos())
-				&& (y < 255 || allowTopOfWorldHit() || o.sideHit != EnumFacing.UP);
+		final MovingObjectPosition position = getObjectMouseOver();
+		return position != null
+				&& position.typeOfHit == MovingObjectType.BLOCK
+				&& new BlockPos(x, y, z).equals(position.getBlockPos())
+				&& (y < 255 || allowTopOfWorldHit() || position.sideHit != EnumFacing.UP);
 	}
 
 	private boolean allowTopOfWorldHit() {
@@ -418,8 +418,8 @@ public abstract class AIHelper {
 	 * @return <code>true</code> if the player faces the block.
 	 */
 	public boolean isFacingBlock(int x, int y, int z, EnumFacing side) {
-		final MovingObjectPosition o = getObjectMouseOver();
-		return isFacingBlock(x, y, z) && o.sideHit == side;
+		final MovingObjectPosition position = getObjectMouseOver();
+		return isFacingBlock(x, y, z) && position.sideHit == side;
 	}
 
 	public boolean isStandingOn(BlockPos pos) {
