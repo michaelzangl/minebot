@@ -73,7 +73,7 @@ public class PlaceTorchSomewhereTask extends AITask {
 	 * 
 	 * @param positions
 	 *            The positions on which the torch should be placed.
-	 * @param preferedDirectionThe
+	 * @param preferedDirection The
 	 *            direction in which the stick of the torch should be mounted.
 	 */
 	public PlaceTorchSomewhereTask(List<BlockPos> positions,
@@ -107,8 +107,8 @@ public class PlaceTorchSomewhereTask extends AITask {
 		if (attemptOnPositions == null) {
 			attemptOnPositions = new LinkedList<PlaceTorchSomewhereTask.PosAndDir>();
 			for (final BlockPos place : places) {
-				for (final EnumFacing d : preferedDirection) {
-					final PosAndDir current = new PosAndDir(place, d);
+				for (final EnumFacing direction : preferedDirection) {
+					final PosAndDir current = new PosAndDir(place, direction);
 					final BlockPos placeOn = current.getPlaceOn();
 					if (!BlockSets.AIR.isAt(aiHelper.getWorld(), placeOn)) {
 						attemptOnPositions.add(current);
@@ -134,9 +134,9 @@ public class PlaceTorchSomewhereTask extends AITask {
 			return;
 		}
 
-		final BlockItemFilter f = new BlockItemFilter(Blocks.torch);
-		if (!aiHelper.selectCurrentItem(f)) {
-			taskOperations.desync(new SelectTaskError(f));
+		final BlockItemFilter itemFilter = new BlockItemFilter(Blocks.torch);
+		if (!aiHelper.selectCurrentItem(itemFilter)) {
+			taskOperations.desync(new SelectTaskError(itemFilter));
 		}
 
 		final PosAndDir next = getNextPlace(aiHelper);
