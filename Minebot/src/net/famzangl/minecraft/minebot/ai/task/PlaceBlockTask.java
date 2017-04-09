@@ -63,9 +63,9 @@ public class PlaceBlockTask extends AITask {
 
 	@Override
 	public void runTick(AIHelper aiHelper, TaskOperations taskOperations) {
-		final BlockItemFilter f = new BlockItemFilter(block);
-		if (!aiHelper.selectCurrentItem(f)) {
-			taskOperations.desync(new SelectTaskError(f));
+		final BlockItemFilter itemFilter = new BlockItemFilter(block);
+		if (!aiHelper.selectCurrentItem(itemFilter)) {
+			taskOperations.desync(new SelectTaskError(itemFilter));
 		}
 
 		aiHelper.faceSideOf(placeOn, onSide);
