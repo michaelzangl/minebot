@@ -69,13 +69,13 @@ public class BlockSetAdapter implements JsonSerializer<BlockSet>,
 		}
 
 		BlockSet metaRes = new BlockSet(new int[0]);
-		JsonArray a = json.getAsJsonArray();
-		for (JsonElement p : a) {
-			if (p.isJsonObject()) {
-				metaRes = metaRes.unionWith(getBlockWithMeta(p
+		JsonArray jsonArray = json.getAsJsonArray();
+		for (JsonElement element : jsonArray) {
+			if (element.isJsonObject()) {
+				metaRes = metaRes.unionWith(getBlockWithMeta(element
 						.getAsJsonObject()));
-			} else if (p.isJsonPrimitive()) {
-				Block block = getBlockId(p.getAsJsonPrimitive());
+			} else if (element.isJsonPrimitive()) {
+				Block block = getBlockId(element.getAsJsonPrimitive());
 				metaRes = metaRes.unionWith(new BlockSet(block));
 			} else {
 				throw new JsonParseException("could not understand this.");
@@ -85,16 +85,16 @@ public class BlockSetAdapter implements JsonSerializer<BlockSet>,
 		return metaRes;
 	}
 
-	private BlockSet getBlockWithMeta(JsonObject p) {
-		return new BlockMetaSet(getBlockId(p.getAsJsonPrimitive("block")), p
-				.getAsJsonPrimitive("meta").getAsInt());
+	private BlockSet getBlockWithMeta(JsonObject object) {
+		return new BlockMetaSet(getBlockId(object.getAsJsonPrimitive("block")),
+				object.getAsJsonPrimitive("meta").getAsInt());
 	}
 
-	public static Block getBlockId(JsonPrimitive p) {
-		if (p.isNumber()) {
-			return Block.getBlockById(p.getAsInt());
-		} else if (p.isString()) {
-			return Block.getBlockFromName(p.getAsString());
+	public static Block getBlockId(JsonPrimitive primitive) {
+		if (primitive.isNumber()) {
+			return Block.getBlockById(primitive.getAsInt());
+		} else if (primitive.isString()) {
+			return Block.getBlockFromName(primitive.getAsString());
 		} else {
 			throw new JsonParseException("could not understand this.");
 		}
