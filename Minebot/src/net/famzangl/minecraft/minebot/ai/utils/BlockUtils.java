@@ -43,8 +43,8 @@ public class BlockUtils {
 	 */
 	public static <ValT extends Comparable<ValT>> ValT getMinimum(
 			BlockArea area, WorldData world, BlockMapper<ValT> mapper) {
-		MinimumVisitor<ValT> v = new MinimumVisitor<ValT>(mapper);
-		area.accept(v, world);
-		return v.getMinimum();
+		MinimumVisitor<ValT> visitor = new MinimumVisitor<ValT>(mapper);
+		area.accept(visitor, world);
+		return visitor.getMinimum();
 	}
 }
