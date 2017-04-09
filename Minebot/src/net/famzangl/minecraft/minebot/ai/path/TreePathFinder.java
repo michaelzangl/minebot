@@ -397,10 +397,10 @@ public class TreePathFinder extends MovePathFinder {
 	}
 
 	private boolean handleLargeTree(BlockPos currentPos) {
-		for (BlockPos p : new BlockPos[] { currentPos,
+		for (BlockPos pos : new BlockPos[] { currentPos,
 				currentPos.add(0, 0, -1), currentPos.add(-1, 0, 0),
 				currentPos.add(-1, 0, -1), }) {
-			LargeTreeState state = new LargeTreeState(p);
+			LargeTreeState state = new LargeTreeState(pos);
 			state.scanTreeHeight(world, currentPos);
 			if (state.getTreeHeight() > 6 || state.getTreeHeightAbovePlayer() > 4) {
 				// we are in a large tree that should be handled by this special algorithm.

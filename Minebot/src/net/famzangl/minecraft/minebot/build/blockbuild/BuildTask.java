@@ -142,8 +142,8 @@ public abstract class BuildTask {
 	public abstract AITask getPlaceBlockTask(BlockPos relativeFromPos);
 
 	public boolean isStandablePlace(BlockPos relativeFromPos) {
-		for (final BlockPos p : getStandablePlaces()) {
-			if (p.equals(relativeFromPos)) {
+		for (final BlockPos place : getStandablePlaces()) {
+			if (place.equals(relativeFromPos)) {
 				return true;
 			}
 		}
@@ -161,8 +161,8 @@ public abstract class BuildTask {
 	 */
 	public boolean couldBuildFrom(AIHelper helper, int x, int y, int z) {
 		final BlockPos pos = getForPosition();
-		for (final BlockPos p : getStandablePlaces()) {
-			if (p.getX() + pos.getX() == x && p.getY() + pos.getY() == y && p.getZ() + pos.getZ() == z) {
+		for (final BlockPos place : getStandablePlaces()) {
+			if (place.getX() + pos.getX() == x && place.getY() + pos.getY() == y && place.getZ() + pos.getZ() == z) {
 				return true;
 			}
 		}

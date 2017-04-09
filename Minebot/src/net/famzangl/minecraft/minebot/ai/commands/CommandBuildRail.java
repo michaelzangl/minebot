@@ -42,10 +42,10 @@ public class CommandBuildRail {
 			@AICommandParameter(type = ParameterType.FIXED, fixedName = "rails", description = "") String nameArg,
 			@AICommandParameter(type = ParameterType.ENUM, description = "direction") EnumFacing inDirection) {
 
-		final BlockPos p = helper.getPlayerPosition();
+		final BlockPos playerPosition = helper.getPlayerPosition();
 		return new PathFinderStrategy(
 				new LayRailPathFinder(inDirection.getFrontOffsetX(),
-						inDirection.getFrontOffsetZ(), p.getX(), p.getY(), p.getZ()),
+						inDirection.getFrontOffsetZ(), playerPosition.getX(), playerPosition.getY(), playerPosition.getZ()),
 				"Building a railway");
 	}
 }

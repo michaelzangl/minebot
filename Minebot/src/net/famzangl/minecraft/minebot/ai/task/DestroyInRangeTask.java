@@ -176,22 +176,22 @@ public class DestroyInRangeTask extends AITask implements CanPrefaceAndDestroy {
 
 	@Override
 	public void runTick(AIHelper h, TaskOperations o) {
-		BlockPos n = getNextToDestruct(h);
+		BlockPos destructPos = getNextToDestruct(h);
 		if (facingAttempts > 23) {
-			failedBlocks.add(n);
-			n = getNextToDestruct(h);
+			failedBlocks.add(destructPos);
+			destructPos = getNextToDestruct(h);
 			facingAttempts = 0;
 		}
-		if (n != null) {
+		if (destructPos != null) {
 			if (facingAttempts % 5 == 4 || lastFacingFor == null
-					|| !lastFacingFor.equals(n)) {
-				facingPos = h.getWorld().getBlockBounds(n).random(n, .9);
-				lastFacingFor = n;
+					|| !lastFacingFor.equals(destructPos)) {
+				facingPos = h.getWorld().getBlockBounds(destructPos).random(destructPos, .9);
+				lastFacingFor = destructPos;
 			}
 
-			BlockPos p = checkFacingAcceptableBlock(h, n, h.isFacing(facingPos));
-			if (p != null) {
-				h.selectToolFor(p);
+			BlockPos pos = checkFacingAcceptableBlock(h, destructPos, h.isFacing(facingPos));
+			if (pos != null) {
+				h.selectToolFor(pos);
 				h.overrideAttack();
 				facingAttempts = 0;
 			} else {

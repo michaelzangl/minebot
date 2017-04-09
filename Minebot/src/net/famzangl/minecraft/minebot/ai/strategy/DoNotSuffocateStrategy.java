@@ -35,18 +35,18 @@ public class DoNotSuffocateStrategy extends AIStrategy {
 
 	@Override
 	public boolean checkShouldTakeOver(AIHelper helper) {
-		BlockPos p = helper.getPlayerPosition();
-		return (!safeFeet(helper, p) || !safeHead(helper, p));
+		BlockPos playerPosition = helper.getPlayerPosition();
+		return (!safeFeet(helper, playerPosition) || !safeHead(helper, playerPosition));
 	}
 
 	@Override
 	protected TickResult onGameTick(AIHelper helper) {
-		BlockPos p = helper.getPlayerPosition();
-		if (!safeFeet(helper, p)) {
-			helper.faceAndDestroy(p);
+		BlockPos playerPosition = helper.getPlayerPosition();
+		if (!safeFeet(helper, playerPosition)) {
+			helper.faceAndDestroy(playerPosition);
 			return TickResult.TICK_HANDLED;
-		} else if (!safeHead(helper, p)) {
-			helper.faceAndDestroy(p.add(0, 1, 0));
+		} else if (!safeHead(helper, playerPosition)) {
+			helper.faceAndDestroy(playerPosition.add(0, 1, 0));
 			return TickResult.TICK_HANDLED;
 		}
 		return TickResult.NO_MORE_WORK;

@@ -93,13 +93,13 @@ public class FillAreaPathfinder extends MovePathFinder {
 			return -1;
 		}
 
-		for (BlockPos s : AbstractBuildTask.STANDABLE) {
-			int blockPosY = y - s.getY();
+		for (BlockPos pos : AbstractBuildTask.STANDABLE) {
+			int blockPosY = y - pos.getY();
 			if (y != currentFillLayer) {
 				continue;
 			}
-			int blockPosX = x - s.getX();
-			int blockPosZ = z - s.getZ();
+			int blockPosX = x - pos.getX();
+			int blockPosZ = z - pos.getZ();
 			if (fillCuboid.contains(world, blockPosX, blockPosY, blockPosZ)
 					&& BlockSets.AIR.isAt(world, blockPosX, blockPosY,
 							blockPosZ)) {
@@ -118,13 +118,13 @@ public class FillAreaPathfinder extends MovePathFinder {
 	}
 
 	private boolean generatePlaceBlockTask(BlockPos currentPos) {
-		for (BlockPos s : AbstractBuildTask.STANDABLE) {
-			BlockPos placeAtPos = currentPos.subtract(s);
+		for (BlockPos pos : AbstractBuildTask.STANDABLE) {
+			BlockPos placeAtPos = currentPos.subtract(pos);
 			if (placeAtPos.getY() == currentFillLayer
 					&& fillCuboid.contains(world, placeAtPos)
 					&& BlockSets.AIR.isAt(world, placeAtPos)) {
 				addTask(new BlockBuildTask(placeAtPos, blockToPlace)
-						.getPlaceBlockTask(s));
+						.getPlaceBlockTask(pos));
 				return true;
 			}
 		}

@@ -101,11 +101,11 @@ public class PlaceTorchStrategy extends AIStrategy {
 
 	private void loadAttemptPositions(WorldData world) {
 		attemptPositions.clear();
-		for (BlockPos p : new BlockPos[] { world.getPlayerPosition(),
+		for (BlockPos pos : new BlockPos[] { world.getPlayerPosition(),
 				world.getPlayerPosition().add(0, 1, 0) }) {
 			for (EnumFacing f : EnumFacing.values()) {
 				if (f != EnumFacing.UP) {
-					loadAttemptPosition(world, new PosAndDir(p, f));
+					loadAttemptPosition(world, new PosAndDir(pos, f));
 				}
 			}
 		}

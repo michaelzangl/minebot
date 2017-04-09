@@ -67,8 +67,8 @@ public class BuildMarkerRenderer extends RenderHelper {
 			renderMarker(nextTask.getForPosition(), 1, 1, 0, 0.7f);
 			findCorners(corners, scheduled);
 			corners.remove(nextTask.getForPosition());
-			for (final BlockPos c : corners) {
-				renderMarker(c, 0, 0, 1, 0.5f);
+			for (final BlockPos pos : corners) {
+				renderMarker(pos, 0, 0, 1, 0.5f);
 			}
 		}
 		renderEnd();

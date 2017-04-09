@@ -77,10 +77,10 @@ public class CommandStepPlace {
 	private static BlockPos getFromPos(AIHelper helper, final BuildTask task,
 			BlockPos forPosition) {
 		BlockPos fromPos = null;
-		for (final BlockPos p : task.getStandablePlaces()) {
-			if (helper.isStandingOn(p.getX() + forPosition.getX(), p.getY() + forPosition.getY(),
-					p.getZ() + forPosition.getZ())) {
-				fromPos = p;
+		for (final BlockPos place : task.getStandablePlaces()) {
+			if (helper.isStandingOn(place.getX() + forPosition.getX(), place.getY() + forPosition.getY(),
+					place.getZ() + forPosition.getZ())) {
+				fromPos = place;
 			}
 		}
 		return fromPos;

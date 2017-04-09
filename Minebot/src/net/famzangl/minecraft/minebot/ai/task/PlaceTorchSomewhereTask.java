@@ -106,9 +106,9 @@ public class PlaceTorchSomewhereTask extends AITask {
 	private PosAndDir getNextPlace(AIHelper h) {
 		if (attemptOnPositions == null) {
 			attemptOnPositions = new LinkedList<PlaceTorchSomewhereTask.PosAndDir>();
-			for (final BlockPos p : places) {
+			for (final BlockPos place : places) {
 				for (final EnumFacing d : preferedDirection) {
-					final PosAndDir current = new PosAndDir(p, d);
+					final PosAndDir current = new PosAndDir(place, d);
 					final BlockPos placeOn = current.getPlaceOn();
 					if (!BlockSets.AIR.isAt(h.getWorld(), placeOn)) {
 						attemptOnPositions.add(current);
