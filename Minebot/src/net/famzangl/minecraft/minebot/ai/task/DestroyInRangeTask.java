@@ -50,15 +50,15 @@ public class DestroyInRangeTask extends AITask implements CanPrefaceAndDestroy {
 	private class ClosestBlockFinder implements AreaVisitor {
 		BlockPos next = null;
 		double currentMin = Float.POSITIVE_INFINITY;
-		private final AIHelper h;
+		private final AIHelper aiHelper;
 
-		public ClosestBlockFinder(AIHelper h) {
-			this.h = h;
+		public ClosestBlockFinder(AIHelper aiHelper) {
+			this.aiHelper = aiHelper;
 		}
 
 		@Override
 		public void visit(WorldData world, int x, int y, int z) {
-			final double rating = rate(h, x, y, z);
+			final double rating = rate(aiHelper, x, y, z);
 			if (rating >= 0 && rating < currentMin) {
 				next = new BlockPos(x, y, z);
 				currentMin = rating;
@@ -115,28 +115,28 @@ public class DestroyInRangeTask extends AITask implements CanPrefaceAndDestroy {
 		this.range = range;
 	}
 
-	private BlockPos getNextToDestruct(AIHelper h) {
+	private BlockPos getNextToDestruct(AIHelper aiHelper) {
 		if (currentAttemptingPos != null
-				&& !noDestructionRequired(h.getWorld(),
+				&& !noDestructionRequired(aiHelper.getWorld(),
 						currentAttemptingPos.getX(),
 						currentAttemptingPos.getY(),
 						currentAttemptingPos.getZ())) {
 			return currentAttemptingPos;
 		}
-		ClosestBlockFinder f = new ClosestBlockFinder(h);
-		range.accept(f, h.getWorld());
-		currentAttemptingPos = f.next;
+		ClosestBlockFinder blockFinder = new ClosestBlockFinder(aiHelper);
+		range.accept(blockFinder, aiHelper.getWorld());
+		currentAttemptingPos = blockFinder.next;
 		return currentAttemptingPos;
 	}
 
-	private double rate(AIHelper h, int x, int y, int z) {
-		if (noDestructionRequired(h.getWorld(), x, y, z)) {
+	private double rate(AIHelper aiHelper, int x, int y, int z) {
+		if (noDestructionRequired(aiHelper.getWorld(), x, y, z)) {
 			return -1;
 		} else {
-			double distance = h.getMinecraft().thePlayer.getDistance(x + .5, y
-					+ .5 - h.getMinecraft().thePlayer.getEyeHeight(), z + .5);
+			double distance = aiHelper.getMinecraft().thePlayer.getDistance(x + .5, y
+					+ .5 - aiHelper.getMinecraft().thePlayer.getEyeHeight(), z + .5);
 			// 0..1
-			double change = h
+			double change = aiHelper
 					.getRequiredAngularChangeTo(x + .5, y + .5, z + .5)
 					/ Math.PI;
 			if (change > .20) {
@@ -170,51 +170,51 @@ public class DestroyInRangeTask extends AITask implements CanPrefaceAndDestroy {
 	}
 
 	@Override
-	public boolean isFinished(AIHelper h) {
-		return getNextToDestruct(h) == null;
+	public boolean isFinished(AIHelper aiHelper) {
+		return getNextToDestruct(aiHelper) == null;
 	}
 
 	@Override
-	public void runTick(AIHelper h, TaskOperations o) {
-		BlockPos destructPos = getNextToDestruct(h);
+	public void runTick(AIHelper aiHelper, TaskOperations taskOperations) {
+		BlockPos destructPos = getNextToDestruct(aiHelper);
 		if (facingAttempts > 23) {
 			failedBlocks.add(destructPos);
-			destructPos = getNextToDestruct(h);
+			destructPos = getNextToDestruct(aiHelper);
 			facingAttempts = 0;
 		}
 		if (destructPos != null) {
 			if (facingAttempts % 5 == 4 || lastFacingFor == null
 					|| !lastFacingFor.equals(destructPos)) {
-				facingPos = h.getWorld().getBlockBounds(destructPos).random(destructPos, .9);
+				facingPos = aiHelper.getWorld().getBlockBounds(destructPos).random(destructPos, .9);
 				lastFacingFor = destructPos;
 			}
 
-			BlockPos pos = checkFacingAcceptableBlock(h, destructPos, h.isFacing(facingPos));
+			BlockPos pos = checkFacingAcceptableBlock(aiHelper, destructPos, aiHelper.isFacing(facingPos));
 			if (pos != null) {
-				h.selectToolFor(pos);
-				h.overrideAttack();
+				aiHelper.selectToolFor(pos);
+				aiHelper.overrideAttack();
 				facingAttempts = 0;
 			} else {
-				h.face(facingPos);
+				aiHelper.face(facingPos);
 				facingAttempts++;
 			}
 		}
 	}
 
-	protected boolean isAcceptedFacingPos(AIHelper h, BlockPos n, BlockPos pos) {
-		return !noDestructionRequired(h.getWorld(), pos.getX(), pos.getY(),
+	protected boolean isAcceptedFacingPos(AIHelper aiHelper, BlockPos n, BlockPos pos) {
+		return !noDestructionRequired(aiHelper.getWorld(), pos.getX(), pos.getY(),
 				pos.getZ());
 	}
 
-	protected BlockPos checkFacingAcceptableBlock(AIHelper h, BlockPos n, boolean isFacingRightDirection) {
-		MovingObjectPosition position = h.getObjectMouseOver();
+	protected BlockPos checkFacingAcceptableBlock(AIHelper aiHelper, BlockPos n, boolean isFacingRightDirection) {
+		MovingObjectPosition position = aiHelper.getObjectMouseOver();
 		if (isFacingRightDirection && position != null && position.typeOfHit == MovingObjectType.BLOCK) {
 			BlockPos pos = position.getBlockPos();
-			if (isAcceptedFacingPos(h, n, pos)) {
+			if (isAcceptedFacingPos(aiHelper, n, pos)) {
 				return pos;
 			}
 		}
-		if (h.isFacingBlock(n)) {
+		if (aiHelper.isFacingBlock(n)) {
 			return n;
 		}
 		return null;
