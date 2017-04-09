@@ -762,8 +762,8 @@ public abstract class AIHelper {
 	 * @return
 	 */
 	public boolean hasItemInInvetory(ItemFilter itemFiler) {
-		for (final ItemStack s : mc.thePlayer.inventory.mainInventory) {
-			if (itemFiler.matches(s)) {
+		for (final ItemStack stack : mc.thePlayer.inventory.mainInventory) {
+			if (itemFiler.matches(stack)) {
 				return true;
 			}
 		}

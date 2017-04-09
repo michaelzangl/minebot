@@ -60,26 +60,26 @@ public class FurnaceStrategy extends PathFinderStrategy {
 					+ putFuel + ", take=" + take + "]";
 		}
 
-		public boolean hasSomePutTasks(FurnaceData f, ItemStack s) {
-			return couldPutFuel(f, s) || couldPutItem(f, s);
+		public boolean hasSomePutTasks(FurnaceData f, ItemStack stack) {
+			return couldPutFuel(f, stack) || couldPutItem(f, stack);
 		}
 
 		public boolean couldTake(FurnaceData f) {
 			return f.couldTake();
 		}
 
-		public boolean couldPutItem(FurnaceData f, ItemStack s) {
-			if (s == null) {
+		public boolean couldPutItem(FurnaceData f, ItemStack stack) {
+			if (stack == null) {
 				return false;
 			}
-			return putItem && f.couldPut(new ItemWithSubtype(s));
+			return putItem && f.couldPut(new ItemWithSubtype(stack));
 		}
 
-		public boolean couldPutFuel(FurnaceData f, ItemStack s) {
-			if (s == null) {
+		public boolean couldPutFuel(FurnaceData f, ItemStack stack) {
+			if (stack == null) {
 				return false;
 			}
-			return putItem && f.couldPutFuel(new ItemWithSubtype(s));
+			return putItem && f.couldPutFuel(new ItemWithSubtype(stack));
 		}
 	}
 
@@ -236,8 +236,8 @@ public class FurnaceStrategy extends PathFinderStrategy {
 					if (list.couldTake(f)) {
 						return distance;
 					}
-					for (ItemStack s : helper.getMinecraft().thePlayer.inventory.mainInventory) {
-						if (list.hasSomePutTasks(f, s)) {
+					for (ItemStack stack : helper.getMinecraft().thePlayer.inventory.mainInventory) {
+						if (list.hasSomePutTasks(f, stack)) {
 							return distance;
 						}
 					}
@@ -260,11 +260,11 @@ public class FurnaceStrategy extends PathFinderStrategy {
 			ArrayList<AITask> furnaceTasks = new ArrayList<AITask>();
 			ItemStack[] mainInventory = helper.getMinecraft().thePlayer.inventory.mainInventory;
 			for (int i = 0; i < mainInventory.length; i++) {
-				ItemStack s = mainInventory[i];
-				if (list.couldPutItem(f, s)) {
+				ItemStack stack = mainInventory[i];
+				if (list.couldPutItem(f, stack)) {
 					furnaceTasks.add(new MoveToBurnable(i, list, f));
 				}
-				if (list.couldPutFuel(f, s)) {
+				if (list.couldPutFuel(f, stack)) {
 					furnaceTasks.add(new MoveToFuel(i, list, f));
 				}
 			}

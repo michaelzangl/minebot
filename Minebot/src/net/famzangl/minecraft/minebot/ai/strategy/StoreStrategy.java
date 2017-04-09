@@ -40,18 +40,18 @@ import net.minecraft.util.BlockPos;
 public class StoreStrategy extends PathFinderStrategy {
 	private static class WaitIfNotFullTask extends WaitTask {
 
-		private final ItemStack s;
+		private final ItemStack stack;
 		private final ChestData c;
 
-		public WaitIfNotFullTask(int time, ChestData c, ItemStack s) {
+		public WaitIfNotFullTask(int time, ChestData c, ItemStack stack) {
 			super(time);
 			this.c = c;
-			this.s = s;
+			this.stack = stack;
 		}
 		
 		@Override
 		public boolean isFinished(AIHelper aiHelper) {
-			return super.isFinished(aiHelper) || c.isFullFor(s);
+			return super.isFinished(aiHelper) || c.isFullFor(stack);
 		}
 	}
 	
@@ -73,9 +73,9 @@ public class StoreStrategy extends PathFinderStrategy {
 					x, y, z));
 			if (chests != null) {
 				for (ChestData c : chests) {
-					for (ItemStack s : helper.getMinecraft().thePlayer.inventory.mainInventory) {
-						if (c.couldPutItem(s)) {
-							return distance + chestBlockHandler.getExpectedPutRating(c.getPos(), s);
+					for (ItemStack stack : helper.getMinecraft().thePlayer.inventory.mainInventory) {
+						if (c.couldPutItem(stack)) {
+							return distance + chestBlockHandler.getExpectedPutRating(c.getPos(), stack);
 						}
 					}
 				}
@@ -91,8 +91,8 @@ public class StoreStrategy extends PathFinderStrategy {
 				boolean chestOpen = false;
 				ItemStack[] inventory = helper.getMinecraft().thePlayer.inventory.mainInventory;
 				for (int i = 0; i < inventory.length; i++) {
-					final ItemStack s = inventory[i];
-					if (c.couldPutItem(s)) {
+					final ItemStack stack = inventory[i];
+					if (c.couldPutItem(stack)) {
 						if (!chestOpen) {
 							addTask(new OpenChestTask(c.getSecondaryPos(),
 									c.getPos()));
@@ -103,10 +103,10 @@ public class StoreStrategy extends PathFinderStrategy {
 							@Override
 							protected void containerIsFull() {
 								super.containerIsFull();
-								c.markAsFullFor(s, true);
+								c.markAsFullFor(stack, true);
 							}
 						});
-						addTask(new WaitIfNotFullTask(5, c, s));
+						addTask(new WaitIfNotFullTask(5, c, stack));
 					}
 				}
 				if (chestOpen) {
