@@ -58,12 +58,12 @@ public class PlantSaplingTask extends PlaceBlockAtFloorTask {
 	}
 
 	@Override
-	public boolean isFinished(AIHelper h) {
-		if (!PLANTABLE.contains(h.getBlock(pos.add(0, -1, 0)))) {
+	public boolean isFinished(AIHelper aiHelper) {
+		if (!PLANTABLE.contains(aiHelper.getBlock(pos.add(0, -1, 0)))) {
 			return true;
 		}
 
-		return super.isFinished(h);
+		return super.isFinished(aiHelper);
 	}
 
 	@Override

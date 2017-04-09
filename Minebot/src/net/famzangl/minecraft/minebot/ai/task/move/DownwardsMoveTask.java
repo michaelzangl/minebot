@@ -45,25 +45,25 @@ public class DownwardsMoveTask extends AITask {
 	}
 
 	@Override
-	public boolean isFinished(AIHelper h) {
-		return h.isStandingOn(pos);
+	public boolean isFinished(AIHelper aiHelper) {
+		return aiHelper.isStandingOn(pos);
 	}
 
 	@Override
-	public void runTick(AIHelper h, TaskOperations o) {
-		WorldData world = h.getWorld();
+	public void runTick(AIHelper aiHelper, TaskOperations taskOperations) {
+		WorldData world = aiHelper.getWorld();
 		if (needsToClearFootBlock(world)) {
 			// tallgrass, ...
-			h.faceAndDestroy(pos.add(0, 1, 0));
+			aiHelper.faceAndDestroy(pos.add(0, 1, 0));
 		} else if (!BlockSets.AIR.isAt(world, pos)) {
-			if (!h.isStandingOn(pos.add(0, 1, 0))) {
-				o.desync(new PositionTaskError(pos.add(0, 1, 0)));
+			if (!aiHelper.isStandingOn(pos.add(0, 1, 0))) {
+				taskOperations.desync(new PositionTaskError(pos.add(0, 1, 0)));
 			}
 			if (hardBlocks.isAt(world, pos)) {
 				obsidianMining = true;
 			}
 
-			h.faceAndDestroy(pos);
+			aiHelper.faceAndDestroy(pos);
 		}
 	}
 

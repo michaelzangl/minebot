@@ -46,13 +46,13 @@ public class KillAnimalsStrategy extends FaceInteractStrategy {
 
 	private final class KillableSelector implements Predicate<Entity> {
 		@Override
-		public boolean apply(Entity e) {
-			if (!type.hasAnimalClass(e)) {
+		public boolean apply(Entity entity) {
+			if (!type.hasAnimalClass(entity)) {
 				return false;
 			}
 
-			return ((EntityAnimal) e).getGrowingAge() >= 0
-					&& ((EntityAnimal) e).getHealth() > 0;
+			return ((EntityAnimal) entity).getGrowingAge() >= 0
+					&& ((EntityAnimal) entity).getHealth() > 0;
 		}
 	}
 
@@ -83,11 +83,11 @@ public class KillAnimalsStrategy extends FaceInteractStrategy {
 				}
 			};
 		} else {
-			Predicate<Entity> s = new KillableSelector();
+			Predicate<Entity> selector = new KillableSelector();
 			if (color != null) {
-				s = new AndSelector(new ColorSelector(color), s);
+				selector = new AndSelector(new ColorSelector(color), selector);
 			}
-			return new AndSelector(s, new NotSelector(new OwnTameableSelector(
+			return new AndSelector(selector, new NotSelector(new OwnTameableSelector(
 					helper.getMinecraft().thePlayer)));
 		}
 	}

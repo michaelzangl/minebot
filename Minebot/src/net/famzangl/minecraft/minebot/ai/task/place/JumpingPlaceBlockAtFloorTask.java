@@ -38,16 +38,16 @@ public class JumpingPlaceBlockAtFloorTask extends PlaceBlockAtFloorTask {
 	}
 
 	@Override
-	public boolean isFinished(AIHelper h) {
-		return h.isStandingOn(pos) && super.isFinished(h);
+	public boolean isFinished(AIHelper aiHelper) {
+		return aiHelper.isStandingOn(pos) && super.isFinished(aiHelper);
 	}
 
 	@Override
-	protected void tryPlaceBlock(AIHelper h) {
-		super.tryPlaceBlock(h);
-		final MovementInput i = new MovementInput();
-		i.jump = true;
-		h.overrideMovement(i);
+	protected void tryPlaceBlock(AIHelper aiHelper) {
+		super.tryPlaceBlock(aiHelper);
+		final MovementInput movement = new MovementInput();
+		movement.jump = true;
+		aiHelper.overrideMovement(movement);
 	}
 
 	@Override

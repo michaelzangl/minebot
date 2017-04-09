@@ -161,10 +161,10 @@ public class ClearAreaPathfinder extends MovePathFinder {
 
 	public int getToClearCount(AIHelper helper) {
 		WorldData world = helper.getWorld();
-		AreaTopVisitor v = new AreaTopVisitor(area.getMin().getY());
-		area.accept(v, world);
-		topY = v.newTopY;
-		System.out.println("top Y:  " + v);
-		return v.count;
+		AreaTopVisitor visitor = new AreaTopVisitor(area.getMin().getY());
+		area.accept(visitor, world);
+		topY = visitor.newTopY;
+		System.out.println("top Y:  " + visitor);
+		return visitor.count;
 	}
 }

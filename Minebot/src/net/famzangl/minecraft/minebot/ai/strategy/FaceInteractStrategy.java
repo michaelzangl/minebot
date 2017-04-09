@@ -63,9 +63,9 @@ public abstract class FaceInteractStrategy extends AIStrategy {
 			ticksSlow = 0;
 		}
 
-		final MovingObjectPosition over = helper.getObjectMouseOver();
-		if (over != null && over.typeOfHit == MovingObjectType.ENTITY
-				&& doInteractWithCurrent(over.entityHit, helper)) {
+		final MovingObjectPosition position = helper.getObjectMouseOver();
+		if (position != null && position.typeOfHit == MovingObjectType.ENTITY
+				&& doInteractWithCurrent(position.entityHit, helper)) {
 			ticksRun = 0;
 		} else {
 			final double speed = helper.getMinecraft().thePlayer.motionX
@@ -73,14 +73,14 @@ public abstract class FaceInteractStrategy extends AIStrategy {
 					+ helper.getMinecraft().thePlayer.motionZ
 					* helper.getMinecraft().thePlayer.motionZ;
 			helper.face(found.posX, found.posY, found.posZ);
-			final MovementInput i = new MovementInput();
+			final MovementInput movement = new MovementInput();
 			if (speed < 0.01 && ticksRun > 8) {
-				i.jump = ++ticksSlow > 5;
+				movement.jump = ++ticksSlow > 5;
 			} else {
 				ticksSlow = 0;
 			}
-			i.moveForward = 1;
-			helper.overrideMovement(i);
+			movement.moveForward = 1;
+			helper.overrideMovement(movement);
 			ticksRun++;
 			if (ticksSlow > 3 * 20 || ticksRun > 20 * 20) {
 				blacklist .add(found);

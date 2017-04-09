@@ -6,11 +6,11 @@ import net.famzangl.minecraft.minebot.ai.path.world.WorldData;
 
 public class BlockIntersection extends BlockArea {
 	private class FilteredAreaVisitor implements AreaVisitor {
-		private AreaVisitor v;
+		private AreaVisitor visitor;
 		private BlockArea[] areas;
 
-		public FilteredAreaVisitor(AreaVisitor v, BlockArea[] areas) {
-			this.v = v;
+		public FilteredAreaVisitor(AreaVisitor visitor, BlockArea[] areas) {
+			this.visitor = visitor;
 			this.areas = areas;
 		}
 		
@@ -21,7 +21,7 @@ public class BlockIntersection extends BlockArea {
 					return;
 				}
 			}
-			v.visit(world, x, y, z);
+			visitor.visit(world, x, y, z);
 		}
 		
 	}
@@ -46,7 +46,7 @@ public class BlockIntersection extends BlockArea {
 	}
 
 	@Override
-	public void accept(AreaVisitor v, WorldData world) {
-		areas[0].accept(new FilteredAreaVisitor(v, Arrays.copyOfRange(areas, 1, areas.length)), world);
+	public void accept(AreaVisitor visitor, WorldData world) {
+		areas[0].accept(new FilteredAreaVisitor(visitor, Arrays.copyOfRange(areas, 1, areas.length)), world);
 	}
 }

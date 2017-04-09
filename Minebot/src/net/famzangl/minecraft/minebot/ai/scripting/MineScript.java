@@ -81,7 +81,7 @@ public class MineScript {
 	 * if the user entered the command, so there are multiple event handlers
 	 * active.
 	 * 
-	 * @param commandLine
+	 * @param command
 	 * @throws UnknownCommandException
 	 */
 	public ScriptStrategy safeStrategy(String command, Object... arguments)
@@ -94,7 +94,7 @@ public class MineScript {
 	/**
 	 * Get a minebot strategy.
 	 * 
-	 * @param commandLine
+	 * @param command
 	 * @throws UnknownCommandException
 	 */
 	public ScriptStrategy strategy(String command, Object... arguments)
@@ -107,8 +107,8 @@ public class MineScript {
 	private String[] toStringArray(Object[] arguments) {
 		String[] strs = new String[arguments.length];
 		for (int i = 0; i < arguments.length; i++) {
-			Object a = arguments[i];
-			strs[i] = a.toString();
+			Object arg = arguments[i];
+			strs[i] = arg.toString();
 		}
 		return strs;
 	}
@@ -254,8 +254,8 @@ public class MineScript {
 			int oldLength = chatMessageCache.length;
 			chatMessageCache = Arrays.copyOf(chatMessageCache, len);
 			for (int i = oldLength; i < len; i++) {
-				PersistentChat m = messages.get(i);
-				chatMessageCache[i] = new ChatMessage(m,
+				PersistentChat message = messages.get(i);
+				chatMessageCache[i] = new ChatMessage(message,
 						tickProvider.getEngine());
 			}
 		}

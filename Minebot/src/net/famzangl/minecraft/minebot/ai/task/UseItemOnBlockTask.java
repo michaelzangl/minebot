@@ -36,8 +36,8 @@ public abstract class UseItemOnBlockTask extends UseItemTask {
 	}
 
 	@Override
-	protected boolean isBlockAllowed(AIHelper h, BlockPos pos) {
-		final Block block = h.getBlock(pos);
+	protected boolean isBlockAllowed(AIHelper aiHelper, BlockPos pos) {
+		final Block block = aiHelper.getBlock(pos);
 		return allowedBlocks.contains(block);
 	}
 

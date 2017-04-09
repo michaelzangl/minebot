@@ -20,7 +20,7 @@ public class BlockAreaEmpty extends BlockArea {
 	}
 	
 	@Override
-	public void accept(AreaVisitor v, WorldData world) {
+	public void accept(AreaVisitor visitor, WorldData world) {
 		// nothing to visit.
 	}
 }

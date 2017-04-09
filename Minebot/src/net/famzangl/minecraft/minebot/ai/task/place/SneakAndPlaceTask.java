@@ -65,8 +65,8 @@ public class SneakAndPlaceTask extends AITask {
 	}
 
 	@Override
-	public boolean isFinished(AIHelper h) {
-		return !BlockSets.AIR.isAt(h.getWorld(), getPositionToPlaceAt()) && !h.isJumping();
+	public boolean isFinished(AIHelper aiHelper) {
+		return !BlockSets.AIR.isAt(aiHelper.getWorld(), getPositionToPlaceAt()) && !aiHelper.isJumping();
 	}
 
 	protected BlockPos getPositionToPlaceAt() {
@@ -74,29 +74,29 @@ public class SneakAndPlaceTask extends AITask {
 	}
 
 	@Override
-	public void runTick(AIHelper h, TaskOperations o) {
+	public void runTick(AIHelper aiHelper, TaskOperations taskOperations) {
 		if (faceTimer > 0) {
 			faceTimer--;
 		}
-		if (h.sneakFrom(getFromPos(), inDirection, faceWhileSneaking())) {
-			final boolean hasRequiredHeight = h.getMinecraft().thePlayer
+		if (aiHelper.sneakFrom(getFromPos(), inDirection, faceWhileSneaking())) {
+			final boolean hasRequiredHeight = aiHelper.getMinecraft().thePlayer
 					.getEntityBoundingBox().minY > minBuildHeight - 0.05;
 			if (hasRequiredHeight) {
 				if (faceTimer == 0) {
-					if (faceBlock(h, o)) {
+					if (faceBlock(aiHelper, taskOperations)) {
 						faceTimer = 3;
 					}
-				} else if (isFacingRightBlock(h)) {
-					if (h.selectCurrentItem(filter)) {
-						h.overrideUseItem();
+				} else if (isFacingRightBlock(aiHelper)) {
+					if (aiHelper.selectCurrentItem(filter)) {
+						aiHelper.overrideUseItem();
 					} else {
-						o.desync(new SelectTaskError(filter));
+						taskOperations.desync(new SelectTaskError(filter));
 					}
 				}
 			} else {
-				final MovementInput i = new MovementInput();
-				i.jump = true;
-				h.overrideMovement(i);
+				final MovementInput movement = new MovementInput();
+				movement.jump = true;
+				aiHelper.overrideMovement(movement);
 			}
 		}
 	}
@@ -105,12 +105,12 @@ public class SneakAndPlaceTask extends AITask {
 		return false;
 	}
 
-	protected boolean isFacingRightBlock(AIHelper h) {
-		return h.isFacingBlock(getPositionToPlaceOn(), inDirection);
+	protected boolean isFacingRightBlock(AIHelper aiHelper) {
+		return aiHelper.isFacingBlock(getPositionToPlaceOn(), inDirection);
 	}
 
-	protected boolean faceBlock(AIHelper h, TaskOperations o) {
-		return h.faceSideOf(getPositionToPlaceOn(), inDirection);
+	protected boolean faceBlock(AIHelper aiHelper, TaskOperations taskOperations) {
+		return aiHelper.faceSideOf(getPositionToPlaceOn(), inDirection);
 	}
 
 	protected BlockPos getPositionToPlaceOn() {

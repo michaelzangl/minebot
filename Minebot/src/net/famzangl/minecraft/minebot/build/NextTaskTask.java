@@ -38,17 +38,17 @@ public final class NextTaskTask extends AITask {
 	}
 
 	@Override
-	public void runTick(AIHelper h, TaskOperations o) {
+	public void runTick(AIHelper aiHelper, TaskOperations taskOperations) {
 		while (tasksToSkip > 0) {
-			if (h.buildManager.peekNextTask() != null) {
-				h.buildManager.popNextTask();
+			if (aiHelper.buildManager.peekNextTask() != null) {
+				aiHelper.buildManager.popNextTask();
 			}
 			tasksToSkip--;
 		}
 	}
 
 	@Override
-	public boolean isFinished(AIHelper h) {
+	public boolean isFinished(AIHelper aiHelper) {
 		return tasksToSkip <= 0;
 	}
 

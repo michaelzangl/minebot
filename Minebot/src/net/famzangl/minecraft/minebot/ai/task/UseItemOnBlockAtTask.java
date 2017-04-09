@@ -46,13 +46,13 @@ public class UseItemOnBlockAtTask extends UseItemTask {
 	}
 
 	@Override
-	protected boolean isBlockAllowed(AIHelper h, BlockPos pos) {
+	protected boolean isBlockAllowed(AIHelper aiHelper, BlockPos pos) {
 		return this.pos.equals(pos);
 	}
 
 	@Override
-	protected void notFacingBlock(AIHelper h) {
-		h.faceBlock(pos);
+	protected void notFacingBlock(AIHelper aiHelper) {
+		aiHelper.faceBlock(pos);
 	}
 	
 	public BlockPos getPos() {

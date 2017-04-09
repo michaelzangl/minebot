@@ -23,18 +23,18 @@ public abstract class BlockArea {
 		}
 	}
 
-	public boolean contains(WorldData world, BlockPos p) {
-		return contains(world, p.getX(), p.getY(), p.getZ());
+	public boolean contains(WorldData world, BlockPos position) {
+		return contains(world, position.getX(), position.getY(), position.getZ());
 	}
 
-	public abstract void accept(AreaVisitor v, WorldData world);
+	public abstract void accept(AreaVisitor visitor, WorldData world);
 
 	public abstract boolean contains(WorldData world, int x, int y, int z);
 
 	public int getVolume(WorldData world) {
-		VolumeVisitor v = new VolumeVisitor();
-		accept(v, world);
-		return v.volume;
+		VolumeVisitor volumeVisitor = new VolumeVisitor();
+		accept(volumeVisitor, world);
+		return volumeVisitor.volume;
 	}
 	
 	public BlockIntersection intersectWith(BlockArea other) {

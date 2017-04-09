@@ -31,8 +31,8 @@ public class DestroyLogInRange extends DestroyInRangeTask {
 		}
 	}
 
-	protected boolean isAcceptedFacingPos(AIHelper h, BlockPos n, BlockPos pos) {
+	protected boolean isAcceptedFacingPos(AIHelper aiHelper, BlockPos n, BlockPos pos) {
 		return (LEAVES_OR_LOGS.isAt(
-						h.getWorld(), pos) && BlockSets.LOGS.isAt(h.getWorld(), n));
+						aiHelper.getWorld(), pos) && BlockSets.LOGS.isAt(aiHelper.getWorld(), n));
 	}
 }

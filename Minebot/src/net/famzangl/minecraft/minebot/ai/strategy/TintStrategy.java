@@ -59,8 +59,8 @@ public class TintStrategy extends TaskStrategy {
 		}
 
 		@Override
-		public boolean apply(Entity var1) {
-			return var1 instanceof EntityWolf && super.apply(var1);
+		public boolean apply(Entity entity) {
+			return entity instanceof EntityWolf && super.apply(entity);
 		}
 	}
 

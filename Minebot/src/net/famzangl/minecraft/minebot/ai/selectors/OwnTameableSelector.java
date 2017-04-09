@@ -33,26 +33,26 @@ public class OwnTameableSelector implements Predicate<Entity> {
 	}
 
 	@Override
-	public boolean apply(Entity var1) {
-		return var1 instanceof EntityTameable && isMine((EntityTameable) var1);
+	public boolean apply(Entity entity) {
+		return entity instanceof EntityTameable && isMine((EntityTameable) entity);
 	}
 
-	private boolean isMine(EntityTameable var1) {
-		Method m;
+	private boolean isMine(EntityTameable entity) {
+		Method method;
 		try {
-			m = EntityTameable.class.getMethod("func_152113_b");
+			method = EntityTameable.class.getMethod("func_152113_b");
 
-			if (m != null) {
+			if (method != null) {
 				// 1.7.10. No fix so far...
-				return var1.isTamed();
+				return entity.isTamed();
 			} else {
-				return var1.getOwner() == owner;
+				return entity.getOwner() == owner;
 			}
 
-		} catch (final NoSuchMethodException e1) {
-			e1.printStackTrace();
-		} catch (final SecurityException e1) {
-			e1.printStackTrace();
+		} catch (final NoSuchMethodException e) {
+			e.printStackTrace();
+		} catch (final SecurityException e) {
+			e.printStackTrace();
 		}
 		return true;
 	}

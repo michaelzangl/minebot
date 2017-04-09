@@ -59,31 +59,31 @@ public class JumpingPlaceAtHalfTask extends JumpingPlaceBlockAtFloorTask {
 	}
 
 	@Override
-	protected void faceBlock(AIHelper h, TaskOperations o) {
+	protected void faceBlock(AIHelper aiHelper, TaskOperations taskOperations) {
 		final EnumFacing[] dirs = getBuildDirs();
 		for (int i = 0; i < dirs.length; i++) {
-			if (faceSideBlock(h, dirs[attempts++ % dirs.length])) {
+			if (faceSideBlock(aiHelper, dirs[attempts++ % dirs.length])) {
 				return;
 			}
 		}
-		o.desync(new StringTaskError("Could not face anywhere to place."));
+		taskOperations.desync(new StringTaskError("Could not face anywhere to place."));
 	}
 
 	protected EnumFacing[] getBuildDirs() {
 		return side == BlockHalf.UPPER_HALF ? TRY_FOR_UPPER : TRY_FOR_LOWER;
 	}
 
-	protected boolean faceSideBlock(AIHelper h, EnumFacing dir) {
+	protected boolean faceSideBlock(AIHelper aiHelper, EnumFacing dir) {
 		LOGGER.trace(MARKER_JUMPING_PLACE_HALF, "Facing side " + dir);
 		BlockPos facingBlock = getPlaceAtPos().offset(dir);
-		if (BlockSets.AIR.isAt(h.getWorld(), facingBlock)) {
+		if (BlockSets.AIR.isAt(aiHelper.getWorld(), facingBlock)) {
 			return false;
 		} else {
-			h.faceSideOf(facingBlock, dir.getOpposite(),
+			aiHelper.faceSideOf(facingBlock, dir.getOpposite(),
 					getSide(dir) == BlockHalf.UPPER_HALF ? 0.5 : 0,
 					getSide(dir) == BlockHalf.LOWER_HALF ? 0.5 : 1,
-					h.getMinecraft().thePlayer.posX - pos.getX(),
-					h.getMinecraft().thePlayer.posZ - pos.getZ(),
+					aiHelper.getMinecraft().thePlayer.posX - pos.getX(),
+					aiHelper.getMinecraft().thePlayer.posZ - pos.getZ(),
 					lookingDirection);
 			return true;
 		}
@@ -95,9 +95,9 @@ public class JumpingPlaceAtHalfTask extends JumpingPlaceBlockAtFloorTask {
 	}
 
 	@Override
-	protected boolean isFacingRightBlock(AIHelper h) {
+	protected boolean isFacingRightBlock(AIHelper aiHelper) {
 		for (final EnumFacing d : getBuildDirs()) {
-			if (isFacing(h, d)) {
+			if (isFacing(aiHelper, d)) {
 				return true;
 			}
 		}

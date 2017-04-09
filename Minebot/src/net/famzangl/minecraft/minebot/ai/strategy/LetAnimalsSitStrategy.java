@@ -100,8 +100,8 @@ public class LetAnimalsSitStrategy extends TaskStrategy {
 		if (found != null) {
 			addTask(new FaceAndInteractTask(found, selector) {
 				@Override
-				protected void doInteractWithCurrent(AIHelper h) {
-					super.doInteractWithCurrent(h);
+				protected void doInteractWithCurrent(AIHelper aiHelper) {
+					super.doInteractWithCurrent(aiHelper);
 					handled.add(found);
 				}
 			});

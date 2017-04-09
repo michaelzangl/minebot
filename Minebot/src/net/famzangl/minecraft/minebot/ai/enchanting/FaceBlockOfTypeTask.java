@@ -28,25 +28,25 @@ import net.minecraft.util.BlockPos;
 public class FaceBlockOfTypeTask extends AITask {
 
 	@Override
-	public boolean isFinished(AIHelper h) {
-		final BlockPos pos = getPos(h);
-		return pos != null && h.isFacingBlock(pos.getX(), pos.getY(), pos.getZ());
+	public boolean isFinished(AIHelper aiHelper) {
+		final BlockPos pos = getPos(aiHelper);
+		return pos != null && aiHelper.isFacingBlock(pos.getX(), pos.getY(), pos.getZ());
 	}
 
-	private BlockPos getPos(AIHelper h) {
-		List<BlockPos> positions = new BlockSet(Blocks.enchanting_table).findBlocks(h.getWorld(), h.getPlayerPosition(), 2);
+	private BlockPos getPos(AIHelper aiHelper) {
+		List<BlockPos> positions = new BlockSet(Blocks.enchanting_table).findBlocks(aiHelper.getWorld(), aiHelper.getPlayerPosition(), 2);
 		final BlockPos pos = positions.isEmpty() ? null : positions.get(1);
 		return pos;
 	}
 
 	@Override
-	public void runTick(AIHelper h, TaskOperations o) {
-		final BlockPos pos = getPos(h);
+	public void runTick(AIHelper aiHelper, TaskOperations taskOperations) {
+		final BlockPos pos = getPos(aiHelper);
 		if (pos == null) {
 			System.out.println("Could not find block around player.");
 		}
 
-		h.face(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5);
+		aiHelper.face(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5);
 	}
 
 }

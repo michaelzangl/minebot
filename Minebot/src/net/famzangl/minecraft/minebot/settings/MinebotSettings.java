@@ -98,7 +98,7 @@ public class MinebotSettings {
 	}
 
 	private void doWriteSettings() {
-		MinebotSettingsRoot s = createSettings();
+		MinebotSettingsRoot settings = createSettings();
 
 		File settingsFile = getSettingsFile();
 		try {
@@ -106,7 +106,7 @@ public class MinebotSettings {
 					+ " ...");
 			Gson gson = getGson();
 			PrintWriter writer = new PrintWriter(settingsFile);
-			gson.toJson(s, writer);
+			gson.toJson(settings, writer);
 			writer.close();
 		} catch (final IOException e) {
 			System.err.println("Could not write settings file.");

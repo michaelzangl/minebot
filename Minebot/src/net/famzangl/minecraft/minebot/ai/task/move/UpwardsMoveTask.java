@@ -50,19 +50,19 @@ public class UpwardsMoveTask extends JumpingPlaceBlockAtFloorTask {
 	}
 
 	@Override
-	public void runTick(AIHelper h, TaskOperations o) {
-		if (!BlockSets.HEAD_CAN_WALK_TRHOUGH.isAt(h.getWorld(), pos.add(0, 1, 0))) {
-			if (!h.isStandingOn(pos.add(0, -1, 0))) {
-				o.desync(new PositionTaskError(pos.add(0, -1, 0)));
+	public void runTick(AIHelper aiHelper, TaskOperations taskOperations) {
+		if (!BlockSets.HEAD_CAN_WALK_TRHOUGH.isAt(aiHelper.getWorld(), pos.add(0, 1, 0))) {
+			if (!aiHelper.isStandingOn(pos.add(0, -1, 0))) {
+				taskOperations.desync(new PositionTaskError(pos.add(0, -1, 0)));
 			}
-			if (hardBlocks.contains(h.getBlock(pos.add(0, 1, 0)))) {
+			if (hardBlocks.contains(aiHelper.getBlock(pos.add(0, 1, 0)))) {
 				obsidianMining = true;
 			}
-			h.faceAndDestroy(pos.add(0, 1, 0));
-		} else if (!BlockSets.AIR.isAt(h.getWorld(), pos.add(0, -1, 0))) {
-			h.faceAndDestroy(pos.add(0, -1, 0));
+			aiHelper.faceAndDestroy(pos.add(0, 1, 0));
+		} else if (!BlockSets.AIR.isAt(aiHelper.getWorld(), pos.add(0, -1, 0))) {
+			aiHelper.faceAndDestroy(pos.add(0, -1, 0));
 		} else {
-			super.runTick(h, o);
+			super.runTick(aiHelper, taskOperations);
 		}
 	}
 

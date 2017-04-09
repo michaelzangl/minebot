@@ -47,13 +47,13 @@ public class AlignToGridTask extends AITask {
 	}
 
 	@Override
-	public boolean isFinished(AIHelper h) {
-		return h.isStandingOn(x, y, z);
+	public boolean isFinished(AIHelper aiHelper) {
+		return aiHelper.isStandingOn(x, y, z);
 	}
 
 	@Override
-	public void runTick(AIHelper h, TaskOperations o) {
-		h.walkTowards(x + 0.5, z + 0.5, false, !o.faceAndDestroyForNextTask());
+	public void runTick(AIHelper aiHelper, TaskOperations taskOperations) {
+		aiHelper.walkTowards(x + 0.5, z + 0.5, false, !taskOperations.faceAndDestroyForNextTask());
 	}
 
 	@Override

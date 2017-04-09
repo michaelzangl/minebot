@@ -95,15 +95,15 @@ public abstract class BlockWithDataOrDontcare {
 	public static ArrayList<String> getAllStrings() {
 		Set<ResourceLocation> keys = Block.blockRegistry.getKeys();
 		ArrayList<String> strings = new ArrayList<String>();
-		for (ResourceLocation k : keys) {
+		for (ResourceLocation key : keys) {
 			// candidate found
-			strings.add(k.toString());
+			strings.add(key.toString());
 
-			Block b = (Block) Block.blockRegistry.getObject(k);
+			Block block = (Block) Block.blockRegistry.getObject(key);
 			HashSet<IBlockState> states = new HashSet<IBlockState>();
 			for (int i = 0; i < 16; i++) {
 				try {
-				IBlockState state = b.getStateFromMeta(i);
+				IBlockState state = block.getStateFromMeta(i);
 				if (!states.contains(state)) {
 					states.add(state);
 				}
@@ -113,9 +113,9 @@ public abstract class BlockWithDataOrDontcare {
 			}
 			if (states.size() > 1) {
 				for (IBlockState state : states) {
-					BlockWithData withData = new BlockWithData(b,
-							b.getMetaFromState(state));
-					strings.add(k + ":" + withData.getMetaString());
+					BlockWithData withData = new BlockWithData(block,
+							block.getMetaFromState(state));
+					strings.add(key + ":" + withData.getMetaString());
 				}
 			}
 		}

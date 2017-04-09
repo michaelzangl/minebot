@@ -26,10 +26,10 @@ import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.settings.MinebotSettings;
 
 public class FileNameBuilder extends ParameterBuilder {
-	public static boolean isFilenameValid(String file) {
-		final File f = new File(file);
+	public static boolean isFilenameValid(String fileName) {
+		final File file = new File(fileName);
 		try {
-			f.getCanonicalPath();
+			file.getCanonicalPath();
 			return true;
 		} catch (final IOException e) {
 			return false;
@@ -53,9 +53,9 @@ public class FileNameBuilder extends ParameterBuilder {
 		@Override
 		public void getTabCompleteOptions(String currentStart,
 				Collection<String> addTo) {
-			for (final File r : File.listRoots()) {
-				if (r.getAbsolutePath().startsWith(currentStart)) {
-					addTo.add(r.getAbsolutePath());
+			for (final File root : File.listRoots()) {
+				if (root.getAbsolutePath().startsWith(currentStart)) {
+					addTo.add(root.getAbsolutePath());
 				}
 			}
 			if (!isFilenameValid(currentStart)) {
@@ -76,10 +76,10 @@ public class FileNameBuilder extends ParameterBuilder {
 				dir = dir.getParentFile();
 			}
 			if (dir != null && dir.isDirectory()) {
-				for (final File f : dir.listFiles()) {
-					if (f.getName().startsWith(namePrefix)) {
-						String path = f.getPath()
-								+ (f.isDirectory() ? File.separator : "");
+				for (final File file : dir.listFiles()) {
+					if (file.getName().startsWith(namePrefix)) {
+						String path = file.getPath()
+								+ (file.isDirectory() ? File.separator : "");
 						if (path.startsWith(base.getAbsolutePath())) {
 							path = path.substring(base.getAbsolutePath().length() + 1);
 						}

@@ -54,104 +54,104 @@ public class CommandDefinition {
 	// // parameterStarts[types.length] = arguments.size();
 	// }
 
-	private CommandDefinition(Method m, ArrayList<ParameterBuilder> builders,
+	private CommandDefinition(Method method, ArrayList<ParameterBuilder> builders,
 			ArrayList<ArgumentDefinition> arguments,
 			ArrayList<Integer> parameterStarts) {
-		method = m;
+		this.method = method;
 		this.builders = builders;
 		this.arguments = arguments;
 		this.parameterStarts = parameterStarts;
 	}
 
-	private static ParameterBuilder getParameter(Method m,
+	private static ParameterBuilder getParameter(Method method,
 			final Class<?>[] types, final Annotation[][] parameterAnnotations,
 			int parameter) {
-		ParameterBuilder b;
+		ParameterBuilder builder;
 		if (types[parameter] == AIHelper.class) {
-			b = new AIHelperBuilder(null);
+			builder = new AIHelperBuilder(null);
 		} else {
-			final AICommandParameter annot = findParameterAnnotation(m,
+			final AICommandParameter annot = findParameterAnnotation(method,
 					parameterAnnotations[parameter]);
 			switch (annot.type()) {
 			case BLOCK_NAME:
-				b = new BlockNameBuilder(annot);
+				builder = new BlockNameBuilder(annot);
 				break;
 			case FIXED:
-				b = new FixedNameBuilder(annot);
+				builder = new FixedNameBuilder(annot);
 				break;
 			case NUMBER:
-				b = new NumberNameBuilder(annot);
+				builder = new NumberNameBuilder(annot);
 				break;
 			case DOUBLE:
-				b = new DoubleNameBuilder(annot);
+				builder = new DoubleNameBuilder(annot);
 				break;
 			case COMMAND:
-				b = new CommandNameBuilder(annot);
+				builder = new CommandNameBuilder(annot);
 				break;
 			case COLOR:
-				b = new ColorNameBuilder(annot);
+				builder = new ColorNameBuilder(annot);
 				break;
 			case ENUM:
-				b = new EnumNameBuilder(annot, types[parameter]);
+				builder = new EnumNameBuilder(annot, types[parameter]);
 				break;
 			case FILE:
-				b = new FileNameBuilder(annot);
+				builder = new FileNameBuilder(annot);
 				break;
 			case POSITION:
-				b = new PositionNameBuilder(annot);
+				builder = new PositionNameBuilder(annot);
 				break;
 			case STRING:
-				b = new StringNameBuilder(annot);
+				builder = new StringNameBuilder(annot);
 				break;
 			default:
 				throw new IllegalArgumentException("Unknown type: "
 						+ annot.type());
 			}
 		}
-		return b;
+		return builder;
 	}
 
-	public static ArrayList<CommandDefinition> getDefinitions(Method m) {
+	public static ArrayList<CommandDefinition> getDefinitions(Method method) {
 		ArrayList<CommandDefinition> list = new ArrayList<CommandDefinition>();
-		final Class<?>[] types = m.getParameterTypes();
-		final Annotation[][] parameterAnnotations = m.getParameterAnnotations();
+		final Class<?>[] types = method.getParameterTypes();
+		final Annotation[][] parameterAnnotations = method.getParameterAnnotations();
 		ArrayList<ParameterBuilder> builders = new ArrayList<ParameterBuilder>();
 		ArrayList<ArgumentDefinition> arguments = new ArrayList<ArgumentDefinition>();
 		ArrayList<Integer> parameterStarts = new ArrayList<Integer>();
 		
-		checkParameters(m, types, parameterAnnotations);
+		checkParameters(method, types, parameterAnnotations);
 
-		addParametersFromTo(list, m, types, parameterAnnotations, builders,
+		addParametersFromTo(list, method, types, parameterAnnotations, builders,
 				arguments, parameterStarts, 0);
 
 		return list;
 	}
 
-	private static void checkParameters(Method m, Class<?>[] types,
+	private static void checkParameters(Method method, Class<?>[] types,
 			Annotation[][] parameterAnnotations) {
 		for (int i = 0; i < types.length; i++) {
-			ParameterBuilder param = getParameter(m, types, parameterAnnotations, i);
+			ParameterBuilder param = getParameter(method, types, parameterAnnotations, i);
 			try {
 			param.isTypeValid(types[i]);}
 			catch (UnsupportedOperationException e) {
-				System.err.println("Cannot check parameters for " + m.getName() + ": " + e.getMessage());
+				System.err.println("Cannot check parameters for " + method.getName() + ": " + e.getMessage());
 			}
 		}
 	}
 
 	private static void addParametersFromTo(ArrayList<CommandDefinition> list,
-			Method m, Class<?>[] types, Annotation[][] parameterAnnotations,
+			Method method, Class<?>[] types, Annotation[][] parameterAnnotations,
 			ArrayList<ParameterBuilder> builders,
 			ArrayList<ArgumentDefinition> arguments,
 			ArrayList<Integer> parameterStarts, int fromIndex) {
 		if (fromIndex >= types.length) {
 			parameterStarts.add(arguments.size());
-			list.add(new CommandDefinition(m, builders, arguments,
+			list.add(new CommandDefinition(method, builders, arguments,
 					parameterStarts));
 			return;
 		}
 
-		ParameterBuilder nextBuilder = getParameter(m, types,
+		ParameterBuilder nextBuilder = getParameter(method, types,
 				parameterAnnotations, fromIndex);
 		if (nextBuilder.isOptional()) {
 			ArrayList<ParameterBuilder> builders2 = new ArrayList<ParameterBuilder>(
@@ -161,14 +161,14 @@ public class CommandDefinition {
 			ArrayList<Integer> parameterStarts2 = new ArrayList<Integer>(
 					parameterStarts);
 			addParameterBuilder(
-					new OptionalParameterBuilder(findParameterAnnotation(m,
+					new OptionalParameterBuilder(findParameterAnnotation(method,
 							parameterAnnotations[fromIndex])), builders2,
 					arguments2, parameterStarts2);
-			addParametersFromTo(list, m, types, parameterAnnotations,
+			addParametersFromTo(list, method, types, parameterAnnotations,
 					builders2, arguments2, parameterStarts2, fromIndex + 1);
 		}
 		addParameterBuilder(nextBuilder, builders, arguments, parameterStarts);
-		addParametersFromTo(list, m, types, parameterAnnotations, builders,
+		addParametersFromTo(list, method, types, parameterAnnotations, builders,
 				arguments, parameterStarts, fromIndex + 1);
 	}
 
@@ -181,17 +181,17 @@ public class CommandDefinition {
 		builders.add(nextBuilder);
 	}
 
-	private static AICommandParameter findParameterAnnotation(Method m,
+	private static AICommandParameter findParameterAnnotation(Method method,
 			Annotation[] annotations) {
-		for (final Annotation a : annotations) {
-			if (a instanceof AICommandParameter) {
+		for (final Annotation annotation : annotations) {
+			if (annotation instanceof AICommandParameter) {
 				// TODO: Type check of parameter.
-				return (AICommandParameter) a;
+				return (AICommandParameter) annotation;
 			}
 		}
 		throw new IllegalArgumentException(
-				"Could not find parameter annotation for " + m.getName()
-						+ " of  class " + m.getDeclaringClass().getSimpleName());
+				"Could not find parameter annotation for " + method.getName()
+						+ " of  class " + method.getDeclaringClass().getSimpleName());
 	}
 
 	// public ArrayList<ArgumentDefinition> getArguments() {

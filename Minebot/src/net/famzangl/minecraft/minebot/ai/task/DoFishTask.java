@@ -39,14 +39,14 @@ public class DoFishTask extends AITask {
 	private boolean sendReset = true;
 
 	@Override
-	public boolean isFinished(AIHelper h) {
-		return revoked || h.getMinecraft().thePlayer.fishEntity == null;
+	public boolean isFinished(AIHelper aiHelper) {
+		return revoked || aiHelper.getMinecraft().thePlayer.fishEntity == null;
 	}
 
 	@Override
-	public void runTick(AIHelper h, TaskOperations o) {
-		if (fishIsCaptured(h)) {
-			h.overrideUseItem();
+	public void runTick(AIHelper aiHelper, TaskOperations taskOperations) {
+		if (fishIsCaptured(aiHelper)) {
+			aiHelper.overrideUseItem();
 			revoked = true;
 		}
 	}

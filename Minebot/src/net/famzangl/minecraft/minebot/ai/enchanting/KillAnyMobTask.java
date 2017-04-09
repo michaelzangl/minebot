@@ -26,17 +26,17 @@ public class KillAnyMobTask extends AITask {
 	int tickCount;
 
 	@Override
-	public boolean isFinished(AIHelper h) {
-		final MovingObjectPosition objectMouseOver = h.getObjectMouseOver();
-		return objectMouseOver == null
-				|| objectMouseOver.typeOfHit != MovingObjectPosition.MovingObjectType.ENTITY;
+	public boolean isFinished(AIHelper aiHelper) {
+		final MovingObjectPosition position = aiHelper.getObjectMouseOver();
+		return position == null
+				|| position.typeOfHit != MovingObjectPosition.MovingObjectType.ENTITY;
 	}
 
 	@Override
-	public void runTick(AIHelper h, TaskOperations o) {
+	public void runTick(AIHelper aiHelper, TaskOperations taskOperations) {
 		tickCount++;
 		if (tickCount % 10 == 5) {
-			h.overrideAttack();
+			aiHelper.overrideAttack();
 		}
 	}
 

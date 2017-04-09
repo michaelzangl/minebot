@@ -54,8 +54,8 @@ public class CommandDumpSigns {
 					out = new PrintStream(file);
 					int signs = 0;
 
-					for (BlockPos p : SIGNS.findBlocks(helper.getWorld(), helper.getPlayerPosition(), distance)) {
-						dumpAtPos(helper, out, p);
+					for (BlockPos pos : SIGNS.findBlocks(helper.getWorld(), helper.getPlayerPosition(), distance)) {
+						dumpAtPos(helper, out, pos);
 						signs++;
 					}
 					AIChatController.addChatLine("Dumped " + signs + " signs (" + distance + " blocks radius).");

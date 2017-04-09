@@ -15,13 +15,13 @@ public class BlockFilteredArea extends BlockArea {
 
 	private static class FitleredVisitor implements AreaVisitor {
 
-		private AreaVisitor v;
+		private AreaVisitor visitor;
 		private WorldData world;
 		private BlockSet containedBlocks;
 
-		public FitleredVisitor(AreaVisitor v, WorldData world,
+		public FitleredVisitor(AreaVisitor visitor, WorldData world,
 				BlockSet containedBlocks) {
-			this.v = v;
+			this.visitor = visitor;
 			this.world = world;
 			this.containedBlocks = containedBlocks;
 		}
@@ -29,7 +29,7 @@ public class BlockFilteredArea extends BlockArea {
 		@Override
 		public void visit(WorldData world, int x, int y, int z) {
 			if (containedBlocks.isAt(world, x, y, z)) {
-				v.visit(world, x, y, z);
+				visitor.visit(world, x, y, z);
 			}
 		}
 
@@ -42,8 +42,8 @@ public class BlockFilteredArea extends BlockArea {
 	}
 
 	@Override
-	public void accept(AreaVisitor v, WorldData world) {
-		base.accept(new FitleredVisitor(v, world, containedBlocks), world);
+	public void accept(AreaVisitor visitor, WorldData world) {
+		base.accept(new FitleredVisitor(visitor, world, containedBlocks), world);
 	}
 
 	@Override

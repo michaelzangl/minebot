@@ -56,15 +56,15 @@ public class PlaceTorchIfLightBelowTask extends PlaceTorchSomewhereTask {
 	}
 
 	@Override
-	public boolean isFinished(AIHelper h) {
-		return (!attempted && (h.getLightAt(currentPos) > torchLightLevel
-				|| !h.canSelectItem(TORCH_FILTER))) || super.isFinished(h);
+	public boolean isFinished(AIHelper aiHelper) {
+		return (!attempted && (aiHelper.getLightAt(currentPos) > torchLightLevel
+				|| !aiHelper.canSelectItem(TORCH_FILTER))) || super.isFinished(aiHelper);
 	}
 	
 	@Override
-	public void runTick(AIHelper h, TaskOperations o) {
+	public void runTick(AIHelper aiHelper, TaskOperations taskOperations) {
 		attempted  = true;
-		super.runTick(h, o);
+		super.runTick(aiHelper, taskOperations);
 	}
 	
 	

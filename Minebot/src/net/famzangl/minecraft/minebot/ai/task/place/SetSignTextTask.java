@@ -62,24 +62,24 @@ public class SetSignTextTask extends AITask {
 	}
 
 	@Override
-	public boolean isFinished(AIHelper h) {
-		return guiOpened && h.getMinecraft().currentScreen == null;
+	public boolean isFinished(AIHelper aiHelper) {
+		return guiOpened && aiHelper.getMinecraft().currentScreen == null;
 	}
 
 	@Override
-	public void runTick(AIHelper h, TaskOperations o) {
+	public void runTick(AIHelper aiHelper, TaskOperations taskOperations) {
 		if (!guiOpened) {
 			// wait
-			guiOpened = h.getMinecraft().currentScreen instanceof GuiEditSign;
+			guiOpened = aiHelper.getMinecraft().currentScreen instanceof GuiEditSign;
 		} else {
 			if (timer == 0) {
-				TileEntitySign sign = (TileEntitySign) h.getMinecraft().theWorld
+				TileEntitySign sign = (TileEntitySign) aiHelper.getMinecraft().theWorld
 						.getTileEntity(pos);
 				// sign.signText = text;
 			} else if (timer == 5) {
 				// GuiEditSign edit = (GuiEditSign)
 				// h.getMinecraft().currentScreen;
-				h.getMinecraft().displayGuiScreen(null);
+				aiHelper.getMinecraft().displayGuiScreen(null);
 			}
 			timer++;
 		}

@@ -368,18 +368,18 @@ public class BuildWayPathfinder extends AlongTrackPathFinder {
 	}
 
 	private void computeNextWayType() {
-		final int i = wayTypes.size();
-		final NormalWayType base = new NormalWayType(i);
+		final int size = wayTypes.size();
+		final NormalWayType base = new NormalWayType(size);
 		WayPiece type = base;
 		if (base.needsBridge()) {
-			type = new BridgeWayType(i);
+			type = new BridgeWayType(size);
 		} else if (base.needsTunnel()) {
-			type = new TunnelWayType(i);
+			type = new TunnelWayType(size);
 		} else {
-			type = new FlatlandWayType(i);
+			type = new FlatlandWayType(size);
 		}
 
-		type.placeTorch = i % 8 == 0;
+		type.placeTorch = size % 8 == 0;
 		wayTypes.add(type);
 	}
 

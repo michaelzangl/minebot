@@ -106,8 +106,8 @@ public class FurnaceBlockHandler extends RangeBlockHandler<FurnaceData> {
 			return pos;
 		}
 
-		public void update(AIHelper h) {
-			update((GuiFurnace) h.getMinecraft().currentScreen);
+		public void update(AIHelper aiHelper) {
+			update((GuiFurnace) aiHelper.getMinecraft().currentScreen);
 		}
 
 	}

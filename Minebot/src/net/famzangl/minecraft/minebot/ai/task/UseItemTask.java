@@ -40,41 +40,41 @@ public abstract class UseItemTask extends AITask {
 	}
 
 	@Override
-	public boolean isFinished(AIHelper h) {
+	public boolean isFinished(AIHelper aiHelper) {
 		return clicked;
 	}
 
 	@Override
-	public void runTick(AIHelper h, TaskOperations o) {
+	public void runTick(AIHelper aiHelper, TaskOperations taskOperations) {
 		if (!clicked) {
 			if (filter != null) {
-				if (!h.selectCurrentItem(filter)) {
+				if (!aiHelper.selectCurrentItem(filter)) {
 					return;
 				}
 			}
 
-			final MovingObjectPosition objectMouseOver = h.getObjectMouseOver();
-			if (objectMouseOver == null
-					|| objectMouseOver.typeOfHit != MovingObjectPosition.MovingObjectType.BLOCK) {
-				notFacingBlock(h);
+			final MovingObjectPosition position = aiHelper.getObjectMouseOver();
+			if (position == null
+					|| position.typeOfHit != MovingObjectPosition.MovingObjectType.BLOCK) {
+				notFacingBlock(aiHelper);
 				return;
 			}
 			// Check is facing to make sure top facing check passed.
-			if (!h.isFacingBlock(objectMouseOver.getBlockPos())
-					|| !isBlockAllowed(h, objectMouseOver.getBlockPos())) {
-				notFacingBlock(h);
+			if (!aiHelper.isFacingBlock(position.getBlockPos())
+					|| !isBlockAllowed(aiHelper, position.getBlockPos())) {
+				notFacingBlock(aiHelper);
 				return;
 			}
 
-			h.overrideUseItem();
+			aiHelper.overrideUseItem();
 			clicked = true;
 		}
 	}
 
-	protected void notFacingBlock(AIHelper h) {
+	protected void notFacingBlock(AIHelper aiHelper) {
 	}
 
-	protected boolean isBlockAllowed(AIHelper h, BlockPos pos) {
+	protected boolean isBlockAllowed(AIHelper aiHelper, BlockPos pos) {
 		return true;
 	}
 }

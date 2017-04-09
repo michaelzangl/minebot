@@ -67,8 +67,8 @@ public class BuildMarkerRenderer extends RenderHelper {
 			renderMarker(nextTask.getForPosition(), 1, 1, 0, 0.7f);
 			findCorners(corners, scheduled);
 			corners.remove(nextTask.getForPosition());
-			for (final BlockPos c : corners) {
-				renderMarker(c, 0, 0, 1, 0.5f);
+			for (final BlockPos pos : corners) {
+				renderMarker(pos, 0, 0, 1, 0.5f);
 			}
 		}
 		renderEnd();
@@ -106,10 +106,10 @@ public class BuildMarkerRenderer extends RenderHelper {
 	private void addWith(HashSet<BlockPos> corners, List<BuildTask> scheduled,
 			int side1, boolean side1Inverted, int side2, boolean side2Inverted,
 			int side3, boolean side3Inverted) {
-		final BuildTask p = Collections.min(scheduled, new CornerComparator(
+		final BuildTask task = Collections.min(scheduled, new CornerComparator(
 				new int[] { side1, side2, side3 }, new boolean[] {
 						side1Inverted, side2Inverted, side3Inverted }));
-		corners.add(p.getForPosition());
+		corners.add(task.getForPosition());
 	}
 
 }

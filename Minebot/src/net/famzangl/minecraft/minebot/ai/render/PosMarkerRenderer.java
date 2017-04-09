@@ -43,9 +43,9 @@ public class PosMarkerRenderer extends RenderHelper {
 		renderStart(event, helper);
 
 		float part = 1.0f;
-		for (final BlockPos m : markerPos) {
-			if (m != null) {
-				renderMarker(m, r * part + (1 - part), g * part + (1 - part), b
+		for (final BlockPos marker : markerPos) {
+			if (marker != null) {
+				renderMarker(marker, r * part + (1 - part), g * part + (1 - part), b
 						* part + (1 - part), 0.7f * part);
 			}
 			part *= 0.6;

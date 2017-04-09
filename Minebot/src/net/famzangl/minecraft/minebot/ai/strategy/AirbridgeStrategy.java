@@ -69,12 +69,12 @@ public class AirbridgeStrategy extends TaskStrategy {
 		}
 
 		@Override
-		public void runTick(AIHelper h, TaskOperations o) {
-			arrived = h.sneakFrom(pos, inDirection, false);
+		public void runTick(AIHelper aiHelper, TaskOperations taskOperations) {
+			arrived = aiHelper.sneakFrom(pos, inDirection, false);
 		}
 
 		@Override
-		public boolean isFinished(AIHelper h) {
+		public boolean isFinished(AIHelper aiHelper) {
 			return arrived;
 		}
 	}
@@ -83,19 +83,19 @@ public class AirbridgeStrategy extends TaskStrategy {
 		private long startTime = 0;
 
 		@Override
-		public void runTick(AIHelper h, TaskOperations o) {
+		public void runTick(AIHelper aiHelper, TaskOperations taskOperations) {
 		}
 
 		@Override
-		public boolean isFinished(AIHelper h) {
-			return h.getMinecraft().theWorld.getTotalWorldTime() >= startTime + LAG_TEST_DELAY;
+		public boolean isFinished(AIHelper aiHelper) {
+			return aiHelper.getMinecraft().theWorld.getTotalWorldTime() >= startTime + LAG_TEST_DELAY;
 		}
 
 		public AITask getTrigger() {
 			return new RunOnceTask() {
 				@Override
-				protected void runOnce(AIHelper h, TaskOperations o) {
-					startTime = h.getMinecraft().theWorld.getTotalWorldTime();
+				protected void runOnce(AIHelper aiHelper, TaskOperations taskOperations) {
+					startTime = aiHelper.getMinecraft().theWorld.getTotalWorldTime();
 				}
 			};
 		}

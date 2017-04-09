@@ -42,16 +42,16 @@ public class FaceAnyMobTask extends AITask {
 	int tickCount;
 
 	@Override
-	public boolean isFinished(AIHelper h) {
+	public boolean isFinished(AIHelper aiHelper) {
 		return tickCount > 10;
 	}
 
 	@Override
-	public void runTick(AIHelper h, TaskOperations o) {
+	public void runTick(AIHelper aiHelper, TaskOperations taskOperations) {
 		tickCount++;
 		if (tickCount > 10) {
-			final Minecraft mc = h.getMinecraft();
-			final List<Entity> entsInBBList = h.getEntities(DIST,
+			final Minecraft mc = aiHelper.getMinecraft();
+			final List<Entity> entsInBBList = aiHelper.getEntities(DIST,
 					new LivingSelector());
 			if (entsInBBList.isEmpty()) {
 				System.out.println("No entity in range");
@@ -61,7 +61,7 @@ public class FaceAnyMobTask extends AITask {
 			final int n = new Random().nextInt(entsInBBList.size());
 			final Entity e = entsInBBList.get(n);
 			final AxisAlignedBB ebb = e.getEntityBoundingBox();
-			h.face((ebb.maxX + ebb.minX) / 2, ebb.minY + 0.2,
+			aiHelper.face((ebb.maxX + ebb.minX) / 2, ebb.minY + 0.2,
 					(ebb.maxZ + ebb.minZ) / 2);
 		}
 	}

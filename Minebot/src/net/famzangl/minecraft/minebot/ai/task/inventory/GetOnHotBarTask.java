@@ -50,53 +50,53 @@ public class GetOnHotBarTask extends AITask {
 	}
 
 	@Override
-	public boolean isFinished(AIHelper h) {
-		return h.canSelectItem(itemFiler)
-				&& h.getMinecraft().currentScreen == null;
+	public boolean isFinished(AIHelper aiHelper) {
+		return aiHelper.canSelectItem(itemFiler)
+				&& aiHelper.getMinecraft().currentScreen == null;
 	}
 
 	@Override
-	public void runTick(AIHelper h, TaskOperations o) {
-		if (h.getMinecraft().currentScreen instanceof GuiInventory) {
-			final GuiInventory screen = (GuiInventory) h.getMinecraft().currentScreen;
+	public void runTick(AIHelper aiHelper, TaskOperations taskOperations) {
+		if (aiHelper.getMinecraft().currentScreen instanceof GuiInventory) {
+			final GuiInventory screen = (GuiInventory) aiHelper.getMinecraft().currentScreen;
 			for (int i = 9; i < 9 * 4; i++) {
 				final Slot slot = screen.inventorySlots.getSlot(i);
 				final ItemStack stack = slot.getStack();
 				if (slot == null || stack == null
-						|| !slot.canTakeStack(h.getMinecraft().thePlayer)
+						|| !slot.canTakeStack(aiHelper.getMinecraft().thePlayer)
 						|| !itemFiler.matches(stack)) {
 					continue;
 				}
 				LOGGER.trace(MARKER_GET_ON_HOTBAR, "Swapping inventory slot " + i);
-				swap(h, screen, i);
-				h.getMinecraft().displayGuiScreen(null);
+				swap(aiHelper, screen, i);
+				aiHelper.getMinecraft().displayGuiScreen(null);
 				break;
 			}
-		} else if (!inventoryOpened && h.hasItemInInvetory(itemFiler)) {
-			h.getMinecraft()
+		} else if (!inventoryOpened && aiHelper.hasItemInInvetory(itemFiler)) {
+			aiHelper.getMinecraft()
 					.getNetHandler()
 					.addToSendQueue(
 							new C16PacketClientStatus(
 									C16PacketClientStatus.EnumState.OPEN_INVENTORY_ACHIEVEMENT));
-			h.getMinecraft().displayGuiScreen(
-					new GuiInventory(h.getMinecraft().thePlayer));
+			aiHelper.getMinecraft().displayGuiScreen(
+					new GuiInventory(aiHelper.getMinecraft().thePlayer));
 			inventoryOpened = true;
 		} else {
-			o.desync(new SelectTaskError(itemFiler));
+			taskOperations.desync(new SelectTaskError(itemFiler));
 		}
 	}
 
 	/**
 	 * Swap a stack with Stack 5 on the hotbar.
 	 * 
-	 * @param h
+	 * @param aiHelper
 	 * @param screen
 	 * @param i
 	 */
-	private void swap(AIHelper h, GuiInventory screen, int i) {
-		final PlayerControllerMP playerController = h.getMinecraft().playerController;
+	private void swap(AIHelper aiHelper, GuiInventory screen, int i) {
+		final PlayerControllerMP playerController = aiHelper.getMinecraft().playerController;
 		final int windowId = screen.inventorySlots.windowId;
-		final EntityPlayerSP player = h.getMinecraft().thePlayer;
+		final EntityPlayerSP player = aiHelper.getMinecraft().thePlayer;
 		playerController.windowClick(windowId, i, 0, 0, player);
 		playerController.windowClick(windowId, 35 + 5, 0, 0, player);
 		playerController.windowClick(windowId, i, 0, 0, player);

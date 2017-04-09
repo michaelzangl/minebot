@@ -29,8 +29,8 @@ public class ClickOnEnchantmentTable extends UseItemOnBlockTask {
 	}
 
 	@Override
-	public boolean isFinished(AIHelper h) {
-		return h.getMinecraft().currentScreen instanceof GuiEnchantment;
+	public boolean isFinished(AIHelper aiHelper) {
+		return aiHelper.getMinecraft().currentScreen instanceof GuiEnchantment;
 	}
 
 }

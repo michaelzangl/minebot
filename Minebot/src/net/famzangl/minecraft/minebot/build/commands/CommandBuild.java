@@ -53,11 +53,11 @@ public class CommandBuild {
 		@Override
 		protected TickResult onGameTick(AIHelper helper) {
 			if (!terrainChecked) {
-				BlockPos p = getBlockInTheWay(helper);
-				if (p != null) {
+				BlockPos pos = getBlockInTheWay(helper);
+				if (pos != null) {
 					AIChatController
 							.addChatLine("The area is not cleared. Block in the way: "
-									+ p);
+									+ pos);
 					return TickResult.ABORT;
 				}
 				terrainChecked = true;
@@ -141,16 +141,16 @@ public class CommandBuild {
 
 	public static BlockPos isAroundSite(AIHelper helper, BuildTask task) {
 		final BlockPos forPosition = task.getForPosition();
-		for (final BlockPos p : task.getStandablePlaces()) {
-			final int x = p.getX() + forPosition.getX();
-			final int y = p.getY() + forPosition.getY();
-			final int z = p.getZ() + forPosition.getZ();
-			System.out.println("Check " + forPosition + " + " + p + " -> "
+		for (final BlockPos pos : task.getStandablePlaces()) {
+			final int x = pos.getX() + forPosition.getX();
+			final int y = pos.getY() + forPosition.getY();
+			final int z = pos.getZ() + forPosition.getZ();
+			System.out.println("Check " + forPosition + " + " + pos + " -> "
 					+ helper.isStandingOn(x, y, z) + ", "
 					+ task.couldBuildFrom(helper, x, y, z));
 			if (helper.isStandingOn(x, y, z)
 					&& task.couldBuildFrom(helper, x, y, z)) {
-				return p;
+				return pos;
 			}
 		}
 		return null;

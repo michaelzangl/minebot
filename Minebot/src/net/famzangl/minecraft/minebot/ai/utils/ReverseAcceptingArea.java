@@ -30,13 +30,13 @@ public class ReverseAcceptingArea extends BlockArea {
 	}
 
 	@Override
-	public void accept(AreaVisitor v, WorldData world) {
+	public void accept(AreaVisitor visitor, WorldData world) {
 		CollectingVisitor collected = new CollectingVisitor();
 		area.accept(collected, world);
 		ArrayList<BlockPos> positions = collected.positions;
 		for (int i = positions.size() - 1; i >= 0; i--) {
-			BlockPos p = positions.get(i);
-			v.visit(world, p.getX(), p.getY(), p.getZ());
+			BlockPos pos = positions.get(i);
+			visitor.visit(world, pos.getX(), pos.getY(), pos.getZ());
 		}
 	}
 

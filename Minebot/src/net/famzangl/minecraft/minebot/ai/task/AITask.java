@@ -44,19 +44,19 @@ public abstract class AITask {
 	 * Returns <code>true</code> as soon as the task is finished. This gets
 	 * called every time before a new tick is run.
 	 * 
-	 * @param h
+	 * @param aiHelper
 	 * @return <code>true</code> If the task has no more work on this tick.
 	 */
-	public abstract boolean isFinished(AIHelper h);
+	public abstract boolean isFinished(AIHelper aiHelper);
 
 	/**
 	 * Lets the task control the bot for one tick. Only modify the bot state in
 	 * this method.
 	 * 
-	 * @param h
-	 * @param o
+	 * @param aiHelper
+	 * @param taskOperations
 	 */
-	public abstract void runTick(AIHelper h, TaskOperations o);
+	public abstract void runTick(AIHelper aiHelper, TaskOperations taskOperations);
 
 	/**
 	 * How many game ticks this task should take. After this time, the task is

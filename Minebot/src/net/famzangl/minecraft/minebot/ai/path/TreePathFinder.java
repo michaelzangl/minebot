@@ -55,12 +55,12 @@ public class TreePathFinder extends MovePathFinder {
 	private static class PrefaceBarrier extends AITask {
 
 		@Override
-		public boolean isFinished(AIHelper h) {
+		public boolean isFinished(AIHelper aiHelper) {
 			return true;
 		}
 
 		@Override
-		public void runTick(AIHelper h, TaskOperations o) {
+		public void runTick(AIHelper aiHelper, TaskOperations taskOperations) {
 		}
 		
 	}
@@ -74,7 +74,7 @@ public class TreePathFinder extends MovePathFinder {
 		private class TopReachedTask extends RunOnceTask {
 
 			@Override
-			protected void runOnce(AIHelper h, TaskOperations o) {
+			protected void runOnce(AIHelper aiHelper, TaskOperations taskOperations) {
 				topReached = true;
 			}
 
@@ -198,8 +198,8 @@ public class TreePathFinder extends MovePathFinder {
 					+ " is not on the trunk.");
 		}
 
-		public void addTasks(AIHelper h) {
-			BlockPos pos = h.getPlayerPosition();
+		public void addTasks(AIHelper aiHelper) {
+			BlockPos pos = aiHelper.getPlayerPosition();
 			if (!isValidPlayerPosition(pos)) {
 				// TODO: Print a warning?
 				System.err.println("Illegal start position " + pos + " for "
@@ -240,11 +240,11 @@ public class TreePathFinder extends MovePathFinder {
 
 			// plant saplings
 			if (replant) {
-				addReplantTasks(h);
+				addReplantTasks(aiHelper);
 			}
 		}
 
-		private void addReplantTasks(AIHelper h) {
+		private void addReplantTasks(AIHelper aiHelper) {
 			for (int i = 0; i < 4; i++) {
 				BlockPos floorBase = getPosition(minY + i).add(0, -i, 0);
 				if (!BlockSets.SAFE_GROUND.isAt(world, floorBase.add(0, -1, 0))
@@ -286,10 +286,10 @@ public class TreePathFinder extends MovePathFinder {
 		}
 
 		@Override
-		protected void runOnce(AIHelper h, TaskOperations o) {
+		protected void runOnce(AIHelper aiHelper, TaskOperations taskOperations) {
 			if (state != null
-					&& !state.isValidPlayerPosition(h.getPlayerPosition())) {
-				o.desync(new StringTaskError("Not in a tree."));
+					&& !state.isValidPlayerPosition(aiHelper.getPlayerPosition())) {
+				taskOperations.desync(new StringTaskError("Not in a tree."));
 				largeTree = null;
 			} else {
 				largeTree = state;
@@ -323,15 +323,15 @@ public class TreePathFinder extends MovePathFinder {
 	 * 
 	 * @return
 	 */
-	public boolean addTasksForLargeTree(AIHelper h) {
+	public boolean addTasksForLargeTree(AIHelper aiHelper) {
 		if (largeTree != null) {
-			largeTree.addTasks(h);
+			largeTree.addTasks(aiHelper);
 			addTask(new SwitchToLargeTreeTask(null));
 			return true;
 		}
 		// Attempt to start a new large tree at our position.
-		world = h.getWorld();
-		return handleLargeTree(h.getPlayerPosition());
+		world = aiHelper.getWorld();
+		return handleLargeTree(aiHelper.getPlayerPosition());
 	}
 
 	@Override
@@ -397,10 +397,10 @@ public class TreePathFinder extends MovePathFinder {
 	}
 
 	private boolean handleLargeTree(BlockPos currentPos) {
-		for (BlockPos p : new BlockPos[] { currentPos,
+		for (BlockPos pos : new BlockPos[] { currentPos,
 				currentPos.add(0, 0, -1), currentPos.add(-1, 0, 0),
 				currentPos.add(-1, 0, -1), }) {
-			LargeTreeState state = new LargeTreeState(p);
+			LargeTreeState state = new LargeTreeState(pos);
 			state.scanTreeHeight(world, currentPos);
 			if (state.getTreeHeight() > 6 || state.getTreeHeightAbovePlayer() > 4) {
 				// we are in a large tree that should be handled by this special algorithm.

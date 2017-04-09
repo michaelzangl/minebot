@@ -32,11 +32,11 @@ public class SelectEnchantmentTask extends AITask {
 	private boolean hasFailed = false;
 
 	@Override
-	public boolean isFinished(AIHelper h) {
-		if (!(h.getMinecraft().currentScreen instanceof GuiEnchantment)) {
+	public boolean isFinished(AIHelper aiHelper) {
+		if (!(aiHelper.getMinecraft().currentScreen instanceof GuiEnchantment)) {
 			return false;
 		} else {
-			final GuiEnchantment screen = (GuiEnchantment) h.getMinecraft().currentScreen;
+			final GuiEnchantment screen = (GuiEnchantment) aiHelper.getMinecraft().currentScreen;
 			return screen.inventorySlots.getSlot(0).getHasStack()
 					&& screen.inventorySlots.getSlot(0).getStack()
 							.isItemEnchanted();
@@ -44,16 +44,16 @@ public class SelectEnchantmentTask extends AITask {
 	}
 
 	@Override
-	public void runTick(AIHelper h, TaskOperations o) {
-		if (!(h.getMinecraft().currentScreen instanceof GuiEnchantment)) {
+	public void runTick(AIHelper aiHelper, TaskOperations taskOperations) {
+		if (!(aiHelper.getMinecraft().currentScreen instanceof GuiEnchantment)) {
 			System.out.println("Screen not opened.");
-			o.desync(new StringTaskError("Enchantment screen is not open."));
+			taskOperations.desync(new StringTaskError("Enchantment screen is not open."));
 			return;
 		}
-		final GuiEnchantment screen = (GuiEnchantment) h.getMinecraft().currentScreen;
+		final GuiEnchantment screen = (GuiEnchantment) aiHelper.getMinecraft().currentScreen;
 		if (!screen.inventorySlots.getSlot(0).getHasStack()) {
 			System.out.println("No stack in slot.");
-			o.desync(new StringTaskError("No stack in enchantment table."));
+			taskOperations.desync(new StringTaskError("No stack in enchantment table."));
 			return;
 		}
 		if (screen.inventorySlots.getSlot(0).getStack().isItemEnchanted()) {
@@ -65,29 +65,29 @@ public class SelectEnchantmentTask extends AITask {
 			final Field field = GuiEnchantment.class
 					.getDeclaredField("field_147075_G");
 			field.setAccessible(true);
-			final ContainerEnchantment c = (ContainerEnchantment) field
+			final ContainerEnchantment enchantment = (ContainerEnchantment) field
 					.get(screen);
 
-			hasFailed = !attemptEnchanting(h, c, E_SLOT);
+			hasFailed = !attemptEnchanting(aiHelper, enchantment, E_SLOT);
 		} catch (final Throwable e) {
 			e.printStackTrace();
-			o.desync(new StringTaskError("Some error... :-("));
+			taskOperations.desync(new StringTaskError("Some error... :-("));
 			return;
 		}
 	}
 
-	private boolean attemptEnchanting(AIHelper h, ContainerEnchantment c,
+	private boolean attemptEnchanting(AIHelper aiHelper, ContainerEnchantment c,
 			int slot) {
 		if (c.enchantLevels[slot] == 0) {
 			System.out.println("No enchantment levels computed yet.");
 			return false;
 		}
-		if (h.getMinecraft().thePlayer.experienceLevel < c.enchantLevels[slot]) {
+		if (aiHelper.getMinecraft().thePlayer.experienceLevel < c.enchantLevels[slot]) {
 			System.out.println("Abort enchantment, not enough levels.");
-			return slot > 0 ? attemptEnchanting(h, c, slot - 1) : false;
+			return slot > 0 ? attemptEnchanting(aiHelper, c, slot - 1) : false;
 		}
-		if (c.enchantItem(h.getMinecraft().thePlayer, slot)) {
-			h.getMinecraft().playerController.sendEnchantPacket(c.windowId,
+		if (c.enchantItem(aiHelper.getMinecraft().thePlayer, slot)) {
+			aiHelper.getMinecraft().playerController.sendEnchantPacket(c.windowId,
 					slot);
 			System.out.println("Sent enchant request package.");
 			return true;

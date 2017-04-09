@@ -59,16 +59,16 @@ public class JumpingPlaceBlockAtSideTask extends JumpingPlaceAtHalfTask {
 	}
 
 	@Override
-	protected boolean isFacingRightBlock(AIHelper h) {
-		if (h.getLookDirection() != lookingDirection) {
+	protected boolean isFacingRightBlock(AIHelper aiHelper) {
+		if (aiHelper.getLookDirection() != lookingDirection) {
 			return false;
 		} else {
-			return isFacing(h, lookingDirection.rotateY())
-					|| isFacing(h,
+			return isFacing(aiHelper, lookingDirection.rotateY())
+					|| isFacing(aiHelper,
 							lookingDirection.rotateYCCW())
-					|| isFacing(h, lookingDirection)
+					|| isFacing(aiHelper, lookingDirection)
 					|| side != BlockHalf.UPPER_HALF
-					&& isFacing(h,
+					&& isFacing(aiHelper,
 							EnumFacing.DOWN);
 		}
 	}

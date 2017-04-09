@@ -67,8 +67,8 @@ public class FeedAnimalsStrategy extends TaskStrategy {
 		if (found != null) {
 			addTask(new FaceAndInteractTask(found, selector) {
 				@Override
-				public void runTick(AIHelper h, TaskOperations o) {
-					h.selectCurrentItem(new ItemFilter() {
+				public void runTick(AIHelper aiHelper, TaskOperations taskOperations) {
+					aiHelper.selectCurrentItem(new ItemFilter() {
 						@Override
 						public boolean matches(ItemStack itemStack) {
 							return itemStack == null
@@ -78,16 +78,16 @@ public class FeedAnimalsStrategy extends TaskStrategy {
 											.getItem() instanceof ItemSeeds);
 						}
 					});
-					super.runTick(h, o);
+					super.runTick(aiHelper, taskOperations);
 				}
 
 				@Override
-				protected void doInteractWithCurrent(AIHelper h) {
-					final Entity over = h.getObjectMouseOver().entityHit;
+				protected void doInteractWithCurrent(AIHelper aiHelper) {
+					final Entity over = aiHelper.getObjectMouseOver().entityHit;
 					if (over instanceof EntityAnimal
-							&& h.selectCurrentItem(new FilterFeedingItem(
+							&& aiHelper.selectCurrentItem(new FilterFeedingItem(
 									(EntityAnimal) over))) {
-						super.doInteractWithCurrent(h);
+						super.doInteractWithCurrent(aiHelper);
 					} else if (found == over) {
 						interacted = true;
 					}

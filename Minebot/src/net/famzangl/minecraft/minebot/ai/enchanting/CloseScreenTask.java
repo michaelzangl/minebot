@@ -24,14 +24,14 @@ import net.minecraft.client.gui.GuiScreen;
 public class CloseScreenTask extends AITask {
 
 	@Override
-	public boolean isFinished(AIHelper h) {
-		return h.getMinecraft().currentScreen == null;
+	public boolean isFinished(AIHelper aiHelper) {
+		return aiHelper.getMinecraft().currentScreen == null;
 	}
 
 	@Override
-	public void runTick(AIHelper h, TaskOperations o) {
-		h.getMinecraft().displayGuiScreen((GuiScreen) null);
-		h.getMinecraft().setIngameFocus();
+	public void runTick(AIHelper aiHelper, TaskOperations taskOperations) {
+		aiHelper.getMinecraft().displayGuiScreen((GuiScreen) null);
+		aiHelper.getMinecraft().setIngameFocus();
 	}
 
 }

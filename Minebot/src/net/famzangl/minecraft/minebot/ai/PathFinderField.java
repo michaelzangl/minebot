@@ -356,8 +356,8 @@ public class PathFinderField implements Comparator<Integer> {
 
 	protected void foundPath(LinkedList<BlockPos> path) {
 		LOGGER.debug(MARKER_PATH, "Path was found.");
-		for (final BlockPos p : path) {
-			LOGGER.trace(MARKER_PATH, "Path part: " + p);
+		for (final BlockPos pos : path) {
+			LOGGER.trace(MARKER_PATH, "Path part: " + pos);
 		}
 	}
 

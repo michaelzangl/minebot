@@ -14,7 +14,7 @@ public class ConditionalWaitTask extends WaitTask {
 	}
 	
 	@Override
-	public boolean isFinished(AIHelper h) {
-		return !condition.shouldWait() || super.isFinished(h);
+	public boolean isFinished(AIHelper aiHelper) {
+		return !condition.shouldWait() || super.isFinished(aiHelper);
 	}
 }

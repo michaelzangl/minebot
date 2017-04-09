@@ -74,10 +74,10 @@ public class CraftStrategy extends PathFinderStrategy {
 
 		private final ItemWithSubtype[][] slots = new ItemWithSubtype[3][3];
 
-		public CraftingPossibility(IRecipe r) {
-			LOGGER.trace(MARKER_RECIPE, "Parsing recipe: " + r);
-			if (r instanceof ShapedRecipes) {
-				ShapedRecipes shapedRecipes = (ShapedRecipes) r;
+		public CraftingPossibility(IRecipe recipe) {
+			LOGGER.trace(MARKER_RECIPE, "Parsing recipe: " + recipe);
+			if (recipe instanceof ShapedRecipes) {
+				ShapedRecipes shapedRecipes = (ShapedRecipes) recipe;
 				LOGGER.trace(MARKER_RECIPE, "Interpreting ShapedRecipes: "
 						+ shapedRecipes.getRecipeOutput().getItem()
 								.getUnlocalizedName());
@@ -119,20 +119,20 @@ public class CraftStrategy extends PathFinderStrategy {
 			else {
 				LOGGER.error(MARKER_RECIPE,
 						"An item recipe has been found but the item cannot be crafted. The class "
-								+ r.getClass().getCanonicalName()
+								+ recipe.getClass().getCanonicalName()
 								+ " cannot be understood.");
-				throw new IllegalArgumentException("Cannot (yet) craft " + r);
+				throw new IllegalArgumentException("Cannot (yet) craft " + recipe);
 			}
 		}
 
 		private ItemStack[] getItems(ShapedRecipes shapedRecipes) {
-			for (Field f : ShapedRecipes.class.getDeclaredFields()) {
-				if (f.getType().isArray()) {
-					Class<?> componentType = f.getType().getComponentType();
+			for (Field field : ShapedRecipes.class.getDeclaredFields()) {
+				if (field.getType().isArray()) {
+					Class<?> componentType = field.getType().getComponentType();
 					if (componentType == ItemStack.class) {
-						f.setAccessible(true);
+						field.setAccessible(true);
 						try {
-							return (ItemStack[]) f.get(shapedRecipes);
+							return (ItemStack[]) field.get(shapedRecipes);
 						} catch (IllegalArgumentException e) {
 							e.printStackTrace();
 						} catch (IllegalAccessException e) {
@@ -147,11 +147,11 @@ public class CraftStrategy extends PathFinderStrategy {
 		private int[] getSizes(ShapedRecipes shapedRecipes) {
 			int i = 0;
 			int[] sizes = new int[2];
-			for (Field f : ShapedRecipes.class.getDeclaredFields()) {
-				if (f.getType() == Integer.TYPE) {
-					f.setAccessible(true);
+			for (Field field : ShapedRecipes.class.getDeclaredFields()) {
+				if (field.getType() == Integer.TYPE) {
+					field.setAccessible(true);
 					try {
-						sizes[i] = f.getInt(shapedRecipes);
+						sizes[i] = field.getInt(shapedRecipes);
 					} catch (IllegalArgumentException e) {
 						e.printStackTrace();
 					} catch (IllegalAccessException e) {
@@ -168,9 +168,9 @@ public class CraftStrategy extends PathFinderStrategy {
 
 		public ItemCountList getRequiredItems(int count) {
 			ItemCountList list = new ItemCountList();
-			for (ItemWithSubtype[] s : slots) {
-				for (ItemWithSubtype ss : s) {
-					list.add(ss, count);
+			for (ItemWithSubtype[] subtypes : slots) {
+				for (ItemWithSubtype subtype : subtypes) {
+					list.add(subtype, count);
 				}
 			}
 			LOGGER.trace(MARKER_RECIPE, "Items required for " + this + ": " + list);
@@ -204,11 +204,11 @@ public class CraftStrategy extends PathFinderStrategy {
 					.getRecipeList();
 			List<CraftingPossibility> possible = new ArrayList<CraftingPossibility>();
 
-			for (IRecipe r : recipes) {
-				ItemStack out = r.getRecipeOutput();
+			for (IRecipe recipe : recipes) {
+				ItemStack out = recipe.getRecipeOutput();
 				if (out != null && new ItemWithSubtype(out).equals(item)) {
 					try {
-						possible.add(new CraftingPossibility(r));
+						possible.add(new CraftingPossibility(recipe));
 					} catch (IllegalArgumentException e) {
 						System.err.println("Cannot craft:" + e.getMessage());
 					}
@@ -275,7 +275,7 @@ public class CraftStrategy extends PathFinderStrategy {
 	public static class CraftingTableFinder extends BlockRangeFinder {
 
 		private final CraftingWish wish;
-		CraftingTableHandler h = new CraftingTableHandler();
+		CraftingTableHandler craftingTableHandler = new CraftingTableHandler();
 		private boolean failed;
 		private int oldItemCount = -1;
 
@@ -308,13 +308,13 @@ public class CraftStrategy extends PathFinderStrategy {
 		@Override
 		protected BlockRangeScanner constructScanner(BlockPos playerPosition) {
 			BlockRangeScanner scanner = super.constructScanner(playerPosition);
-			scanner.addHandler(h);
+			scanner.addHandler(craftingTableHandler);
 			return scanner;
 		}
 
 		@Override
 		protected float rateDestination(int distance, int x, int y, int z) {
-			ArrayList<CraftingTableData> tables = h
+			ArrayList<CraftingTableData> tables = craftingTableHandler
 					.getReachableForPos(new BlockPos(x, y, z));
 			return !failed && tables != null && tables.size() > 0 ? distance
 					: -1;
@@ -322,7 +322,7 @@ public class CraftStrategy extends PathFinderStrategy {
 
 		@Override
 		protected void addTasksForTarget(BlockPos currentPos) {
-			ArrayList<CraftingTableData> tables = h
+			ArrayList<CraftingTableData> tables = craftingTableHandler
 					.getReachableForPos(currentPos);
 			CraftingTableData table = tables.get(0);
 			List<CraftingPossibility> possibilities = wish.getPossibility();
@@ -339,14 +339,14 @@ public class CraftStrategy extends PathFinderStrategy {
 
 			addTask(new UseItemOnBlockAtTask(table.pos) {
 				@Override
-				protected boolean isBlockAllowed(AIHelper h, BlockPos pos) {
-					return h.getBlock(pos) == Blocks.crafting_table;
+				protected boolean isBlockAllowed(AIHelper aiHelper, BlockPos pos) {
+					return aiHelper.getBlock(pos) == Blocks.crafting_table;
 				}
 
 				@Override
-				public boolean isFinished(AIHelper h) {
-					return super.isFinished(h)
-							&& h.getMinecraft().currentScreen instanceof GuiCrafting;
+				public boolean isFinished(AIHelper aiHelper) {
+					return super.isFinished(aiHelper)
+							&& aiHelper.getMinecraft().currentScreen instanceof GuiCrafting;
 				}
 			});
 			addCraftTaks(grid);
@@ -391,9 +391,9 @@ public class CraftStrategy extends PathFinderStrategy {
 
 		private int countInInventory(ItemWithSubtype itemWithSubtype) {
 			int count = 0;
-			for (ItemStack s : helper.getMinecraft().thePlayer.inventory.mainInventory) {
-				if (itemWithSubtype.equals(ItemWithSubtype.fromStack(s))) {
-					count += s.stackSize;
+			for (ItemStack stack : helper.getMinecraft().thePlayer.inventory.mainInventory) {
+				if (itemWithSubtype.equals(ItemWithSubtype.fromStack(stack))) {
+					count += stack.stackSize;
 				}
 			}
 			return count;
@@ -401,24 +401,24 @@ public class CraftStrategy extends PathFinderStrategy {
 
 		/**
 		 * Gets an array of items that specifies how they need to be placed on the crafting grid.
-		 * @param h
+		 * @param aiHelper
 		 * @param possibilities
 		 * @return
 		 */
-		private ItemWithSubtype[][] getCraftablePossibility(AIHelper h,
+		private ItemWithSubtype[][] getCraftablePossibility(AIHelper aiHelper,
 				List<CraftingPossibility> possibilities) {
-			for (CraftingPossibility p : possibilities) {
+			for (CraftingPossibility possibility : possibilities) {
 				ItemWithSubtype[][] assignedSlots = new ItemWithSubtype[3][3];
 				// TODO: Order this in a better way. We need to have multiples of our item count first.
-				for (ItemStack i : h.getMinecraft().thePlayer.inventory.mainInventory) {
-					if (i == null) {
+				for (ItemStack stack : aiHelper.getMinecraft().thePlayer.inventory.mainInventory) {
+					if (stack == null) {
 						continue;
 					}
-					ItemWithSubtype item = new ItemWithSubtype(i);
-					int leftOver = i.stackSize;
+					ItemWithSubtype item = new ItemWithSubtype(stack);
+					int leftOver = stack.stackSize;
 					for (int x = 0; x < 3 && leftOver > 0; x++) {
 						for (int y = 0; y < 3 && leftOver > 0; y++) {
-							if (p.goodForPosition(item, x, y)
+							if (possibility.goodForPosition(item, x, y)
 									&& assignedSlots[x][y] == null) {
 								assignedSlots[x][y] = item;
 								leftOver--;
@@ -430,7 +430,7 @@ public class CraftStrategy extends PathFinderStrategy {
 				boolean allGood = true;
 				for (int x = 0; x < 3; x++) {
 					for (int y = 0; y < 3; y++) {
-						if (!p.goodForPosition(assignedSlots[x][y], x, y)) {
+						if (!possibility.goodForPosition(assignedSlots[x][y], x, y)) {
 							allGood = false;
 							LOGGER.warn(MARKER_RECIPE, "Placed wrong item at " + x + "," + y + ": " + assignedSlots[x][y]);
 						}

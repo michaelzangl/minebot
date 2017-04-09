@@ -188,7 +188,7 @@ public class AIController extends AIHelper implements IAIControllable {
 			doUngrab = true;
 		}
 
-		AIStrategy newStrat;
+		AIStrategy newStrategy;
 		if (dead || stop.isPressed() || stop.isKeyDown()) {
 			// FIXME: Better way to determine of this stategy can be resumed.
 			if (deactivatedStrategy == null
@@ -200,12 +200,12 @@ public class AIController extends AIHelper implements IAIControllable {
 			}
 			deactivateCurrentStrategy();
 			dead = false;
-		} else if ((newStrat = findNewStrategy()) != null) {
+		} else if ((newStrategy = findNewStrategy()) != null) {
 			deactivateCurrentStrategy();
-			currentStrategy = newStrat;
+			currentStrategy = newStrategy;
 			deactivatedStrategy = null;
 			LOGGER.debug(MARKER_STRATEGY, "Using new root strategy: "
-					+ newStrat);
+					+ newStrategy);
 			currentStrategy.setActive(true, this);
 		}
 
@@ -365,9 +365,9 @@ public class AIController extends AIHelper implements IAIControllable {
 			}
 			buildMarkerRenderer.render(activeDrawEvent, this);
 		}
-		AIStrategy strat = currentStrategy;
-		if (strat != null) {
-			strat.drawMarkers(activeDrawEvent, this);
+		AIStrategy strategy = currentStrategy;
+		if (strategy != null) {
+			strategy.drawMarkers(activeDrawEvent, this);
 		}
 	}
 
@@ -379,16 +379,16 @@ public class AIController extends AIHelper implements IAIControllable {
 
 	private AIStrategy findNewStrategy() {
 		if (requestedStrategy != null) {
-			final AIStrategy r = requestedStrategy;
+			final AIStrategy strategy = requestedStrategy;
 			requestedStrategy = null;
-			return r;
+			return strategy;
 		}
 
 		for (final Entry<KeyBinding, AIStrategyFactory> e : uses.entrySet()) {
 			if (e.getKey().isPressed()) {
-				final AIStrategy strat = e.getValue().produceStrategy(this);
-				if (strat != null) {
-					return strat;
+				final AIStrategy strategy = e.getValue().produceStrategy(this);
+				if (strategy != null) {
+					return strategy;
 				}
 			}
 		}
