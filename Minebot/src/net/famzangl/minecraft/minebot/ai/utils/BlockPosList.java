@@ -15,9 +15,9 @@ public class BlockPosList extends BlockArea {
 	}
 
 	@Override
-	public void accept(AreaVisitor v, WorldData world) {
+	public void accept(AreaVisitor visitor, WorldData world) {
 		for (BlockPos p : positions) {
-			v.visit(world, p.getX(), p.getY(), p.getZ());
+			visitor.visit(world, p.getX(), p.getY(), p.getZ());
 		}
 	}
 
