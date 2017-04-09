@@ -95,11 +95,11 @@ public abstract class BlockWithDataOrDontcare {
 	public static ArrayList<String> getAllStrings() {
 		Set<ResourceLocation> keys = Block.blockRegistry.getKeys();
 		ArrayList<String> strings = new ArrayList<String>();
-		for (ResourceLocation k : keys) {
+		for (ResourceLocation key : keys) {
 			// candidate found
-			strings.add(k.toString());
+			strings.add(key.toString());
 
-			Block block = (Block) Block.blockRegistry.getObject(k);
+			Block block = (Block) Block.blockRegistry.getObject(key);
 			HashSet<IBlockState> states = new HashSet<IBlockState>();
 			for (int i = 0; i < 16; i++) {
 				try {
@@ -115,7 +115,7 @@ public abstract class BlockWithDataOrDontcare {
 				for (IBlockState state : states) {
 					BlockWithData withData = new BlockWithData(block,
 							block.getMetaFromState(state));
-					strings.add(k + ":" + withData.getMetaString());
+					strings.add(key + ":" + withData.getMetaString());
 				}
 			}
 		}
