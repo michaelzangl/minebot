@@ -64,9 +64,9 @@ public class MinebotDirectoryCreator {
 			dir.mkdirs();
 			ZipInputStream zip = new ZipInputStream(jar.openStream());
 			try {
-				ZipEntry e;
-				while ((e = zip.getNextEntry()) != null) {
-					String name = e.getName();
+				ZipEntry zipEntry;
+				while ((zipEntry = zip.getNextEntry()) != null) {
+					String name = zipEntry.getName();
 					if (name.startsWith(BASE)) {
 						String[] localName = name.substring(BASE.length())
 								.split("/");
