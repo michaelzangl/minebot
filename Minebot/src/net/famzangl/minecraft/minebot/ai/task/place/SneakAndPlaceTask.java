@@ -94,9 +94,9 @@ public class SneakAndPlaceTask extends AITask {
 					}
 				}
 			} else {
-				final MovementInput i = new MovementInput();
-				i.jump = true;
-				aiHelper.overrideMovement(i);
+				final MovementInput movement = new MovementInput();
+				movement.jump = true;
+				aiHelper.overrideMovement(movement);
 			}
 		}
 	}

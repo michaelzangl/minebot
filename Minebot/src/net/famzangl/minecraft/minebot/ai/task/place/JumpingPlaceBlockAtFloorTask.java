@@ -45,9 +45,9 @@ public class JumpingPlaceBlockAtFloorTask extends PlaceBlockAtFloorTask {
 	@Override
 	protected void tryPlaceBlock(AIHelper aiHelper) {
 		super.tryPlaceBlock(aiHelper);
-		final MovementInput i = new MovementInput();
-		i.jump = true;
-		aiHelper.overrideMovement(i);
+		final MovementInput movement = new MovementInput();
+		movement.jump = true;
+		aiHelper.overrideMovement(movement);
 	}
 
 	@Override

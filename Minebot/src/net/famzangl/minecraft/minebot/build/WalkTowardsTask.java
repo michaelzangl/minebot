@@ -100,9 +100,9 @@ public class WalkTowardsTask extends AITask {
 						taskOperations.desync(new SelectTaskError(CARPET));
 					}
 				}
-				final MovementInput i = new MovementInput();
-				i.jump = true;
-				aiHelper.overrideMovement(i);
+				final MovementInput movement = new MovementInput();
+				movement.jump = true;
+				aiHelper.overrideMovement(movement);
 			} else if ((aiHelper.isStandingOn(nextPos.getX(), nextPos.getY(),
 					nextPos.getZ()) || wasStandingOnDest)
 					&& !carpets.isEmpty()) {

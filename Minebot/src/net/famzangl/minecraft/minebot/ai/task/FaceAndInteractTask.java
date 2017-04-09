@@ -90,10 +90,10 @@ public class FaceAndInteractTask extends AITask {
 					* aiHelper.getMinecraft().thePlayer.motionZ;
 			aiHelper.face(preferedAnimal.posX, preferedAnimal.posY,
 					preferedAnimal.posZ);
-			final MovementInput i = new MovementInput();
-			i.jump = speed < 0.01 && ticksRun > 8;
-			i.moveForward = 1;
-			aiHelper.overrideMovement(i);
+			final MovementInput movement = new MovementInput();
+			movement.jump = speed < 0.01 && ticksRun > 8;
+			movement.moveForward = 1;
+			aiHelper.overrideMovement(movement);
 		}
 		ticksRun++;
 	}
