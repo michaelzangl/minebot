@@ -117,23 +117,23 @@ public class MinebotNetHandler extends NetHandlerPlayClient implements
 	@Override
 	public void addToSendQueue(Packet p_147297_1_) {
 		if (p_147297_1_ instanceof C01PacketChatMessage) {
-			C01PacketChatMessage message = (C01PacketChatMessage) p_147297_1_;
+			C01PacketChatMessage chatMessage = (C01PacketChatMessage) p_147297_1_;
 			// Intercept chat message.
-			String m = message.getMessage();
-			if (m.startsWith("/")) {
-				if (AIChatController.getRegistry().interceptCommand(m)) {
+			String message = chatMessage.getMessage();
+			if (message.startsWith("/")) {
+				if (AIChatController.getRegistry().interceptCommand(message)) {
 					return;
 				}
 			}
 		} else if (p_147297_1_ instanceof C14PacketTabComplete) {
 			C14PacketTabComplete complete = (C14PacketTabComplete) p_147297_1_;
-			String m = complete.getMessage();
-			if (m.startsWith("/") && m.indexOf(" ") >= 0) {
-				if (AIChatController.getRegistry().interceptTab(m, this)) {
+			String message = complete.getMessage();
+			if (message.startsWith("/") && message.indexOf(" ") >= 0) {
+				if (AIChatController.getRegistry().interceptTab(message, this)) {
 					return;
 				}
 			}
-			lastSendTabComplete = m;
+			lastSendTabComplete = message;
 		}
 		super.addToSendQueue(p_147297_1_);
 	}
