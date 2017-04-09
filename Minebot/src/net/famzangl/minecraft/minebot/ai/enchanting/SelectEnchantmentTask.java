@@ -65,10 +65,10 @@ public class SelectEnchantmentTask extends AITask {
 			final Field field = GuiEnchantment.class
 					.getDeclaredField("field_147075_G");
 			field.setAccessible(true);
-			final ContainerEnchantment c = (ContainerEnchantment) field
+			final ContainerEnchantment enchantment = (ContainerEnchantment) field
 					.get(screen);
 
-			hasFailed = !attemptEnchanting(aiHelper, c, E_SLOT);
+			hasFailed = !attemptEnchanting(aiHelper, enchantment, E_SLOT);
 		} catch (final Throwable e) {
 			e.printStackTrace();
 			taskOperations.desync(new StringTaskError("Some error... :-("));
