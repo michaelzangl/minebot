@@ -57,9 +57,9 @@ public class BlockBoundsCache {
 	}
 
 	private static BlockBounds attemptLoad(int blockWithMeta) {
-		BlockWithData d = new BlockWithData(blockWithMeta);
-		Block block = d.getBlock();
-		final IBlockState state = d.getBlockState();
+		BlockWithData blockData = new BlockWithData(blockWithMeta);
+		Block block = blockData.getBlock();
+		final IBlockState state = blockData.getBlockState();
 		IBlockAccess world = new IBlockAccess() {
 			@Override
 			public boolean isAirBlock(BlockPos pos) {
