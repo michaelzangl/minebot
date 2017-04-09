@@ -57,9 +57,9 @@ public class CommandStepPlace {
 					AIChatController.addChatLine("Not at starting position.");
 				} else if (BlockSets.AIR.isAt(helper.getWorld(),
 						task.getForPosition())) {
-					final AITask t = task.getPlaceBlockTask(fromPos);
-					if (t != null) {
-						addTask(t);
+					final AITask aiTask = task.getPlaceBlockTask(fromPos);
+					if (aiTask != null) {
+						addTask(aiTask);
 					}
 				} else {
 					AIChatController
