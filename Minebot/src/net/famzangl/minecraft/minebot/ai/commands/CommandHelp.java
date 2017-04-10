@@ -31,6 +31,7 @@ import net.famzangl.minecraft.minebot.ai.command.CommandDefinition;
 import net.famzangl.minecraft.minebot.ai.command.FixedNameBuilder.FixedArgumentDefinition;
 import net.famzangl.minecraft.minebot.ai.command.ParameterType;
 import net.famzangl.minecraft.minebot.ai.strategy.AIStrategy;
+import net.famzangl.minecraft.minebot.ai.strategy.StopStrategy;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.util.ChatComponentText;
 
@@ -96,7 +97,7 @@ final public class CommandHelp {
 		Collections.sort(commands, new CommandComperator());
 		AIChatController.addToChatPaged("Help", page, commands,
 				new CommandToTextConverter());
-		return null;
+		return new StopStrategy();
 
 	}
 
@@ -122,7 +123,7 @@ final public class CommandHelp {
 			AIChatController.addChatLine("Command could not be found: "
 					+ commandName);
 		}
-		return null;
+		return new StopStrategy();
 	}
 
 	private static void printHelp(EntityPlayerSP player,
