@@ -164,10 +164,13 @@ public class AIChatController {
 
 	public static <T> void addToChatPaged(String title, int page, List<T> data,
 			Function<T, String> convert) {
-		AIChatController.addChatLine(title + " " + page + " / "
-				+ (int) Math.ceil((float) data.size() / PER_PAGE));
-		for (int i = Math.max(0, page - 1) * PER_PAGE; i < Math.min(page
-				* PER_PAGE, data.size()); i++) {
+
+		int totalPages = (int) Math.ceil(data.size() / PER_PAGE);
+		AIChatController.addChatLine(title + " " + page + " / " + totalPages);
+
+		int start = Math.max(0, page - 1) * PER_PAGE;
+		int end = Math.min(page * PER_PAGE, data.size());
+		for (int i = start; i < end; i++) {
 			final String line = convert.apply(data.get(i));
 			addChatLine(line);
 		}
