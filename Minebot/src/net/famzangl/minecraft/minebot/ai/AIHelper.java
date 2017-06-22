@@ -55,10 +55,10 @@ import net.minecraft.entity.Entity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.MovementInput;
-import net.minecraft.util.MovingObjectPosition;
-import net.minecraft.util.MovingObjectPosition.MovingObjectType;
+import net.minecraft.util.RayTraceResult.MovingObjectType;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.storage.ExtendedBlockStorage;
@@ -218,7 +218,7 @@ public abstract class AIHelper {
 	 * 
 	 * @return
 	 */
-	public MovingObjectPosition getObjectMouseOver() {
+	public RayTraceResult getObjectMouseOver() {
 		if (objectMouseOverInvalidated) {
 			objectMouseOverInvalidated = false;
 			getMinecraft().entityRenderer.getMouseOver(1.0F);
@@ -368,7 +368,7 @@ public abstract class AIHelper {
 	 * @return <code>true</code> if it is facing the Block.
 	 */
 	public boolean isFacingBlock(int x, int y, int z) {
-		final MovingObjectPosition position = getObjectMouseOver();
+		final RayTraceResult position = getObjectMouseOver();
 		return position != null
 				&& position.typeOfHit == MovingObjectType.BLOCK
 				&& new BlockPos(x, y, z).equals(position.getBlockPos())
@@ -424,7 +424,7 @@ public abstract class AIHelper {
 	 * @return <code>true</code> if the player faces the block.
 	 */
 	public boolean isFacingBlock(int x, int y, int z, EnumFacing side) {
-		final MovingObjectPosition position = getObjectMouseOver();
+		final RayTraceResult position = getObjectMouseOver();
 		return isFacingBlock(x, y, z) && position.sideHit == side;
 	}
 

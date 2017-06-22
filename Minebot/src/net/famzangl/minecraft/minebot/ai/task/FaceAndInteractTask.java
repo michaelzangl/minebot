@@ -23,8 +23,8 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.item.EntityXPOrb;
 import net.minecraft.util.MovementInput;
-import net.minecraft.util.MovingObjectPosition;
-import net.minecraft.util.MovingObjectPosition.MovingObjectType;
+import net.minecraft.util.RayTraceResult.MovingObjectType;
+import net.minecraft.util.math.RayTraceResult;
 
 /**
  * Try to interact with a given entity. If it is not clickable, the bot attempts
@@ -78,7 +78,7 @@ public class FaceAndInteractTask extends AITask {
 
 	@Override
 	public void runTick(AIHelper aiHelper, TaskOperations taskOperations) {
-		final MovingObjectPosition position = aiHelper.getObjectMouseOver();
+		final RayTraceResult position = aiHelper.getObjectMouseOver();
 		if (ticksRun > 2 && position != null
 				&& position.typeOfHit == MovingObjectType.ENTITY
 				&& alsoAcceptedAnimal.apply(position.entityHit)) {

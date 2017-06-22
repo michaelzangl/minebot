@@ -24,8 +24,8 @@ import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.selectors.AndSelector;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.MovementInput;
-import net.minecraft.util.MovingObjectPosition;
-import net.minecraft.util.MovingObjectPosition.MovingObjectType;
+import net.minecraft.util.RayTraceResult.MovingObjectType;
+import net.minecraft.util.math.RayTraceResult;
 
 public abstract class FaceInteractStrategy extends AIStrategy {
 
@@ -63,7 +63,7 @@ public abstract class FaceInteractStrategy extends AIStrategy {
 			ticksSlow = 0;
 		}
 
-		final MovingObjectPosition position = helper.getObjectMouseOver();
+		final RayTraceResult position = helper.getObjectMouseOver();
 		if (position != null && position.typeOfHit == MovingObjectType.ENTITY
 				&& doInteractWithCurrent(position.entityHit, helper)) {
 			ticksRun = 0;
