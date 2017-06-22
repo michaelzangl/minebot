@@ -320,7 +320,7 @@ public abstract class AIHelper {
 			float pitchClamp = Math.min(
 					Math.abs(MAX_PITCH_CHANGE / pitchChange), 1);
 			float clamp = Math.min(yawClamp, pitchClamp);
-			if (yawInfluence <= 0 && pitchInfluence <= 0) {
+			if (yawInfluence <= 0e-5 && pitchInfluence <= 0e-5) {
 				// only test, do not set
 				return Math.abs(yawChange) < .01 && Math.abs(pitchChange) < .01;
 			}
@@ -333,8 +333,8 @@ public abstract class AIHelper {
 					getMinecraft().player.posX,
 					getMinecraft().player.posY,
 					getMinecraft().player.posZ,
-					yawChange / 0.15f * yawInfluence,
-					-pitchChange / 0.15f * pitchInfluence);
+					rotationYaw + yawChange * yawInfluence,
+					rotationPitch + pitchChange * pitchInfluence);
 			invalidateObjectMouseOver();
 
 			LOGGER.trace(MARKER_FACING, "facing clamped at " + clamp
