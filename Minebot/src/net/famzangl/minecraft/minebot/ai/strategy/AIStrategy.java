@@ -48,6 +48,10 @@ public abstract class AIStrategy {
 	};
 
 	private boolean active;
+	/**
+	 * Disable autojump while the bot is active but store user preference
+	 */
+	private boolean oldAutoJump;
 
 	/**
 	 * (de) Activates the strategy. Always called in a game tick. This can be
@@ -68,10 +72,13 @@ public abstract class AIStrategy {
 		return active;
 	}
 
-	protected void onDeactivate(AIHelper helper) {
-	}
-
 	protected void onActivate(AIHelper helper) {
+		oldAutoJump = helper.getMinecraft().gameSettings.autoJump;
+		helper.getMinecraft().gameSettings.autoJump = false;
+	}
+	
+	protected void onDeactivate(AIHelper helper) {
+		helper.getMinecraft().gameSettings.autoJump = oldAutoJump;
 	}
 
 	/**
