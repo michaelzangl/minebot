@@ -32,6 +32,7 @@ import net.famzangl.minecraft.minebot.ai.task.AITask;
 import net.famzangl.minecraft.minebot.ai.task.CanPrefaceAndDestroy;
 import net.famzangl.minecraft.minebot.ai.task.SkipWhenSearchingPrefetch;
 import net.famzangl.minecraft.minebot.ai.task.TaskOperations;
+import net.famzangl.minecraft.minebot.ai.task.error.StrategyDeactivatedError;
 import net.famzangl.minecraft.minebot.ai.task.error.StringTaskError;
 import net.famzangl.minecraft.minebot.ai.task.error.TaskError;
 import net.minecraft.util.math.BlockPos;
@@ -55,7 +56,6 @@ public abstract class TaskStrategy extends AIStrategy implements
 	private static final int DESYNC_TIME = 5;
 	// Maximum distance for aiming at blocks to destroy.
 	private static final int MAX_PREDESTROY_DISTANCE = 4;
-	private static final boolean LESS_ERRORS = false;
 	protected final LinkedList<AITask> tasks = new LinkedList<AITask>();
 
 	private int desyncTimer = 0;
@@ -68,7 +68,7 @@ public abstract class TaskStrategy extends AIStrategy implements
 
 	@Override
 	protected void onDeactivate(AIHelper helper) {
-		desync(new StringTaskError("An other strategy took over."));
+		desync(new StrategyDeactivatedError());
 		super.onDeactivate(helper);
 	}
 
@@ -86,7 +86,7 @@ public abstract class TaskStrategy extends AIStrategy implements
 		LOGGER.error(MARKER_TASK, "Error: " + error);
 		Thread.dumpStack();
 
-		if (!LESS_ERRORS || !lastErrors.contains(error)) {
+		if (!lastErrors.contains(error) && error.shouldBeDisplayed()) {
 			AIChatController.addChatLine("Error: " + error.getMessage());
 		}
 		if (lastErrors.size() > 2) {
