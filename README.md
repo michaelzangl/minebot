@@ -11,31 +11,36 @@ Have a look at the [Getting Started Wiki Page](https://github.com/michaelzangl/m
 
 This repo also contains an independent bow aiming helper.
 
-Download + Installing
-==========
+Download + Installing (Stable version)
+=====================
 
-Install [Forge mod loader](http://files.minecraftforge.net/#Downloads).
+--------------
+* Install [Forge mod loader](http://files.minecraftforge.net/#Downloads).
 
-Get the latest [release](https://github.com/michaelzangl/minebot/releases).
+* Get the latest [release](https://github.com/michaelzangl/minebot/releases).
 
-Extract the ZIP file and put the jar files in your minecraft mods directory.
+* Extract the ZIP file and put the jar files in your minecraft mods directory.
 
-Building
+Building (Latest version)
 ========
+
+The developer version may contain more bugs than the real version.
 
 Building Minebot is straight forward. You need linux, git and the normal java development tools.
 
-* Clone this repo
+* Clone/Download this repo
 * Run ./release.sh
 * Extract that ZIP file in your minecraft mods directory
 
 Developing Minebot
 ==================
 
-I won't develop this mod any further. Minecraft 1.8.9 is the last supported version.
+I won't develop this mod any further. Minecraft 1.8.9 is the last supported version. A baisc but incomplete port is available for Minecraft 1.11.2.
 But I will be accepting PRs to this repository.
 
-I use eclipse for development. You should know how to set up and use Minecraft Forge.
+I use eclipse neon for development. You can simply import Minebot as existing project.
+
+The main classes of Minebot have some Javadoc in them. Most other classes are undocumented but should explain themselves.
 
 How to add a new command:
 * Add a new command class and register it in AIChatController. The class needs an AICommand-Annotation. Most commands use "minebot" as base cmmand.
