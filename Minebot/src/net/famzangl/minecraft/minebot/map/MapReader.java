@@ -31,6 +31,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonIOException;
 import com.google.gson.JsonSyntaxException;
 
+import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.net.ChunkListener;
 import net.famzangl.minecraft.minebot.ai.path.world.WorldData;
@@ -783,11 +784,11 @@ public class MapReader implements ChunkListener {
 			if (!(provider instanceof ChunkProviderClient)) {
 				return;
 			}
-			List<Chunk> list;
+			Long2ObjectMap<Chunk> list;
 			list = PrivateFieldUtils.getFieldValue(
 					(ChunkProviderClient) provider, ChunkProviderClient.class,
-					List.class);
-			for (Chunk chunk : list) {
+					Long2ObjectMap.class);
+			for (Chunk chunk : list.values()) {
 				chunkQueue.offer(chunk.getPos());
 			}
 		} catch (IndexOutOfBoundsException e) {
