@@ -18,8 +18,8 @@ package net.famzangl.minecraft.minebot.ai.task.place;
 
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.ItemFilter;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.MovementInput;
+import net.minecraft.util.math.BlockPos;
 
 /**
  * For blocks we collide with.

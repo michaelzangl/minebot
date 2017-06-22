@@ -26,8 +26,8 @@ import net.famzangl.minecraft.minebot.ai.path.TunnelPathFinder;
 import net.famzangl.minecraft.minebot.ai.path.TunnelPathFinder.TorchSide;
 import net.famzangl.minecraft.minebot.ai.strategy.AIStrategy;
 import net.famzangl.minecraft.minebot.ai.strategy.PathFinderStrategy;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.math.BlockPos;
 
 @AICommand(helpText = "Build a tunnel with the given profile", name = "minebot")
 public class CommandTunnel {

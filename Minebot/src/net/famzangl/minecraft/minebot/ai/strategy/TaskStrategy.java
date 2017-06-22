@@ -19,6 +19,11 @@ package net.famzangl.minecraft.minebot.ai.strategy;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.Marker;
+import org.apache.logging.log4j.MarkerManager;
+
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.command.AIChatController;
 import net.famzangl.minecraft.minebot.ai.path.TaskReceiver;
@@ -31,11 +36,6 @@ import net.famzangl.minecraft.minebot.ai.task.error.StringTaskError;
 import net.famzangl.minecraft.minebot.ai.task.error.TaskError;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.fml.common.gameevent.TickEvent.RenderTickEvent;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.Marker;
-import org.apache.logging.log4j.MarkerManager;
 
 /**
  * This is a strategy that always queries for new tasks to do and then executes

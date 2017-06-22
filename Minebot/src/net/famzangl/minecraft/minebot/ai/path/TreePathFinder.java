@@ -33,8 +33,8 @@ import net.famzangl.minecraft.minebot.ai.task.place.PlantSaplingTask;
 import net.famzangl.minecraft.minebot.ai.utils.BlockCounter;
 import net.famzangl.minecraft.minebot.ai.utils.BlockCuboid;
 import net.famzangl.minecraft.minebot.build.block.WoodType;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.math.BlockPos;
 
 /**
  * This searches for trees (vertical rows of logs), walks to the bottom most and

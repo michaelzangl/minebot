@@ -28,8 +28,8 @@ import net.famzangl.minecraft.minebot.ai.path.world.WorldData;
 import net.famzangl.minecraft.minebot.settings.MinebotSettings;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.init.Blocks;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.math.BlockPos;
 
 /**
  * Place a torch on the floor if the light level is below x.

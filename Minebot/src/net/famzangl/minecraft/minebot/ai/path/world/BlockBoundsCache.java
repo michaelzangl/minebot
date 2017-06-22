@@ -2,20 +2,20 @@ package net.famzangl.minecraft.minebot.ai.path.world;
 
 import java.util.HashMap;
 
-import net.famzangl.minecraft.minebot.ai.command.BlockWithData;
-import net.minecraft.block.Block;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.world.IBlockAccess;
-import net.minecraft.world.WorldType;
-import net.minecraft.world.biome.BiomeGenBase;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.MarkerManager;
+
+import net.famzangl.minecraft.minebot.ai.command.BlockWithData;
+import net.minecraft.block.Block;
+import net.minecraft.block.state.IBlockState;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.IBlockAccess;
+import net.minecraft.world.WorldType;
+import net.minecraft.world.biome.BiomeGenBase;
 
 public class BlockBoundsCache {
 	private static final Marker MARKER_BOUNDS_PROBLEM = MarkerManager

@@ -27,11 +27,11 @@ import java.util.Hashtable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import org.apache.commons.lang3.StringEscapeUtils;
+
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent.PlayerTickEvent;
-
-import org.apache.commons.lang3.StringEscapeUtils;
 
 /**
  * This sends a list of all visible players to a server, e.g. to display it on a

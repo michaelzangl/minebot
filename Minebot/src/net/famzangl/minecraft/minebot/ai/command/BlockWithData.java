@@ -3,6 +3,8 @@ package net.famzangl.minecraft.minebot.ai.command;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import org.apache.commons.lang3.ArrayUtils;
+
 import net.famzangl.minecraft.minebot.ai.ColoredBlockItemFilter;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockMetaSet;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSet;
@@ -13,8 +15,6 @@ import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.EnumDyeColor;
-
-import org.apache.commons.lang3.ArrayUtils;
 
 /**
  * This is the object wrapper for a block (id) and meta value pair. You can use

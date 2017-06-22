@@ -2,9 +2,9 @@ package net.famzangl.minecraft.minebot.ai.utils;
 
 import net.famzangl.minecraft.minebot.ai.path.world.Pos;
 import net.famzangl.minecraft.minebot.ai.path.world.WorldData;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.Vec3i;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3i;
 
 /**
  * This is cuboid of blocks.

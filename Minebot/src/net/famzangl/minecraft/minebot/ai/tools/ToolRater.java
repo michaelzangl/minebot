@@ -11,6 +11,8 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.google.gson.Gson;
+
 import net.famzangl.minecraft.minebot.ai.ItemFilter;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockFloatMap;
 import net.famzangl.minecraft.minebot.ai.tools.rate.AndRater;
@@ -35,8 +37,6 @@ import net.minecraft.item.ItemSpade;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemSword;
 import net.minecraft.item.ItemTool;
-
-import com.google.gson.Gson;
 
 /**
  * This class rates tools.

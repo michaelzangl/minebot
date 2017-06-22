@@ -24,8 +24,8 @@ import net.famzangl.minecraft.minebot.ai.task.place.JumpingPlaceBlockAtSideTask;
 import net.famzangl.minecraft.minebot.ai.task.place.SneakAndPlaceAtSideTask;
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.math.BlockPos;
 
 public class BuildNormalStairsTask extends AbstractBuildTask {
 

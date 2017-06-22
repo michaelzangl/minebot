@@ -38,8 +38,8 @@ import net.famzangl.minecraft.minebot.build.blockbuild.BlockBuildTask;
 import net.famzangl.minecraft.minebot.build.blockbuild.SlabBuildTask;
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.math.BlockPos;
 
 /**
  * Build a way. it is covered with cobblestone slabs. Bridge profile:

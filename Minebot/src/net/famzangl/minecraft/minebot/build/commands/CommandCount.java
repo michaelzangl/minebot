@@ -22,6 +22,8 @@ import java.util.Comparator;
 import java.util.Hashtable;
 import java.util.Map.Entry;
 
+import com.google.common.base.Function;
+
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.HumanReadableItemFilter;
 import net.famzangl.minecraft.minebot.ai.ItemFilter;
@@ -32,8 +34,6 @@ import net.famzangl.minecraft.minebot.ai.command.AICommandParameter;
 import net.famzangl.minecraft.minebot.ai.command.ParameterType;
 import net.famzangl.minecraft.minebot.ai.strategy.AIStrategy;
 import net.famzangl.minecraft.minebot.build.blockbuild.BuildTask;
-
-import com.google.common.base.Function;
 
 @AICommand(helpText = "Count all stuff required for building.", name = "minebuild")
 public class CommandCount {

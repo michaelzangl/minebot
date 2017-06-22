@@ -8,7 +8,6 @@ import net.famzangl.minecraft.minebot.ai.command.ParameterType;
 import net.famzangl.minecraft.minebot.ai.strategy.AIStrategy;
 import net.famzangl.minecraft.minebot.ai.strategy.LookAtStrategy;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.Vec3;
 import net.minecraft.util.math.Vec3d;
 
 @AICommand(name = "minebot", helpText = "Look at a given position")

@@ -16,8 +16,8 @@
  *******************************************************************************/
 package net.famzangl.minecraft.minebot.ai.path.world;
 
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.math.BlockPos;
 
 /**
  * This class holds some useful methods to handle the {@link BlockPos}

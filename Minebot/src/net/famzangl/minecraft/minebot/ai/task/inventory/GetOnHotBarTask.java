@@ -16,6 +16,9 @@
  *******************************************************************************/
 package net.famzangl.minecraft.minebot.ai.task.inventory;
 
+import org.apache.logging.log4j.Marker;
+import org.apache.logging.log4j.MarkerManager;
+
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.ItemFilter;
 import net.famzangl.minecraft.minebot.ai.task.AITask;
@@ -28,9 +31,6 @@ import net.minecraft.client.multiplayer.PlayerControllerMP;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.play.client.C16PacketClientStatus;
-
-import org.apache.logging.log4j.Marker;
-import org.apache.logging.log4j.MarkerManager;
 
 /**
  * Gets the item on the hotbar out of the inventory. Currently only uses slot 5.

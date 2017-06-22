@@ -32,8 +32,8 @@ import net.famzangl.minecraft.minebot.ai.task.SkipWhenSearchingPrefetch;
 import net.famzangl.minecraft.minebot.ai.task.TaskOperations;
 import net.famzangl.minecraft.minebot.ai.utils.BlockCuboid;
 import net.famzangl.minecraft.minebot.ai.utils.BlockFilteredArea;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.math.BlockPos;
 
 public class TunnelPathFinder extends AlongTrackPathFinder {
 	/**

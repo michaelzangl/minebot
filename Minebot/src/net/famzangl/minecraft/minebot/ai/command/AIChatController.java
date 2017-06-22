@@ -18,6 +18,8 @@ package net.famzangl.minecraft.minebot.ai.command;
 
 import java.util.List;
 
+import com.google.common.base.Function;
+
 import net.famzangl.minecraft.minebot.ai.commands.CommandAirbridge;
 import net.famzangl.minecraft.minebot.ai.commands.CommandBuildWay;
 import net.famzangl.minecraft.minebot.ai.commands.CommandCraft;
@@ -71,8 +73,6 @@ import net.famzangl.minecraft.minebot.build.commands.CommandStepPlace;
 import net.famzangl.minecraft.minebot.build.commands.CommandStepWalk;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.ChatComponentText;
-
-import com.google.common.base.Function;
 
 /**
  * Controlls the AI from a chat line.

@@ -16,9 +16,9 @@
  *******************************************************************************/
 package net.famzangl.minecraft.minebot.ai.selectors;
 
-import net.minecraft.entity.Entity;
-
 import com.google.common.base.Predicate;
+
+import net.minecraft.entity.Entity;
 
 public class AndSelector implements Predicate<Entity> {
 

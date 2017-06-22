@@ -18,8 +18,8 @@ package net.famzangl.minecraft.minebot.ai.task;
 
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.ItemFilter;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.MovingObjectPosition;
+import net.minecraft.util.math.BlockPos;
 
 /**
  * Uses an item on something. Use subclases to define what to use it for.

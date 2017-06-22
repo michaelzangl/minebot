@@ -51,9 +51,9 @@ import net.minecraft.entity.Entity;
 import net.minecraft.nbt.JsonToNBT;
 import net.minecraft.nbt.NBTException;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.IChatComponent;
 import net.minecraft.util.Vec3;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 /**

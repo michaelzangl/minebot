@@ -7,8 +7,8 @@ import net.famzangl.minecraft.minebot.ai.task.place.DestroyBlockTask;
 import net.famzangl.minecraft.minebot.ai.task.place.PlaceBlockAtFloorTask;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemReed;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.math.BlockPos;
 
 public class SugarCanePathFinder extends WalkingPathfinder {
 	private static final BlockSet SUGAR_CANE_GROUND = new BlockSet(Blocks.SAND, Blocks.GRASS, Blocks.DIRT);

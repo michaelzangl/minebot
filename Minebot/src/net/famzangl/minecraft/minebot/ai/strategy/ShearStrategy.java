@@ -16,6 +16,8 @@
  *******************************************************************************/
 package net.famzangl.minecraft.minebot.ai.strategy;
 
+import com.google.common.base.Predicate;
+
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.ItemFilter;
 import net.famzangl.minecraft.minebot.ai.selectors.AndSelector;
@@ -27,8 +29,6 @@ import net.minecraft.entity.passive.EntitySheep;
 import net.minecraft.item.EnumDyeColor;
 import net.minecraft.item.ItemShears;
 import net.minecraft.item.ItemStack;
-
-import com.google.common.base.Predicate;
 
 public class ShearStrategy extends FaceInteractStrategy {
 	private final EnumDyeColor color;

@@ -23,14 +23,6 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Date;
 
-import net.famzangl.minecraft.minebot.ai.path.world.BlockFloatMap;
-import net.famzangl.minecraft.minebot.ai.path.world.BlockSet;
-import net.famzangl.minecraft.minebot.ai.tools.ToolRater;
-import net.famzangl.minecraft.minebot.settings.serialize.BlockFloatAdapter;
-import net.famzangl.minecraft.minebot.settings.serialize.BlockSetAdapter;
-import net.famzangl.minecraft.minebot.settings.serialize.ToolRaterAdapter;
-import net.minecraft.client.Minecraft;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.Marker;
@@ -39,6 +31,14 @@ import org.apache.logging.log4j.MarkerManager;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonParseException;
+
+import net.famzangl.minecraft.minebot.ai.path.world.BlockFloatMap;
+import net.famzangl.minecraft.minebot.ai.path.world.BlockSet;
+import net.famzangl.minecraft.minebot.ai.tools.ToolRater;
+import net.famzangl.minecraft.minebot.settings.serialize.BlockFloatAdapter;
+import net.famzangl.minecraft.minebot.settings.serialize.BlockSetAdapter;
+import net.famzangl.minecraft.minebot.settings.serialize.ToolRaterAdapter;
+import net.minecraft.client.Minecraft;
 
 /**
  * This wraps a minebot setting file and provides convenient access to the

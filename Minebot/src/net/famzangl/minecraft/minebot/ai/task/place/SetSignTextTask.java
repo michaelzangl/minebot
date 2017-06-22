@@ -21,8 +21,8 @@ import net.famzangl.minecraft.minebot.ai.task.AITask;
 import net.famzangl.minecraft.minebot.ai.task.TaskOperations;
 import net.minecraft.client.gui.inventory.GuiEditSign;
 import net.minecraft.tileentity.TileEntitySign;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.ChatAllowedCharacters;
+import net.minecraft.util.math.BlockPos;
 
 /**
  * Set the text of the sign, assuming that the GUI is open.

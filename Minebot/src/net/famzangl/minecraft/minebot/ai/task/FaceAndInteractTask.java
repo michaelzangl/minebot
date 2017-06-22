@@ -16,6 +16,8 @@
  *******************************************************************************/
 package net.famzangl.minecraft.minebot.ai.task;
 
+import com.google.common.base.Predicate;
+
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityItem;
@@ -23,8 +25,6 @@ import net.minecraft.entity.item.EntityXPOrb;
 import net.minecraft.util.MovementInput;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.MovingObjectPosition.MovingObjectType;
-
-import com.google.common.base.Predicate;
 
 /**
  * Try to interact with a given entity. If it is not clickable, the bot attempts

@@ -9,7 +9,7 @@ import net.famzangl.minecraft.minebot.ai.blockmap.ChunkCubeProvider;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.AxisAlignedBB;
+import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 
 /**

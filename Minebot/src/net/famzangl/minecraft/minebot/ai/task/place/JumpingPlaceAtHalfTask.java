@@ -16,17 +16,17 @@
  *******************************************************************************/
 package net.famzangl.minecraft.minebot.ai.task.place;
 
+import org.apache.logging.log4j.Marker;
+import org.apache.logging.log4j.MarkerManager;
+
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.ItemFilter;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSets;
 import net.famzangl.minecraft.minebot.ai.task.BlockHalf;
 import net.famzangl.minecraft.minebot.ai.task.TaskOperations;
 import net.famzangl.minecraft.minebot.ai.task.error.StringTaskError;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.EnumFacing;
-
-import org.apache.logging.log4j.Marker;
-import org.apache.logging.log4j.MarkerManager;
+import net.minecraft.util.math.BlockPos;
 
 /**
  * Place a block at the given upper/lower side of its adjacent blocks by

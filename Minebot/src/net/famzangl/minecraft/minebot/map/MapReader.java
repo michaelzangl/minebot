@@ -27,6 +27,10 @@ import javax.swing.JOptionPane;
 import javax.swing.JSeparator;
 import javax.swing.JToolBar;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonIOException;
+import com.google.gson.JsonSyntaxException;
+
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.net.ChunkListener;
 import net.famzangl.minecraft.minebot.ai.path.world.WorldData;
@@ -41,10 +45,6 @@ import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.IChunkProvider;
 import net.minecraft.world.chunk.storage.ExtendedBlockStorage;
-
-import com.google.gson.Gson;
-import com.google.gson.JsonIOException;
-import com.google.gson.JsonSyntaxException;
 
 /**
  * Reads the map that is sent to the user,

@@ -21,12 +21,12 @@ import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.PriorityQueue;
 
-import net.minecraft.util.math.BlockPos;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.MarkerManager;
+
+import net.minecraft.util.math.BlockPos;
 
 /**
  * The basic path finding algorithm.

@@ -1,7 +1,6 @@
 package net.famzangl.minecraft.minebot.ai.strategy;
 
 import net.famzangl.minecraft.minebot.ai.AIHelper;
-import net.minecraft.util.Vec3;
 import net.minecraft.util.math.Vec3d;
 
 /**

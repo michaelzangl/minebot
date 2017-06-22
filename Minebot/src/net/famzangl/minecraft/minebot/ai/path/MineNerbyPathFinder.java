@@ -3,8 +3,8 @@ package net.famzangl.minecraft.minebot.ai.path;
 import java.util.BitSet;
 
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSets;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.math.BlockPos;
 
 /**
  * Mine some visible ores that are close to us.

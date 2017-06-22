@@ -24,6 +24,11 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Map.Entry;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.Marker;
+import org.apache.logging.log4j.MarkerManager;
+
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.command.BlockWithDataOrDontcare;
 import net.famzangl.minecraft.minebot.ai.enchanting.CloseScreenTask;
@@ -49,11 +54,6 @@ import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.item.crafting.ShapedRecipes;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.oredict.ShapedOreRecipe;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.Marker;
-import org.apache.logging.log4j.MarkerManager;
 
 /**
  * Use the crafting table.

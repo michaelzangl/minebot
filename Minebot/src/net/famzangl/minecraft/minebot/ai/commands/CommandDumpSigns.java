@@ -21,8 +21,8 @@ import net.minecraft.block.BlockSign;
 import net.minecraft.init.Blocks;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntitySign;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.IChatComponent;
+import net.minecraft.util.math.BlockPos;
 
 @AICommand(helpText = "Dump all signs to a text file.", name = "minebot")
 public class CommandDumpSigns {

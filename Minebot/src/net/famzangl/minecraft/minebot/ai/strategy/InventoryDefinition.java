@@ -19,13 +19,13 @@ package net.famzangl.minecraft.minebot.ai.strategy;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+
 import net.famzangl.minecraft.minebot.ai.task.inventory.ItemWithSubtype;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-
-import com.google.gson.Gson;
-import com.google.gson.JsonArray;
 
 /**
  * This is a definition of what the (current) inventory of the player contains.

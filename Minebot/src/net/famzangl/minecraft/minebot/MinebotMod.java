@@ -18,6 +18,10 @@ package net.famzangl.minecraft.minebot;
 
 import java.net.URISyntaxException;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.core.LoggerContext;
+import org.apache.logging.log4j.core.config.Configuration;
+
 import net.famzangl.minecraft.minebot.ai.AIController;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockBoundsCache;
 import net.minecraftforge.fml.common.FMLCommonHandler;
@@ -25,10 +29,6 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
 import net.minecraftforge.fml.common.Mod.Instance;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.core.LoggerContext;
-import org.apache.logging.log4j.core.config.Configuration;
 
 @Mod(modid = "minebot-mod", name = "Minebot", version = "0.4")
 public class MinebotMod {

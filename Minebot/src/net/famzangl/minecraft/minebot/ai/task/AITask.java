@@ -16,14 +16,14 @@
  *******************************************************************************/
 package net.famzangl.minecraft.minebot.ai.task;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.path.world.RecordingWorld;
 import net.famzangl.minecraft.minebot.ai.path.world.WorldWithDelta;
 import net.famzangl.minecraft.minebot.ai.strategy.TaskStrategy;
 import net.minecraftforge.fml.common.gameevent.TickEvent.RenderTickEvent;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 /**
  * This is a specific task that the {@link TaskStrategy} should work on.

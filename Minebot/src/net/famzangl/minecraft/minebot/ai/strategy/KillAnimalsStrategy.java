@@ -18,6 +18,8 @@ package net.famzangl.minecraft.minebot.ai.strategy;
 
 import java.util.HashSet;
 
+import com.google.common.base.Predicate;
+
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.ItemFilter;
 import net.famzangl.minecraft.minebot.ai.animals.AnimalyType;
@@ -33,8 +35,6 @@ import net.minecraft.entity.passive.EntityAnimal;
 import net.minecraft.item.EnumDyeColor;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemSword;
-
-import com.google.common.base.Predicate;
 
 /**
  * Kills all animals in range by mving towards them and hitting them.

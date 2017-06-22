@@ -16,6 +16,8 @@
  *******************************************************************************/
 package net.famzangl.minecraft.minebot.ai.strategy;
 
+import com.google.common.base.Predicate;
+
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.ItemFilter;
 import net.famzangl.minecraft.minebot.ai.selectors.AndSelector;
@@ -32,8 +34,6 @@ import net.minecraft.init.Items;
 import net.minecraft.item.EnumDyeColor;
 import net.minecraft.item.ItemSeeds;
 import net.minecraft.item.ItemStack;
-
-import com.google.common.base.Predicate;
 
 public class FeedAnimalsStrategy extends TaskStrategy {
 

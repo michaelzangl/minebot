@@ -22,6 +22,13 @@ import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.Marker;
+import org.apache.logging.log4j.MarkerManager;
+
+import com.mojang.authlib.GameProfile;
+
 import net.famzangl.minecraft.minebot.ai.AIController;
 import net.famzangl.minecraft.minebot.ai.command.AIChatController;
 import net.famzangl.minecraft.minebot.ai.utils.PrivateFieldUtils;
@@ -38,7 +45,6 @@ import net.minecraft.network.play.server.S02PacketChat;
 import net.minecraft.network.play.server.S08PacketPlayerPosLook;
 import net.minecraft.network.play.server.S21PacketChunkData;
 import net.minecraft.network.play.server.S22PacketMultiBlockChange;
-import net.minecraft.network.play.server.S22PacketMultiBlockChange.BlockUpdateData;
 import net.minecraft.network.play.server.S23PacketBlockChange;
 import net.minecraft.network.play.server.S24PacketBlockAction;
 import net.minecraft.network.play.server.S26PacketMapChunkBulk;
@@ -46,16 +52,10 @@ import net.minecraft.network.play.server.S28PacketEffect;
 import net.minecraft.network.play.server.S29PacketSoundEffect;
 import net.minecraft.network.play.server.S2APacketParticles;
 import net.minecraft.network.play.server.S3APacketTabComplete;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.network.play.server.SPacketMultiBlockChange.BlockUpdateData;
 import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.IChatComponent;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.Marker;
-import org.apache.logging.log4j.MarkerManager;
-
-import com.mojang.authlib.GameProfile;
+import net.minecraft.util.math.BlockPos;
 
 public class MinebotNetHandler extends NetHandlerPlayClient implements
 		NetworkHelper {

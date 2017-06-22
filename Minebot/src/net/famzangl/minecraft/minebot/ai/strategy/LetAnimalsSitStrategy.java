@@ -19,6 +19,8 @@ package net.famzangl.minecraft.minebot.ai.strategy;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.google.common.base.Predicate;
+
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.ItemFilter;
 import net.famzangl.minecraft.minebot.ai.animals.AnimalyType;
@@ -34,8 +36,6 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemDye;
 import net.minecraft.item.ItemFood;
 import net.minecraft.item.ItemStack;
-
-import com.google.common.base.Predicate;
 
 /**
  * Lets all wolves that are owned by the current player either sit or stand.

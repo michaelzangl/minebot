@@ -18,11 +18,11 @@ package net.famzangl.minecraft.minebot.ai.selectors;
 
 import java.lang.reflect.Method;
 
+import com.google.common.base.Predicate;
+
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.passive.EntityTameable;
-
-import com.google.common.base.Predicate;
 
 public class OwnTameableSelector implements Predicate<Entity> {
 	private final EntityLivingBase owner;
