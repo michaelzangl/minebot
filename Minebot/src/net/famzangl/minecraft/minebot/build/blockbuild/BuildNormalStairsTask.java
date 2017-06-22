@@ -117,5 +117,10 @@ public class BuildNormalStairsTask extends AbstractBuildTask {
 		return new BuildNormalStairsTask(add, stairs, dir,
 				half == EnumHalf.BOTTOM ? EnumHalf.TOP : EnumHalf.BOTTOM);
 	}
+	
+	@Override
+	public Object[] getCommandArguments() {
+		return new Object[] { stairs.getRegistryName(), upwardsDirection, half };
+	}
 
 }
