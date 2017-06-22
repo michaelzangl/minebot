@@ -9,6 +9,7 @@ import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.chunk.Chunk;
@@ -224,8 +225,11 @@ public class WorldData {
 		return new BlockPos(x, y, z);
 	}
 
-	public Vec3 getExactPlayerPosition() {
-		return new Vec3(thePlayerToGetPositionFrom.posX,
+	/**
+	 * @return Feet of the player
+	 */
+	public Vec3d getExactPlayerPosition() {
+		return new Vec3d(thePlayerToGetPositionFrom.posX,
 				thePlayerToGetPositionFrom.getEntityBoundingBox().minY,
 				thePlayerToGetPositionFrom.posZ);
 	}

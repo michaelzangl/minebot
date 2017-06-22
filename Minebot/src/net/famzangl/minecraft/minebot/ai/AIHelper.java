@@ -47,6 +47,8 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.Vec3i;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.MovementInput;
@@ -271,11 +273,11 @@ public abstract class AIHelper {
 			return 0;
 		}
 		
-		Vec3 playerLook = getMinecraft().player.getLookVec().normalize();
-		return Math.acos(playerLook.dotProduct(new Vec3(d0, d1, d2).normalize()));
+		Vec3d playerLook = getMinecraft().player.getLookVec().normalize();
+		return Math.acos(playerLook.dotProduct(new Vec3d(d0, d1, d2).normalize()));
 	}
 	
-	public boolean isFacing(Vec3 vec) {
+	public boolean isFacing(Vec3d vec) {
 		return isFacing(vec.xCoord, vec.yCoord, vec.zCoord);
 	}
 
@@ -283,7 +285,7 @@ public abstract class AIHelper {
 		return face(x, y, z, 0, 0);
 	}
 
-	public boolean face(Vec3 vec) {
+	public boolean face(Vec3d vec) {
 		return face(vec.xCoord, vec.yCoord, vec.zCoord);
 	}
 
