@@ -60,9 +60,9 @@ public class ItemNameBuilder extends ParameterBuilder {
 				Collection<String> addTo) {
 			super.getTabCompleteOptions(currentStart, addTo);
 			@SuppressWarnings("unchecked")
-			final Set<ResourceLocation> keys = Item.itemRegistry.getKeys();
+			final Set<ResourceLocation> keys = Item.REGISTRY.getKeys();
 			for (final ResourceLocation k : keys) {
-				final Object block = Item.itemRegistry.getObject(k);
+				final Object block = Item.REGISTRY.getObject(k);
 				if (k.getResourceDomain().equals(MINECRAFT_PREFIX)) {
 					final String subKey = k.getResourcePath();
 					addKey(currentStart, addTo, subKey);

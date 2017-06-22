@@ -71,11 +71,11 @@ public abstract class MinePathfinder extends MovePathFinder {
 //		public float getForBlock(int id) {
 //
 //			if (!isCached[id]) {
-//				// final String name = Block.blockRegistry.getNameForObject(
-//				// Block.blockRegistry.getObjectById(id)).replace(
+//				// final String name = Block.REGISTRY.getNameForObject(
+//				// Block.REGISTRY.getObjectById(id)).replace(
 //				// "minecraft:", "");
 //				cached[id] = settingsProvider
-//						.getFloat((Block) Block.blockRegistry.getObjectById(id));
+//						.getFloat((Block) Block.REGISTRY.getObjectById(id));
 //				isCached[id] = true;
 //			}
 //			return cached[id];
@@ -102,9 +102,9 @@ public abstract class MinePathfinder extends MovePathFinder {
 			if (factors == null) {
 				throw new NullPointerException("No points map provided.");
 			}
-			for (ResourceLocation k : (Set<ResourceLocation>) Block.blockRegistry
+			for (ResourceLocation k : (Set<ResourceLocation>) Block.REGISTRY
 					.getKeys()) {
-				int id = Block.getIdFromBlock((Block) Block.blockRegistry
+				int id = Block.getIdFromBlock((Block) Block.REGISTRY
 						.getObject(k));
 				// TODO: Do this better...
 				float f = factors.get(id * 16);

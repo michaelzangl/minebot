@@ -53,7 +53,7 @@ public class BlockSetAdapter implements JsonSerializer<BlockSet>,
 	}
 
 	public static JsonElement getName(int blockId) {
-		Object name = Block.blockRegistry.getNameForObject(Block.getBlockById(blockId));
+		Object name = Block.REGISTRY.getNameForObject(Block.getBlockById(blockId));
 		if (name != null && name instanceof ResourceLocation) {
 			return new JsonPrimitive(BlockNameBuilder.toString((ResourceLocation) name));
 		} else {

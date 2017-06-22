@@ -76,9 +76,9 @@ public class BlockNameBuilder extends ParameterBuilder {
 			
 //			@SuppressWarnings("unchecked")
 			// BIG TODO: Get a list of all blocks for tab complete.
-//			final Set<ResourceLocation> keys = Block.blockRegistry.getKeys();
+//			final Set<ResourceLocation> keys = Block.REGISTRY.getKeys();
 //			for (final ResourceLocation k : keys) {
-//				final Object block = Block.blockRegistry.getObject(k);
+//				final Object block = Block.REGISTRY.getObject(k);
 //				if (blockFilter.matches((Block) block)) {
 //					if (k.getResourceDomain().equals(MINECRAFT_PREFIX)) {
 //						final String subKey = k.getResourcePath();
