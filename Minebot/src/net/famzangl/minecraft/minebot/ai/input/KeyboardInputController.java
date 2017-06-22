@@ -119,12 +119,12 @@ public class KeyboardInputController {
 			} else {
 				LOGGER.trace(MARKER_KEY, "Key should still be down. " + key);
 			}
-			if (!binding.isPressed()) {
+			if (!binding.isKeyDown()) {
 				LOGGER.error(MARKER_KEY, "Key press simulated but key is not pressed: " + key);
 			}
 		} else {
 			if (wasOverride) {
-				LOGGER.trace(MARKER_KEY, "Key ovveride deactivated: " + key);
+				LOGGER.trace(MARKER_KEY, "Key override deactivated: " + key);
 				KeyBinding.setKeyBindState(key.keyCode, false);
 				binding.setKeyCode(oldKeyCode);
 				KeyBinding.resetKeyBindingArrayAndHash();
