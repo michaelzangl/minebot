@@ -16,11 +16,18 @@
  *******************************************************************************/
 package net.famzangl.minecraft.minebot.ai.animals;
 
+import java.util.stream.Stream;
+
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.monster.EntityPolarBear;
 import net.minecraft.entity.passive.EntityAnimal;
 import net.minecraft.entity.passive.EntityChicken;
 import net.minecraft.entity.passive.EntityCow;
+import net.minecraft.entity.passive.EntityDonkey;
+import net.minecraft.entity.passive.EntityHorse;
+import net.minecraft.entity.passive.EntityLlama;
 import net.minecraft.entity.passive.EntityOcelot;
+import net.minecraft.entity.passive.EntityParrot;
 import net.minecraft.entity.passive.EntityPig;
 import net.minecraft.entity.passive.EntityRabbit;
 import net.minecraft.entity.passive.EntitySheep;
@@ -37,20 +44,34 @@ public enum AnimalyType {
 	COW(EntityCow.class),
 	CHICKEN(EntityChicken.class),
 	PIG(EntityPig.class),
+	POLARBEAR(EntityPolarBear.class, false),
 	SHEEP(EntitySheep.class),
-	WOLF(EntityWolf.class),
+	WOLF(EntityWolf.class, false),
 	OCELOT(EntityOcelot.class),
-	RABBIT(EntityRabbit.class);
+	RABBIT(EntityRabbit.class),
+	HORSE(EntityHorse.class),
+	DONKEY(EntityDonkey.class),
+	PARROT(EntityParrot.class),
+	LLAMA(EntityLlama.class, false);
 
 	private Class<?> animalClass;
+	private boolean inDefaultList;
 
 	private AnimalyType(Class<?> animalClass) {
+		this(animalClass, true);
+	}
+	
+	private AnimalyType(Class<?> animalClass, boolean inDefaultList) {
 		this.animalClass = animalClass;
+		this.inDefaultList = inDefaultList;
 	}
 
 	public boolean hasAnimalClass(Entity e) {
-		return animalClass == null ? e instanceof EntityAnimal
-				: e.getClass() == animalClass;
+		if (animalClass == null) {
+			return Stream.of(values()).filter(t -> t.inDefaultList).anyMatch(t -> t.animalClass == e.getClass());
+		} else {
+			return e.getClass() == animalClass;
+		}
 	}
 
 }
