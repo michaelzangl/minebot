@@ -124,7 +124,7 @@ public class ItemWithSubtype {
 			throw new NullPointerException("Could not find item " + itemId);
 		}
 		ItemStack stack = new ItemStack(item);
-		stack.stackSize = size;
+		stack.setCount(size);
 		if (stack.getHasSubtypes()) {
 			stack.setItemDamage(itemDamage);
 		}

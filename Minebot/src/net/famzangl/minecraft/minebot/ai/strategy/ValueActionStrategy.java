@@ -86,7 +86,7 @@ public abstract class ValueActionStrategy extends AIStrategy {
 		} else if (shouldLogOut) {
 			final Minecraft mc = helper.getMinecraft();
 
-			mc.theWorld.sendQuittingDisconnectingPacket();
+			mc.world.sendQuittingDisconnectingPacket();
 			mc.loadWorld((WorldClient) null);
 			mc.displayGuiScreen(new GuiMainMenu());
 			shouldLogOut = false;

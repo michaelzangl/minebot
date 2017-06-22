@@ -55,7 +55,6 @@ import net.minecraft.entity.Entity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.MovementInput;
-import net.minecraft.util.RayTraceResult.MovingObjectType;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RayTraceResult;
@@ -159,7 +158,7 @@ public abstract class AIHelper {
 	}
 
 	public static File getMinebotDir() {
-		File dir = new File(getMinecraft().mcDataDir, "minebot");
+		File dir = new File(mc.mcDataDir, "minebot");
 		if (!dir.exists()) {
 			dir.mkdir();
 		}
@@ -370,7 +369,7 @@ public abstract class AIHelper {
 	public boolean isFacingBlock(int x, int y, int z) {
 		final RayTraceResult position = getObjectMouseOver();
 		return position != null
-				&& position.typeOfHit == MovingObjectType.BLOCK
+				&& position.typeOfHit == RayTraceResult.Type.BLOCK
 				&& new BlockPos(x, y, z).equals(position.getBlockPos())
 				&& (y < 255 || allowTopOfWorldHit() || position.sideHit != EnumFacing.UP);
 	}
@@ -1013,7 +1012,7 @@ public abstract class AIHelper {
 	 */
 	public EnumFacing getLookDirection() {
 		switch (MathHelper
-				.floor_double(getMinecraft().player.rotationYaw / 360 * 4 + .5) & 3) {
+				.floor(getMinecraft().player.rotationYaw / 360 * 4 + .5) & 3) {
 		case 1:
 			return EnumFacing.WEST;
 		case 2:

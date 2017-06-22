@@ -97,8 +97,8 @@ public class CraftStrategy extends PathFinderStrategy {
 					}
 				}
 				LOGGER.trace(MARKER_RECIPE, "Slots " + Arrays.toString(slots));
-			} else if (r instanceof ShapedOreRecipe) {
-				ShapedOreRecipe shapedRecipes = (ShapedOreRecipe) r;
+			} else if (recipe instanceof ShapedOreRecipe) {
+				ShapedOreRecipe shapedRecipes = (ShapedOreRecipe) recipe;
 				try {
 					// Width is the first integer field.
 					int width = PrivateFieldUtils.getField(shapedRecipes, ShapedOreRecipe.class, Integer.TYPE).getInt(shapedRecipes);
@@ -124,9 +124,9 @@ public class CraftStrategy extends PathFinderStrategy {
 						}
 					}
 				} catch (SecurityException e) {
-					throw new IllegalArgumentException("Cannot access " + r);
+					throw new IllegalArgumentException("Cannot access " + recipe);
 				} catch (IllegalAccessException e) {
-					throw new IllegalArgumentException("Cannot access " + r);
+					throw new IllegalArgumentException("Cannot access " + recipe);
 				}
 			} else {
 				LOGGER.error(MARKER_RECIPE,
@@ -406,7 +406,7 @@ public class CraftStrategy extends PathFinderStrategy {
 			int count = 0;
 			for (ItemStack stack : helper.getMinecraft().player.inventory.mainInventory) {
 				if (itemWithSubtype.equals(ItemWithSubtype.fromStack(stack))) {
-					count += stack.stackSize;
+					count += stack.getMaxStackSize();
 				}
 			}
 			return count;
@@ -430,7 +430,7 @@ public class CraftStrategy extends PathFinderStrategy {
 						continue;
 					}
 					ItemWithSubtype item = new ItemWithSubtype(stack);
-					int leftOver = stack.stackSize;
+					int leftOver = stack.getMaxStackSize();
 					for (int x = 0; x < 3 && leftOver > 0; x++) {
 						for (int y = 0; y < 3 && leftOver > 0; y++) {
 							if (possibility.goodForPosition(item, x, y)

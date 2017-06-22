@@ -21,6 +21,7 @@ import net.famzangl.minecraft.minebot.ai.task.AITask;
 import net.famzangl.minecraft.minebot.ai.task.TaskOperations;
 import net.famzangl.minecraft.minebot.ai.task.error.StringTaskError;
 import net.minecraft.client.gui.inventory.GuiContainer;
+import net.minecraft.inventory.ClickType;
 import net.minecraft.inventory.Slot;
 
 /**
@@ -63,7 +64,7 @@ public abstract class PutItemInContainerTask extends AITask {
 			do {
 				oldContent = newContent;
 				aiHelper.getMinecraft().playerController.windowClick(
-						screen.inventorySlots.windowId, slotToPlace, 0, 1,
+						screen.inventorySlots.windowId, slotToPlace, 0, ClickType.PICKUP,
 						aiHelper.getMinecraft().player);
 				newContent = getSlotContentCount(slot);
 			} while (newContent != oldContent);
@@ -78,7 +79,7 @@ public abstract class PutItemInContainerTask extends AITask {
 	}
 
 	private int getSlotContentCount(Slot slot) {
-		return slot.getHasStack() ? slot.getStack().stackSize : 0;
+		return slot.getHasStack() ? slot.getStack().getMaxStackSize() : 0;
 	}
 
 	protected abstract int getStackToPut(AIHelper aiHelper);

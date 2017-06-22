@@ -132,7 +132,7 @@ public class BuildReverser {
 		LOGGER.trace(MARKER_RECONSTRUCT, "Reconstructing block at " + pos);
 
 		final Block block = helper.getBlock(pos);
-		if (block != Blocks.air) {
+		if (block != Blocks.AIR) {
 			try {
 				final TaskDescription taskString = BuildTaskFactories.getTaskFor(helper.getWorld(), pos) ;
 				LOGGER.trace(MARKER_RECONSTRUCT, "Resulting description: " + taskString);

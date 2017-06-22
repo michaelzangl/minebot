@@ -24,6 +24,7 @@ import net.famzangl.minecraft.minebot.ai.task.AITask;
 import net.famzangl.minecraft.minebot.ai.task.TaskOperations;
 import net.famzangl.minecraft.minebot.ai.task.error.StringTaskError;
 import net.minecraft.client.gui.inventory.GuiContainer;
+import net.minecraft.inventory.ClickType;
 import net.minecraft.inventory.Slot;
 
 /**
@@ -149,33 +150,34 @@ public abstract class MoveInInventoryTask extends AITask {
 			boolean rightclickOnStart) {
 		int oldCount = getSlotContentCount(to);
 
-		click(aiHelper, from.slotNumber, rightclickOnStart ? 1 : 0);
+		click(aiHelper, from.slotNumber, rightclickOnStart ? ClickType.PICKUP : ClickType.PICKUP_ALL);
 
-		click(aiHelper, to.slotNumber, 0);
+		click(aiHelper, to.slotNumber, ClickType.PICKUP);
 		return getSlotContentCount(to) - oldCount;
 	}
 
-	private void click(AIHelper aiHelper, int slotNumber, int i) {
-		System.out.println("Click on " + slotNumber + " using " + i);
+	// TODO: Check the click types
+	private void click(AIHelper aiHelper, int slotNumber, ClickType clickType) {
+		System.out.println("Click on " + slotNumber + " using " + clickType);
 		final GuiContainer screen = (GuiContainer) aiHelper.getMinecraft().currentScreen;
 		aiHelper.getMinecraft().playerController.windowClick(
-				screen.inventorySlots.windowId, slotNumber, i, 0,
+				screen.inventorySlots.windowId, slotNumber, 1, ClickType.PICKUP,
 				aiHelper.getMinecraft().player);
 	}
 
 	private int moveStackPart(AIHelper aiHelper, Slot from, Slot to, int count) {
 		int oldCount = getSlotContentCount(to);
 
-		click(aiHelper, from.slotNumber, 0);
+		click(aiHelper, from.slotNumber, ClickType.PICKUP);
 		for (int i = 0; i < count; i++) {
-			click(aiHelper, to.slotNumber, 1);
+			click(aiHelper, to.slotNumber, ClickType.PICKUP);
 		}
-		click(aiHelper, from.slotNumber, 0);
+		click(aiHelper, from.slotNumber, ClickType.PICKUP_ALL);
 		return getSlotContentCount(to) - oldCount;
 	}
 
 	protected int getSlotContentCount(Slot slot) {
-		return slot.getHasStack() ? slot.getStack().stackSize : 0;
+		return slot.getHasStack() ? slot.getStack().getMaxStackSize() : 0;
 	}
 
 	protected static int convertPlayerInventorySlot(int inventorySlot) {

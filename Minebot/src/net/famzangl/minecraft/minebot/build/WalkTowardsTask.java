@@ -42,7 +42,7 @@ import net.minecraft.util.math.BlockPos;
 public class WalkTowardsTask extends AITask {
 
 	private static final BlockSet CARPETS = new BlockSet(
-			Blocks.carpet);
+			Blocks.CARPET);
 
 	private static final BlockItemFilter CARPET = new BlockItemFilter(CARPETS);
 	private final BlockPos fromPos;

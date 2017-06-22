@@ -94,9 +94,9 @@ public class FurnaceBlockHandler extends RangeBlockHandler<FurnaceData> {
 			setBurnItem = burn == null ? null : new ItemWithSubtype(burn);
 			setFuelItem = fuel == null ? null : new ItemWithSubtype(fuel);
 			isFullBurn = burn != null
-					&& burn.getMaxStackSize() <= burn.stackSize;
+					&& burn.getMaxStackSize() <= burn.getMaxStackSize();
 			isFullFuel = fuel != null
-					&& fuel.getMaxStackSize() <= fuel.stackSize;
+					&& fuel.getMaxStackSize() <= fuel.getMaxStackSize();
 			setResultItem = result == null ? null : new ItemWithSubtype(result);
 			resultStackKnown = true;
 		}

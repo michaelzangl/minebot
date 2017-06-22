@@ -77,7 +77,7 @@ public enum RenderMode {
 		public int getColor(WorldData world, Chunk chunk, int dx, int dz) {
 			int height = chunk.getHeightValue(dx & 0xf, dz & 0xf) + 1;
 			while (height > 3
-					&& IGNORED_COVER_BLOCKS.contains(chunk.getBlock(dx, height, dz))) {
+					&& IGNORED_COVER_BLOCKS.contains(chunk.getBlockState(dx, height, dz))) {
 				height--;
 			}
 			BlockCuboid area = new BlockCuboid(new BlockPos(dx, 0, dz),

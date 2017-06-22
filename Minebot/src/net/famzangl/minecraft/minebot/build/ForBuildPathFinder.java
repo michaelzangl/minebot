@@ -40,7 +40,7 @@ public class ForBuildPathFinder extends MovePathFinder {
 
 	private static final int NEIGHBOURS_PER_DIRECTION = 6;
 	private static final BlockSet FENCES = new BlockSet(
-			Blocks.cobblestone_wall).unionWith(BlockSets.FENCE);
+			Blocks.COBBLESTONE_WALL).unionWith(BlockSets.FENCE);
 	/**
 	 * Task we want to prepare for.
 	 */
@@ -67,7 +67,7 @@ public class ForBuildPathFinder extends MovePathFinder {
 
 	@Override
 	protected boolean runSearch(BlockPos playerPosition) {
-		canBuildUp = helper.canSelectItem(new BlockItemFilter(Blocks.carpet));
+		canBuildUp = helper.canSelectItem(new BlockItemFilter(Blocks.CARPET));
 		return super.runSearch(playerPosition);
 	}
 

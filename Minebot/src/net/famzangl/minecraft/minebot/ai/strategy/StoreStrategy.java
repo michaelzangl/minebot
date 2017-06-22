@@ -29,6 +29,7 @@ import net.famzangl.minecraft.minebot.ai.task.WaitTask;
 import net.famzangl.minecraft.minebot.ai.task.inventory.PutInChestTask;
 import net.minecraft.client.gui.inventory.GuiChest;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
 
 /**
@@ -89,9 +90,9 @@ public class StoreStrategy extends PathFinderStrategy {
 					.getReachableForPos(currentPos);
 			for (final ChestData c : chests) {
 				boolean chestOpen = false;
-				ItemStack[] inventory = helper.getMinecraft().player.inventory.mainInventory;
-				for (int i = 0; i < inventory.length; i++) {
-					final ItemStack stack = inventory[i];
+				NonNullList<ItemStack> inventory = helper.getMinecraft().player.inventory.mainInventory;
+				for (int i = 0; i < inventory.size(); i++) {
+					final ItemStack stack = inventory.get(i);
 					if (c.couldPutItem(stack)) {
 						if (!chestOpen) {
 							addTask(new OpenChestTask(c.getSecondaryPos(),

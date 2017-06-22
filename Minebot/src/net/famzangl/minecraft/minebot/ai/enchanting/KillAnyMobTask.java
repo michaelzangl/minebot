@@ -29,7 +29,7 @@ public class KillAnyMobTask extends AITask {
 	public boolean isFinished(AIHelper aiHelper) {
 		final RayTraceResult position = aiHelper.getObjectMouseOver();
 		return position == null
-				|| position.typeOfHit != RayTraceResult.MovingObjectType.ENTITY;
+				|| position.typeOfHit != RayTraceResult.Type.ENTITY;
 	}
 
 	@Override

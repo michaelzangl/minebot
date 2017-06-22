@@ -41,7 +41,7 @@ public class ItemCountList {
 	public ItemCountList(InventoryPlayer from) {
 		for (ItemStack i : from.mainInventory) {
 			if (i != null && i.getItem() != null) {
-				this.add(new ItemWithSubtype(i), i.stackSize);
+				this.add(new ItemWithSubtype(i), i.getMaxStackSize());
 			}
 		}
 	}

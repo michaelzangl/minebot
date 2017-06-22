@@ -28,9 +28,10 @@ import net.famzangl.minecraft.minebot.ai.task.error.SelectTaskError;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.gui.inventory.GuiInventory;
 import net.minecraft.client.multiplayer.PlayerControllerMP;
+import net.minecraft.inventory.ClickType;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
-import net.minecraft.network.play.client.C16PacketClientStatus;
+import net.minecraft.network.play.client.CPacketClientStatus;
 
 /**
  * Gets the item on the hotbar out of the inventory. Currently only uses slot 5.
@@ -76,8 +77,8 @@ public class GetOnHotBarTask extends AITask {
 			aiHelper.getMinecraft()
 					.getNetHandler()
 					.addToSendQueue(
-							new C16PacketClientStatus(
-									C16PacketClientStatus.EnumState.OPEN_INVENTORY_ACHIEVEMENT));
+							new CPacketClientStatus(
+									CPacketClientStatus.State.OPEN_INVENTORY_ACHIEVEMENT));
 			aiHelper.getMinecraft().displayGuiScreen(
 					new GuiInventory(aiHelper.getMinecraft().player));
 			inventoryOpened = true;
@@ -97,9 +98,9 @@ public class GetOnHotBarTask extends AITask {
 		final PlayerControllerMP playerController = aiHelper.getMinecraft().playerController;
 		final int windowId = screen.inventorySlots.windowId;
 		final EntityPlayerSP player = aiHelper.getMinecraft().player;
-		playerController.windowClick(windowId, i, 0, 0, player);
-		playerController.windowClick(windowId, 35 + 5, 0, 0, player);
-		playerController.windowClick(windowId, i, 0, 0, player);
+		playerController.windowClick(windowId, i, 0, ClickType.PICKUP, player);
+		playerController.windowClick(windowId, 35 + 5, 0, ClickType.PICKUP, player);
+		playerController.windowClick(windowId, i, 0, ClickType.PICKUP, player);
 	}
 
 }

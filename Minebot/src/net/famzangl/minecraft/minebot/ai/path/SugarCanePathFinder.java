@@ -1,12 +1,12 @@
 package net.famzangl.minecraft.minebot.ai.path;
 
+import net.famzangl.minecraft.minebot.ai.BlockItemFilter;
 import net.famzangl.minecraft.minebot.ai.ClassItemFilter;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSet;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSets;
 import net.famzangl.minecraft.minebot.ai.task.place.DestroyBlockTask;
 import net.famzangl.minecraft.minebot.ai.task.place.PlaceBlockAtFloorTask;
 import net.minecraft.init.Blocks;
-import net.minecraft.item.ItemReed;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 
@@ -51,7 +51,8 @@ public class SugarCanePathFinder extends WalkingPathfinder {
 		if (SUGAR_CANE.isAt(world, top)) {
 			addTask(new DestroyBlockTask(top));
 		} else if (BlockSets.AIR.isAt(world, currentPos)) {
-			addTask(new PlaceBlockAtFloorTask(currentPos, new ClassItemFilter(ItemReed.class)));
+			//TODO: Test if this is the correct filter
+			addTask(new PlaceBlockAtFloorTask(currentPos, new BlockItemFilter(Blocks.REEDS)));
 		}
 	}
 }

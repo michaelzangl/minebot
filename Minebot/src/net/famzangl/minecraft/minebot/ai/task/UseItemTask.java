@@ -55,7 +55,7 @@ public abstract class UseItemTask extends AITask {
 
 			final RayTraceResult position = aiHelper.getObjectMouseOver();
 			if (position == null
-					|| position.typeOfHit != RayTraceResult.MovingObjectType.BLOCK) {
+					|| position.typeOfHit != RayTraceResult.Type.BLOCK) {
 				notFacingBlock(aiHelper);
 				return;
 			}

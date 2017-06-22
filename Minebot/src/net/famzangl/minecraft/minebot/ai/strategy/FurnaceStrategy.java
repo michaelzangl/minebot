@@ -38,6 +38,7 @@ import net.famzangl.minecraft.minebot.ai.task.inventory.TakeResultItem;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.inventory.GuiFurnace;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
 
 public class FurnaceStrategy extends PathFinderStrategy {
@@ -257,9 +258,9 @@ public class FurnaceStrategy extends PathFinderStrategy {
 
 		private void addFurnaceTasks(final FurnaceData f) {
 			ArrayList<AITask> furnaceTasks = new ArrayList<AITask>();
-			ItemStack[] mainInventory = helper.getMinecraft().player.inventory.mainInventory;
-			for (int i = 0; i < mainInventory.length; i++) {
-				ItemStack stack = mainInventory[i];
+			NonNullList<ItemStack> mainInventory = helper.getMinecraft().player.inventory.mainInventory;
+			for (int i = 0; i < mainInventory.size(); i++) {
+				ItemStack stack = mainInventory.get(i);
 				if (list.couldPutItem(f, stack)) {
 					furnaceTasks.add(new MoveToBurnable(i, list, f));
 				}

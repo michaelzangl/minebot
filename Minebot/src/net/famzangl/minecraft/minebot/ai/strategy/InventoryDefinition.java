@@ -76,13 +76,13 @@ public class InventoryDefinition {
 
 	public InventoryDefinition(InventoryPlayer player) {
 		for (int i = 0; i < 36; i++) {
-			ItemStack stack = player.mainInventory[i];
+			ItemStack stack = player.mainInventory.get(i);
 			if (stack == null || stack.getItem() == null) {
 				continue;
 			}
 
 			stack.getItem();
-			slots.add(new InventorySlot(i, stack.stackSize, Item
+			slots.add(new InventorySlot(i, stack.getMaxStackSize(), Item
 					.getIdFromItem(stack.getItem()),
 					stack.getHasSubtypes() ? stack.getItemDamage() : -1));
 		}
