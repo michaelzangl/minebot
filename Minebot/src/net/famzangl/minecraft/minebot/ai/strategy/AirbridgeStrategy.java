@@ -215,11 +215,11 @@ public class AirbridgeStrategy extends TaskStrategy {
 				} else {
 					// cannot handle this.
 					AIChatController.addChatLine("Please stand on a half slab.");
+				}
 				
 				LOGGER.info(MARKER_PROGRESS,
 						"No valid half slab found. Required area is: "
 								+ getSidewardsArea(buildPos.add(0, -1, 0)));
-				}
 			}
 			return;
 		}

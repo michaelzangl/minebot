@@ -33,7 +33,6 @@ import net.famzangl.minecraft.minebot.ai.input.KeyboardInputController;
 import net.famzangl.minecraft.minebot.ai.input.KeyboardInputController.KeyType;
 import net.famzangl.minecraft.minebot.ai.net.NetworkHelper;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockBounds;
-import net.famzangl.minecraft.minebot.ai.path.world.BlockBoundsCache;
 import net.famzangl.minecraft.minebot.ai.path.world.Pos;
 import net.famzangl.minecraft.minebot.ai.path.world.WorldData;
 import net.famzangl.minecraft.minebot.ai.strategy.AIStrategy;
@@ -99,7 +98,6 @@ public abstract class AIHelper {
 	 * A world that never gets a delta applied to it.
 	 */
 	private static WorldData minecraftWorld;
-	private final Random rand = new Random();
 
 	public final BuildManager buildManager = new BuildManager();
 	private boolean objectMouseOverInvalidated;

@@ -44,7 +44,7 @@ public class WorldData {
 					final int ly = y & 15;
 					final int lz = z & 15;
 					//TODO: Make this faster again
-					Block.BLOCK_STATE_IDS.get(extendedblockstorage.get(lx, ly, lz));
+					blockId = Block.BLOCK_STATE_IDS.get(extendedblockstorage.get(lx, ly, lz));
 				}
 			}
 
