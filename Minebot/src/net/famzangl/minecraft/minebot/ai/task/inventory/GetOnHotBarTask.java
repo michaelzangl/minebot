@@ -75,8 +75,8 @@ public class GetOnHotBarTask extends AITask {
 			}
 		} else if (!inventoryOpened && aiHelper.hasItemInInvetory(itemFiler)) {
 			aiHelper.getMinecraft()
-					.getNetHandler()
-					.addToSendQueue(
+					.getConnection()
+					.sendPacket(
 							new CPacketClientStatus(
 									CPacketClientStatus.State.OPEN_INVENTORY_ACHIEVEMENT));
 			aiHelper.getMinecraft().displayGuiScreen(

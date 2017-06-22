@@ -25,6 +25,7 @@ import net.famzangl.minecraft.minebot.ai.tools.rate.OrRater;
 import net.famzangl.minecraft.minebot.ai.tools.rate.Rater;
 import net.famzangl.minecraft.minebot.settings.MinebotSettings;
 import net.minecraft.enchantment.Enchantment;
+import net.minecraft.init.Enchantments;
 import net.minecraft.item.Item;
 import net.minecraft.item.Item.ToolMaterial;
 import net.minecraft.item.ItemAxe;
@@ -153,13 +154,13 @@ public class ToolRater {
 		}
 	}
 
-	private static final Hashtable<String, Integer> ENCHANTMENTS = new Hashtable<String, Integer>();
+	private static final Hashtable<String, Enchantment> ENCHANTMENTS = new Hashtable<String, Enchantment>();
 
 	static {
-		ENCHANTMENTS.put("efficiency", Enchantment.efficiency.effectId);
-		ENCHANTMENTS.put("fortune", Enchantment.fortune.effectId);
-		ENCHANTMENTS.put("unbreaking", Enchantment.unbreaking.effectId);
-		ENCHANTMENTS.put("silk_touch", Enchantment.silkTouch.effectId);
+		ENCHANTMENTS.put("efficiency", Enchantments.EFFICIENCY);
+		ENCHANTMENTS.put("fortune", Enchantments.FORTUNE);
+		ENCHANTMENTS.put("unbreaking", Enchantments.UNBREAKING);
+		ENCHANTMENTS.put("silk_touch", Enchantments.SILK_TOUCH);
 	}
 
 	private static final Hashtable<String, ItemFilter> FILTERS = new Hashtable<String, ItemFilter>();
@@ -229,7 +230,7 @@ public class ToolRater {
 			return new MatchesRater(name, values);
 		}
 
-		Integer enchantmentId = ENCHANTMENTS.get(name);
+		Enchantment enchantmentId = ENCHANTMENTS.get(name);
 		if (enchantmentId != null) {
 			return new MultiplyEnchantmentRater(enchantmentId, name, values);
 		}

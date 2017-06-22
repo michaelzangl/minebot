@@ -15,7 +15,7 @@ public class MatchesRater extends Rater {
 				&& forBlockAndMeta >= 0
 				&& item.getItem() != null
 				&& item.getItem().getStrVsBlock(item,
-						Block.getBlockById(forBlockAndMeta >> 4)) > 1;
+						Block.getStateById(forBlockAndMeta >> 4)) > 1;
 	}
 
 	@Override

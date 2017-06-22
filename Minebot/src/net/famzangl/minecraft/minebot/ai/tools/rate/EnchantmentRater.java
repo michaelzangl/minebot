@@ -1,13 +1,14 @@
 package net.famzangl.minecraft.minebot.ai.tools.rate;
 
 import net.famzangl.minecraft.minebot.ai.path.world.BlockFloatMap;
+import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.item.ItemStack;
 
 public class EnchantmentRater extends Rater {
-	protected final int enchantmentId;
+	protected final Enchantment enchantmentId;
 
-	public EnchantmentRater(int enchantmentId, String name,
+	public EnchantmentRater(Enchantment enchantmentId, String name,
 			BlockFloatMap values) {
 		super(name, values);
 		this.enchantmentId = enchantmentId;

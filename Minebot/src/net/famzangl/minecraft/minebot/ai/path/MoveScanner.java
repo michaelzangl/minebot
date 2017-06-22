@@ -31,12 +31,14 @@ import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.PathFinderField;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSet;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSets;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.monster.EntityCreeper;
 import net.minecraft.entity.monster.EntitySkeleton;
 import net.minecraft.entity.monster.EntitySpider;
 import net.minecraft.entity.monster.EntityZombie;
 import net.minecraft.util.ClassInheritanceMultiMap;
+import net.minecraft.world.chunk.BlockStateContainer;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.storage.ExtendedBlockStorage;
 
@@ -120,15 +122,18 @@ public class MoveScanner {
 		 */
 		public void scanBlocks(Chunk chunk, int chunkY, ScannerPolicy policy) {
 			ExtendedBlockStorage storage = chunk.getBlockStorageArray()[chunkY];
-			char[] array = storage.getData();
+			
+			BlockStateContainer data = storage.getData();
+//			char[] array = storage.getData();
 			for (int y = 0; y < 16; y++) {
 				for (int z = 0; z < 16; z++) {
 					int oResult = local(0, y, z);
-					int oFrom = (y << 8 | z << 4);
+//					int oFrom = (y << 8 | z << 4);
 					for (int x = 0; x < 16; x ++) {
-						int data = array[oFrom + x];
-						
-						blocks[oResult + x] = (short) (policy.getPositionFlags(data) | DEFAULT_POSITION_FLAGS);
+//						int data = array[oFrom + x];
+//						
+//						blocks[oResult + x] = (short) (policy.getPositionFlags(data) | DEFAULT_POSITION_FLAGS);
+						blocks[oResult + x] = (short) (policy.getPositionFlags(data.get(x, y, z)) | DEFAULT_POSITION_FLAGS);
 					}
 				}
 			}
@@ -601,6 +606,11 @@ public class MoveScanner {
 				flag |= BLOCK_IS_SAFE_SIDE;
 			}
 			return flag;
+		}
+
+		public int getPositionFlags(IBlockState iBlockState) {
+			iBlockState.toI
+			return 0;
 		}
 
 		public int getDangerDistanceFor(Entity e) {
