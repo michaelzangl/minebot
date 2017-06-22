@@ -44,15 +44,17 @@ import net.famzangl.minecraft.minebot.ai.strategy.StackStrategy;
 import net.famzangl.minecraft.minebot.ai.strategy.StrategyStack;
 import net.famzangl.minecraft.minebot.ai.strategy.WalkTowardsStrategy;
 import net.famzangl.minecraft.minebot.ai.tools.ToolRater;
+import net.minecraft.command.CommandException;
 import net.minecraft.command.CommandResultStats.Type;
+import net.minecraft.command.EntitySelector;
 import net.minecraft.command.ICommandSender;
-import net.minecraft.command.PlayerSelector;
 import net.minecraft.entity.Entity;
 import net.minecraft.nbt.JsonToNBT;
 import net.minecraft.nbt.NBTException;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.Vec3;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.world.World;
 
@@ -145,60 +147,71 @@ public class MineScript {
 	public Object getEntities(String entityDescr, Object nbtO)
 			throws ScriptException {
 		final AIHelper helper = waitForTick();
-		List<Entity> entities = PlayerSelector.matchEntities(
-				new ICommandSender() {
-					@Override
-					public void setCommandStat(Type type, int amount) {
-						throw new UnsupportedOperationException();
-					}
+		List<Entity> entities;
+		try {
+			entities = EntitySelector.matchEntities(
+					new ICommandSender() {
+						@Override
+						public void setCommandStat(Type type, int amount) {
+							throw new UnsupportedOperationException();
+						}
 
-					@Override
-					public boolean sendCommandFeedback() {
-						throw new UnsupportedOperationException();
-					}
+						@Override
+						public boolean sendCommandFeedback() {
+							throw new UnsupportedOperationException();
+						}
 
-					@Override
-					public Vec3 getPositionVector() {
-						throw new UnsupportedOperationException();
-					}
+						@Override
+						public Vec3d getPositionVector() {
+							throw new UnsupportedOperationException();
+						}
 
-					@Override
-					public BlockPos getPosition() {
-						return helper.getMinecraft().player.getPosition();
-					}
+						@Override
+						public BlockPos getPosition() {
+							return helper.getMinecraft().player.getPosition();
+						}
 
-					@Override
-					public String getName() {
-						throw new UnsupportedOperationException();
-					}
+						@Override
+						public String getName() {
+							throw new UnsupportedOperationException();
+						}
 
-					@Override
-					public World getEntityWorld() {
-						return helper.getWorld().getBackingWorld();
-					}
+						@Override
+						public World getEntityWorld() {
+							return helper.getWorld().getBackingWorld();
+						}
 
-					@Override
-					public ITextComponent getDisplayName() {
-						throw new UnsupportedOperationException();
-					}
+						@Override
+						public ITextComponent getDisplayName() {
+							throw new UnsupportedOperationException();
+						}
 
-					@Override
-					public Entity getCommandSenderEntity() {
-						return helper.getMinecraft().player;
-					}
+						@Override
+						public Entity getCommandSenderEntity() {
+							return helper.getMinecraft().player;
+						}
 
-					@Override
-					public boolean canCommandSenderUseCommand(int permLevel,
-							String commandName) {
-						return true;
-					}
+						@Override
+						public void sendMessage(ITextComponent component) {
+							// Only called for errors.
+							throw new RuntimeException(component.toString());
+							
+						}
 
-					@Override
-					public void addChatMessage(ITextComponent message) {
-						// Only called for errors.
-						throw new RuntimeException(message.toString());
-					}
-				}, entityDescr, Entity.class);
+						@Override
+						public boolean canUseCommand(int permLevel, String commandName) {
+							return true;
+						}
+
+						@Override
+						public MinecraftServer getServer() {
+							// TODO Auto-generated method stub
+							return null;
+						}
+					}, entityDescr, Entity.class);
+		} catch (CommandException e2) {
+			throw new ScriptException(e2);
+		}
 
 		NBTTagCompound nbt = null;
 		if (nbtO != null) {

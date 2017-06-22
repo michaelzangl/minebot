@@ -72,7 +72,8 @@ import net.famzangl.minecraft.minebot.build.commands.CommandStepNext;
 import net.famzangl.minecraft.minebot.build.commands.CommandStepPlace;
 import net.famzangl.minecraft.minebot.build.commands.CommandStepWalk;
 import net.minecraft.client.Minecraft;
-import net.minecraft.util.ChatComponentText;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.TextComponentString;
 
 /**
  * Controlls the AI from a chat line.
@@ -161,7 +162,7 @@ public class AIChatController {
 
 	private static void addToChat(String string) {
 		Minecraft.getMinecraft().player
-				.addChatMessage(new ChatComponentText(string));
+				.sendMessage(new TextComponentString(string));
 	}
 
 	public static <T> void addToChatPaged(String title, int page, List<T> data,

@@ -32,7 +32,8 @@ public class RecordingWorld extends WorldWithDelta {
 	private int getTimeToDestroy(BlockPos blockPos, int blockWithMeta) {
 		Block block = Block.getBlockById(blockWithMeta >> 4);
 		//how much damage to give the block per tick. The block is destroyed on damage >= 1;
-		float hardness = block.getPlayerRelativeBlockHardness(blockBreaker, getBackingWorld(), blockPos);
+		// TODO: Use real block state
+		float hardness = block.getPlayerRelativeBlockHardness(block.getDefaultState(), blockBreaker, getBackingWorld(), blockPos);
 		System.out.println("TIME to destroy block at " + blockPos + ": " + 1 / hardness);
 		return (int) Math.round(1 / hardness) + TIME_TO_FACE;
 	}

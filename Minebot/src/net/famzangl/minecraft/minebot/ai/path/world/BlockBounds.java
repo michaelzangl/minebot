@@ -3,6 +3,7 @@ package net.famzangl.minecraft.minebot.ai.path.world;
 import net.famzangl.minecraft.minebot.ai.utils.RandUtils;
 import net.minecraft.block.Block;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 
@@ -28,13 +29,13 @@ public class BlockBounds {
 		this.maxZ = maxZ;
 	}
 	
-	public BlockBounds(Block block) {
-		this.minX = block.getBlockBoundsMinX();
-		this.maxX = block.getBlockBoundsMaxX();
-		this.minY = block.getBlockBoundsMinY();
-		this.maxY = block.getBlockBoundsMaxY();
-		this.minZ = block.getBlockBoundsMinZ();
-		this.maxZ = block.getBlockBoundsMaxZ();
+	public BlockBounds(AxisAlignedBB axisAlignedBB) {
+		this.minX = axisAlignedBB.minX;
+		this.maxX = axisAlignedBB.maxX;
+		this.minY = axisAlignedBB.minY;
+		this.maxY = axisAlignedBB.maxY;
+		this.minZ = axisAlignedBB.minZ;
+		this.maxZ = axisAlignedBB.maxZ;
 	}
 
 	/**

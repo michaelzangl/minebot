@@ -10,12 +10,13 @@ import org.apache.logging.log4j.MarkerManager;
 import net.famzangl.minecraft.minebot.ai.command.BlockWithData;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.init.Biomes;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.WorldType;
-import net.minecraft.world.biome.BiomeGenBase;
+import net.minecraft.world.biome.Biome;
 
 public class BlockBoundsCache {
 	private static final Marker MARKER_BOUNDS_PROBLEM = MarkerManager
@@ -94,23 +95,17 @@ public class BlockBoundsCache {
 			}
 
 			@Override
-			public BiomeGenBase getBiomeGenForCoords(BlockPos pos) {
-				throw new UnsupportedOperationException();
-			}
-
-			@Override
-			public boolean extendedLevelsInChunkCache() {
-				throw new UnsupportedOperationException();
-			}
-
-			@Override
 			public boolean isSideSolid(BlockPos pos, EnumFacing side,
 					boolean _default) {
 				throw new UnsupportedOperationException();
 			}
-		};
-		block.setBlockBoundsBasedOnState(world, Pos.ZERO);
 
-		return new BlockBounds(block);
+			@Override
+			public Biome getBiome(BlockPos pos) {
+				return Biomes.DEFAULT;
+			}
+		};
+
+		return new BlockBounds(block.getBoundingBox(state, world, Pos.ZERO));
 	}
 }

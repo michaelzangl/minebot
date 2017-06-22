@@ -31,6 +31,7 @@ import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.PathFinderField;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSet;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSets;
+import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.monster.EntityCreeper;
@@ -609,8 +610,7 @@ public class MoveScanner {
 		}
 
 		public int getPositionFlags(IBlockState iBlockState) {
-			iBlockState.toI
-			return 0;
+			return Block.BLOCK_STATE_IDS.get(iBlockState);
 		}
 
 		public int getDangerDistanceFor(Entity e) {

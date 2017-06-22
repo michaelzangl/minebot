@@ -33,6 +33,7 @@ import net.famzangl.minecraft.minebot.ai.input.KeyboardInputController;
 import net.famzangl.minecraft.minebot.ai.input.KeyboardInputController.KeyType;
 import net.famzangl.minecraft.minebot.ai.net.NetworkHelper;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockBounds;
+import net.famzangl.minecraft.minebot.ai.path.world.BlockBoundsCache;
 import net.famzangl.minecraft.minebot.ai.path.world.Pos;
 import net.famzangl.minecraft.minebot.ai.path.world.WorldData;
 import net.famzangl.minecraft.minebot.ai.strategy.AIStrategy;
@@ -330,7 +331,11 @@ public abstract class AIHelper {
 			pitchInfluence = Math.min(pitchInfluence, clamp);
 			// TODO: Make this linear?
 
-			getMinecraft().player.setAngles(yawChange / 0.15f * yawInfluence,
+			getMinecraft().player.setPositionAndRotation(
+					getMinecraft().player.posX,
+					getMinecraft().player.posY,
+					getMinecraft().player.posZ,
+					yawChange / 0.15f * yawInfluence,
 					-pitchChange / 0.15f * pitchInfluence);
 			invalidateObjectMouseOver();
 
@@ -471,7 +476,13 @@ public abstract class AIHelper {
 			final int blockMetadata = getWorld().getBlockIdWithMeta(x, y, z) & 0xf;
 			maxY = (blockMetadata & 0x8) == 0 ? 0.5 : 1;
 		} else {
-			maxY = block.getBlockBoundsMaxY();
+			// TODO: Provide with the right block state
+			//Use BlockBoundsCache.getBounds(blockWithMeta);
+			try {
+				maxY = block.getBoundingBox(null, null, null).maxY;
+			}catch (NullPointerException e) {
+				maxY = 1;
+			}
 		}
 
 		return y - 1 + maxY;
@@ -799,9 +810,9 @@ public abstract class AIHelper {
 	 * Presses the attack key in the next game tick.
 	 */
 	public void overrideAttack() {
-		if (getMinecraft().player.isUsingItem()) {
-			LOGGER.warn("WARNING: Player is currently using an item, but attack was requested.");
-		}
+//		if (getMinecraft().player.useisUsingItem()) {
+//			LOGGER.warn("WARNING: Player is currently using an item, but attack was requested.");
+//		}
 		overrideKey(KeyType.ATTACK);
 	}
 

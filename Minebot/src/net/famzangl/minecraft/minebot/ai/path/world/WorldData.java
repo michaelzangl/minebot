@@ -9,6 +9,7 @@ import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.chunk.Chunk;
@@ -42,8 +43,8 @@ public class WorldData {
 					final int lx = x & 15;
 					final int ly = y & 15;
 					final int lz = z & 15;
-					blockId = extendedblockstorage.getData()[ly << 8 | lz << 4
-							| lx] & 0xffff;
+					//TODO: Make this faster again
+					Block.BLOCK_STATE_IDS.get(extendedblockstorage.get(lx, ly, lz));
 				}
 			}
 
@@ -244,13 +245,10 @@ public class WorldData {
 			// TODO: Replace this.
 			WorldClient world = getBackingWorld();
 			BlockPos pos = new BlockPos(x, y, z);
-			Block block = world.getBlockState(pos).getBlock();
-			block.setBlockBoundsBasedOnState(world, pos);
+			IBlockState state = world.getBlockState(pos);
+			AxisAlignedBB bounds = state.getBoundingBox(world, pos);
 
-			return new BlockBounds(block.getBlockBoundsMinX(),
-					block.getBlockBoundsMaxX(), block.getBlockBoundsMinY(),
-					block.getBlockBoundsMaxY(), block.getBlockBoundsMinZ(),
-					block.getBlockBoundsMaxZ());
+			return new BlockBounds(bounds);
 		}
 		return res;
 	}
