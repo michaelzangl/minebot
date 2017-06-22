@@ -274,10 +274,10 @@ public class AIController extends AIHelper implements IAIControllable {
 		}
 		int y = 10;
 		for (String s : str) {
-			getMinecraft().fontRendererObj.drawStringWithShadow(
+			getMinecraft().fontRenderer.drawStringWithShadow(
 					s,
 					res.getScaledWidth()
-							- getMinecraft().fontRendererObj.getStringWidth(s)
+							- getMinecraft().fontRenderer.getStringWidth(s)
 							- 10, y, 16777215);
 			y += 15;
 		}

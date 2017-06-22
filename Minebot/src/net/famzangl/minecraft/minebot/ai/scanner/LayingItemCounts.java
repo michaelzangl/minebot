@@ -36,7 +36,7 @@ public class LayingItemCounts implements ChunkCubeProvider<BlockCubeCounter> {
 						chunkStartZ, chunkStartX + 16, chunkStartY + 16,
 						chunkStartZ + 16));
 		for (EntityItem i : items) {
-			ItemStack item = i.getEntityItem();
+			ItemStack item = i.getItem();
 			if (item == null) {
 				continue;
 			}

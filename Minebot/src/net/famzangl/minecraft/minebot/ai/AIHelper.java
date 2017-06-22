@@ -274,7 +274,7 @@ public abstract class AIHelper {
 	}
 	
 	public boolean isFacing(Vec3d vec) {
-		return isFacing(vec.xCoord, vec.yCoord, vec.zCoord);
+		return isFacing(vec.x, vec.y, vec.z);
 	}
 
 	public boolean isFacing(double x, double y, double z) {
@@ -282,7 +282,7 @@ public abstract class AIHelper {
 	}
 
 	public boolean face(Vec3d vec) {
-		return face(vec.xCoord, vec.yCoord, vec.zCoord);
+		return face(vec.x, vec.y, vec.z);
 	}
 
 	/**
@@ -405,7 +405,7 @@ public abstract class AIHelper {
 		if (!isFacingBlock(x, y, z, blockSide)) {
 			return false;
 		} else {
-			final double fy = getObjectMouseOver().hitVec.yCoord - y;
+			final double fy = getObjectMouseOver().hitVec.y - y;
 			return half != BlockHalf.LOWER_HALF && fy > .5
 					|| half != BlockHalf.UPPER_HALF && fy <= .5;
 		}
@@ -876,8 +876,9 @@ public abstract class AIHelper {
 		return getMinecraft().world.getEntitiesInAABBexcluding(
 				getMinecraft().getRenderViewEntity(),
 				getMinecraft().getRenderViewEntity().getEntityBoundingBox()
-						.addCoord(-dist, -dist, -dist)
-						.addCoord(dist, dist, dist).expand(1, 1, 1), selector);
+						.expand(-dist, -dist, -dist)
+						.expand(dist, dist, dist)
+						.grow(1), selector);
 	}
 
 	/**
@@ -988,7 +989,7 @@ public abstract class AIHelper {
 					+ "; d = " + dx + "," + dz + "; walk: " + same + ","
 					+ strafe);
 			final MovementInput movement = new MovementInput();
-			movement.moveForward = (float) (speed * same);
+			movement.field_192832_b = (float) (speed * same);
 			movement.moveStrafe = (float) (speed * strafe);
 			movement.jump = jump;
 			overrideMovement(movement);
@@ -1088,7 +1089,7 @@ public abstract class AIHelper {
 		if (storage == null) {
 			return 0;
 		} else {
-			return storage.getExtBlocklightValue(pos.getX() & 15,
+			return storage.getBlockLight(pos.getX() & 15,
 					pos.getY() & 15, pos.getZ() & 15);
 		}
 	}

@@ -4,7 +4,7 @@ buildscript {
         maven { url = "http://files.minecraftforge.net/maven" }
     }
     dependencies {
-        classpath 'net.minecraftforge.gradle:ForgeGradle:2.2-SNAPSHOT'
+        classpath 'net.minecraftforge.gradle:ForgeGradle:2.3-SNAPSHOT'
     }
 }
 
@@ -12,23 +12,26 @@ apply plugin: 'net.minecraftforge.gradle.forge'
 compileJava.options.encoding = 'UTF-8'
 version='0.5'
 group = "de.michaelzangl.minebot"
-archivesBaseName = "minebot"
+archivesBaseName = project.projectDir.name
+
+sourceCompatibility = targetCompatibility = '1.8'
+compileJava {
+    sourceCompatibility = targetCompatibility = '1.8'
+}
+
 
 minecraft {
-    version = "1.11.2-13.20.0.2315"
-    runDir = "eclipse"
+    version = "1.12-14.21.0.2344"
+    runDir = "run"
 
     // the mappings can be changed at any time, and must be in the following format.
     // snapshot_YYYYMMDD   snapshot are built nightly.
     // stable_#            stables are built at the discretion of the MCP team.
     // Use non-default mappings at your own risk. they may not allways work.
     // simply re-run your setup task after changing the mappings to update your workspace.
-    mappings = "snapshot_20161220"
+    mappings = "snapshot_20170617"
 }
 
-
-version = "1.0"
-archivesBaseName = project.projectDir.name
 sourceSets.main{
     java{
         srcDirs 'src'

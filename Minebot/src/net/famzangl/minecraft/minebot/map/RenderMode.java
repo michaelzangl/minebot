@@ -104,14 +104,14 @@ public enum RenderMode {
 				--height;
 				state = chunk.getBlockState(new BlockPos(dx, height, dz));
 			} while ((GLOBAL_COVER_BLACKLIST.contains(state.getBlock()) || state
-					.getBlock().getMapColor(state) == MapColor.AIR)
+					.getBlock().getMapColor(state, world.getBackingWorld(), new BlockPos(dx, height, dz)) == MapColor.AIR)
 					&& height > 0);
 
 			if (state.getBlock() == Blocks.SANDSTONE || state.getBlock() == Blocks.SANDSTONE_STAIRS) {
 				return 0xffb4ad8a;
 			}
 			
-			MapColor color = (state.getBlock().getMapColor(state));
+			MapColor color = (state.getBlock().getMapColor(state, world.getBackingWorld(), new BlockPos(dx, height, dz)));
 			return getColor(color);
 		}
 

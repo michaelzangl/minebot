@@ -78,7 +78,7 @@ public abstract class FaceInteractStrategy extends AIStrategy {
 			} else {
 				ticksSlow = 0;
 			}
-			movement.moveForward = 1;
+			movement.field_192832_b = 1;
 			helper.overrideMovement(movement);
 			ticksRun++;
 			if (ticksSlow > 3 * 20 || ticksRun > 20 * 20) {

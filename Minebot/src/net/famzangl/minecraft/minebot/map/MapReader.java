@@ -181,16 +181,16 @@ public class MapReader implements ChunkListener {
 		}
 
 		public void renderAt(WorldData world, Chunk chunk, int dx, int dz) {
-			int color = mode.getColor(world, chunk, chunk.xPosition * 16 + dx,
-					chunk.zPosition * 16 + dz);
+			int color = mode.getColor(world, chunk, chunk.x * 16 + dx,
+					chunk.z * 16 + dz);
 			getPaintingImage().setRGB(
-					-pos.topLeftX + chunk.xPosition * 16 + dx,
-					-pos.topLeftZ + chunk.zPosition * 16 + dz, color);
+					-pos.topLeftX + chunk.x * 16 + dx,
+					-pos.topLeftZ + chunk.z * 16 + dz, color);
 		}
 
 		public void renderChunk(WorldData world, Chunk chunk) {
-			int chunkX = chunk.xPosition * 16;
-			int chunkZ = chunk.zPosition * 16;
+			int chunkX = chunk.x * 16;
+			int chunkZ = chunk.z * 16;
 
 			byte[] pixels = ((DataBufferByte) getPaintingImage().getRaster()
 					.getDataBuffer()).getData();
@@ -591,19 +591,19 @@ public class MapReader implements ChunkListener {
 			if (!wcm.shouldStillRender()) {
 				return;
 			}
-			ImagePos pos = new ImagePos(chunk.xPosition * 16,
-					chunk.zPosition * 16);
+			ImagePos pos = new ImagePos(chunk.x * 16,
+					chunk.z * 16);
 
 			MultiModeImage image = getImage(pos);
 			int hash = getChunkHash(chunk);
-			if (!image.isValidForChunkHash(chunk.xPosition, chunk.zPosition,
+			if (!image.isValidForChunkHash(chunk.x, chunk.z,
 					hash)) {
 				System.err.println("Abort rendering: Chunk hash has changed.");
-				if (!wcm.chunkHashChanged(chunk.xPosition, chunk.zPosition)) {
+				if (!wcm.chunkHashChanged(chunk.x, chunk.z)) {
 					return;
 				}
 			}
-			image.setChunkHash(chunk.xPosition, chunk.zPosition, hash);
+			image.setChunkHash(chunk.x, chunk.z, hash);
 
 			WorldData world = registeredHelper.getWorld();
 			image.renderChunk(world, chunk);
@@ -739,7 +739,7 @@ public class MapReader implements ChunkListener {
 
 		for (ChunkPos d : chunkQueue.tickAndGet()) {
 			Chunk chunkFromChunkCoords = helper.getMinecraft().world
-					.getChunkFromChunkCoords(d.chunkXPos, d.chunkZPos);
+					.getChunkFromChunkCoords(d.x, d.z);
 			if (chunkFromChunkCoords != null) {
 				chunksToProcess.offer(chunkFromChunkCoords);
 			}

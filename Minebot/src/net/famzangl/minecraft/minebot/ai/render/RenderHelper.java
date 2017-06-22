@@ -19,9 +19,9 @@ package net.famzangl.minecraft.minebot.ai.render;
 import org.lwjgl.opengl.GL11;
 
 import net.famzangl.minecraft.minebot.ai.AIHelper;
+import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.VertexBuffer;
 import net.minecraft.client.renderer.vertex.VertexFormat;
 import net.minecraft.client.renderer.vertex.VertexFormatElement;
 import net.minecraft.entity.Entity;
@@ -56,7 +56,7 @@ public class RenderHelper {
 
 		preRender();
         Tessellator tessellator = Tessellator.getInstance();
-        VertexBuffer worldrenderer = tessellator.getBuffer();
+        BufferBuilder worldrenderer = tessellator.getBuffer();
         worldrenderer.setTranslation(-x, -y, -z);
         worldrenderer.begin(GL11.GL_QUADS, VF);
        // worldrenderer.markDirty();
@@ -89,7 +89,7 @@ public class RenderHelper {
     }
 	protected void renderEnd() {
 		final Tessellator tessellator = Tessellator.getInstance();
-		VertexBuffer worldrenderer = tessellator.getBuffer();
+		BufferBuilder worldrenderer = tessellator.getBuffer();
 		tessellator.draw();
 		worldrenderer.setTranslation(0.0D, 0.0D, 0.0D);
 		postRender();
@@ -97,12 +97,12 @@ public class RenderHelper {
 
 	protected void renderMarker(BlockPos m, float r, float g, float b, float a) {
 		final Tessellator tessellator = Tessellator.getInstance();
-		VertexBuffer renderer = tessellator.getBuffer();
+		BufferBuilder renderer = tessellator.getBuffer();
 		renderer.color(r, g, b, a);
 		renderMarkerP(renderer, m.getX(), m.getY(), m.getZ());
 	}
 
-	private void renderMarkerP(VertexBuffer worldRenderer, int x, int y, int z) {
+	private void renderMarkerP(BufferBuilder worldRenderer, int x, int y, int z) {
 		worldRenderer.pos(x + MIN, y + MAX, z + MIN);
 		worldRenderer.pos(x + MIN, y + MAX, z + MAX);
 		worldRenderer.pos(x + MAX, y + MAX, z + MAX);

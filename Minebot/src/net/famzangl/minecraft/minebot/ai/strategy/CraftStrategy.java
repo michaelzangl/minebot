@@ -20,9 +20,11 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -103,10 +105,11 @@ public class CraftStrategy extends PathFinderStrategy {
 					// Width is the first integer field.
 					int width = PrivateFieldUtils.getField(shapedRecipes, ShapedOreRecipe.class, Integer.TYPE).getInt(shapedRecipes);
 					for (int x = 0; x < width; x++) {
-						int height = shapedRecipes.getRecipeSize() / width;
+						int height = shapedRecipes.getHeight();
 						for (int y = 0; y < height; y++) {
-							Object itemStack = shapedRecipes.getInput()[x + y
-									* width];
+							//TODO: Test
+							Object itemStack = shapedRecipes.getIngredients().get(x + y
+									* width);
 							if (itemStack instanceof ItemStack) {
 								this.slots[x][y] = new ItemWithSubtype(
 										(ItemStack) itemStack);
@@ -213,21 +216,19 @@ public class CraftStrategy extends PathFinderStrategy {
 		}
 
 		public List<CraftingPossibility> getPossibility() {
-			List<IRecipe> recipes = CraftingManager.getInstance()
-					.getRecipeList();
-			List<CraftingPossibility> possible = new ArrayList<CraftingPossibility>();
-
-			for (IRecipe recipe : recipes) {
-				ItemStack out = recipe.getRecipeOutput();
-				if (out != null && new ItemWithSubtype(out).equals(item)) {
-					try {
-						possible.add(new CraftingPossibility(recipe));
-					} catch (IllegalArgumentException e) {
-						System.err.println("Cannot craft:" + e.getMessage());
-					}
-				}
+			try {
+				return CraftingManager.REGISTRY.getKeys().stream()
+						.map(id -> CraftingManager.REGISTRY.getObject(id))
+						.filter(recipe -> {
+							ItemStack out = recipe.getRecipeOutput();
+							return out != null && new ItemWithSubtype(out).equals(item);
+						})
+						.map(CraftingPossibility::new)
+						.collect(Collectors.toList());
+			} catch (IllegalArgumentException e) {
+				System.err.println("Cannot craft:" + e.getMessage());
+				return Collections.emptyList();
 			}
-			return possible;
 		}
 
 		@Override

@@ -74,11 +74,11 @@ public class GetOnHotBarTask extends AITask {
 				break;
 			}
 		} else if (!inventoryOpened && aiHelper.hasItemInInvetory(itemFiler)) {
-			aiHelper.getMinecraft()
-					.getConnection()
-					.sendPacket(
-							new CPacketClientStatus(
-									CPacketClientStatus.State.OPEN_INVENTORY_ACHIEVEMENT));
+//			aiHelper.getMinecraft()
+//					.getConnection()
+//					.sendPacket(
+//							new CPacketClientStatus(
+//									CPacketClientStatus.State.));
 			aiHelper.getMinecraft().displayGuiScreen(
 					new GuiInventory(aiHelper.getMinecraft().player));
 			inventoryOpened = true;

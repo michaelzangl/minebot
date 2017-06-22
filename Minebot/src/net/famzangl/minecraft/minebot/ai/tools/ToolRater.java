@@ -112,7 +112,7 @@ public class ToolRater {
 				return false;
 			} else if (itemStack.getItem() instanceof ItemTool) {
 				ItemTool itemTool = (ItemTool) itemStack.getItem();
-				return itemTool.getToolMaterial() == toolMaterial;
+				return itemTool.getToolMaterialName().equals(toolMaterial.toString());
 			} else if (itemStack.getItem() instanceof ItemHoe) {
 				ItemHoe itemTool = (ItemHoe) itemStack.getItem();
 				return itemTool.getMaterialName().equals(toolMaterial.toString());
