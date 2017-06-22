@@ -103,7 +103,7 @@ public abstract class AITask {
 		// }
 		// }
 		RecordingWorld world = new RecordingWorld(helper.getWorld(),
-				helper.getMinecraft().thePlayer);
+				helper.getMinecraft().player);
 		if (applyToDelta(world)) {
 			return (int) (world.getTimeInTicks() * 1.3f);
 		} else {

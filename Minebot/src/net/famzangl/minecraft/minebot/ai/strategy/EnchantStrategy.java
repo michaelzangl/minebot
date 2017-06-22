@@ -36,7 +36,7 @@ import net.famzangl.minecraft.minebot.ai.task.UseItemOnBlockAtTask;
 import net.famzangl.minecraft.minebot.ai.task.inventory.ItemWithSubtype;
 import net.minecraft.client.gui.GuiEnchantment;
 import net.minecraft.init.Blocks;
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.math.BlockPos;
 
 public class EnchantStrategy extends PathFinderStrategy {
 
@@ -52,7 +52,7 @@ public class EnchantStrategy extends PathFinderStrategy {
 
 	public final static class EnchantingTableHandler extends
 			RangeBlockHandler<EnchantingTableData> {
-		private static final BlockSet IDS = new BlockSet(Blocks.enchanting_table);
+		private static final BlockSet IDS = new BlockSet(Blocks.ENCHANTING_TABLE);
 
 		private final Hashtable<BlockPos, EnchantingTableData> found = new Hashtable<BlockPos, EnchantingTableData>();
 
@@ -86,7 +86,7 @@ public class EnchantStrategy extends PathFinderStrategy {
 
 		@Override
 		protected boolean runSearch(BlockPos playerPosition) {
-			if (helper.getMinecraft().thePlayer.experienceLevel <= 0
+			if (helper.getMinecraft().player.experienceLevel <= 0
 					|| (enchantTask != null && enchantTask.hasFailed())) {
 				return true;
 			}

@@ -63,7 +63,7 @@ public class GetOnHotBarTask extends AITask {
 				final Slot slot = screen.inventorySlots.getSlot(i);
 				final ItemStack stack = slot.getStack();
 				if (slot == null || stack == null
-						|| !slot.canTakeStack(aiHelper.getMinecraft().thePlayer)
+						|| !slot.canTakeStack(aiHelper.getMinecraft().player)
 						|| !itemFiler.matches(stack)) {
 					continue;
 				}
@@ -79,7 +79,7 @@ public class GetOnHotBarTask extends AITask {
 							new C16PacketClientStatus(
 									C16PacketClientStatus.EnumState.OPEN_INVENTORY_ACHIEVEMENT));
 			aiHelper.getMinecraft().displayGuiScreen(
-					new GuiInventory(aiHelper.getMinecraft().thePlayer));
+					new GuiInventory(aiHelper.getMinecraft().player));
 			inventoryOpened = true;
 		} else {
 			taskOperations.desync(new SelectTaskError(itemFiler));
@@ -96,7 +96,7 @@ public class GetOnHotBarTask extends AITask {
 	private void swap(AIHelper aiHelper, GuiInventory screen, int i) {
 		final PlayerControllerMP playerController = aiHelper.getMinecraft().playerController;
 		final int windowId = screen.inventorySlots.windowId;
-		final EntityPlayerSP player = aiHelper.getMinecraft().thePlayer;
+		final EntityPlayerSP player = aiHelper.getMinecraft().player;
 		playerController.windowClick(windowId, i, 0, 0, player);
 		playerController.windowClick(windowId, 35 + 5, 0, 0, player);
 		playerController.windowClick(windowId, i, 0, 0, player);

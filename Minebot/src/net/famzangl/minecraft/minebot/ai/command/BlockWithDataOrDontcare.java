@@ -73,12 +73,12 @@ public abstract class BlockWithDataOrDontcare {
 		}
 
 		Block block = (Block) Block.blockRegistry.getObject(new ResourceLocation(matcher.group(1)));
-		if (block == null || block == Blocks.air) {
+		if (block == null || block == Blocks.AIR) {
 			// minecraft:dirt case
 			block = (Block) Block.blockRegistry.getObject(new ResourceLocation(blockWithMeta));
 			matcher = null;
 		}
-		if (block == null || block == Blocks.air) {
+		if (block == null || block == Blocks.AIR) {
 			throw new IllegalBlockNameException(
 					"Could not understand block name: " + blockWithMeta);
 		} else if (matcher == null || matcher.group(2) == null

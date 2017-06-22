@@ -24,17 +24,24 @@ import net.famzangl.minecraft.minebot.ai.task.place.JumpingPlaceBlockAtSideTask;
 import net.famzangl.minecraft.minebot.ai.task.place.SneakAndPlaceAtSideTask;
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.EnumFacing;
 
 public class BuildNormalStairsTask extends AbstractBuildTask {
 
-	public static final BlockSet BLOCKS = new BlockSet(Blocks.acacia_stairs,
-			Blocks.birch_stairs, Blocks.brick_stairs, Blocks.dark_oak_stairs,
-			Blocks.jungle_stairs, Blocks.nether_brick_stairs,
-			Blocks.oak_stairs, Blocks.sandstone_stairs, Blocks.spruce_stairs,
-			Blocks.stone_brick_stairs, Blocks.stone_stairs,
-			Blocks.quartz_stairs);
+	public static final BlockSet BLOCKS = new BlockSet(
+			Blocks.ACACIA_STAIRS,
+			Blocks.BIRCH_STAIRS, 
+			Blocks.BRICK_STAIRS, 
+			Blocks.DARK_OAK_STAIRS,
+			Blocks.JUNGLE_STAIRS,
+			Blocks.NETHER_BRICK_STAIRS,
+			Blocks.OAK_STAIRS,
+			Blocks.SANDSTONE_STAIRS, 
+			Blocks.SPRUCE_STAIRS,
+			Blocks.STONE_BRICK_STAIRS, 
+			Blocks.STONE_STAIRS,
+			Blocks.QUARTZ_STAIRS);
 	private final EnumFacing upwardsDirection;
 	private final boolean inverted;
 	private final Block stairs;

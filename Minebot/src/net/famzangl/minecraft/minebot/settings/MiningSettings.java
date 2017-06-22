@@ -21,32 +21,32 @@ public class MiningSettings {
 		factorMap.setDefault(0);
 		pointsMap.setDefault(0);
 		
-		factorMap.setBlock(Blocks.coal_ore, 1);
-		pointsMap.setBlock(Blocks.coal_ore, 0);
+		factorMap.setBlock(Blocks.COAL_ORE, 1);
+		pointsMap.setBlock(Blocks.COAL_ORE, 0);
 
-		factorMap.setBlock(Blocks.iron_ore, 1);
-		pointsMap.setBlock(Blocks.iron_ore, 1);
+		factorMap.setBlock(Blocks.IRON_ORE, 1);
+		pointsMap.setBlock(Blocks.IRON_ORE, 1);
 
-		factorMap.setBlock(Blocks.redstone_ore, 1);
-		pointsMap.setBlock(Blocks.redstone_ore, 1);
+		factorMap.setBlock(Blocks.REDSTONE_ORE, 1);
+		pointsMap.setBlock(Blocks.REDSTONE_ORE, 1);
 
-		factorMap.setBlock(Blocks.gold_ore, 3);
-		pointsMap.setBlock(Blocks.gold_ore, 2);
+		factorMap.setBlock(Blocks.GOLD_ORE, 3);
+		pointsMap.setBlock(Blocks.GOLD_ORE, 2);
 
-		factorMap.setBlock(Blocks.lapis_ore, 2);
-		pointsMap.setBlock(Blocks.lapis_ore, 2);
+		factorMap.setBlock(Blocks.LAPIS_ORE, 2);
+		pointsMap.setBlock(Blocks.LAPIS_ORE, 2);
 
-		factorMap.setBlock(Blocks.diamond_ore, 5);
-		pointsMap.setBlock(Blocks.diamond_ore, 5);
+		factorMap.setBlock(Blocks.DIAMOND_ORE, 5);
+		pointsMap.setBlock(Blocks.DIAMOND_ORE, 5);
 
-		factorMap.setBlock(Blocks.emerald_ore, 5);
-		pointsMap.setBlock(Blocks.emerald_ore, 5);
+		factorMap.setBlock(Blocks.EMERALD_ORE, 5);
+		pointsMap.setBlock(Blocks.EMERALD_ORE, 5);
 
-		factorMap.setBlock(Blocks.quartz_ore, 1);
-		pointsMap.setBlock(Blocks.quartz_ore, 0);
+		factorMap.setBlock(Blocks.QUARTZ_ORE, 1);
+		pointsMap.setBlock(Blocks.QUARTZ_ORE, 0);
 
-		factorMap.setBlock(Blocks.glowstone, 2);
-		pointsMap.setBlock(Blocks.glowstone, 0);
+		factorMap.setBlock(Blocks.GLOWSTONE, 2);
+		pointsMap.setBlock(Blocks.GLOWSTONE, 0);
 	}
 
 	public float getDoubleBonus() {

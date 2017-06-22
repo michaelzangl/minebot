@@ -691,7 +691,7 @@ public class MoveScanner {
 						dangerZone, chunkY * STRIDE_Y * 16
 								+ (chunkZ % CHUNK_SIZE_X_Z) * STRIDE_Z * 16
 								+ (chunkX % CHUNK_SIZE_X_Z) * STRIDE_X * 16);
-				Chunk mcChunk = helper.getMinecraft().theWorld
+				Chunk mcChunk = helper.getMinecraft().world
 						.getChunkFromChunkCoords(chunkX, chunkZ);
 				scheduler
 						.addTask(new ScanChunkTask(chunks[i], policy, mcChunk));

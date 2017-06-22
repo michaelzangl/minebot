@@ -35,7 +35,7 @@ import net.famzangl.minecraft.minebot.ai.utils.PrivateFieldUtils;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.multiplayer.ChunkProviderClient;
 import net.minecraft.client.multiplayer.WorldClient;
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.ChunkCoordIntPair;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
@@ -737,7 +737,7 @@ public class MapReader implements ChunkListener {
 		}
 
 		for (ChunkCoordIntPair d : chunkQueue.tickAndGet()) {
-			Chunk chunkFromChunkCoords = helper.getMinecraft().theWorld
+			Chunk chunkFromChunkCoords = helper.getMinecraft().world
 					.getChunkFromChunkCoords(d.chunkXPos, d.chunkZPos);
 			if (chunkFromChunkCoords != null) {
 				chunksToProcess.offer(chunkFromChunkCoords);
@@ -752,7 +752,7 @@ public class MapReader implements ChunkListener {
 		}
 
 		checkIsAlive(helper);
-		EntityPlayerSP playerSP = helper.getMinecraft().thePlayer;
+		EntityPlayerSP playerSP = helper.getMinecraft().player;
 		BlockPos newPlayer = playerSP == null ? null : helper
 				.getPlayerPosition();
 		int newLook = niceDegrees(playerSP == null ? 0
@@ -765,7 +765,7 @@ public class MapReader implements ChunkListener {
 
 	private void checkIsAlive(AIHelper helper) {
 		boolean isAlive = helper.isAlive();
-		if (!isAlive && wasAlive && helper.getMinecraft().thePlayer != null) {
+		if (!isAlive && wasAlive && helper.getMinecraft().player != null) {
 			addIcon(new IconDefinition(helper.getPlayerPosition(), "Death: "
 					+ new Date().toLocaleString(), IconType.DEATH));
 		}
@@ -774,7 +774,7 @@ public class MapReader implements ChunkListener {
 
 	private void loadAllChunks(AIHelper helper) {
 		try {
-			WorldClient theWorld = helper.getMinecraft().theWorld;
+			WorldClient theWorld = helper.getMinecraft().world;
 			if (theWorld == null) {
 				return;
 			}

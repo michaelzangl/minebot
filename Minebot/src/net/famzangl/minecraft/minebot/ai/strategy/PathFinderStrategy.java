@@ -23,7 +23,7 @@ import net.famzangl.minecraft.minebot.ai.path.world.WorldWithDelta;
 import net.famzangl.minecraft.minebot.ai.render.PosMarkerRenderer;
 import net.famzangl.minecraft.minebot.ai.task.AITask;
 import net.famzangl.minecraft.minebot.ai.task.WaitTask;
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.fml.common.gameevent.TickEvent.RenderTickEvent;
 
 /**
@@ -76,7 +76,7 @@ public class PathFinderStrategy extends TaskStrategy {
 	}
 
 	private boolean isInAir(AIHelper helper) {
-		return !helper.getMinecraft().thePlayer.onGround;
+		return !helper.getMinecraft().player.onGround;
 	}
 
 	private boolean searchTasksWithPathfinder(AIHelper helper) {
@@ -154,7 +154,7 @@ public class PathFinderStrategy extends TaskStrategy {
 	// if (!helper.canWalkOn(floorBlock)) {
 	// return new DestroyBlockTask(pos.x, pos.y, pos.z);
 	// }
-	// return watcher.getOverrideTask(helper.getMinecraft().thePlayer
+	// return watcher.getOverrideTask(helper.getMinecraft().player
 	// .getHealth());
 	// }
 

@@ -23,7 +23,7 @@ import net.famzangl.minecraft.minebot.ai.path.world.BlockSets;
 import net.famzangl.minecraft.minebot.ai.path.world.WorldWithDelta;
 import net.famzangl.minecraft.minebot.ai.task.TaskOperations;
 import net.minecraft.init.Blocks;
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.math.BlockPos;
 
 /**
  * Digs one block up and one to the side. Then jumps there.
@@ -75,7 +75,7 @@ public class JumpMoveTask extends HorizontalMoveTask {
 	}
 	@Override
 	public boolean applyToDelta(WorldWithDelta world) {
-		world.setBlock(toDestroyForJump(), Blocks.air);
+		world.setBlock(toDestroyForJump(), Blocks.AIR);
 		return super.applyToDelta(world);
 	}
 }

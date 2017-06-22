@@ -25,7 +25,7 @@ import net.famzangl.minecraft.minebot.ai.task.place.DestroyBlockTask;
 import net.famzangl.minecraft.minebot.ai.task.place.PlaceBlockAtFloorTask;
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.math.BlockPos;
 
 public class LayRailPathFinder extends AlongTrackPathFinder {
 
@@ -45,7 +45,7 @@ public class LayRailPathFinder extends AlongTrackPathFinder {
 	@Override
 	protected float rateDestination(int distance, int x, int y, int z) {
 		if (isRedstoneBlockPosition(x, y, z)
-				&& !new BlockSet(Blocks.redstone_block).isAt(world, x, y, z)) {
+				&& !new BlockSet(Blocks.REDSTONE_BLOCK).isAt(world, x, y, z)) {
 			return distance + 2;
 		} else if (isOnTrack(x, z) && y == cy
 				&& !BlockSets.RAILS.isAt(world, x, y, z)) {
@@ -70,18 +70,18 @@ public class LayRailPathFinder extends AlongTrackPathFinder {
 				currentPos.getZ())) {
 			// For those server lags
 			addTask(new UpwardsMoveTask(currentPos.add(0, 1, 0),
-					new BlockItemFilter(Blocks.redstone_block)));
+					new BlockItemFilter(Blocks.REDSTONE_BLOCK)));
 		} else if (placeAccRail(currentPos.getX(), currentPos.getZ())) {
-			if (!new BlockSet(Blocks.redstone_block).isAt(world, currentPos.add(0, -1, 0))
+			if (!new BlockSet(Blocks.REDSTONE_BLOCK).isAt(world, currentPos.add(0, -1, 0))
 					&& BlockSets.safeSideAround(world, currentPos.add(0,-1,0))
 					&& BlockSets.SAFE_GROUND.isAt(world, currentPos.add(0,-2,0))) {
 				addTask(new DownwardsMoveTask(currentPos.add(0, -1, 0)));
 				addTask(new UpwardsMoveTask(currentPos, new BlockItemFilter(
-						Blocks.redstone_block)));
+						Blocks.REDSTONE_BLOCK)));
 			}
-			placeRail(currentPos, Blocks.golden_rail);
+			placeRail(currentPos, Blocks.GOLDEN_RAIL);
 		} else {
-			placeRail(currentPos, Blocks.rail);
+			placeRail(currentPos, Blocks.RAIL);
 		}
 	}
 

@@ -28,7 +28,7 @@ import net.famzangl.minecraft.minebot.ai.task.AITask;
 import net.famzangl.minecraft.minebot.ai.task.CanPrefaceAndDestroy;
 import net.famzangl.minecraft.minebot.ai.task.TaskOperations;
 import net.minecraft.init.Blocks;
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.math.BlockPos;
 
 /**
  * Digs/walks horizontaly one block wide.
@@ -37,7 +37,7 @@ import net.minecraft.util.BlockPos;
  *
  */
 public class HorizontalMoveTask extends AITask implements CanPrefaceAndDestroy {
-	private static final BlockSet hardBlocks = new BlockSet(Blocks.obsidian);
+	private static final BlockSet hardBlocks = new BlockSet(Blocks.OBSIDIAN);
 	static final int OBSIDIAN_TIME = 10 * 20;
 	protected final BlockPos pos;
 	private boolean hasObsidianLower;
@@ -114,10 +114,10 @@ public class HorizontalMoveTask extends AITask implements CanPrefaceAndDestroy {
 	@Override
 	public boolean applyToDelta(WorldWithDelta world) {
 		if (needDestroyHead(world)) {
-			world.setBlock(pos.add(0, 1, 0), Blocks.air);
+			world.setBlock(pos.add(0, 1, 0), Blocks.AIR);
 		}
 		if (needDestroyFoot(world)) {
-			world.setBlock(pos, Blocks.air);
+			world.setBlock(pos, Blocks.AIR);
 		}
 		world.setPlayerPosition(pos);
 		return true;

@@ -16,7 +16,7 @@
  *******************************************************************************/
 package net.famzangl.minecraft.minebot.ai.path;
 
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.math.BlockPos;
 
 public class GoToPathfinder extends WalkingPathfinder {
 	private final BlockPos position;

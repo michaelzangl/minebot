@@ -1,7 +1,7 @@
 package net.famzangl.minecraft.minebot.build.reverse;
 
 import net.famzangl.minecraft.minebot.ai.path.world.WorldData;
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.math.BlockPos;
 
 public class UnsupportedBlockException extends Exception {
 

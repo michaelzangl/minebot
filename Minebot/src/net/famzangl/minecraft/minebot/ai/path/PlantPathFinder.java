@@ -36,15 +36,15 @@ import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemHoe;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.math.BlockPos;
 
 public class PlantPathFinder extends MovePathFinder {
-	private static final BlockSet FARMLAND = new BlockSet(Blocks.farmland);
+	private static final BlockSet FARMLAND = new BlockSet(Blocks.FARMLAND);
 	private static final BlockSet NETHERWART_FARMLAND = new BlockSet(
-			Blocks.soul_sand);
+			Blocks.SOUL_SAND);
 
-	private static final BlockSet FARMLANDABLE = new BlockSet(Blocks.dirt,
-			Blocks.grass);
+	private static final BlockSet FARMLANDABLE = new BlockSet(Blocks.DIRT,
+			Blocks.GRASS);
 
 	private final class PlaceSeedsTask extends PlaceBlockAtFloorTask {
 		private final SeedFilter seedFilter;
@@ -69,10 +69,11 @@ public class PlantPathFinder extends MovePathFinder {
 	}
 
 	public enum PlantType {
-		NORMAL(FARMLAND, Items.wheat_seeds, Items.carrot, Items.potato), WHEAT(
-				FARMLAND, Items.wheat_seeds), CARROT(FARMLAND, Items.carrot), POTATO(
-				FARMLAND, Items.potato), NETHERWART(NETHERWART_FARMLAND,
-				Items.nether_wart);
+		NORMAL(FARMLAND, Items.WHEAT_SEEDS, Items.CARROT, Items.POTATO),
+		WHEAT(FARMLAND, Items.WHEAT_SEEDS),
+		CARROT(FARMLAND, Items.CARROT),
+		POTATO(FARMLAND, Items.POTATO),
+		NETHERWART(NETHERWART_FARMLAND, Items.NETHER_WART);
 
 		public final BlockSet farmland;
 
@@ -116,7 +117,7 @@ public class PlantPathFinder extends MovePathFinder {
 		@Override
 		public boolean applyToDelta(WorldWithDelta world) {
 			if (FARMLANDABLE.isAt(world, getPos())) {
-				world.setBlock(getPos(), Blocks.farmland);
+				world.setBlock(getPos(), Blocks.FARMLAND);
 			}
 			return true;
 		}
@@ -157,7 +158,7 @@ public class PlantPathFinder extends MovePathFinder {
 		if (Block.getBlockById(blockWithMeta >> 4) instanceof BlockCrops) {
 			final int metadata = blockWithMeta & 0xf;
 			return metadata >= 7;
-		} else if (new BlockMetaSet(Blocks.nether_wart, 3).isAt(world, x, y, z)) {
+		} else if (new BlockMetaSet(Blocks.NETHER_WART, 3).isAt(world, x, y, z)) {
 			return true;
 		}
 		return false;

@@ -29,7 +29,7 @@ public class CommandLookAt {
 			@AICommandParameter(type = ParameterType.ENUM, description = "direction") EnumFacing direction) {
 		Vec3 offset = new Vec3(direction.getFrontOffsetX(),
 				direction.getFrontOffsetY()
-						+ helper.getMinecraft().thePlayer.getEyeHeight(),
+						+ helper.getMinecraft().player.getEyeHeight(),
 				direction.getFrontOffsetZ());
 		return run(helper,
 				helper.getWorld().getExactPlayerPosition().add(offset));

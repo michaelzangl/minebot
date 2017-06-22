@@ -73,8 +73,8 @@ public class FeedAnimalsStrategy extends TaskStrategy {
 						public boolean matches(ItemStack itemStack) {
 							return itemStack == null
 									|| itemStack.getItem() == null
-									|| !(itemStack.getItem() == Items.wheat
-											|| itemStack.getItem() == Items.carrot || itemStack
+									|| !(itemStack.getItem() == Items.WHEAT
+											|| itemStack.getItem() == Items.CARROT || itemStack
 											.getItem() instanceof ItemSeeds);
 						}
 					});

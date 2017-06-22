@@ -25,7 +25,7 @@ import net.famzangl.minecraft.minebot.ai.task.AITask;
 import net.famzangl.minecraft.minebot.ai.task.TaskOperations;
 import net.famzangl.minecraft.minebot.ai.task.error.PositionTaskError;
 import net.minecraft.init.Blocks;
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.math.BlockPos;
 
 /**
  * Digs one block down.
@@ -35,7 +35,7 @@ import net.minecraft.util.BlockPos;
  */
 public class DownwardsMoveTask extends AITask {
 
-	private static final BlockSet hardBlocks = new BlockSet(Blocks.obsidian);
+	private static final BlockSet hardBlocks = new BlockSet(Blocks.OBSIDIAN);
 
 	private boolean obsidianMining;
 	private BlockPos pos;
@@ -87,9 +87,9 @@ public class DownwardsMoveTask extends AITask {
 	@Override
 	public boolean applyToDelta(WorldWithDelta world) {
 		if (needsToClearFootBlock(world)) {
-			world.setBlock(pos.add(0, 1, 0), Blocks.air);
+			world.setBlock(pos.add(0, 1, 0), Blocks.AIR);
 		}
-		world.setBlock(pos, Blocks.air);
+		world.setBlock(pos, Blocks.AIR);
 		world.setPlayerPosition(pos);
 		return true;
 	}

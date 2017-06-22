@@ -44,7 +44,7 @@ public @interface AICommandParameter {
 	}
 	
 	public static class SurvivalBlockFilter extends BlockFilter {
-		private static final BlockSet NON_SURVIVAL_BLOCKS = new BlockSet(Blocks.air, Blocks.command_block);
+		private static final BlockSet NON_SURVIVAL_BLOCKS = new BlockSet(Blocks.AIR, Blocks.COMMAND_BLOCK);
 
 		@Override
 		public boolean matches(BlockWithDataOrDontcare b) {

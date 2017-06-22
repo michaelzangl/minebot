@@ -1,7 +1,7 @@
 package net.famzangl.minecraft.minebot.ai.utils;
 
 import net.famzangl.minecraft.minebot.ai.path.world.WorldData;
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.math.BlockPos;
 
 /**
  * This is an area of blocks. It is allowed to be empty. An area is final and

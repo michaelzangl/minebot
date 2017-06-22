@@ -95,7 +95,7 @@ public class TintStrategy extends TaskStrategy {
 			return;
 		}
 
-		final EntityPlayerSP owner = helper.getMinecraft().thePlayer;
+		final EntityPlayerSP owner = helper.getMinecraft().player;
 		// FIXME: Check.
 		final EnumDyeColor holdingColor = EnumDyeColor.values()[15 - owner.inventory
 				.getCurrentItem().getItemDamage()];

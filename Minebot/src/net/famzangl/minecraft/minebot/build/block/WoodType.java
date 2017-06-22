@@ -35,10 +35,10 @@ import net.minecraft.init.Blocks;
  *
  */
 public enum WoodType {
-	OAK(Blocks.log, 0, EnumType.OAK), SPRUCE(Blocks.log, 1, EnumType.SPRUCE), BIRCH(
-			Blocks.log, 2, EnumType.BIRCH), JUNGLE(Blocks.log, 3,
-			EnumType.JUNGLE), ACACIA(Blocks.log2, 0, EnumType.ACACIA), DARK_OAK(
-			Blocks.log2, 1, EnumType.DARK_OAK);
+	OAK(Blocks.LOG, 0, EnumType.OAK), SPRUCE(Blocks.LOG, 1, EnumType.SPRUCE), BIRCH(
+			Blocks.LOG, 2, EnumType.BIRCH), JUNGLE(Blocks.LOG, 3,
+			EnumType.JUNGLE), ACACIA(Blocks.LOG2, 0, EnumType.ACACIA), DARK_OAK(
+			Blocks.LOG2, 1, EnumType.DARK_OAK);
 
 	public enum LogDirection {
 		X(BlockLog.EnumAxis.X, 1 << 2), Y(BlockLog.EnumAxis.Y, 0), Z(

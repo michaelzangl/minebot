@@ -29,7 +29,7 @@ import net.famzangl.minecraft.minebot.ai.path.ClearAreaPathfinder.ClearMode;
 import net.famzangl.minecraft.minebot.ai.strategy.AIStrategy;
 import net.famzangl.minecraft.minebot.ai.strategy.PathFinderStrategy;
 import net.famzangl.minecraft.minebot.ai.utils.BlockCuboid;
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.math.BlockPos;
 
 @AICommand(helpText = "Clears the selected area.", name = "minebuild")
 public class CommandClearArea {

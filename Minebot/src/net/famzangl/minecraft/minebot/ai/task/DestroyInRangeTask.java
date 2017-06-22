@@ -29,7 +29,7 @@ import net.famzangl.minecraft.minebot.ai.render.PosMarkerRenderer;
 import net.famzangl.minecraft.minebot.ai.utils.BlockArea;
 import net.famzangl.minecraft.minebot.ai.utils.BlockArea.AreaVisitor;
 import net.famzangl.minecraft.minebot.ai.utils.BlockCuboid;
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.MovingObjectPosition.MovingObjectType;
 import net.minecraft.util.Vec3;
@@ -133,8 +133,8 @@ public class DestroyInRangeTask extends AITask implements CanPrefaceAndDestroy {
 		if (noDestructionRequired(aiHelper.getWorld(), x, y, z)) {
 			return -1;
 		} else {
-			double distance = aiHelper.getMinecraft().thePlayer.getDistance(x + .5, y
-					+ .5 - aiHelper.getMinecraft().thePlayer.getEyeHeight(), z + .5);
+			double distance = aiHelper.getMinecraft().player.getDistance(x + .5, y
+					+ .5 - aiHelper.getMinecraft().player.getEyeHeight(), z + .5);
 			// 0..1
 			double change = aiHelper
 					.getRequiredAngularChangeTo(x + .5, y + .5, z + .5)

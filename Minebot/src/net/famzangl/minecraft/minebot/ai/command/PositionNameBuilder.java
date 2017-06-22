@@ -21,7 +21,7 @@ import java.util.ArrayList;
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.NumberInvalidException;
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.math.BlockPos;
 
 public class PositionNameBuilder extends ParameterBuilder {
 
@@ -51,7 +51,7 @@ public class PositionNameBuilder extends ParameterBuilder {
 	@Override
 	public Object getParameter(AIHelper helper, String[] arguments) {
 		try {
-			return CommandBase.parseBlockPos(helper.getMinecraft().thePlayer,
+			return CommandBase.parseBlockPos(helper.getMinecraft().player,
 					arguments, 0, true);
 		} catch (final NumberInvalidException e) {
 			throw new CommandEvaluationException("Number format not supported.");

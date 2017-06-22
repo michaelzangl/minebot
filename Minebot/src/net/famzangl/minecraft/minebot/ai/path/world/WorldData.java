@@ -8,7 +8,7 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.init.Blocks;
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.chunk.Chunk;
@@ -21,7 +21,7 @@ import net.minecraft.world.chunk.storage.ExtendedBlockStorage;
  * @author Michael Zangl
  */
 public class WorldData {
-	private static final int BARRIER_ID = Block.getIdFromBlock(Blocks.barrier) << 4;
+	private static final int BARRIER_ID = Block.getIdFromBlock(Blocks.BARRIER) << 4;
 	private static final int AIR_ID = 0;
 	private static final int CACHE_ENTRIES = 10;
 	/**
@@ -161,7 +161,7 @@ public class WorldData {
 	public IBlockState getBlockState(BlockPos pos) {
 		IBlockState iblockstate = (IBlockState) Block.BLOCK_STATE_IDS
 				.getByValue(getBlockIdWithMeta(pos));
-		return iblockstate != null ? iblockstate : Blocks.air.getDefaultState();
+		return iblockstate != null ? iblockstate : Blocks.AIR.getDefaultState();
 	}
 
 	public boolean isSideTorch(BlockPos pos) {
@@ -176,7 +176,7 @@ public class WorldData {
 		EnumFacing facing = null;
 		if (BlockSets.TORCH.contains(meta.getBlock())) {
 			facing = getTorchDirection(meta);
-		} else if (meta.getBlock().equals(Blocks.wall_sign)) {
+		} else if (meta.getBlock().equals(Blocks.WALL_SIGN)) {
 			facing = getSignDirection(meta);
 			// TODO Ladder and other hanging blocks.
 		} else if (BlockSets.FEET_CAN_WALK_THROUGH.contains(meta)) {

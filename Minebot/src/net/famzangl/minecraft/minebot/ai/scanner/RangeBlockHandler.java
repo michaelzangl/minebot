@@ -25,12 +25,12 @@ import net.famzangl.minecraft.minebot.ai.path.world.BlockSet;
 import net.famzangl.minecraft.minebot.ai.path.world.WorldData;
 import net.famzangl.minecraft.minebot.ai.scanner.BlockRangeScanner.BlockHandler;
 import net.minecraft.init.Blocks;
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.EnumFacing;
 
 public abstract class RangeBlockHandler<ReachData> implements BlockHandler {
 	private static final BlockSet THROUGH_REACHABLE = new BlockSet(
-			Blocks.air, Blocks.torch);
+			Blocks.AIR, Blocks.TORCH);
 	private final Hashtable<BlockPos, ArrayList<ReachData>> reachable = new Hashtable<BlockPos, ArrayList<ReachData>>();
 
 	@Override

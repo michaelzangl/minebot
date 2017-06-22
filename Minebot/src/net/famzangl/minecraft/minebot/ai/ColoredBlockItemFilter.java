@@ -29,9 +29,9 @@ import net.minecraft.item.EnumDyeColor;
  * 
  */
 public class ColoredBlockItemFilter extends BlockItemFilter {
-	public static final BlockSet COLORABLE_BLOCKS = new BlockSet(Blocks.wool,
-			Blocks.stained_hardened_clay, Blocks.stained_glass,
-			Blocks.stained_glass_pane, Blocks.carpet);
+	public static final BlockSet COLORABLE_BLOCKS = new BlockSet(Blocks.WOOL,
+			Blocks.STAINED_HARDENED_CLAY, Blocks.STAINED_GLASS,
+			Blocks.STAINED_GLASS_PANE, Blocks.CARPET);
 
 	// /**
 	// * Right names for sheep wool and most blocks.

@@ -36,7 +36,7 @@ import net.famzangl.minecraft.minebot.settings.MinebotSettings;
 import net.famzangl.minecraft.minebot.settings.MinebotSettingsRoot;
 import net.famzangl.minecraft.minebot.settings.PathfindingSetting;
 import net.minecraft.init.Blocks;
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.EnumFacing;
 
 /**
@@ -53,15 +53,21 @@ public class MovePathFinder extends PathFinderField {
 	 * Blocks that are destructable faster.
 	 */
 	protected final static BlockSet fastDestructableBlocks = new BlockSet(
-			Blocks.dirt, Blocks.gravel, Blocks.sand, Blocks.sandstone);
+			Blocks.DIRT,
+			Blocks.GRAVEL, 
+			Blocks.SAND, 
+			Blocks.SANDSTONE);
 
 	/**
 	 * Blocks we should not dig through, e.g. because we cannot handle them
 	 * correctly.
 	 */
 	protected static final BlockSet defaultForbiddenBlocks = new BlockSet(
-			Blocks.bedrock, Blocks.cactus, Blocks.obsidian,
-			Blocks.piston_extension, Blocks.piston_head);
+			Blocks.BEDROCK, 
+			Blocks.CACTUS, 
+			Blocks.OBSIDIAN,
+			Blocks.PISTON_EXTENSION, 
+			Blocks.PISTON_HEAD);
 
 	/**
 	 * The AI helper

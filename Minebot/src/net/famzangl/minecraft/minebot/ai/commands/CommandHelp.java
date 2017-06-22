@@ -107,7 +107,7 @@ final public class CommandHelp {
 			@AICommandParameter(type = ParameterType.FIXED, fixedName = "help", description = "") String nameArg,
 			@AICommandParameter(type = ParameterType.COMMAND, description = "command help") String commandName) {
 		boolean found = false;
-		final EntityPlayerSP player = helper.getMinecraft().thePlayer;
+		final EntityPlayerSP player = helper.getMinecraft().player;
 		for (final CommandDefinition command : AIChatController.getRegistry()
 				.getAllCommands()) {
 			final ArrayList<ArgumentDefinition> args = command.getArguments();

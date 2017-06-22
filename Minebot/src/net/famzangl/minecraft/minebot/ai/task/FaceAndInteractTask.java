@@ -73,7 +73,7 @@ public class FaceAndInteractTask extends AITask {
 		final boolean collect = preferedAnimal instanceof EntityItem
 				|| preferedAnimal instanceof EntityXPOrb;
 		return collect ? preferedAnimal.getEntityBoundingBox().intersectsWith(
-				aiHelper.getMinecraft().thePlayer.getEntityBoundingBox()) : interacted;
+				aiHelper.getMinecraft().player.getEntityBoundingBox()) : interacted;
 	}
 
 	@Override
@@ -84,10 +84,10 @@ public class FaceAndInteractTask extends AITask {
 				&& alsoAcceptedAnimal.apply(position.entityHit)) {
 			doInteractWithCurrent(aiHelper);
 		} else {
-			final double speed = aiHelper.getMinecraft().thePlayer.motionX
-					* aiHelper.getMinecraft().thePlayer.motionX
-					+ aiHelper.getMinecraft().thePlayer.motionZ
-					* aiHelper.getMinecraft().thePlayer.motionZ;
+			final double speed = aiHelper.getMinecraft().player.motionX
+					* aiHelper.getMinecraft().player.motionX
+					+ aiHelper.getMinecraft().player.motionZ
+					* aiHelper.getMinecraft().player.motionZ;
 			aiHelper.face(preferedAnimal.posX, preferedAnimal.posY,
 					preferedAnimal.posZ);
 			final MovementInput movement = new MovementInput();

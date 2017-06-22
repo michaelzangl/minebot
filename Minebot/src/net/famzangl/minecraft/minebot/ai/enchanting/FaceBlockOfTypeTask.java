@@ -23,7 +23,7 @@ import net.famzangl.minecraft.minebot.ai.path.world.BlockSet;
 import net.famzangl.minecraft.minebot.ai.task.AITask;
 import net.famzangl.minecraft.minebot.ai.task.TaskOperations;
 import net.minecraft.init.Blocks;
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.math.BlockPos;
 
 public class FaceBlockOfTypeTask extends AITask {
 
@@ -34,7 +34,7 @@ public class FaceBlockOfTypeTask extends AITask {
 	}
 
 	private BlockPos getPos(AIHelper aiHelper) {
-		List<BlockPos> positions = new BlockSet(Blocks.enchanting_table).findBlocks(aiHelper.getWorld(), aiHelper.getPlayerPosition(), 2);
+		List<BlockPos> positions = new BlockSet(Blocks.ENCHANTING_TABLE).findBlocks(aiHelper.getWorld(), aiHelper.getPlayerPosition(), 2);
 		final BlockPos pos = positions.isEmpty() ? null : positions.get(1);
 		return pos;
 	}

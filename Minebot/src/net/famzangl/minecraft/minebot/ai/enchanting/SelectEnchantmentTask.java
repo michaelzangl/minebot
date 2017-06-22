@@ -82,11 +82,11 @@ public class SelectEnchantmentTask extends AITask {
 			System.out.println("No enchantment levels computed yet.");
 			return false;
 		}
-		if (aiHelper.getMinecraft().thePlayer.experienceLevel < c.enchantLevels[slot]) {
+		if (aiHelper.getMinecraft().player.experienceLevel < c.enchantLevels[slot]) {
 			System.out.println("Abort enchantment, not enough levels.");
 			return slot > 0 ? attemptEnchanting(aiHelper, c, slot - 1) : false;
 		}
-		if (c.enchantItem(aiHelper.getMinecraft().thePlayer, slot)) {
+		if (c.enchantItem(aiHelper.getMinecraft().player, slot)) {
 			aiHelper.getMinecraft().playerController.sendEnchantPacket(c.windowId,
 					slot);
 			System.out.println("Sent enchant request package.");

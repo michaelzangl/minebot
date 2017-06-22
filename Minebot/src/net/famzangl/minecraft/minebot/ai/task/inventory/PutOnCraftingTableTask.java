@@ -44,7 +44,7 @@ public class PutOnCraftingTableTask extends MoveInInventoryTask {
 
 	@Override
 	protected int getFromStack(AIHelper aiHelper) {
-		ItemStack[] mainInventory = aiHelper.getMinecraft().thePlayer.inventory.mainInventory;
+		ItemStack[] mainInventory = aiHelper.getMinecraft().player.inventory.mainInventory;
 		int inventorySlot = -1;
 		for (int i = 0; i < mainInventory.length; i++) {
 			if (item.equals(ItemWithSubtype.fromStack(mainInventory[i]))) {

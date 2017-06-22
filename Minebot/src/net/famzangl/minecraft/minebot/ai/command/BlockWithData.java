@@ -68,16 +68,16 @@ public class BlockWithData extends BlockWithDataOrDontcare {
 		for (WoodType woodType : WoodType.values()) {
 			plankTypes[woodType.plankType.getMetadata()] = woodType.plankType
 					.toString();
-			String[] logArray = woodType.block == Blocks.log ? log : log2;
+			String[] logArray = woodType.block == Blocks.LOG ? log : log2;
 			for (LogDirection d : LogDirection.values()) {
 				logArray[d.higherBits + woodType.lowerBits] = woodType.plankType
 						.toString() + ":" + d.axis.toString();
 			}
 		}
-		nicerMeta.add(new NicerMetaValue(new BlockSet(Blocks.planks),
+		nicerMeta.add(new NicerMetaValue(new BlockSet(Blocks.PLANKS),
 				plankTypes));
-		nicerMeta.add(new NicerMetaValue(new BlockSet(Blocks.log), log));
-		nicerMeta.add(new NicerMetaValue(new BlockSet(Blocks.log2), log2));
+		nicerMeta.add(new NicerMetaValue(new BlockSet(Blocks.LOG), log));
+		nicerMeta.add(new NicerMetaValue(new BlockSet(Blocks.LOG2), log2));
 	}
 
 	static BlockWithDataOrDontcare fromNiceMeta(Block block, String meta) {

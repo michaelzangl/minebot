@@ -35,7 +35,7 @@ import net.famzangl.minecraft.minebot.ai.task.move.AlignToGridTask;
 import net.famzangl.minecraft.minebot.build.ForBuildPathFinder;
 import net.famzangl.minecraft.minebot.build.NextTaskTask;
 import net.famzangl.minecraft.minebot.build.blockbuild.BuildTask;
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.fml.common.gameevent.TickEvent.RenderTickEvent;
 
 @AICommand(helpText = "Runs all tasks that are scheduled for building.", name = "minebuild")

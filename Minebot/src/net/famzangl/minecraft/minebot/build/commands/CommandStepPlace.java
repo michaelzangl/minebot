@@ -28,7 +28,7 @@ import net.famzangl.minecraft.minebot.ai.strategy.AIStrategy;
 import net.famzangl.minecraft.minebot.ai.strategy.TaskStrategy;
 import net.famzangl.minecraft.minebot.ai.task.AITask;
 import net.famzangl.minecraft.minebot.build.blockbuild.BuildTask;
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.math.BlockPos;
 
 @AICommand(helpText = "Place the next block.\n Use the walk command before this command or walk there yourself.", name = "minebuild")
 public class CommandStepPlace {

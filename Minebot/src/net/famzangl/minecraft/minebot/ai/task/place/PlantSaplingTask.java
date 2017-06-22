@@ -22,7 +22,7 @@ import net.famzangl.minecraft.minebot.ai.path.world.BlockSet;
 import net.famzangl.minecraft.minebot.build.block.WoodType;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.math.BlockPos;
 
 /**
  * Replant by placing tree saplings on the floor.
@@ -36,7 +36,7 @@ public class PlantSaplingTask extends PlaceBlockAtFloorTask {
 		private WoodType type;
 
 		private SaplingFilter(WoodType type) {
-			super(Blocks.sapling);
+			super(Blocks.SAPLING);
 			this.type = type;
 		}
 		
@@ -51,7 +51,7 @@ public class PlantSaplingTask extends PlaceBlockAtFloorTask {
 	}
 
 	private final static BlockSet PLANTABLE = new BlockSet(
-			Blocks.dirt, Blocks.grass);
+			Blocks.DIRT, Blocks.GRASS);
 
 	public PlantSaplingTask(BlockPos pos, WoodType type) {
 		super(pos, new SaplingFilter(type));

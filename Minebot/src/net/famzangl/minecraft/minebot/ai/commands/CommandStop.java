@@ -72,7 +72,7 @@ public class CommandStop {
 		return new StopOnConditionStrategy(new StopCondition() {
 			@Override
 			public boolean shouldStop(AIHelper helper) {
-				InventoryDefinition inventory = new InventoryDefinition(helper.getMinecraft().thePlayer.inventory);
+				InventoryDefinition inventory = new InventoryDefinition(helper.getMinecraft().player.inventory);
 				return inventory.searchFreeSlot() < 0;
 			}
 		}, force != null, "full inventory");

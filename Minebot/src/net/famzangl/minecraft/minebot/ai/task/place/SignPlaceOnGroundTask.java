@@ -20,7 +20,7 @@ import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.ClassItemFilter;
 import net.famzangl.minecraft.minebot.ai.task.TaskOperations;
 import net.minecraft.item.ItemSign;
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.math.BlockPos;
 
 /**
  * Place a sign on the ground.
@@ -62,7 +62,7 @@ public class SignPlaceOnGroundTask extends PlaceBlockAtFloorTask {
 	
 	@Override
 	protected boolean isFacingRightBlock(AIHelper aiHelper) {
-		return super.isFacingRightBlock(aiHelper) && isGoodForDirection(aiHelper.getMinecraft().thePlayer.rotationYaw);
+		return super.isFacingRightBlock(aiHelper) && isGoodForDirection(aiHelper.getMinecraft().player.rotationYaw);
 	}
 
 	private boolean isGoodForDirection(float rotationYaw) {

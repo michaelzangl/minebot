@@ -38,7 +38,7 @@ public abstract class CloseEntityActionStrategy extends ValueActionStrategy {
 
 				});
 		return closest == null ? Double.MAX_VALUE : closest
-				.getDistanceToEntity(helper.getMinecraft().thePlayer);
+				.getDistanceToEntity(helper.getMinecraft().player);
 	}
 
 	protected abstract boolean matches(AIHelper helper, Entity player);

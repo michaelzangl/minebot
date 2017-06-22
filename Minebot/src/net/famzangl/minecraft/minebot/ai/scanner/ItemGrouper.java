@@ -41,14 +41,14 @@ public class ItemGrouper {
 	}
 	
 	public static ItemGroup[] ITEM_GROUPS = new ItemGroup[] {
-		new ItemGroup(Items.wheat, Item.getItemFromBlock(Blocks.hay_block), 3),
-		new ItemGroup(Items.coal, Item.getItemFromBlock(Blocks.coal_block), 3),
-		new ItemGroup(Items.redstone, Item.getItemFromBlock(Blocks.redstone_block), 3),
-		new ItemGroup(Items.emerald, Item.getItemFromBlock(Blocks.emerald_block), 3),
-		new ItemGroup(Items.diamond, Item.getItemFromBlock(Blocks.diamond_block), 3),
-		new ItemGroup(Items.iron_ingot, Item.getItemFromBlock(Blocks.iron_block), 3),
-		new ItemGroup(Items.gold_ingot, Item.getItemFromBlock(Blocks.gold_block), 3),
-		new ItemGroup(Items.gold_nugget, Items.gold_ingot, 3),
+		new ItemGroup(Items.WHEAT, Item.getItemFromBlock(Blocks.HAY_BLOCK), 3),
+		new ItemGroup(Items.COAL, Item.getItemFromBlock(Blocks.COAL_BLOCK), 3),
+		new ItemGroup(Items.REDSTONE, Item.getItemFromBlock(Blocks.REDSTONE_BLOCK), 3),
+		new ItemGroup(Items.EMERALD, Item.getItemFromBlock(Blocks.EMERALD_BLOCK), 3),
+		new ItemGroup(Items.DIAMOND, Item.getItemFromBlock(Blocks.DIAMOND_BLOCK), 3),
+		new ItemGroup(Items.IRON_INGOT, Item.getItemFromBlock(Blocks.IRON_BLOCK), 3),
+		new ItemGroup(Items.GOLD_INGOT, Item.getItemFromBlock(Blocks.GOLD_BLOCK), 3),
+		new ItemGroup(Items.GOLD_NUGGET, Items.GOLD_INGOT, 3),
 	//	new ItemGroup(Items.snowball, Item.getItemFromBlock(Blocks.snow), 2),
 	};
 }

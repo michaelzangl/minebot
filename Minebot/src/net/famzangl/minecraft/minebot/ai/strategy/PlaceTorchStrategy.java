@@ -28,7 +28,7 @@ import net.famzangl.minecraft.minebot.ai.path.world.WorldData;
 import net.famzangl.minecraft.minebot.settings.MinebotSettings;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.init.Blocks;
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.EnumFacing;
 
 /**
@@ -60,7 +60,7 @@ public class PlaceTorchStrategy extends AIStrategy {
 	private static final BlockSet CAN_PLACE_ON = BlockSets.SIMPLE_CUBE;
 
 	private static final BlockItemFilter TORCH_FILTER = new BlockItemFilter(
-			Blocks.torch);
+			Blocks.TORCH);
 
 	private static final int MAX_TICKS_PER_PLACE = 10;
 
@@ -82,7 +82,7 @@ public class PlaceTorchStrategy extends AIStrategy {
 		if (!helper.canSelectItem(TORCH_FILTER)) {
 			return false;
 		}
-		EntityPlayerSP playerPosition = helper.getMinecraft().thePlayer;
+		EntityPlayerSP playerPosition = helper.getMinecraft().player;
 		BlockPos playerBlockPosition = helper.getPlayerPosition();
 		if (!done.contains(playerBlockPosition)
 				&& playerBlockPosition.distanceSqToCenter(playerPosition.posX,

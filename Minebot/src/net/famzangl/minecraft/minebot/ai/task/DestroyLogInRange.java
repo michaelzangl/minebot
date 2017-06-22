@@ -6,7 +6,7 @@ import net.famzangl.minecraft.minebot.ai.path.world.BlockSets;
 import net.famzangl.minecraft.minebot.ai.path.world.WorldData;
 import net.famzangl.minecraft.minebot.ai.utils.BlockArea;
 import net.minecraft.init.Blocks;
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.math.BlockPos;
 
 /**
  * This task attemtps to destroy any log in a given area.
@@ -16,7 +16,7 @@ import net.minecraft.util.BlockPos;
  */
 public class DestroyLogInRange extends DestroyInRangeTask {
 
-	private static final BlockSet LEAVES_OR_LOGS = BlockSets.LEAVES.unionWith(BlockSets.LOGS).unionWith(new BlockSet(Blocks.vine));
+	private static final BlockSet LEAVES_OR_LOGS = BlockSets.LEAVES.unionWith(BlockSets.LOGS).unionWith(new BlockSet(Blocks.VINE));
 
 	public DestroyLogInRange(BlockArea range) {
 		super(range);

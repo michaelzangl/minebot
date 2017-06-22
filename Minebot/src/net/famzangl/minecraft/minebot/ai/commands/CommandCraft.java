@@ -36,16 +36,16 @@ public class CommandCraft {
 	 * Blocks that can not be crafted.
 	 */
 	private static final BlockSet simpleBlocks = new BlockSet(
-			Blocks.air, Blocks.brewing_stand, Blocks.bed, Blocks.nether_wart,
-			Blocks.cauldron, Blocks.flower_pot, Blocks.wheat, Blocks.reeds,
-			Blocks.cake, Blocks.skull, Blocks.piston_head,
-			Blocks.piston_extension, Blocks.lit_redstone_ore,
-			Blocks.powered_repeater, Blocks.pumpkin_stem, Blocks.standing_sign,
-			Blocks.powered_comparator, Blocks.tripwire,
-			Blocks.lit_redstone_lamp, Blocks.melon_stem,
-			Blocks.unlit_redstone_torch, Blocks.unpowered_comparator,
-			Blocks.redstone_wire, Blocks.wall_sign, Blocks.unpowered_repeater,
-			Blocks.iron_door, Blocks.wool).unionWith(BlockSets.WOODEN_DOR).invert();
+			Blocks.AIR, Blocks.BREWING_STAND, Blocks.BED, Blocks.NETHER_WART,
+			Blocks.CAULDRON, Blocks.FLOWER_POT, Blocks.WHEAT, Blocks.REEDS,
+			Blocks.CAKE, Blocks.SKULL, Blocks.PISTON_HEAD,
+			Blocks.PISTON_EXTENSION, Blocks.LIT_REDSTONE_ORE,
+			Blocks.POWERED_REPEATER, Blocks.PUMPKIN_STEM, Blocks.STANDING_SIGN,
+			Blocks.POWERED_COMPARATOR, Blocks.TRIPWIRE,
+			Blocks.LIT_REDSTONE_LAMP, Blocks.MELON_STEM,
+			Blocks.UNLIT_REDSTONE_TORCH, Blocks.UNPOWERED_COMPARATOR,
+			Blocks.REDSTONE_WIRE, Blocks.WALL_SIGN, Blocks.UNPOWERED_REPEATER,
+			Blocks.IRON_DOOR, Blocks.WOOL).unionWith(BlockSets.WOODEN_DOR).invert();
 
 	public static final class MyBlockFilter extends BlockFilter {
 		@Override

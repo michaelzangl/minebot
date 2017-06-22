@@ -25,7 +25,7 @@ import net.famzangl.minecraft.minebot.ai.command.SafeStrategyRule;
 import net.famzangl.minecraft.minebot.ai.path.GoToPathfinder;
 import net.famzangl.minecraft.minebot.ai.strategy.AIStrategy;
 import net.famzangl.minecraft.minebot.ai.strategy.PathFinderStrategy;
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.math.BlockPos;
 
 @AICommand(name = "minebot", helpText = "Use the pathfinder to get to a given location.")
 public class CommandPathfind {

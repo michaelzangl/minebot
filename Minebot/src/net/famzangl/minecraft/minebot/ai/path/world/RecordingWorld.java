@@ -2,7 +2,7 @@ package net.famzangl.minecraft.minebot.ai.path.world;
 
 import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.math.BlockPos;
 
 public class RecordingWorld extends WorldWithDelta {
 

@@ -27,7 +27,7 @@ import net.famzangl.minecraft.minebot.ai.utils.BlockCuboid;
 import net.famzangl.minecraft.minebot.ai.utils.BlockFilteredArea;
 import net.famzangl.minecraft.minebot.ai.utils.BlockIntersection;
 import net.minecraft.init.Blocks;
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.math.BlockPos;
 
 public class ClearAreaPathfinder extends MovePathFinder {
 	public enum ClearMode {
@@ -45,8 +45,8 @@ public class ClearAreaPathfinder extends MovePathFinder {
 	private final BlockCuboid area;
 	private ClearMode mode;
 
-	private static final BlockSet CLEARED_BLOCKS = new BlockSet(Blocks.air,
-			Blocks.torch);
+	private static final BlockSet CLEARED_BLOCKS = new BlockSet(Blocks.AIR,
+			Blocks.TORCH);
 
 	private final BlockSet clearedBlocks;
 

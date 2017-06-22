@@ -6,8 +6,8 @@ import net.minecraft.init.Blocks;
 
 public class PathfindingSettings {
 	private static final BlockSet defaultUpwardsBlocks = new BlockSet(
-			Blocks.dirt, Blocks.stone, Blocks.cobblestone, Blocks.sand,
-			Blocks.netherrack);
+			Blocks.DIRT, Blocks.STONE, Blocks.COBBLESTONE, Blocks.SAND,
+			Blocks.NETHERRACK);
 	private static final BlockSet allowedForUpwards = BlockSets.SAFE_GROUND
 			.unionWith(BlockSets.FEET_CAN_WALK_THROUGH);
 	private static final BlockSet destructableBlocks = BlockSets.SAFE_AFTER_DESTRUCTION

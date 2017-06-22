@@ -21,12 +21,12 @@ import net.minecraft.block.BlockSign;
 import net.minecraft.init.Blocks;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntitySign;
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.IChatComponent;
 
 @AICommand(helpText = "Dump all signs to a text file.", name = "minebot")
 public class CommandDumpSigns {
-	private static final BlockSet SIGNS = new BlockSet(Blocks.standing_sign, Blocks.wall_sign);
+	private static final BlockSet SIGNS = new BlockSet(Blocks.STANDING_SIGN, Blocks.WALL_SIGN);
 	@AICommandInvocation()
 	public static AIStrategy run(
 			AIHelper helper,
@@ -66,7 +66,7 @@ public class CommandDumpSigns {
 
 			private void dumpAtPos(AIHelper helper, PrintStream out, BlockPos p) {
 				BlockSign block = (BlockSign) helper.getBlock(p);
-				TileEntity tileentity = helper.getMinecraft().theWorld
+				TileEntity tileentity = helper.getMinecraft().world
 						.getTileEntity(p);
 				if (tileentity instanceof TileEntitySign) {
 					out.print(p.getX());

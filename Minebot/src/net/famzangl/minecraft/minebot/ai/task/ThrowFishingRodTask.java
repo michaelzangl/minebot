@@ -26,7 +26,7 @@ public class ThrowFishingRodTask extends AITask {
 	
 	@Override
 	public boolean isFinished(AIHelper aiHelper) {
-		return aiHelper.getMinecraft().thePlayer.fishEntity != null && time < 1;
+		return aiHelper.getMinecraft().player.fishEntity != null && time < 1;
 	}
 
 	@Override

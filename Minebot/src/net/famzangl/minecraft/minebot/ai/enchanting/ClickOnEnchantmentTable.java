@@ -25,7 +25,7 @@ import net.minecraft.init.Blocks;
 public class ClickOnEnchantmentTable extends UseItemOnBlockTask {
 
 	public ClickOnEnchantmentTable() {
-		super(new BlockSet(Blocks.enchanting_table));
+		super(new BlockSet(Blocks.ENCHANTING_TABLE));
 	}
 
 	@Override

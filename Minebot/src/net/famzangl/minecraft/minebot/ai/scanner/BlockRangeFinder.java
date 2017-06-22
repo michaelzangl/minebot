@@ -17,7 +17,7 @@
 package net.famzangl.minecraft.minebot.ai.scanner;
 
 import net.famzangl.minecraft.minebot.ai.path.WalkingPathfinder;
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.math.BlockPos;
 
 public class BlockRangeFinder extends WalkingPathfinder {
 	protected BlockRangeScanner rangeScanner;

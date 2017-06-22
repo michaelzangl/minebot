@@ -20,7 +20,7 @@ import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.ItemFilter;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSets;
 import net.famzangl.minecraft.minebot.ai.task.AITask;
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.math.BlockPos;
 
 public abstract class BuildTask {
 
@@ -34,7 +34,7 @@ public abstract class BuildTask {
 //			BlockPos worldPos) throws UnknownBlockException {
 //		int blockWithMeta = world.getBlockIdWithMeta(worldPos);
 //		
-//		final IBlockState blockState = h.getMinecraft().theWorld.getBlockState(worldPos);
+//		final IBlockState blockState = h.getMinecraft().world.getBlockState(worldPos);
 //		final int blockMetadata = h.getWorld().getBlockIdWithMeta(worldPos) & 0xf;
 //		if (BlockBuildTask.BLOCKS.contains(b)) {
 //			return new TaskDescription(name, CubeBuildTask.STANDABLE);

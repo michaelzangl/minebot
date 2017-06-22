@@ -34,8 +34,9 @@ import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.entity.Entity;
 import net.minecraft.init.Items;
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.EnumHand;
 import net.minecraft.util.MouseHelper;
+import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -141,7 +142,7 @@ public class AIController extends AIHelper implements IAIControllable {
 
 	@SubscribeEvent
 	public void connect(ClientConnectedToServerEvent e) {
-		networkHelper = MinebotNetHandler.inject(this, e.manager, e.handler);
+		networkHelper = MinebotNetHandler.inject(this, e.getManager(), e.getHandler());
 		profilerHelper = InterceptingProfiler.inject(getMinecraft());
 		// Hook into
 		// net.minecraft.client.renderer.RenderGlobal.drawBlockDamageTexture(Tessellator,
@@ -163,15 +164,15 @@ public class AIController extends AIHelper implements IAIControllable {
 	public void onPlayerTick(ClientTickEvent evt) {
 		if (evt.phase != ClientTickEvent.Phase.START) {
 			return;
-		} else if (getMinecraft().thePlayer == null
-				|| getMinecraft().theWorld == null) {
+		} else if (getMinecraft().player == null
+				|| getMinecraft().world == null) {
 			LOGGER.debug(MARKER_STRATEGY,
 					"Player tick but player is not in world.");
 			return;
 		}
 
 		LOGGER.debug(MARKER_STRATEGY, "Strategy game tick. World time: "
-				+ getMinecraft().theWorld.getTotalWorldTime());
+				+ getMinecraft().world.getTotalWorldTime());
 		testUngrabMode();
 		invalidateObjectMouseOver();
 		resetAllInputs();
@@ -340,14 +341,14 @@ public class AIController extends AIHelper implements IAIControllable {
 			return;
 		}
 		EntityPlayerSP player = (EntityPlayerSP) view;
-		if (player.getHeldItem() != null
-				&& player.getHeldItem().getItem() == Items.wooden_axe) {
+		if (player.getHeldItem(EnumHand.MAIN_HAND) != null
+				&& player.getHeldItem(EnumHand.MAIN_HAND).getItem() == Items.WOODEN_AXE) {
 			if (markerRenderer == null) {
 				markerRenderer = new PosMarkerRenderer(1, 0, 0);
 			}
 			markerRenderer.render(activeDrawEvent, this, pos1, pos2);
-		} else if (player.getHeldItem() != null
-				&& player.getHeldItem().getItem() == Items.stick) {
+		} else if (player.getHeldItem(EnumHand.MAIN_HAND) != null
+				&& player.getHeldItem(EnumHand.MAIN_HAND).getItem() == Items.STICK) {
 			if (buildMarkerRenderer == null) {
 				buildMarkerRenderer = new BuildMarkerRenderer();
 			}

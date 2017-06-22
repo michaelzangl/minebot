@@ -5,7 +5,7 @@ import java.util.Hashtable;
 
 import net.minecraft.block.Block;
 import net.minecraft.client.multiplayer.WorldClient;
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.Vec3;
 
 import org.apache.logging.log4j.LogManager;

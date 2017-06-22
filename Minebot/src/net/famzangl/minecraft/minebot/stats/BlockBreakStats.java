@@ -23,7 +23,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import net.famzangl.minecraft.minebot.ai.command.BlockWithData;
 import net.famzangl.minecraft.minebot.ai.path.world.WorldData;
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.math.BlockPos;
 
 /**
  * A recorder of the block breaks.

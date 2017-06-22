@@ -22,7 +22,7 @@ public class DamageTakenStrategy extends ValueActionStrategy {
 
 	@Override
 	protected double getValue(AIHelper helper) {
-		return helper.getMinecraft().thePlayer.getHealth();
+		return helper.getMinecraft().player.getHealth();
 	}
 
 	@Override

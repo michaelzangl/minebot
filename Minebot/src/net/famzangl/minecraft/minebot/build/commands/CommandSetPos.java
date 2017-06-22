@@ -23,7 +23,7 @@ import net.famzangl.minecraft.minebot.ai.command.AICommandParameter;
 import net.famzangl.minecraft.minebot.ai.command.ParameterType;
 import net.famzangl.minecraft.minebot.ai.strategy.AIStrategy;
 import net.famzangl.minecraft.minebot.ai.strategy.RunOnceStrategy;
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.math.BlockPos;
 
 @AICommand(helpText = "Set bounding position manually.", name = "minebuild")
 public class CommandSetPos {

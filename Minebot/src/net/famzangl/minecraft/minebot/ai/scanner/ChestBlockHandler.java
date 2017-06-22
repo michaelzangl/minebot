@@ -33,12 +33,12 @@ import net.minecraft.entity.item.EntityItemFrame;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.AxisAlignedBB;
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.EnumFacing;
 
 public class ChestBlockHandler extends RangeBlockHandler<ChestData> {
-	private static final BlockSet CHEST = new BlockSet(Blocks.chest,
-			Blocks.trapped_chest);
+	private static final BlockSet CHEST = new BlockSet(Blocks.CHEST,
+			Blocks.TRAPPED_CHEST);
 
 	public static class AbstractChestData {
 		protected final BlockPos pos;

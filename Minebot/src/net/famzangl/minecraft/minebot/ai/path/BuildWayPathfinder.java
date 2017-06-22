@@ -38,7 +38,7 @@ import net.famzangl.minecraft.minebot.build.blockbuild.BlockBuildTask;
 import net.famzangl.minecraft.minebot.build.blockbuild.SlabBuildTask;
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.EnumFacing;
 
 /**
@@ -68,8 +68,8 @@ public class BuildWayPathfinder extends AlongTrackPathFinder {
 
 	private static final SlabType FLOOR = SlabType.COBBLESTONE;
 
-	private static final Block BRIDGE_SIDE = Blocks.cobblestone;
-	private static final Block BRIDGE_WALL = Blocks.cobblestone_wall;
+	private static final Block BRIDGE_SIDE = Blocks.COBBLESTONE;
+	private static final Block BRIDGE_WALL = Blocks.COBBLESTONE_WALL;
 	private final int width = 2;
 
 	private BuildWayPathfinder(int dx, int dz, int cx, int cy, int cz) {
@@ -116,7 +116,7 @@ public class BuildWayPathfinder extends AlongTrackPathFinder {
 		public void addConstructionTasks(BlockPos currentPos) {
 			addTask(new GetOnHotBarTask(new SlabFilter(FLOOR)));
 			if (placeTorch) {
-				addTask(new GetOnHotBarTask(new BlockItemFilter(Blocks.torch)));
+				addTask(new GetOnHotBarTask(new BlockItemFilter(Blocks.TORCH)));
 			}
 
 			final BlockPos first = getPos(0, -1);

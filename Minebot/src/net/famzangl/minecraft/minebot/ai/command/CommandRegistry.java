@@ -40,7 +40,7 @@ import net.famzangl.minecraft.minebot.ai.strategy.StackStrategy;
 import net.famzangl.minecraft.minebot.ai.strategy.StrategyStack;
 import net.minecraft.network.ThreadQuickExitException;
 import net.minecraft.network.play.server.S3APacketTabComplete;
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.math.BlockPos;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;

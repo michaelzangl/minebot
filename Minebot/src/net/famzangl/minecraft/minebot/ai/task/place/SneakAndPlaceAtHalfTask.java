@@ -26,7 +26,7 @@ import net.famzangl.minecraft.minebot.ai.path.world.WorldData;
 import net.famzangl.minecraft.minebot.ai.task.BlockHalf;
 import net.famzangl.minecraft.minebot.ai.task.TaskOperations;
 import net.famzangl.minecraft.minebot.ai.task.error.StringTaskError;
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.Vec3;
 
@@ -194,9 +194,9 @@ public class SneakAndPlaceAtHalfTask extends SneakAndPlaceTask {
 		}
 
 		// TODO: lookingDirection
-		// TODO: aiHelper.getMinecraft().thePlayer.posX -
+		// TODO: aiHelper.getMinecraft().player.posX -
 		// getPositionToPlaceAt().getX(),
-		// TODO: aiHelper.getMinecraft().thePlayer.posZ -
+		// TODO: aiHelper.getMinecraft().player.posZ -
 		// getPositionToPlaceAt().getZ(),
 	}
 

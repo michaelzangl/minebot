@@ -2,7 +2,8 @@ package net.famzangl.minecraft.minebot.ai.path.world;
 
 import net.famzangl.minecraft.minebot.ai.utils.RandUtils;
 import net.minecraft.block.Block;
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3i;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.Vec3;
 
@@ -81,8 +82,8 @@ public class BlockBounds {
 				side == EnumFacing.NORTH ? minZ : maxZ);
 	}
 
-	public Vec3 random(BlockPos pos, double centered) {
-		return new Vec3(
+	public Vec3i random(BlockPos pos, double centered) {
+		return new Vec3i(
 				pos.getX() + RandUtils.getBetweenCentered(minX, maxX, centered),
 				pos.getY() + RandUtils.getBetweenCentered(minY, maxY, centered),
 				pos.getZ() + RandUtils.getBetweenCentered(minZ, maxZ, centered));

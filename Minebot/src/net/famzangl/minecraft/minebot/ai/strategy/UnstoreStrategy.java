@@ -34,7 +34,7 @@ import net.famzangl.minecraft.minebot.ai.task.inventory.MoveInInventoryTask;
 import net.minecraft.client.gui.inventory.GuiChest;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.math.BlockPos;
 
 public class UnstoreStrategy extends PathFinderStrategy {
 
@@ -202,7 +202,7 @@ public class UnstoreStrategy extends PathFinderStrategy {
 			ArrayList<ChestData> chests = chestBlockHandler
 					.getReachableForPos(currentPos);
 			for (final ChestData chestData : chests) {
-				ItemStack[] inventory = helper.getMinecraft().thePlayer.inventory.mainInventory;
+				ItemStack[] inventory = helper.getMinecraft().player.inventory.mainInventory;
 				ArrayList<AITask> tasks = list.getTakeTasks(inventory, chestData);
 
 				if (!tasks.isEmpty()) {

@@ -23,7 +23,7 @@ public class PutLapisInTableTask extends PutItemInContainerTask {
 		final GuiEnchantment screen = (GuiEnchantment) aiHelper.getMinecraft().currentScreen;
 		for (int i = TABLE_INV_OFFSET; i < 9 * 4 + TABLE_INV_OFFSET; i++) {
 			final Slot slot = screen.inventorySlots.getSlot(i);
-			if (slot == null || !slot.canTakeStack(aiHelper.getMinecraft().thePlayer)) {
+			if (slot == null || !slot.canTakeStack(aiHelper.getMinecraft().player)) {
 				continue;
 			}
 			final ItemStack stack = slot.getStack();

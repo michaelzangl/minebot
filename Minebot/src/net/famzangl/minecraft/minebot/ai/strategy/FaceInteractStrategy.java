@@ -68,10 +68,10 @@ public abstract class FaceInteractStrategy extends AIStrategy {
 				&& doInteractWithCurrent(position.entityHit, helper)) {
 			ticksRun = 0;
 		} else {
-			final double speed = helper.getMinecraft().thePlayer.motionX
-					* helper.getMinecraft().thePlayer.motionX
-					+ helper.getMinecraft().thePlayer.motionZ
-					* helper.getMinecraft().thePlayer.motionZ;
+			final double speed = helper.getMinecraft().player.motionX
+					* helper.getMinecraft().player.motionX
+					+ helper.getMinecraft().player.motionZ
+					* helper.getMinecraft().player.motionZ;
 			helper.face(found.posX, found.posY, found.posZ);
 			final MovementInput movement = new MovementInput();
 			if (speed < 0.01 && ticksRun > 8) {

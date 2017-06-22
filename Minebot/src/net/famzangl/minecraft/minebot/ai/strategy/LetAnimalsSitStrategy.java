@@ -89,7 +89,7 @@ public class LetAnimalsSitStrategy extends TaskStrategy {
 		}
 
 		Predicate<Entity> selector = new AndSelector(new IsSittingSelector(
-				!shouldSit, helper.getMinecraft().thePlayer), new NotSelector(
+				!shouldSit, helper.getMinecraft().player), new NotSelector(
 				new OneOfListSelector(handled)));
 		if (color != null) {
 			selector = new AndSelector(selector, new ColorSelector(color));

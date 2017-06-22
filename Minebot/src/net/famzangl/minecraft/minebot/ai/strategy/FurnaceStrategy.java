@@ -38,7 +38,7 @@ import net.famzangl.minecraft.minebot.ai.task.inventory.TakeResultItem;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.inventory.GuiFurnace;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.math.BlockPos;
 
 public class FurnaceStrategy extends PathFinderStrategy {
 
@@ -125,7 +125,7 @@ public class FurnaceStrategy extends PathFinderStrategy {
 		}
 
 		protected ItemStack getStack(AIHelper aiHelper) {
-			return aiHelper.getMinecraft().thePlayer.inventory
+			return aiHelper.getMinecraft().player.inventory
 					.getStackInSlot(stackIndex);
 		}
 
@@ -235,7 +235,7 @@ public class FurnaceStrategy extends PathFinderStrategy {
 					if (list.couldTake(f)) {
 						return distance;
 					}
-					for (ItemStack stack : helper.getMinecraft().thePlayer.inventory.mainInventory) {
+					for (ItemStack stack : helper.getMinecraft().player.inventory.mainInventory) {
 						if (list.hasSomePutTasks(f, stack)) {
 							return distance;
 						}
@@ -257,7 +257,7 @@ public class FurnaceStrategy extends PathFinderStrategy {
 
 		private void addFurnaceTasks(final FurnaceData f) {
 			ArrayList<AITask> furnaceTasks = new ArrayList<AITask>();
-			ItemStack[] mainInventory = helper.getMinecraft().thePlayer.inventory.mainInventory;
+			ItemStack[] mainInventory = helper.getMinecraft().player.inventory.mainInventory;
 			for (int i = 0; i < mainInventory.length; i++) {
 				ItemStack stack = mainInventory[i];
 				if (list.couldPutItem(f, stack)) {

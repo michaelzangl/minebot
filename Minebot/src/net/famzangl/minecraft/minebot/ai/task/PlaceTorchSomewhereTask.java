@@ -25,7 +25,7 @@ import net.famzangl.minecraft.minebot.ai.BlockItemFilter;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSets;
 import net.famzangl.minecraft.minebot.ai.task.error.SelectTaskError;
 import net.minecraft.init.Blocks;
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.EnumFacing;
 
 /**
@@ -134,7 +134,7 @@ public class PlaceTorchSomewhereTask extends AITask {
 			return;
 		}
 
-		final BlockItemFilter itemFilter = new BlockItemFilter(Blocks.torch);
+		final BlockItemFilter itemFilter = new BlockItemFilter(Blocks.TORCH);
 		if (!aiHelper.selectCurrentItem(itemFilter)) {
 			taskOperations.desync(new SelectTaskError(itemFilter));
 		}

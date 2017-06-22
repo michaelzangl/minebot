@@ -25,11 +25,11 @@ import net.famzangl.minecraft.minebot.ai.task.AITask;
 import net.famzangl.minecraft.minebot.ai.task.place.SignPlaceOnGroundTask;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemSign;
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.math.BlockPos;
 
 public class StandingSignBuildTask extends BuildFlatOnGroundTask {
 
-	public static final BlockSet BLOCKS = new BlockSet(Blocks.standing_sign);
+	public static final BlockSet BLOCKS = new BlockSet(Blocks.STANDING_SIGN);
 	
 	private final SignDirection direction;
 

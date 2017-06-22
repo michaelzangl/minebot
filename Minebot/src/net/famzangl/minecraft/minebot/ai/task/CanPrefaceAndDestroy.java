@@ -19,7 +19,7 @@ package net.famzangl.minecraft.minebot.ai.task;
 import java.util.List;
 
 import net.famzangl.minecraft.minebot.ai.AIHelper;
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.math.BlockPos;
 
 /**
  * An interface that is implemented by all {@link AITask}s that do destroy

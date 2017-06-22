@@ -18,7 +18,7 @@ package net.famzangl.minecraft.minebot.ai.path;
 
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSet;
 import net.minecraft.init.Blocks;
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.EnumFacing;
 
 public class OrebfuscatedMinePathFinder extends MineBySettingsPathFinder {
@@ -36,7 +36,7 @@ public class OrebfuscatedMinePathFinder extends MineBySettingsPathFinder {
 	private static final BlockSet targetBlocks = new BlockSet(1, 4, 5, 14, 15,
 			16, 21, 46, 48, 49, 56, 73, 82, 129, 13, 87, 88, 112, 153);
 	private static final BlockSet visibleMakingBlocks = new BlockSet(
-			Blocks.gravel, Blocks.dirt).unionWith(targetBlocks).invert();
+			Blocks.GRAVEL, Blocks.DIRT).unionWith(targetBlocks).invert();
 	
 	@Override
 	protected void onPreRunSearch(BlockPos playerPosition) {

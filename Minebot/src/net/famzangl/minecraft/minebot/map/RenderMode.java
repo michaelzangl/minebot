@@ -9,7 +9,7 @@ import net.famzangl.minecraft.minebot.ai.utils.BlockCuboid;
 import net.minecraft.block.material.MapColor;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.chunk.Chunk;
 
 public enum RenderMode {
@@ -83,10 +83,10 @@ public enum RenderMode {
 				--height;
 				state = chunk.getBlockState(new BlockPos(dx, height, dz));
 			} while ((GLOBAL_COVER_BLACKLIST.contains(state.getBlock()) || state
-					.getBlock().getMapColor(state) == MapColor.airColor)
+					.getBlock().getMapColor(state) == MapColor.AIR)
 					&& height > 0);
 
-			if (state.getBlock() == Blocks.sandstone || state.getBlock() == Blocks.sandstone_stairs) {
+			if (state.getBlock() == Blocks.SANDSTONE || state.getBlock() == Blocks.SANDSTONE_STAIRS) {
 				return 0xffb4ad8a;
 			}
 			

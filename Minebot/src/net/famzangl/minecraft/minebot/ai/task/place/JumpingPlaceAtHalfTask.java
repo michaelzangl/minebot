@@ -22,7 +22,7 @@ import net.famzangl.minecraft.minebot.ai.path.world.BlockSets;
 import net.famzangl.minecraft.minebot.ai.task.BlockHalf;
 import net.famzangl.minecraft.minebot.ai.task.TaskOperations;
 import net.famzangl.minecraft.minebot.ai.task.error.StringTaskError;
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.EnumFacing;
 
 import org.apache.logging.log4j.Marker;
@@ -82,8 +82,8 @@ public class JumpingPlaceAtHalfTask extends JumpingPlaceBlockAtFloorTask {
 			aiHelper.faceSideOf(facingBlock, dir.getOpposite(),
 					getSide(dir) == BlockHalf.UPPER_HALF ? 0.5 : 0,
 					getSide(dir) == BlockHalf.LOWER_HALF ? 0.5 : 1,
-					aiHelper.getMinecraft().thePlayer.posX - pos.getX(),
-					aiHelper.getMinecraft().thePlayer.posZ - pos.getZ(),
+					aiHelper.getMinecraft().player.posX - pos.getX(),
+					aiHelper.getMinecraft().player.posZ - pos.getZ(),
 					lookingDirection);
 			return true;
 		}

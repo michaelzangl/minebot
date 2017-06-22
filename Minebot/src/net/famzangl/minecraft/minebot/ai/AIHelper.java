@@ -46,7 +46,7 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.MovementInput;
@@ -141,12 +141,12 @@ public abstract class AIHelper {
 
 	protected void invalidateChunkCache() {
 		if (minecraftWorld == null
-				|| mc.theWorld != minecraftWorld.getBackingWorld()) {
-			if (mc.theWorld == null) {
+				|| getMinecraft().world != minecraftWorld.getBackingWorld()) {
+			if (getMinecraft().world == null) {
 				minecraftWorld = null;
 			} else {
 				minecraftWorld = new WorldData(
-						mc.theWorld, mc.thePlayer);
+						getMinecraft().world, getMinecraft().player);
 			}
 		}
 		if (minecraftWorld != null) {
@@ -159,7 +159,7 @@ public abstract class AIHelper {
 	}
 
 	public static File getMinebotDir() {
-		File dir = new File(mc.mcDataDir, "minebot");
+		File dir = new File(getMinecraft().mcDataDir, "minebot");
 		if (!dir.exists()) {
 			dir.mkdir();
 		}
@@ -221,9 +221,9 @@ public abstract class AIHelper {
 	public MovingObjectPosition getObjectMouseOver() {
 		if (objectMouseOverInvalidated) {
 			objectMouseOverInvalidated = false;
-			mc.entityRenderer.getMouseOver(1.0F);
+			getMinecraft().entityRenderer.getMouseOver(1.0F);
 		}
-		return mc.objectMouseOver;
+		return getMinecraft().objectMouseOver;
 	}
 
 	/**
@@ -247,7 +247,7 @@ public abstract class AIHelper {
 	 */
 	public Block getBlock(int x, int y, int z) {
 		// TODO: Warn that no delta is used.
-		return mc.theWorld.getBlockState(new BlockPos(x, y, z)).getBlock();
+		return getMinecraft().world.getBlockState(new BlockPos(x, y, z)).getBlock();
 	}
 
 	public WorldData getWorld() {
@@ -262,16 +262,16 @@ public abstract class AIHelper {
 	 * @return
 	 */
 	public double getRequiredAngularChangeTo(double x, double y, double z) {
-		final double d0 = x - mc.thePlayer.posX;
-		final double d1 = z - mc.thePlayer.posZ;
-		final double d2 = y - mc.thePlayer.posY - mc.thePlayer.getEyeHeight();
+		final double d0 = x - getMinecraft().player.posX;
+		final double d1 = z - getMinecraft().player.posZ;
+		final double d2 = y - getMinecraft().player.posY - getMinecraft().player.getEyeHeight();
 		final double d3 = d0 * d0 + d2 * d2 + d1 * d1;
 
 		if (d3 < 2.500000277905201E-7D) {
 			return 0;
 		}
 		
-		Vec3 playerLook = mc.thePlayer.getLookVec().normalize();
+		Vec3 playerLook = getMinecraft().player.getLookVec().normalize();
 		return Math.acos(playerLook.dotProduct(new Vec3(d0, d1, d2).normalize()));
 	}
 	
@@ -303,14 +303,14 @@ public abstract class AIHelper {
 
 		LOGGER.trace(MARKER_FACING, "facing " + x + "," + y + "," + z
 				+ " using influence: " + yawInfluence + ";" + pitchInfluence);
-		final double d0 = x - mc.thePlayer.posX;
-		final double d1 = z - mc.thePlayer.posZ;
-		final double d2 = y - mc.thePlayer.posY - mc.thePlayer.getEyeHeight();
+		final double d0 = x - getMinecraft().player.posX;
+		final double d1 = z - getMinecraft().player.posZ;
+		final double d2 = y - getMinecraft().player.posY - getMinecraft().player.getEyeHeight();
 		final double d3 = d0 * d0 + d2 * d2 + d1 * d1;
 
 		if (d3 >= 2.500000277905201E-7D) {
-			final float rotationYaw = mc.thePlayer.rotationYaw;
-			final float rotationPitch = mc.thePlayer.rotationPitch;
+			final float rotationYaw = getMinecraft().player.rotationYaw;
+			final float rotationPitch = getMinecraft().player.rotationPitch;
 
 			final float yaw = (float) (Math.atan2(d1, d0) * 180.0D / Math.PI) - 90.0F;
 			final float pitch = (float) -(Math.atan2(d2,
@@ -331,7 +331,7 @@ public abstract class AIHelper {
 			pitchInfluence = Math.min(pitchInfluence, clamp);
 			// TODO: Make this linear?
 
-			mc.thePlayer.setAngles(yawChange / 0.15f * yawInfluence,
+			getMinecraft().player.setAngles(yawChange / 0.15f * yawInfluence,
 					-pitchChange / 0.15f * pitchInfluence);
 			invalidateObjectMouseOver();
 
@@ -443,9 +443,9 @@ public abstract class AIHelper {
 	public boolean isStandingOn(int x, int y, int z) {
 		// boolean isFence = blockIsOneOf(getBlock(x, y - 1, z),
 		// FenceBuildTask.BLOCKS);
-		return Math.abs(x + 0.5 - mc.thePlayer.posX) < 0.2
-				&& Math.abs(z + 0.5 - mc.thePlayer.posZ) < 0.2
-				&& Math.abs(mc.thePlayer.getEntityBoundingBox().minY - y) < 0.52;
+		return Math.abs(x + 0.5 - getMinecraft().player.posX) < 0.2
+				&& Math.abs(z + 0.5 - getMinecraft().player.posZ) < 0.2
+				&& Math.abs(getMinecraft().player.getEntityBoundingBox().minY - y) < 0.52;
 	}
 
 	public double realBlockTopY(BlockPos pos) {
@@ -488,7 +488,7 @@ public abstract class AIHelper {
 	}
 
 	/*
-	 * public void moveTo(int x, int y, int z) { face(x + .5, mc.thePlayer.posY,
+	 * public void moveTo(int x, int y, int z) { face(x + .5, getMinecraft().player.posY,
 	 * z + .5); MovementInput i = new MovementInput(); i.moveForward = 0.8f;
 	 * overrideMovement(i); }
 	 */
@@ -502,7 +502,7 @@ public abstract class AIHelper {
 	 */
 	public boolean canSelectItem(ItemFilter f) {
 		for (int i = 0; i < 9; ++i) {
-			if (f.matches(mc.thePlayer.inventory.getStackInSlot(i))) {
+			if (f.matches(getMinecraft().player.inventory.getStackInSlot(i))) {
 				return true;
 			}
 		}
@@ -517,12 +517,12 @@ public abstract class AIHelper {
 	 * @return <code>true</code> if the player is now holding that item.
 	 */
 	public boolean selectCurrentItem(ItemFilter f) {
-		if (f.matches(mc.thePlayer.inventory.getCurrentItem())) {
+		if (f.matches(getMinecraft().player.inventory.getCurrentItem())) {
 			return true;
 		}
 		for (int i = 0; i < 9; ++i) {
-			if (f.matches(mc.thePlayer.inventory.getStackInSlot(i))) {
-				mc.thePlayer.inventory.currentItem = i;
+			if (f.matches(getMinecraft().player.inventory.getStackInSlot(i))) {
+				getMinecraft().player.inventory.currentItem = i;
 				return true;
 			}
 		}
@@ -603,21 +603,21 @@ public abstract class AIHelper {
 	 */
 	public ToolRaterResult selectToolFor(final BlockPos pos, ToolRater rater) {
 		ToolRaterResult res = searchToolFor(pos, rater);
-		mc.thePlayer.inventory.currentItem = res.getBestSlot();
+		getMinecraft().player.inventory.currentItem = res.getBestSlot();
 		return res;
 	}
 	
 	public ToolRaterResult searchToolFor(final BlockPos pos, ToolRater rater) {
-		int bestRatingSlot = mc.thePlayer.inventory.currentItem;
+		int bestRatingSlot = getMinecraft().player.inventory.currentItem;
 		if (bestRatingSlot < 0 || bestRatingSlot >= 9) {
 			bestRatingSlot = 0;
 		}
 		int block = pos == null ? -1 : getWorld().getBlockIdWithMeta(pos);
 		float bestRating = rater.rateTool(
-				mc.thePlayer.inventory.getStackInSlot(bestRatingSlot), block);
+				getMinecraft().player.inventory.getStackInSlot(bestRatingSlot), block);
 		for (int i = 0; i < 9; ++i) {
 			float rating = rater.rateTool(
-					mc.thePlayer.inventory.getStackInSlot(i), block);
+					getMinecraft().player.inventory.getStackInSlot(i), block);
 			if (rating > bestRating) {
 				bestRating = rating;
 				bestRatingSlot = i;
@@ -769,7 +769,7 @@ public abstract class AIHelper {
 	 * @return
 	 */
 	public boolean hasItemInInvetory(ItemFilter itemFiler) {
-		for (final ItemStack stack : mc.thePlayer.inventory.mainInventory) {
+		for (final ItemStack stack : getMinecraft().player.inventory.mainInventory) {
 			if (itemFiler.matches(stack)) {
 				return true;
 			}
@@ -784,9 +784,9 @@ public abstract class AIHelper {
 	 */
 	public void overrideMovement(MovementInput i) {
 		if (resetMovementInput == null) {
-			resetMovementInput = mc.thePlayer.movementInput;
+			resetMovementInput = getMinecraft().player.movementInput;
 		}
-		mc.thePlayer.movementInput = i;
+		getMinecraft().player.movementInput = i;
 	}
 
 	/**
@@ -800,7 +800,7 @@ public abstract class AIHelper {
 	 * Presses the attack key in the next game tick.
 	 */
 	public void overrideAttack() {
-		if (mc.thePlayer.isUsingItem()) {
+		if (getMinecraft().player.isUsingItem()) {
 			LOGGER.warn("WARNING: Player is currently using an item, but attack was requested.");
 		}
 		overrideKey(KeyType.ATTACK);
@@ -829,7 +829,7 @@ public abstract class AIHelper {
 	 */
 	protected void resetAllInputs() {
 		if (resetMovementInput != null) {
-			mc.thePlayer.movementInput = resetMovementInput;
+			getMinecraft().player.movementInput = resetMovementInput;
 			resetMovementInput = null;
 		}
 	}
@@ -865,9 +865,9 @@ public abstract class AIHelper {
 	 */
 	@SuppressWarnings("unchecked")
 	public List<Entity> getEntities(int dist, Predicate<Entity> selector) {
-		return mc.theWorld.getEntitiesInAABBexcluding(
-				mc.getRenderViewEntity(),
-				mc.getRenderViewEntity().getEntityBoundingBox()
+		return getMinecraft().world.getEntitiesInAABBexcluding(
+				getMinecraft().getRenderViewEntity(),
+				getMinecraft().getRenderViewEntity().getEntityBoundingBox()
 						.addCoord(-dist, -dist, -dist)
 						.addCoord(dist, dist, dist).expand(1, 1, 1), selector);
 	}
@@ -886,7 +886,7 @@ public abstract class AIHelper {
 		double mindist = Double.MAX_VALUE;
 		Entity found = null;
 		for (final Entity e : entities) {
-			final double mydist = e.getDistanceSqToEntity(mc.thePlayer);
+			final double mydist = e.getDistanceSqToEntity(getMinecraft().player);
 			if (mydist < mindist) {
 				found = e;
 				mindist = mydist;
@@ -957,20 +957,20 @@ public abstract class AIHelper {
 	}
 
 	public boolean walkTowards(double x, double z, boolean jump, boolean face) {
-		final double dx = x - mc.thePlayer.posX;
-		final double dz = z - mc.thePlayer.posZ;
+		final double dx = x - getMinecraft().player.posX;
+		final double dz = z - getMinecraft().player.posZ;
 		final double distTo = Math.sqrt(dx * dx + dz * dz);
 		boolean arrived = distTo > MIN_DISTANCE_ERROR;
 		if (arrived) {
 			if (face) {
-				face(x, mc.thePlayer.getEyeHeight() + mc.thePlayer.posY, z, 1,
+				face(x, getMinecraft().player.getEyeHeight() + getMinecraft().player.posY, z, 1,
 						.1f);
 			}
 			double speed = 1;
 			if (distTo < 4 * WALK_PER_STEP) {
 				speed = Math.max(distTo / WALK_PER_STEP / 4, 0.1);
 			}
-			final double yaw = mc.thePlayer.rotationYaw / 180 * Math.PI;
+			final double yaw = getMinecraft().player.rotationYaw / 180 * Math.PI;
 			final double lookX = -Math.sin(yaw);
 			final double lookZ = Math.cos(yaw);
 			final double dlength = Math.sqrt(dx * dx + dz * dz);
@@ -984,7 +984,7 @@ public abstract class AIHelper {
 			movement.moveStrafe = (float) (speed * strafe);
 			movement.jump = jump;
 			overrideMovement(movement);
-			if (distTo < 0.5 || mc.thePlayer.isSprinting() && distTo < 0.8) {
+			if (distTo < 0.5 || getMinecraft().player.isSprinting() && distTo < 0.8) {
 				overrideSneak();
 			} else if (distTo > 6) {
 				overrideSprint();
@@ -996,14 +996,14 @@ public abstract class AIHelper {
 	}
 
 	public boolean arrivedAt(double x, double z) {
-		final double dx = x - mc.thePlayer.posX;
-		final double dz = z - mc.thePlayer.posZ;
+		final double dx = x - getMinecraft().player.posX;
+		final double dz = z - getMinecraft().player.posZ;
 		final double distTo = Math.sqrt(dx * dx + dz * dz);
 		return distTo <= MIN_DISTANCE_ERROR;
 	}
 
 	public boolean isJumping() {
-		return !mc.thePlayer.onGround;
+		return !getMinecraft().player.onGround;
 	}
 
 	/**
@@ -1013,7 +1013,7 @@ public abstract class AIHelper {
 	 */
 	public EnumFacing getLookDirection() {
 		switch (MathHelper
-				.floor_double(getMinecraft().thePlayer.rotationYaw / 360 * 4 + .5) & 3) {
+				.floor_double(getMinecraft().player.rotationYaw / 360 * 4 + .5) & 3) {
 		case 1:
 			return EnumFacing.WEST;
 		case 2:
@@ -1032,13 +1032,13 @@ public abstract class AIHelper {
 	 * @return <code>true</code> if it is alive.
 	 */
 	public boolean isAlive() {
-		return mc.thePlayer != null && mc.thePlayer.getHealth() > 0.0F;
+		return getMinecraft().player != null && getMinecraft().player.getHealth() > 0.0F;
 	}
 
 	public void respawn() {
 		if (!isAlive()) {
-			mc.thePlayer.respawnPlayer();
-			mc.displayGuiScreen(null);
+			getMinecraft().player.respawnPlayer();
+			getMinecraft().displayGuiScreen(null);
 		}
 	}
 
@@ -1073,7 +1073,7 @@ public abstract class AIHelper {
 
 	// TODO: Move this to WorldData
 	public int getLightAt(BlockPos pos) {
-		final Chunk chunk = mc.theWorld.getChunkFromChunkCoords(
+		final Chunk chunk = getMinecraft().world.getChunkFromChunkCoords(
 				pos.getX() >> 4, pos.getZ() >> 4);
 		final ExtendedBlockStorage storage = chunk.getBlockStorageArray()[pos
 				.getY() >> 4];

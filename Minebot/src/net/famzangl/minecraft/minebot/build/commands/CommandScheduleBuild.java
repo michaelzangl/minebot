@@ -35,7 +35,7 @@ import net.famzangl.minecraft.minebot.build.blockbuild.LogBuildTask;
 import net.famzangl.minecraft.minebot.build.blockbuild.SlabBuildTask;
 import net.famzangl.minecraft.minebot.build.blockbuild.StandingSignBuildTask;
 import net.famzangl.minecraft.minebot.build.blockbuild.StandingSignBuildTask.SignDirection;
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.math.BlockPos;
 
 @AICommand(helpText = "Schedules a build task.", name = "minebuild")
 public class CommandScheduleBuild {

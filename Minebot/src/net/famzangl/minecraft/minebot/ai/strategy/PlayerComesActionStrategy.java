@@ -24,7 +24,7 @@ public class PlayerComesActionStrategy extends CloseEntityActionStrategy {
 
 	@Override
 	protected boolean matches(AIHelper helper, Entity player) {
-		return player instanceof EntityPlayer && player != helper.getMinecraft().thePlayer;
+		return player instanceof EntityPlayer && player != helper.getMinecraft().player;
 	}
 
 	@Override

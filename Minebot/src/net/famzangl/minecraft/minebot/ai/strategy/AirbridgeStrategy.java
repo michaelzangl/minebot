@@ -18,7 +18,7 @@ import net.famzangl.minecraft.minebot.ai.utils.BlockArea.AreaVisitor;
 import net.famzangl.minecraft.minebot.ai.utils.BlockCuboid;
 import net.famzangl.minecraft.minebot.ai.utils.BlockFilteredArea;
 import net.famzangl.minecraft.minebot.ai.utils.ReverseAcceptingArea;
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.EnumFacing;
 
 import org.apache.logging.log4j.LogManager;
@@ -88,14 +88,14 @@ public class AirbridgeStrategy extends TaskStrategy {
 
 		@Override
 		public boolean isFinished(AIHelper aiHelper) {
-			return aiHelper.getMinecraft().theWorld.getTotalWorldTime() >= startTime + LAG_TEST_DELAY;
+			return aiHelper.getMinecraft().world.getTotalWorldTime() >= startTime + LAG_TEST_DELAY;
 		}
 
 		public AITask getTrigger() {
 			return new RunOnceTask() {
 				@Override
 				protected void runOnce(AIHelper aiHelper, TaskOperations taskOperations) {
-					startTime = aiHelper.getMinecraft().theWorld.getTotalWorldTime();
+					startTime = aiHelper.getMinecraft().world.getTotalWorldTime();
 				}
 			};
 		}
@@ -175,7 +175,7 @@ public class AirbridgeStrategy extends TaskStrategy {
 
 		boolean slabsFound = false;
 		for (int i = 0; i < 9 * 4; ++i) {
-			if (SLABS_FILTER.matches(helper.getMinecraft().thePlayer.inventory
+			if (SLABS_FILTER.matches(helper.getMinecraft().player.inventory
 					.getStackInSlot(i))) {
 				slabsFound = true;
 			}

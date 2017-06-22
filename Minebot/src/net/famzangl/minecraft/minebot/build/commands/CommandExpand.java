@@ -9,7 +9,7 @@ import net.famzangl.minecraft.minebot.ai.command.ParameterType;
 import net.famzangl.minecraft.minebot.ai.path.world.Pos;
 import net.famzangl.minecraft.minebot.ai.strategy.AIStrategy;
 import net.famzangl.minecraft.minebot.ai.strategy.RunOnceStrategy;
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.Vec3i;
 
@@ -69,7 +69,7 @@ public class CommandExpand {
 			@AICommandParameter(type = ParameterType.ENUM, description = "Direction", optional = true) EnumFacing direction) {
 		if (direction == null) {
 			System.out.println("Pitch: "
-					+ helper.getMinecraft().thePlayer.rotationPitch);
+					+ helper.getMinecraft().player.rotationPitch);
 			direction = helper.getLookDirection();
 		}
 

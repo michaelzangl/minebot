@@ -64,7 +64,7 @@ public abstract class PutItemInContainerTask extends AITask {
 				oldContent = newContent;
 				aiHelper.getMinecraft().playerController.windowClick(
 						screen.inventorySlots.windowId, slotToPlace, 0, 1,
-						aiHelper.getMinecraft().thePlayer);
+						aiHelper.getMinecraft().player);
 				newContent = getSlotContentCount(slot);
 			} while (newContent != oldContent);
 			if (newContent > 0) {

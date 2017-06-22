@@ -47,7 +47,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.CraftingManager;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.item.crafting.ShapedRecipes;
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.oredict.ShapedOreRecipe;
 
 import org.apache.logging.log4j.LogManager;
@@ -252,7 +252,7 @@ public class CraftStrategy extends PathFinderStrategy {
 
 	public final static class CraftingTableHandler extends
 			RangeBlockHandler<CraftingTableData> {
-		private static final BlockSet IDS = new BlockSet(Blocks.crafting_table);
+		private static final BlockSet IDS = new BlockSet(Blocks.CRAFTING_TABLE);
 
 		private final Hashtable<BlockPos, CraftingTableData> found = new Hashtable<BlockPos, CraftingTableData>();
 
@@ -353,7 +353,7 @@ public class CraftStrategy extends PathFinderStrategy {
 			addTask(new UseItemOnBlockAtTask(table.pos) {
 				@Override
 				protected boolean isBlockAllowed(AIHelper aiHelper, BlockPos pos) {
-					return aiHelper.getBlock(pos) == Blocks.crafting_table;
+					return aiHelper.getBlock(pos) == Blocks.CRAFTING_TABLE;
 				}
 
 				@Override
@@ -404,7 +404,7 @@ public class CraftStrategy extends PathFinderStrategy {
 
 		private int countInInventory(ItemWithSubtype itemWithSubtype) {
 			int count = 0;
-			for (ItemStack stack : helper.getMinecraft().thePlayer.inventory.mainInventory) {
+			for (ItemStack stack : helper.getMinecraft().player.inventory.mainInventory) {
 				if (itemWithSubtype.equals(ItemWithSubtype.fromStack(stack))) {
 					count += stack.stackSize;
 				}
@@ -425,7 +425,7 @@ public class CraftStrategy extends PathFinderStrategy {
 			for (CraftingPossibility possibility : possibilities) {
 				ItemWithSubtype[][] assignedSlots = new ItemWithSubtype[3][3];
 				// TODO: Order this in a better way. We need to have multiples of our item count first.
-				for (ItemStack stack : aiHelper.getMinecraft().thePlayer.inventory.mainInventory) {
+				for (ItemStack stack : aiHelper.getMinecraft().player.inventory.mainInventory) {
 					if (stack == null) {
 						continue;
 					}

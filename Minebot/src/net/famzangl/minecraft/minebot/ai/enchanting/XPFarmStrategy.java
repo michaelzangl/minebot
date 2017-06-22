@@ -50,14 +50,14 @@ public class XPFarmStrategy extends TaskStrategy {
 		} else if (enchantmentTableOpened(helper)) {
 			addTask(new TakeEnchantedItemTask());
 			addTask(new CloseScreenTask());
-		} else if (helper.getMinecraft().thePlayer.experienceLevel < level) {
+		} else if (helper.getMinecraft().player.experienceLevel < level) {
 			addTask(new FaceAnyMobTask());
 			addTask(new KillAnyMobTask());
 		}
 	}
 
 	private boolean hasLevelsToEnchant(AIHelper helper) {
-		return helper.getMinecraft().thePlayer.experienceLevel >= level;
+		return helper.getMinecraft().player.experienceLevel >= level;
 	}
 
 	private boolean enchantmentTableOpened(AIHelper helper) {

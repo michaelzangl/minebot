@@ -21,7 +21,7 @@ import net.famzangl.minecraft.minebot.ai.path.world.RecordingWorld;
 import net.famzangl.minecraft.minebot.ai.task.AITask;
 import net.famzangl.minecraft.minebot.ai.task.TaskOperations;
 import net.famzangl.minecraft.minebot.ai.task.error.PositionTaskError;
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.math.BlockPos;
 
 /**
  * Simply walks towards (x, z) assuming there is nothing in the way.

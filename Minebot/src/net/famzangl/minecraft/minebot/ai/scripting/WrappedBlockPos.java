@@ -1,6 +1,6 @@
 package net.famzangl.minecraft.minebot.ai.scripting;
 
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.math.BlockPos;
 
 public class WrappedBlockPos {
 	public final int x;

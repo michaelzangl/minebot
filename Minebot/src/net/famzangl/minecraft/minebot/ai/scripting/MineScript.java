@@ -51,7 +51,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.nbt.JsonToNBT;
 import net.minecraft.nbt.NBTException;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.IChatComponent;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
@@ -121,7 +121,7 @@ public class MineScript {
 	}
 
 	public FoundEntity getPlayer() {
-		return new FoundEntity(waitForTick().getMinecraft().thePlayer);
+		return new FoundEntity(waitForTick().getMinecraft().player);
 	}
 
 	/**
@@ -164,7 +164,7 @@ public class MineScript {
 
 					@Override
 					public BlockPos getPosition() {
-						return helper.getMinecraft().thePlayer.getPosition();
+						return helper.getMinecraft().player.getPosition();
 					}
 
 					@Override
@@ -184,7 +184,7 @@ public class MineScript {
 
 					@Override
 					public Entity getCommandSenderEntity() {
-						return helper.getMinecraft().thePlayer;
+						return helper.getMinecraft().player;
 					}
 
 					@Override
@@ -267,16 +267,16 @@ public class MineScript {
 	}
 
 	public int getExperienceLevel() {
-		return waitForTick().getMinecraft().thePlayer.experienceLevel;
+		return waitForTick().getMinecraft().player.experienceLevel;
 	}
 
 	public int getCurrentTime() {
-		return (int) (waitForTick().getMinecraft().theWorld.getWorldTime() % 24000l);
+		return (int) (waitForTick().getMinecraft().world.getWorldTime() % 24000l);
 	}
 
 	public InventoryDefinition getInventory() {
 		return new InventoryDefinition(
-				waitForTick().getMinecraft().thePlayer.inventory);
+				waitForTick().getMinecraft().player.inventory);
 	}
 
 	public ScriptStrategy stack(Object... strats) {

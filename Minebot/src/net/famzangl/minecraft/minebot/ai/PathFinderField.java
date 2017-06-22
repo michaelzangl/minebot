@@ -21,7 +21,7 @@ import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.PriorityQueue;
 
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.math.BlockPos;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;

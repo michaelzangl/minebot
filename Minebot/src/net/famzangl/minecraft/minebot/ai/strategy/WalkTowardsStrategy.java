@@ -56,7 +56,7 @@ public class WalkTowardsStrategy extends AIStrategy {
 
 	@Override
 	public String getDescription(AIHelper helper) {
-		EntityPlayerSP player = helper.getMinecraft().thePlayer;
+		EntityPlayerSP player = helper.getMinecraft().player;
 		double dist = player == null ? 0 : player.getDistance(x, player.posY, z);
 		return "Walking to " + x + ", " + z + " (" + Math.round(dist) + "m)";
 	}

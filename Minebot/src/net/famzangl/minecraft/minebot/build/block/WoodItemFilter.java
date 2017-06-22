@@ -31,7 +31,7 @@ public class WoodItemFilter extends BlockItemFilter {
 	private final WoodType woodType;
 
 	public WoodItemFilter(WoodType woodType) {
-		super(Blocks.planks);
+		super(Blocks.PLANKS);
 		this.woodType = woodType;
 	}
 

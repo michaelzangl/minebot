@@ -17,7 +17,7 @@
 package net.famzangl.minecraft.minebot.ai.task.place;
 
 import net.famzangl.minecraft.minebot.ai.task.DestroyInRangeTask;
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.math.BlockPos;
 
 /**
  * Simply destroy a block at a given position, assuming it is in reach.

@@ -40,7 +40,7 @@ public class DoFishTask extends AITask {
 
 	@Override
 	public boolean isFinished(AIHelper aiHelper) {
-		return revoked || aiHelper.getMinecraft().thePlayer.fishEntity == null;
+		return revoked || aiHelper.getMinecraft().player.fishEntity == null;
 	}
 
 	@Override
@@ -71,7 +71,7 @@ public class DoFishTask extends AITask {
 			sendReset = false;
 		}
 		return minebotNetHandler
-				.fishIsCaptured(helper.getMinecraft().thePlayer.fishEntity);
+				.fishIsCaptured(helper.getMinecraft().player.fishEntity);
 	}
 
 	/**
@@ -82,7 +82,7 @@ public class DoFishTask extends AITask {
 	 * @return
 	 */
 	private boolean fishIsCapturedSP(AIHelper helper) {
-		final EntityFishHook fishEntity = helper.getMinecraft().thePlayer.fishEntity;
+		final EntityFishHook fishEntity = helper.getMinecraft().player.fishEntity;
 		if (fishEntity == null) {
 			return false;
 		}

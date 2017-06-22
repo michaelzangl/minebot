@@ -38,9 +38,9 @@ import net.minecraft.init.Blocks;
 		+ "If blockName is given, only the block that is given is searched for.", name = "minebot")
 public class CommandMine {
 
-	public static BlockSet MINEABLE = new BlockSet(Blocks.air,
-			Blocks.lava, Blocks.flowing_lava, Blocks.water,
-			Blocks.flowing_water, Blocks.waterlily, Blocks.bedrock).invert();
+	public static BlockSet MINEABLE = new BlockSet(Blocks.AIR,
+			Blocks.LAVA, Blocks.FLOWING_LAVA, Blocks.WATER,
+			Blocks.FLOWING_WATER, Blocks.WATERLILY, Blocks.BEDROCK).invert();
 
 	@AICommandInvocation(safeRule = SafeStrategyRule.DEFEND_MINING)
 	public static AIStrategy run(

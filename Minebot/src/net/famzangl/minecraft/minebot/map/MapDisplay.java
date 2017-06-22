@@ -19,7 +19,7 @@ import net.famzangl.minecraft.minebot.map.MapReader.ImagePos;
 import net.famzangl.minecraft.minebot.map.MapReader.MultiModeImage;
 import net.famzangl.minecraft.minebot.map.MapReader.WriteableImage;
 import net.famzangl.minecraft.minebot.map.PlayerPositionLabel.FollowPlayerListener;
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.math.BlockPos;
 
 /**
  * This panel displays the map.

@@ -25,7 +25,7 @@ import net.famzangl.minecraft.minebot.ai.task.TaskOperations;
 import net.famzangl.minecraft.minebot.ai.task.error.PositionTaskError;
 import net.famzangl.minecraft.minebot.ai.task.place.JumpingPlaceBlockAtFloorTask;
 import net.minecraft.init.Blocks;
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.math.BlockPos;
 
 /**
  * Move upwards by digging one block up and then jumping while placing a block
@@ -43,7 +43,7 @@ public class UpwardsMoveTask extends JumpingPlaceBlockAtFloorTask {
 	 * FIXME: Find a nice, central place for digging times.
 	 */
 	private static final BlockSet hardBlocks = new BlockSet(
-			Blocks.obsidian);
+			Blocks.OBSIDIAN);
 
 	public UpwardsMoveTask(BlockPos pos, ItemFilter filter) {
 		super(pos, filter);
@@ -81,9 +81,9 @@ public class UpwardsMoveTask extends JumpingPlaceBlockAtFloorTask {
 	public boolean applyToDelta(WorldWithDelta world) {
 		// we always set cobblestone... TODO: set other material.
 		
-		world.setBlock(getPlaceAtPos(), Blocks.cobblestone);
-		world.setBlock(pos, Blocks.air);
-		world.setBlock(pos.add(0, 1, 0), Blocks.air);
+		world.setBlock(getPlaceAtPos(), Blocks.COBBLESTONE);
+		world.setBlock(pos, Blocks.AIR);
+		world.setBlock(pos.add(0, 1, 0), Blocks.AIR);
 		
 		return super.applyToDelta(world);
 	}

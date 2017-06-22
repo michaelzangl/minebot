@@ -29,7 +29,7 @@ import net.famzangl.minecraft.minebot.ai.task.WaitTask;
 import net.famzangl.minecraft.minebot.ai.task.inventory.PutInChestTask;
 import net.minecraft.client.gui.inventory.GuiChest;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.math.BlockPos;
 
 /**
  * Store whatever you are holding in a chest.
@@ -73,7 +73,7 @@ public class StoreStrategy extends PathFinderStrategy {
 					x, y, z));
 			if (chests != null) {
 				for (ChestData c : chests) {
-					for (ItemStack stack : helper.getMinecraft().thePlayer.inventory.mainInventory) {
+					for (ItemStack stack : helper.getMinecraft().player.inventory.mainInventory) {
 						if (c.couldPutItem(stack)) {
 							return distance + chestBlockHandler.getExpectedPutRating(c.getPos(), stack);
 						}
@@ -89,7 +89,7 @@ public class StoreStrategy extends PathFinderStrategy {
 					.getReachableForPos(currentPos);
 			for (final ChestData c : chests) {
 				boolean chestOpen = false;
-				ItemStack[] inventory = helper.getMinecraft().thePlayer.inventory.mainInventory;
+				ItemStack[] inventory = helper.getMinecraft().player.inventory.mainInventory;
 				for (int i = 0; i < inventory.length; i++) {
 					final ItemStack stack = inventory[i];
 					if (c.couldPutItem(stack)) {

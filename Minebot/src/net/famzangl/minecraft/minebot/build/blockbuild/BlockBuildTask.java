@@ -20,24 +20,55 @@ import net.famzangl.minecraft.minebot.ai.BlockItemFilter;
 import net.famzangl.minecraft.minebot.ai.command.BlockWithDataOrDontcare;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSet;
 import net.minecraft.init.Blocks;
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.math.BlockPos;
 
 public class BlockBuildTask extends AbstractBuildTask {
 
-	public static final BlockSet BLOCKS = new BlockSet(Blocks.dirt,
-			Blocks.stone, Blocks.cobblestone, Blocks.beacon, Blocks.bookshelf,
-			Blocks.brick_block, Blocks.cake, Blocks.coal_block,
-			Blocks.coal_ore, Blocks.crafting_table, Blocks.diamond_block,
-			Blocks.diamond_ore, Blocks.emerald_block, Blocks.emerald_ore,
-			Blocks.end_stone, Blocks.glass, Blocks.gold_block, Blocks.gold_ore,
-			Blocks.grass, Blocks.gravel, Blocks.hay_block, Blocks.iron_block,
-			Blocks.iron_ore, Blocks.lapis_block, Blocks.lapis_ore,
-			Blocks.melon_block, Blocks.mossy_cobblestone, Blocks.nether_brick,
-			Blocks.netherrack, Blocks.obsidian, Blocks.pumpkin,
-			Blocks.quartz_block, Blocks.quartz_ore, Blocks.red_mushroom_block,
-			Blocks.redstone_block, Blocks.redstone_lamp, Blocks.redstone_ore,
-			Blocks.sand, Blocks.stonebrick, Blocks.tnt, Blocks.planks,
-			Blocks.wool, Blocks.stained_glass, Blocks.stained_hardened_clay);
+	public static final BlockSet BLOCKS = new BlockSet(
+			Blocks.DIRT,
+			Blocks.STONE,
+			Blocks.COBBLESTONE,
+			Blocks.BEACON,
+			Blocks.BOOKSHELF,
+			Blocks.BRICK_BLOCK,
+			Blocks.CAKE,
+			Blocks.COAL_BLOCK,
+			Blocks.COAL_ORE,
+			Blocks.CRAFTING_TABLE,
+			Blocks.DIAMOND_BLOCK,
+			Blocks.DIAMOND_ORE,
+			Blocks.EMERALD_BLOCK,
+			Blocks.EMERALD_ORE,
+			Blocks.END_STONE,
+			Blocks.GLASS,
+			Blocks.GOLD_BLOCK,
+			Blocks.GOLD_ORE,
+			Blocks.GRASS, 
+			Blocks.GRAVEL, 
+			Blocks.HAY_BLOCK, 
+			Blocks.IRON_BLOCK,
+			Blocks.IRON_ORE,
+			Blocks.LAPIS_BLOCK, 
+			Blocks.LAPIS_ORE,
+			Blocks.MELON_BLOCK, 
+			Blocks.MOSSY_COBBLESTONE, 
+			Blocks.NETHER_BRICK,
+			Blocks.NETHERRACK,
+			Blocks.OBSIDIAN, 
+			Blocks.PUMPKIN,
+			Blocks.QUARTZ_BLOCK,
+			Blocks.QUARTZ_ORE, 
+			Blocks.RED_MUSHROOM_BLOCK,
+			Blocks.REDSTONE_BLOCK,
+			Blocks.REDSTONE_LAMP, 
+			Blocks.REDSTONE_ORE,
+			Blocks.SAND, 
+			Blocks.STONEBRICK,
+			Blocks.TNT,
+			Blocks.PLANKS,
+			Blocks.WOOL,
+			Blocks.STAINED_GLASS, 
+			Blocks.STAINED_HARDENED_CLAY);
 	protected final BlockWithDataOrDontcare blockToPlace;
 
 	public BlockBuildTask(BlockPos forPosition,

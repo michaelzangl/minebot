@@ -7,12 +7,12 @@ import net.famzangl.minecraft.minebot.ai.task.place.DestroyBlockTask;
 import net.famzangl.minecraft.minebot.ai.task.place.PlaceBlockAtFloorTask;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemReed;
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.EnumFacing;
 
 public class SugarCanePathFinder extends WalkingPathfinder {
-	private static final BlockSet SUGAR_CANE_GROUND = new BlockSet(Blocks.sand, Blocks.grass, Blocks.dirt);
-	private static final BlockSet SUGAR_CANE = new BlockSet(Blocks.reeds);
+	private static final BlockSet SUGAR_CANE_GROUND = new BlockSet(Blocks.SAND, Blocks.GRASS, Blocks.DIRT);
+	private static final BlockSet SUGAR_CANE = new BlockSet(Blocks.REEDS);
 
 	@Override
 	protected float rateDestination(int distance, int x, int y, int z) {

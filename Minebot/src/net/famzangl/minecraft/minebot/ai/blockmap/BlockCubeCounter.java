@@ -1,6 +1,6 @@
 package net.famzangl.minecraft.minebot.ai.blockmap;
 
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.math.BlockPos;
 
 /**
  * This is a map that assigns an integer to every {@link BlockPos}. It has

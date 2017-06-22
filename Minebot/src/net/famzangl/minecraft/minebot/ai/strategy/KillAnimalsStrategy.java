@@ -88,7 +88,7 @@ public class KillAnimalsStrategy extends FaceInteractStrategy {
 				selector = new AndSelector(new ColorSelector(color), selector);
 			}
 			return new AndSelector(selector, new NotSelector(new OwnTameableSelector(
-					helper.getMinecraft().thePlayer)));
+					helper.getMinecraft().player)));
 		}
 	}
 

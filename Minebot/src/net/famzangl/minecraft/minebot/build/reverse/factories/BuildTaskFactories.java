@@ -10,12 +10,12 @@ import net.famzangl.minecraft.minebot.build.blockbuild.BuildTask;
 import net.famzangl.minecraft.minebot.build.reverse.TaskDescription;
 import net.famzangl.minecraft.minebot.build.reverse.UnsupportedBlockException;
 import net.minecraft.init.Blocks;
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.math.BlockPos;
 
 public class BuildTaskFactories {
 
 	public static final BlockSet IGNORED_ON_RECONSTRUCT = BlockSets.AIR
-			.unionWith(new BlockSet(Blocks.barrier));
+			.unionWith(new BlockSet(Blocks.BARRIER));
 
 	private static final ArrayList<BuildTaskFactory> factories = new ArrayList<BuildTaskFactory>();
 

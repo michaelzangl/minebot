@@ -21,7 +21,7 @@ import net.famzangl.minecraft.minebot.ai.command.BlockWithDataOrDontcare;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSet;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSets;
 import net.minecraft.init.Blocks;
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.math.BlockPos;
 
 public class FenceBuildTask extends AbstractBuildTask {
 
@@ -29,7 +29,7 @@ public class FenceBuildTask extends AbstractBuildTask {
 			new BlockPos(0, 1, -1), new BlockPos(1, 1, 0), new BlockPos(0, 1, 1), };
 
 	public static final BlockSet BLOCKS = new BlockSet(
-			Blocks.cobblestone_wall).unionWith(BlockSets.FENCE);
+			Blocks.COBBLESTONE_WALL).unionWith(BlockSets.FENCE);
 
 	private final BlockWithDataOrDontcare fenceBlock;
 

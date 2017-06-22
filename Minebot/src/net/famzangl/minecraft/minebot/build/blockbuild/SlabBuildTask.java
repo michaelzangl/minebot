@@ -25,7 +25,7 @@ import net.famzangl.minecraft.minebot.ai.task.place.JumpingPlaceAtHalfTask;
 import net.famzangl.minecraft.minebot.ai.task.place.SneakAndPlaceAtHalfTask;
 import net.famzangl.minecraft.minebot.build.block.SlabFilter;
 import net.famzangl.minecraft.minebot.build.block.SlabType;
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.math.BlockPos;
 
 public class SlabBuildTask extends BlockBuildTask {
 

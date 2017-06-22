@@ -17,7 +17,7 @@
 package net.famzangl.minecraft.minebot.build.reverse;
 
 import net.minecraft.block.Block;
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.math.BlockPos;
 
 /**
  * A field where all tasks from the build reverser are stored.

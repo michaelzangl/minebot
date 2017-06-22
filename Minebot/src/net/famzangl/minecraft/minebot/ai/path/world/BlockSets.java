@@ -1,7 +1,7 @@
 package net.famzangl.minecraft.minebot.ai.path.world;
 
 import net.minecraft.init.Blocks;
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.math.BlockPos;
 
 /**
  * This is a helper class that holds lots of block sets and helper functions to
@@ -17,118 +17,163 @@ public class BlockSets {
 	 * Blocks we can just walk over/next to without problems.
 	 */
 	public static final BlockSet SIMPLE_CUBE = new BlockSet(
-			Blocks.bedrock,
-			Blocks.bookshelf,
-			Blocks.brick_block,
-			Blocks.brown_mushroom_block,
-			Blocks.cake,
-			Blocks.clay,
-			Blocks.coal_block,
-			Blocks.coal_ore,
-			Blocks.cobblestone,
-			Blocks.crafting_table,
-			Blocks.diamond_block,
-			Blocks.diamond_ore,
-			Blocks.dirt,
-			Blocks.double_stone_slab,
-			Blocks.double_wooden_slab,
-			Blocks.emerald_block,
-			Blocks.emerald_ore,
+			Blocks.BEDROCK,
+			Blocks.BOOKSHELF,
+			Blocks.BRICK_BLOCK,
+			Blocks.BROWN_MUSHROOM_BLOCK,
+			Blocks.CAKE,
+			Blocks.CLAY,
+			Blocks.COAL_BLOCK,
+			Blocks.COAL_ORE,
+			Blocks.COBBLESTONE,
+			Blocks.CRAFTING_TABLE,
+			Blocks.DIAMOND_BLOCK,
+			Blocks.DIAMOND_ORE,
+			Blocks.DIRT,
+			Blocks.DOUBLE_STONE_SLAB,
+			Blocks.DOUBLE_WOODEN_SLAB,
+			Blocks.EMERALD_BLOCK,
+			Blocks.EMERALD_ORE,
 			// FIXME: Not a cube.
-			Blocks.farmland, Blocks.furnace, Blocks.glass, Blocks.glowstone,
-			Blocks.grass, Blocks.gold_block, Blocks.gold_ore,
-			Blocks.hardened_clay, Blocks.iron_block, Blocks.iron_ore,
-			Blocks.lapis_block, Blocks.lapis_ore, Blocks.leaves,
-			Blocks.leaves2, Blocks.lit_pumpkin, Blocks.lit_furnace,
-			Blocks.lit_redstone_lamp, Blocks.lit_redstone_ore, Blocks.log,
-			Blocks.log2,
-			Blocks.melon_block,
-			Blocks.mossy_cobblestone,
-			Blocks.mycelium,
-			Blocks.nether_brick,
-			Blocks.netherrack,
+			Blocks.FARMLAND, Blocks.FURNACE, Blocks.GLASS, Blocks.GLOWSTONE,
+			Blocks.GRASS, Blocks.GOLD_BLOCK, Blocks.GOLD_ORE,
+			Blocks.HARDENED_CLAY, Blocks.IRON_BLOCK, Blocks.IRON_ORE,
+			Blocks.LAPIS_BLOCK, Blocks.LAPIS_ORE, Blocks.LEAVES,
+			Blocks.LEAVES2, Blocks.LIT_PUMPKIN, Blocks.LIT_FURNACE,
+			Blocks.LIT_REDSTONE_LAMP, Blocks.LIT_REDSTONE_ORE, Blocks.LOG,
+			Blocks.LOG2,
+			Blocks.MELON_BLOCK,
+			Blocks.MOSSY_COBBLESTONE,
+			Blocks.MYCELIUM,
+			Blocks.NETHER_BRICK,
+			Blocks.NETHERRACK,
 			// Watch out, this cannot be broken easily !
-			Blocks.obsidian, Blocks.packed_ice, Blocks.planks, Blocks.pumpkin,
-			Blocks.quartz_block, Blocks.quartz_ore, Blocks.red_mushroom_block,
-			Blocks.redstone_block, Blocks.redstone_lamp, Blocks.redstone_ore,
-			Blocks.sandstone,
-			Blocks.snow,
+			Blocks.OBSIDIAN, Blocks.PACKED_ICE, Blocks.PLANKS, Blocks.PUMPKIN,
+			Blocks.QUARTZ_BLOCK, Blocks.QUARTZ_ORE, Blocks.RED_MUSHROOM_BLOCK,
+			Blocks.REDSTONE_BLOCK, Blocks.REDSTONE_LAMP, Blocks.REDSTONE_ORE,
+			Blocks.SANDSTONE,
+			Blocks.SNOW,
 			// FIXME: Not a cube.
-			Blocks.soul_sand, Blocks.stained_glass,
-			Blocks.stained_hardened_clay, Blocks.stone, Blocks.stonebrick,
-			Blocks.wool);
+			Blocks.SOUL_SAND, Blocks.STAINED_GLASS,
+			Blocks.STAINED_HARDENED_CLAY, Blocks.STONE, Blocks.STONEBRICK,
+			Blocks.WOOL);
 
 	/**
 	 * Blocks that fall down.
 	 */
-	public static final BlockSet FALLING = new BlockSet(Blocks.gravel,
-			Blocks.sand);
+	public static final BlockSet FALLING = new BlockSet(Blocks.GRAVEL,
+			Blocks.SAND);
 
-	public static final BlockSet AIR = new BlockSet(Blocks.air);
+	public static final BlockSet AIR = new BlockSet(Blocks.AIR);
 	/**
 	 * All stairs. It is no problem to walk on them.
 	 */
-	public static final BlockSet STAIRS = new BlockSet(Blocks.acacia_stairs,
-			Blocks.birch_stairs, Blocks.brick_stairs, Blocks.dark_oak_stairs,
-			Blocks.jungle_stairs, Blocks.nether_brick_stairs,
-			Blocks.oak_stairs, Blocks.sandstone_stairs, Blocks.spruce_stairs,
-			Blocks.stone_brick_stairs, Blocks.stone_stairs, Blocks.stone_slab,
-			Blocks.wooden_slab, Blocks.quartz_stairs);
+	public static final BlockSet STAIRS = new BlockSet(Blocks.ACACIA_STAIRS,
+			Blocks.BIRCH_STAIRS, Blocks.BRICK_STAIRS, Blocks.DARK_OAK_STAIRS,
+			Blocks.JUNGLE_STAIRS, Blocks.NETHER_BRICK_STAIRS,
+			Blocks.OAK_STAIRS, Blocks.SANDSTONE_STAIRS, Blocks.SPRUCE_STAIRS,
+			Blocks.STONE_BRICK_STAIRS, Blocks.STONE_STAIRS, Blocks.STONE_SLAB,
+			Blocks.WOODEN_SLAB, Blocks.QUARTZ_STAIRS);
 
 	/**
 	 * All rail blocks.
 	 */
-	public static final BlockSet RAILS = new BlockSet(Blocks.golden_rail,
-			Blocks.detector_rail, Blocks.rail, Blocks.activator_rail);
+	public static final BlockSet RAILS = new BlockSet(
+			Blocks.GOLDEN_RAIL,
+			Blocks.DETECTOR_RAIL, 
+			Blocks.RAIL, 
+			Blocks.ACTIVATOR_RAIL);
 
 	/**
 	 * Flowers and stuff like that
 	 */
 	private static final BlockSet explicitFootWalkableBlocks = new BlockSet(
-			Blocks.tallgrass, Blocks.yellow_flower, Blocks.red_flower,
-			Blocks.wheat, Blocks.carrots, Blocks.potatoes, Blocks.pumpkin_stem,
-			Blocks.melon_stem, Blocks.carpet, Blocks.double_plant,
-			Blocks.red_mushroom, Blocks.brown_mushroom, Blocks.redstone_wire,
-			Blocks.sapling, Blocks.snow_layer, Blocks.nether_wart,
-			Blocks.standing_sign, Blocks.wall_sign, Blocks.deadbush).unionWith(RAILS);
+			Blocks.TALLGRASS, 
+			Blocks.YELLOW_FLOWER, 
+			Blocks.RED_FLOWER,
+			Blocks.WHEAT, 
+			Blocks.CARROTS,
+			Blocks.POTATOES,
+			Blocks.PUMPKIN_STEM,
+			Blocks.MELON_STEM, 
+			Blocks.CARPET, 
+			Blocks.DOUBLE_PLANT,
+			Blocks.RED_MUSHROOM, 
+			Blocks.BROWN_MUSHROOM, 
+			Blocks.REDSTONE_WIRE,
+			Blocks.SAPLING, 
+			Blocks.SNOW_LAYER, 
+			Blocks.NETHER_WART,
+			Blocks.STANDING_SIGN, 
+			Blocks.WALL_SIGN, 
+			Blocks.DEADBUSH).unionWith(RAILS);
 
 	/**
 	 * Torches.
 	 */
-	public static final BlockSet TORCH = new BlockSet(Blocks.torch,
-			Blocks.redstone_torch);
+	public static final BlockSet TORCH = new BlockSet(
+			Blocks.TORCH,
+			Blocks.REDSTONE_TORCH);
 
 	/**
 	 * Blocks our head can walk though. Signs could be added here, but we stay
 	 * away from them for now.
 	 */
 	public static final BlockSet HEAD_CAN_WALK_TRHOUGH = new BlockSet(
-			Blocks.air, Blocks.double_plant, Blocks.reeds).unionWith(TORCH);
+			Blocks.AIR,
+			Blocks.DOUBLE_PLANT,
+			Blocks.REEDS)
+			.unionWith(TORCH);
 
 	public static final BlockSet FEET_CAN_WALK_THROUGH = explicitFootWalkableBlocks
 			.unionWith(HEAD_CAN_WALK_TRHOUGH);
 
-	public static final BlockSet FENCE = new BlockSet(Blocks.oak_fence,
-			Blocks.spruce_fence, Blocks.birch_fence, Blocks.jungle_fence,
-			Blocks.dark_oak_fence, Blocks.acacia_fence,
-			Blocks.nether_brick_fence);
+	public static final BlockSet FENCE = new BlockSet(
+			Blocks.OAK_FENCE,
+			Blocks.SPRUCE_FENCE,
+			Blocks.BIRCH_FENCE,
+			Blocks.JUNGLE_FENCE,
+			Blocks.DARK_OAK_FENCE,
+			Blocks.ACACIA_FENCE,
+			Blocks.NETHER_BRICK_FENCE);
 
-	public static final BlockSet WOODEN_DOR = new BlockSet(Blocks.oak_door,
-			Blocks.spruce_door, Blocks.birch_door, Blocks.jungle_door,
-			Blocks.dark_oak_door, Blocks.acacia_door);
+	public static final BlockSet WOODEN_DOR = new BlockSet(
+			Blocks.OAK_DOOR,
+			Blocks.SPRUCE_DOOR,
+			Blocks.BIRCH_DOOR,
+			Blocks.JUNGLE_DOOR,
+			Blocks.DARK_OAK_DOOR,
+			Blocks.ACACIA_DOOR);
 
 	public static final BlockSet FENCE_GATE = new BlockSet(
-			Blocks.oak_fence_gate, Blocks.spruce_fence_gate,
-			Blocks.birch_fence_gate, Blocks.jungle_fence_gate,
-			Blocks.dark_oak_fence_gate, Blocks.acacia_fence_gate);
+			Blocks.OAK_FENCE_GATE,
+			Blocks.SPRUCE_FENCE_GATE,
+			Blocks.BIRCH_FENCE_GATE, 
+			Blocks.JUNGLE_FENCE_GATE,
+			Blocks.DARK_OAK_FENCE_GATE, 
+			Blocks.ACACIA_FENCE_GATE);
 
 	private static final BlockSet explicitSafeSideBlocks = new BlockSet(
-			Blocks.anvil, Blocks.cobblestone_wall, Blocks.cactus, Blocks.reeds,
-			Blocks.web, Blocks.glass_pane, Blocks.bed, Blocks.enchanting_table,
-			Blocks.waterlily, Blocks.brewing_stand, Blocks.vine, Blocks.chest,
-			Blocks.trapped_chest, Blocks.tripwire, Blocks.tripwire_hook,
-			Blocks.wooden_pressure_plate, Blocks.stone_pressure_plate,
-			Blocks.wooden_button, Blocks.stone_button, Blocks.monster_egg)
+			Blocks.ANVIL, 
+			Blocks.COBBLESTONE_WALL, 
+			Blocks.CACTUS, 
+			Blocks.REEDS,
+			Blocks.WEB, 
+			Blocks.GLASS_PANE, 
+			Blocks.BED, 
+			Blocks.ENCHANTING_TABLE,
+			Blocks.WATERLILY,
+			Blocks.BREWING_STAND, 
+			Blocks.VINE,
+			Blocks.CHEST,
+			Blocks.TRAPPED_CHEST, 
+			Blocks.TRIPWIRE, 
+			Blocks.TRIPWIRE_HOOK,
+			Blocks.WOODEN_PRESSURE_PLATE, 
+			Blocks.STONE_PRESSURE_PLATE,
+			Blocks.WOODEN_BUTTON, 
+			Blocks.STONE_BUTTON, 
+			Blocks.MONSTER_EGG)
 			.unionWith(FENCE).unionWith(FENCE_GATE);
 
 	/**
@@ -143,54 +188,59 @@ public class BlockSets {
 
 	public static final BlockSet SAFE_CEILING = STAIRS
 			.unionWith(FEET_CAN_WALK_THROUGH).unionWith(SIMPLE_CUBE)
-			.unionWith(AIR).unionWith(new BlockSet(Blocks.vine, Blocks.cactus));
+			.unionWith(AIR).unionWith(new BlockSet(Blocks.VINE, Blocks.CACTUS));
 
 	/**
 	 * Blocks you need to destroy but that are then safe.
 	 */
 	public static final BlockSet SAFE_AFTER_DESTRUCTION = new BlockSet(
-			Blocks.vine, Blocks.cactus);
+			Blocks.VINE, Blocks.CACTUS);
 
 	/**
 	 * Blocks that are considered indestructable and should be avoided.
 	 */
-	public static final BlockSet INDESTRUCTABLE = new BlockSet(Blocks.bedrock,
-			Blocks.barrier, Blocks.obsidian);
+	public static final BlockSet INDESTRUCTABLE = new BlockSet(
+			Blocks.BEDROCK,
+			Blocks.BARRIER,
+			Blocks.OBSIDIAN);
 
 	/**
 	 * All leaves. FIXME: Only consider leaves that do not decay as safe ground.
 	 */
-	public static final BlockSet LEAVES = new BlockSet(Blocks.leaves,
-			Blocks.leaves2);
-	public static final BlockSet LOGS = new BlockSet(Blocks.log, Blocks.log2);
+	public static final BlockSet LEAVES = new BlockSet(
+			Blocks.LEAVES,
+			Blocks.LEAVES2);
+	public static final BlockSet LOGS = new BlockSet(
+			Blocks.LOG, 
+			Blocks.LOG2);
 
 	public static final BlockSet LOWER_SLABS;
 	static {
 		BlockSet lower = BlockSets.EMPTY;
 		for (int i = 0; i < 8; i++) {
-			lower = lower.unionWith(new BlockMetaSet(Blocks.stone_slab, i));
-			lower = lower.unionWith(new BlockMetaSet(Blocks.wooden_slab, i));
+			lower = lower.unionWith(new BlockMetaSet(Blocks.STONE_SLAB, i));
+			lower = lower.unionWith(new BlockMetaSet(Blocks.WOODEN_SLAB, i));
 		}
-		lower = lower.unionWith(new BlockMetaSet(Blocks.stone_slab2, 0));
+		lower = lower.unionWith(new BlockMetaSet(Blocks.STONE_SLAB2, 0));
 		LOWER_SLABS = lower;
 	}
 
 	public static final BlockSet UPPER_SLABS;
 
-	public static final BlockSet WATER = new BlockSet(Blocks.water,
-			Blocks.flowing_water);
+	public static final BlockSet WATER = new BlockSet(Blocks.WATER,
+			Blocks.FLOWING_WATER);
 
 	public static final BlockSet TREE_BLOCKS = LOGS.unionWith(LEAVES);
-	public static final BlockSet FURNACE = new BlockSet(Blocks.furnace, Blocks.lit_furnace);
+	public static final BlockSet FURNACE = new BlockSet(Blocks.FURNACE, Blocks.LIT_FURNACE);
 
 	static {
 		BlockSet upper = BlockSets.EMPTY;
 		for (int i = 0; i < 8; i++) {
-			upper = upper.unionWith(new BlockMetaSet(Blocks.stone_slab, i + 8));
+			upper = upper.unionWith(new BlockMetaSet(Blocks.STONE_SLAB, i + 8));
 			upper = upper
-					.unionWith(new BlockMetaSet(Blocks.wooden_slab, i + 8));
+					.unionWith(new BlockMetaSet(Blocks.WOODEN_SLAB, i + 8));
 		}
-		upper = upper.unionWith(new BlockMetaSet(Blocks.stone_slab2, 8));
+		upper = upper.unionWith(new BlockMetaSet(Blocks.STONE_SLAB2, 8));
 		UPPER_SLABS = upper;
 	}
 

@@ -39,7 +39,7 @@ public class EatStrategy extends AIStrategy {
 	}
 
 	private boolean needFood(AIHelper helper) {
-		return helper.getMinecraft().thePlayer.getFoodStats().needFood();
+		return helper.getMinecraft().player.getFoodStats().needFood();
 	}
 
 	@Override

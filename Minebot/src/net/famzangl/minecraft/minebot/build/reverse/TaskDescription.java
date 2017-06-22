@@ -18,7 +18,7 @@ package net.famzangl.minecraft.minebot.build.reverse;
 
 import java.util.Arrays;
 
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.math.BlockPos;
 
 public class TaskDescription {
 	private final String commandArgs;

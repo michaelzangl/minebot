@@ -160,7 +160,7 @@ public class AIChatController {
 	}
 
 	private static void addToChat(String string) {
-		Minecraft.getMinecraft().thePlayer
+		Minecraft.getMinecraft().player
 				.addChatMessage(new ChatComponentText(string));
 	}
 

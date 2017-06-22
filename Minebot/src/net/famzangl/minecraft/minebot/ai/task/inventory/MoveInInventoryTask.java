@@ -160,7 +160,7 @@ public abstract class MoveInInventoryTask extends AITask {
 		final GuiContainer screen = (GuiContainer) aiHelper.getMinecraft().currentScreen;
 		aiHelper.getMinecraft().playerController.windowClick(
 				screen.inventorySlots.windowId, slotNumber, i, 0,
-				aiHelper.getMinecraft().thePlayer);
+				aiHelper.getMinecraft().player);
 	}
 
 	private int moveStackPart(AIHelper aiHelper, Slot from, Slot to, int count) {

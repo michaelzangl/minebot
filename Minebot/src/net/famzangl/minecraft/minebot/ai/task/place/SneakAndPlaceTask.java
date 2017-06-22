@@ -22,7 +22,7 @@ import net.famzangl.minecraft.minebot.ai.path.world.BlockSets;
 import net.famzangl.minecraft.minebot.ai.task.AITask;
 import net.famzangl.minecraft.minebot.ai.task.TaskOperations;
 import net.famzangl.minecraft.minebot.ai.task.error.SelectTaskError;
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.MovementInput;
 
@@ -79,7 +79,7 @@ public class SneakAndPlaceTask extends AITask {
 			faceTimer--;
 		}
 		if (aiHelper.sneakFrom(getFromPos(), inDirection, faceWhileSneaking())) {
-			final boolean hasRequiredHeight = aiHelper.getMinecraft().thePlayer
+			final boolean hasRequiredHeight = aiHelper.getMinecraft().player
 					.getEntityBoundingBox().minY > minBuildHeight - 0.05;
 			if (hasRequiredHeight) {
 				if (faceTimer == 0) {

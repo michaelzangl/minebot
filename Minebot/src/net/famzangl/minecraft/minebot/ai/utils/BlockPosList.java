@@ -4,7 +4,7 @@ import java.util.Collection;
 import java.util.HashSet;
 
 import net.famzangl.minecraft.minebot.ai.path.world.WorldData;
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.math.BlockPos;
 
 public class BlockPosList extends BlockArea {
 
