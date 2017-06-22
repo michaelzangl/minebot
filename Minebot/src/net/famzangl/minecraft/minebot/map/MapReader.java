@@ -40,7 +40,7 @@ import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.multiplayer.ChunkProviderClient;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.ChunkCoordIntPair;
+import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.IChunkProvider;
@@ -678,14 +678,14 @@ public class MapReader implements ChunkListener {
 		 * The integer states in how many ticks they will be collected for
 		 * rendering.
 		 */
-		private Hashtable<ChunkCoordIntPair, Integer> dirtyChunks = new Hashtable<ChunkCoordIntPair, Integer>();
+		private Hashtable<ChunkPos, Integer> dirtyChunks = new Hashtable<ChunkPos, Integer>();
 
 		/**
 		 * 
 		 */
-		private Hashtable<ChunkCoordIntPair, Integer> cooldownForLastUsed = new Hashtable<ChunkCoordIntPair, Integer>();
+		private Hashtable<ChunkPos, Integer> cooldownForLastUsed = new Hashtable<ChunkPos, Integer>();
 
-		public synchronized void offer(ChunkCoordIntPair pos) {
+		public synchronized void offer(ChunkPos pos) {
 			if (!dirtyChunks.containsKey(pos)) {
 				Integer coolDown = cooldownForLastUsed.get(pos);
 				int time = coolDown == null ? 0 : coolDown;
@@ -693,11 +693,11 @@ public class MapReader implements ChunkListener {
 			}
 		}
 
-		public synchronized ArrayList<ChunkCoordIntPair> tickAndGet() {
-			ArrayList<ChunkCoordIntPair> ret = new ArrayList<ChunkCoordIntPair>();
-			ArrayList<ChunkCoordIntPair> keys = new ArrayList<ChunkCoordIntPair>(
+		public synchronized ArrayList<ChunkPos> tickAndGet() {
+			ArrayList<ChunkPos> ret = new ArrayList<ChunkPos>();
+			ArrayList<ChunkPos> keys = new ArrayList<ChunkPos>(
 					dirtyChunks.keySet());
-			for (ChunkCoordIntPair k : keys) {
+			for (ChunkPos k : keys) {
 				Integer counter = dirtyChunks.get(k);
 				if (counter <= 0) {
 					dirtyChunks.remove(k);
@@ -707,9 +707,9 @@ public class MapReader implements ChunkListener {
 					dirtyChunks.put(k, counter - 1);
 				}
 			}
-			ArrayList<ChunkCoordIntPair> keys2 = new ArrayList<ChunkCoordIntPair>(
+			ArrayList<ChunkPos> keys2 = new ArrayList<ChunkPos>(
 					dirtyChunks.keySet());
-			for (ChunkCoordIntPair k : keys2) {
+			for (ChunkPos k : keys2) {
 				Integer time = cooldownForLastUsed.get(k);
 				if (time <= 0) {
 					cooldownForLastUsed.remove(k);
@@ -736,7 +736,7 @@ public class MapReader implements ChunkListener {
 			loadAllChunks(helper);
 		}
 
-		for (ChunkCoordIntPair d : chunkQueue.tickAndGet()) {
+		for (ChunkPos d : chunkQueue.tickAndGet()) {
 			Chunk chunkFromChunkCoords = helper.getMinecraft().world
 					.getChunkFromChunkCoords(d.chunkXPos, d.chunkZPos);
 			if (chunkFromChunkCoords != null) {
@@ -788,7 +788,7 @@ public class MapReader implements ChunkListener {
 					(ChunkProviderClient) provider, ChunkProviderClient.class,
 					List.class);
 			for (Chunk chunk : list) {
-				chunkQueue.offer(chunk.getChunkCoordIntPair());
+				chunkQueue.offer(chunk.getPos());
 			}
 		} catch (IndexOutOfBoundsException e) {
 		} catch (ConcurrentModificationException e) {
@@ -797,7 +797,7 @@ public class MapReader implements ChunkListener {
 
 	@Override
 	public void chunkChanged(int chunkX, int chunkZ) {
-		chunkQueue.offer(new ChunkCoordIntPair(chunkX, chunkZ));
+		chunkQueue.offer(new ChunkPos(chunkX, chunkZ));
 	}
 
 	int niceDegrees(int cameraYaw) {
