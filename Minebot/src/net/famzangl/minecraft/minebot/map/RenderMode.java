@@ -16,22 +16,43 @@ public enum RenderMode {
 	UNDERGROUND(new UndergroundRenderer(), "-underground"), MAP(
 			new MapRenderer(), ""), BIOME(new BiomeRenderer(), "-biome");
 	private static final BlockSet GLOBAL_COVER_BLACKLIST = new BlockSet(
-			Blocks.wooden_slab, Blocks.stone_slab, Blocks.stone_slab2,
-			Blocks.air);
+			Blocks.WOODEN_SLAB,
+			Blocks.STONE_SLAB,
+			Blocks.STONE_SLAB2,
+			Blocks.AIR);
 	private static final BlockSet IGNORED_COVER_BLOCKS = new BlockSet(
-			Blocks.air, Blocks.leaves, Blocks.leaves2, Blocks.log,
-			Blocks.log2, Blocks.torch, Blocks.water, Blocks.flowing_water,
-			Blocks.waterlily, Blocks.lava, Blocks.flowing_lava,
-			Blocks.snow, Blocks.snow_layer, Blocks.ice)
+			Blocks.AIR, 
+			Blocks.LEAVES,
+			Blocks.LEAVES2, 
+			Blocks.LOG,
+			Blocks.LOG2, 
+			Blocks.TORCH, 
+			Blocks.WATER, 
+			Blocks.FLOWING_WATER,
+			Blocks.WATERLILY, 
+			Blocks.LAVA, 
+			Blocks.FLOWING_LAVA,
+			Blocks.SNOW,
+			Blocks.SNOW_LAYER, 
+			Blocks.ICE)
 			.unionWith(GLOBAL_COVER_BLACKLIST);
 	private static final BlockSet UNDERGROUND_BLOCKS = new BlockSet(
-			Blocks.air, Blocks.torch);
+			Blocks.AIR,
+			Blocks.TORCH);
 	private static final BlockSet STRUCTURE_BLOCKS = new BlockSet(
-			Blocks.oak_fence, Blocks.end_portal_frame, Blocks.end_stone,
-			Blocks.bookshelf, Blocks.prismarine, Blocks.planks,
-			Blocks.nether_brick, Blocks.nether_wart, Blocks.torch);
+			Blocks.OAK_FENCE, 
+			Blocks.END_PORTAL_FRAME,
+			Blocks.END_STONE,
+			Blocks.BOOKSHELF, 
+			Blocks.PRISMARINE, 
+			Blocks.PLANKS,
+			Blocks.NETHER_BRICK,
+			Blocks.NETHER_WART, 
+			Blocks.TORCH);
 	private static final BlockSet INTERESTING_BLOCKS = new BlockSet(
-			Blocks.chest, Blocks.mob_spawner, Blocks.gold_block);
+			Blocks.CHEST,
+			Blocks.MOB_SPAWNER, 
+			Blocks.GOLD_BLOCK);
 
 	private interface IRenderer {
 		/**
