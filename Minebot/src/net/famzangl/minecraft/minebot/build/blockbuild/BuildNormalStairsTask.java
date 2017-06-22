@@ -23,6 +23,7 @@ import net.famzangl.minecraft.minebot.ai.task.BlockHalf;
 import net.famzangl.minecraft.minebot.ai.task.place.JumpingPlaceBlockAtSideTask;
 import net.famzangl.minecraft.minebot.ai.task.place.SneakAndPlaceAtSideTask;
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockStairs.EnumHalf;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
@@ -43,7 +44,7 @@ public class BuildNormalStairsTask extends AbstractBuildTask {
 			Blocks.STONE_STAIRS,
 			Blocks.QUARTZ_STAIRS);
 	private final EnumFacing upwardsDirection;
-	private final boolean inverted;
+	private final EnumHalf half;
 	private final Block stairs;
 
 	public static enum Half {
@@ -51,11 +52,11 @@ public class BuildNormalStairsTask extends AbstractBuildTask {
 	}
 
 	public BuildNormalStairsTask(BlockPos forPosition, Block stairs,
-			EnumFacing upwardsDirection, Half half) {
+			EnumFacing upwardsDirection, EnumHalf half) {
 		super(forPosition);
 		this.stairs = stairs;
 		this.upwardsDirection = upwardsDirection;
-		this.inverted = half == Half.UPPER;
+		this.half = half;
 		if (upwardsDirection != EnumFacing.EAST
 				&& upwardsDirection != EnumFacing.WEST
 				&& upwardsDirection != EnumFacing.NORTH
@@ -71,7 +72,7 @@ public class BuildNormalStairsTask extends AbstractBuildTask {
 
 	@Override
 	public AITask getPlaceBlockTask(BlockPos relativeFromPos) {
-		final BlockHalf side = inverted ? BlockHalf.UPPER_HALF
+		final BlockHalf side = half == EnumHalf.TOP ? BlockHalf.UPPER_HALF
 				: BlockHalf.LOWER_HALF;
 		if (!isStandablePlace(relativeFromPos)) {
 			return null;
@@ -88,7 +89,7 @@ public class BuildNormalStairsTask extends AbstractBuildTask {
 	@Override
 	public String toString() {
 		return "BuildNormalStairsTask [upwardsDirection=" + upwardsDirection
-				+ ", inverted=" + inverted + ", blockFilter=" + getItemToPlaceFilter()
+				+ ", half=" + half + ", blockFilter=" + getItemToPlaceFilter()
 				+ ", forPosition=" + forPosition + "]";
 	}
 
@@ -114,7 +115,7 @@ public class BuildNormalStairsTask extends AbstractBuildTask {
 		}
 
 		return new BuildNormalStairsTask(add, stairs, dir,
-				inverted ? Half.UPPER : Half.LOWER);
+				half == EnumHalf.BOTTOM ? EnumHalf.TOP : EnumHalf.BOTTOM);
 	}
 
 }

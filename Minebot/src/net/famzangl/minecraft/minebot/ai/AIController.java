@@ -281,6 +281,7 @@ public class AIController extends AIHelper implements IAIControllable {
 							- 10, y, 16777215);
 			y += 15;
 		}
+		
 	}
 
 	private synchronized void startUngrabMode() {

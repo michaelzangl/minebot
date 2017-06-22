@@ -16,26 +16,25 @@
  *******************************************************************************/
 package net.famzangl.minecraft.minebot.build.reverse.factories;
 
-import net.famzangl.minecraft.minebot.ai.path.world.WorldData;
-import net.famzangl.minecraft.minebot.build.reverse.TaskDescription;
-import net.famzangl.minecraft.minebot.build.reverse.UnsupportedBlockException;
+import net.famzangl.minecraft.minebot.ai.command.BlockWithDataOrDontcare;
+import net.famzangl.minecraft.minebot.ai.path.world.BlockSet;
+import net.famzangl.minecraft.minebot.build.blockbuild.BuildNormalStairsTask;
+import net.famzangl.minecraft.minebot.build.blockbuild.BuildTask;
+import net.minecraft.block.BlockStairs;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.util.math.BlockPos;
 
+public class StairBuildTaskFactory extends AbstractBuildTaskFactory {
 
-/**
- * This is a factory for build task descriptions. Those build tasks are then turned into a text file.
- * @author Michael Zangl
- *
- */
-@FunctionalInterface
-public interface BuildTaskFactory {
-	
-	/**
-	 * Attempts to create a task description (textual representation of the task) for the given position.
-	 * @param world The world state.
-	 * @param position The position the build task is at.
-	 * @return The task description.
-	 * @throws UnsupportedBlockException If the block should have been handled but some error occurred (unknown state, ...)
-	 */
-	public TaskDescription getTaskDescription(WorldData world, BlockPos position) throws UnsupportedBlockException;
+	@Override
+	public BlockSet getSupportedBlocks() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	protected BuildTask getTaskImpl(BlockPos position, IBlockState block) {
+		return new BuildNormalStairsTask(position, block.getBlock(), block.getValue(BlockStairs.FACING), block.getValue(BlockStairs.HALF));
+	}
+
 }

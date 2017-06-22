@@ -105,6 +105,10 @@ public class BlockWithData extends BlockWithDataOrDontcare {
 		this(toBlockWithMeta(blockId, meta));
 	}
 
+	public BlockWithData(IBlockState block) {
+		this(Block.BLOCK_STATE_IDS.get(block));
+	}
+
 	public static int toBlockWithMeta(int blockId, int meta) {
 		return (blockId << 4) | (meta & 0xf);
 	}

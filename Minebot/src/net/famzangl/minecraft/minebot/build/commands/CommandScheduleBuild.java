@@ -35,6 +35,8 @@ import net.famzangl.minecraft.minebot.build.blockbuild.LogBuildTask;
 import net.famzangl.minecraft.minebot.build.blockbuild.SlabBuildTask;
 import net.famzangl.minecraft.minebot.build.blockbuild.StandingSignBuildTask;
 import net.famzangl.minecraft.minebot.build.blockbuild.StandingSignBuildTask.SignDirection;
+import net.minecraft.block.BlockStairs.EnumHalf;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 
 @AICommand(helpText = "Schedules a build task.", name = "minebuild")
@@ -182,29 +184,21 @@ public class CommandScheduleBuild {
 
 	// TODO: Merge with Factory
 
-	// @AICommandInvocation()
-	// public static AIStrategy run(
-	// AIHelper helper,
-	// @AICommandParameter(type = ParameterType.FIXED, fixedName = "schedule",
-	// description = "") String nameArg,
-	// @AICommandParameter(type = ParameterType.POSITION, description =
-	// "Where to place it (relative is to your current pos)") BlockPos
-	// forPosition,
-	// @AICommandParameter(type = ParameterType.BLOCK_NAME, description =
-	// "The block", blockFilter = StairsBlockFilter.class)
-	// BlockWithDataOrDontcare blockToPlace,
-	// @AICommandParameter(type = ParameterType.ENUM, description =
-	// "The direction the stairs face") EnumFacing direction,
-	// @AICommandParameter(type = ParameterType.ENUM, description =
-	// "Upper for inverted stairs", optional = true) Half half) {
-	// if (BuildNormalStairsTask.BLOCKS.contains(blockToPlace)) {
-	// addTask(helper, new BuildNormalStairsTask(forPosition,
-	// blockToPlace, direction, half == null ? Half.LOWER : half));
-	// } else {
-	// throw new CommandEvaluationException("Cannot build " + blockToPlace);
-	// }
-	// return null;
-	// }
+	@AICommandInvocation()
+	public static AIStrategy run(AIHelper helper,
+			@AICommandParameter(type = ParameterType.FIXED, fixedName = "schedule", description = "") String nameArg,
+			@AICommandParameter(type = ParameterType.POSITION, description = "Where to place it (relative is to your current pos)") BlockPos forPosition,
+			@AICommandParameter(type = ParameterType.BLOCK_NAME, description = "The block", blockFilter = StairsBlockFilter.class) BlockWithDataOrDontcare blockToPlace,
+			@AICommandParameter(type = ParameterType.ENUM, description = "The direction the stairs face") EnumFacing direction,
+			@AICommandParameter(type = ParameterType.ENUM, description = "Upper for inverted stairs", optional = true) EnumHalf half) {
+		if (BuildNormalStairsTask.BLOCKS.contains(blockToPlace)) {
+			addTask(helper,
+					new BuildNormalStairsTask(forPosition, blockToPlace.getBlock(), direction, half == null ? EnumHalf.BOTTOM : half));
+		} else {
+			throw new CommandEvaluationException("Cannot build " + blockToPlace);
+		}
+		return null;
+	}
 
 	public static final class SignBlockFilter extends BlockFilter {
 		@Override
