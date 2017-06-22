@@ -51,9 +51,9 @@ import net.minecraft.entity.Entity;
 import net.minecraft.nbt.JsonToNBT;
 import net.minecraft.nbt.NBTException;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.IChatComponent;
 import net.minecraft.util.Vec3;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.ITextComponent;
 import net.minecraft.world.World;
 
 /**
@@ -178,7 +178,7 @@ public class MineScript {
 					}
 
 					@Override
-					public IChatComponent getDisplayName() {
+					public ITextComponent getDisplayName() {
 						throw new UnsupportedOperationException();
 					}
 
@@ -194,7 +194,7 @@ public class MineScript {
 					}
 
 					@Override
-					public void addChatMessage(IChatComponent message) {
+					public void addChatMessage(ITextComponent message) {
 						// Only called for errors.
 						throw new RuntimeException(message.toString());
 					}
