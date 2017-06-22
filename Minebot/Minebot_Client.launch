@@ -8,6 +8,6 @@
 </listAttribute>
 <stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="GradleStart"/>
 <stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="Minebot"/>
-<stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-DFORGE_FORCE_FRAME_RECALC=true"/>
+<stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-DFORGE_FORCE_FRAME_RECALC=true -DMINEBOT_LOG=1"/>
 <stringAttribute key="org.eclipse.jdt.launching.WORKING_DIRECTORY" value="/home/michael/minebot/Minebot/eclipse"/>
 </launchConfiguration>
