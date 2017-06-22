@@ -301,7 +301,7 @@ public class ChestBlockHandler extends RangeBlockHandler<ChestData> {
 	 * @return
 	 */
 	private EnumFacing getDirection(EntityItemFrame itemFrame) {
-		return itemFrame.field_174860_b;
+		return itemFrame.facingDirection;
 	}
 
 	public int getExpectedPutRating(BlockPos pos, ItemStack stack) {

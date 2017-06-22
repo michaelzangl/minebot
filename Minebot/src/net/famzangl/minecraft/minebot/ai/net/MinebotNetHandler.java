@@ -35,7 +35,10 @@ import net.minecraft.network.play.INetHandlerPlayClient;
 import net.minecraft.network.play.client.C01PacketChatMessage;
 import net.minecraft.network.play.client.C14PacketTabComplete;
 import net.minecraft.network.play.server.S02PacketChat;
+import net.minecraft.network.play.server.S08PacketPlayerPosLook;
 import net.minecraft.network.play.server.S21PacketChunkData;
+import net.minecraft.network.play.server.S22PacketMultiBlockChange;
+import net.minecraft.network.play.server.S22PacketMultiBlockChange.BlockUpdateData;
 import net.minecraft.network.play.server.S23PacketBlockChange;
 import net.minecraft.network.play.server.S24PacketBlockAction;
 import net.minecraft.network.play.server.S26PacketMapChunkBulk;
@@ -62,6 +65,8 @@ public class MinebotNetHandler extends NetHandlerPlayClient implements
 			.getMarker("fish");
 	private static final Marker MARKER_COMPLETE = MarkerManager
 			.getMarker("complete");
+	private static final Marker MARKER_POS = MarkerManager
+			.getMarker("pos");
 	private static final Logger LOGGER = LogManager.getLogger(MinebotNetHandler.class);
 
 	public static class PersistentChat {
@@ -74,7 +79,7 @@ public class MinebotNetHandler extends NetHandlerPlayClient implements
 
 		public PersistentChat(S02PacketChat packetIn) {
 			chat = packetIn.isChat();
-			message = packetIn.func_148915_c();
+			message = packetIn.getChatComponent();
 		}
 
 		public IChatComponent getMessage() {
@@ -176,7 +181,7 @@ public class MinebotNetHandler extends NetHandlerPlayClient implements
 	@Override
 	public void handleParticles(S2APacketParticles packetIn) {
 		// For detecting fishing rod events.
-		if (packetIn.func_179749_a() == EnumParticleTypes.WATER_SPLASH) {
+		if (packetIn.getParticleType() == EnumParticleTypes.WATER_SPLASH) {
 			if (packetIn.getParticleCount() > 0) {
 				double x = packetIn.getXCoordinate();
 				double y = packetIn.getYCoordinate();
@@ -200,11 +205,11 @@ public class MinebotNetHandler extends NetHandlerPlayClient implements
 
 	@Override
 	public void handleSoundEffect(S29PacketSoundEffect packetIn) {
-		String name = packetIn.func_149212_c();
+		String name = packetIn.getSoundName();
 		if ("random.splash".equals(name)) {
-			double x = packetIn.func_149207_d();
-			double y = packetIn.func_149211_e();
-			double z = packetIn.func_149210_f();
+			double x = packetIn.getX();
+			double y = packetIn.getY();
+			double z = packetIn.getZ();
 			foundFishPositions.add(new BlockPos(x, y, z));
 			LOGGER.trace(MARKER_FISH, "fish at " + new BlockPos(x, y, z));
 		}
@@ -234,17 +239,17 @@ public class MinebotNetHandler extends NetHandlerPlayClient implements
 
 	@Override
 	public void handleChunkData(S21PacketChunkData packetIn) {
-		int x = packetIn.func_149273_e();
-		int z = packetIn.func_149276_g();
+		int x = packetIn.getChunkX();
+		int z = packetIn.getChunkZ();
 		fireChunkChange(x, z);
 		super.handleChunkData(packetIn);
 	}
 
 	@Override
 	public void handleMapChunkBulk(S26PacketMapChunkBulk packetIn) {
-		for (int i = 0; i < packetIn.func_149254_d(); ++i) {
-			int x = packetIn.func_149255_a(i);
-			int y = packetIn.func_149253_b(i);
+		for (int i = 0; i < packetIn.getChunkCount(); ++i) {
+			int x = packetIn.getChunkX(i);
+			int y = packetIn.getChunkX(i);
 			fireChunkChange(x, y);
 		}
 		super.handleMapChunkBulk(packetIn);
@@ -252,14 +257,22 @@ public class MinebotNetHandler extends NetHandlerPlayClient implements
 
 	@Override
 	public void handleBlockChange(S23PacketBlockChange packetIn) {
-		blockChange(packetIn.func_179827_b());
+		blockChange(packetIn.getBlockPosition());
 		super.handleBlockChange(packetIn);
 	}
 
 	@Override
 	public void handleBlockAction(S24PacketBlockAction packetIn) {
-		blockChange(packetIn.func_179825_a());
+		blockChange(packetIn.getBlockPosition());
 		super.handleBlockAction(packetIn);
+	}
+	
+	@Override
+	public void handleMultiBlockChange(S22PacketMultiBlockChange packetIn) {
+		for (BlockUpdateData b : packetIn.getChangedBlocks()) {
+			blockChange(b.getPos());
+		}
+		super.handleMultiBlockChange(packetIn);
 	}
 
 	private void blockChange(BlockPos pos) {
@@ -287,7 +300,7 @@ public class MinebotNetHandler extends NetHandlerPlayClient implements
 	@Override
 	public void handleChat(S02PacketChat packetIn) {
 		if (mcIn.isCallingFromMinecraftThread()) {
-			LOGGER.trace(MARKER_CHAT, "Received chat package: " + packetIn.hashCode() + ": " + packetIn.func_148915_c());
+			LOGGER.trace(MARKER_CHAT, "Received chat package: " + packetIn.hashCode() + ": " + packetIn.getChatComponent());
 			chatMessages.add(new PersistentChat(packetIn));
 		} // else: super passes it on to mc thread.
 		super.handleChat(packetIn);
@@ -295,5 +308,11 @@ public class MinebotNetHandler extends NetHandlerPlayClient implements
 
 	public List<PersistentChat> getChatMessages() {
 		return Collections.unmodifiableList(chatMessages);
+	}
+	
+	@Override
+	public void handlePlayerPosLook(S08PacketPlayerPosLook packetIn) {
+		LOGGER.trace(MARKER_POS, "Forced move to: " + packetIn.getX() + "," + packetIn.getZ());
+		super.handlePlayerPosLook(packetIn);
 	}
 }

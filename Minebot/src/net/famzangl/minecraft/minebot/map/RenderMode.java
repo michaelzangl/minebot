@@ -54,7 +54,7 @@ public enum RenderMode {
 
 		@Override
 		public int getColor(WorldData world, Chunk chunk, int dx, int dz) {
-			int height = chunk.getHeight(dx & 0xf, dz & 0xf) + 1;
+			int height = chunk.getHeightValue(dx & 0xf, dz & 0xf) + 1;
 			while (height > 3
 					&& IGNORED_COVER_BLOCKS.contains(chunk.getBlock(dx, height, dz))) {
 				height--;
@@ -77,7 +77,7 @@ public enum RenderMode {
 	private static class MapRenderer implements RenderMode.IRenderer {
 		@Override
 		public int getColor(WorldData world, Chunk chunk, int dx, int dz) {
-			int height = chunk.getHeight(dx & 0xf, dz & 0xf) + 1;
+			int height = chunk.getHeightValue(dx & 0xf, dz & 0xf) + 1;
 			IBlockState state;
 			do {
 				--height;
@@ -86,6 +86,10 @@ public enum RenderMode {
 					.getBlock().getMapColor(state) == MapColor.airColor)
 					&& height > 0);
 
+			if (state.getBlock() == Blocks.sandstone || state.getBlock() == Blocks.sandstone_stairs) {
+				return 0xffb4ad8a;
+			}
+			
 			MapColor color = (state.getBlock().getMapColor(state));
 			return getColor(color);
 		}

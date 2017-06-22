@@ -17,10 +17,13 @@
 package net.famzangl.minecraft.minebot.ai;
 
 import java.io.File;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
 
 import net.famzangl.minecraft.minebot.ai.command.AIChatController;
+import net.famzangl.minecraft.minebot.ai.input.KeyboardInputController;
+import net.famzangl.minecraft.minebot.ai.input.KeyboardInputController.KeyType;
 import net.famzangl.minecraft.minebot.ai.net.NetworkHelper;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockBounds;
 import net.famzangl.minecraft.minebot.ai.path.world.Pos;
@@ -33,6 +36,7 @@ import net.famzangl.minecraft.minebot.build.BuildManager;
 import net.famzangl.minecraft.minebot.map.MapReader;
 import net.famzangl.minecraft.minebot.settings.MinebotSettings;
 import net.famzangl.minecraft.minebot.settings.SaferuleSettings;
+import net.famzangl.minecraft.minebot.stats.StatsManager;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockFence;
 import net.minecraft.block.BlockFenceGate;
@@ -40,7 +44,6 @@ import net.minecraft.block.BlockSlab;
 import net.minecraft.block.BlockWall;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.entity.Entity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.BlockPos;
@@ -105,20 +108,19 @@ public abstract class AIHelper {
 	protected BlockPos pos2 = null;
 
 	private MovementInput resetMovementInput;
-	private KeyBinding resetAttackKey;
-	private KeyBinding resetUseItemKey;
-	private boolean useItemKeyJustPressed;
-	private boolean attackKeyJustPressed;
+	
+	private HashMap<KeyType, KeyboardInputController> keys = new HashMap<KeyType, KeyboardInputController>();
+	
 	protected boolean doUngrab;
-	private KeyBinding resetSneakKey;
-	private boolean sneakKeyJustPressed;
-	private KeyBinding resetSprintKey;
-	private boolean sprintKeyJustPressed;
 
 	protected MapReader activeMapReader;
+	
+	private final StatsManager stats = new StatsManager();
 
 	public AIHelper() {
-		
+		for (KeyType key : KeyType.values()) {
+			keys.put(key, new KeyboardInputController(mc, key));
+		}
 	}
 	
 	/**
@@ -140,8 +142,12 @@ public abstract class AIHelper {
 	protected void invalidateChunkCache() {
 		if (minecraftWorld == null
 				|| mc.theWorld != minecraftWorld.getBackingWorld()) {
-			minecraftWorld = mc.theWorld == null ? null : new WorldData(
-					mc.theWorld, mc.thePlayer);
+			if (mc.theWorld == null) {
+				minecraftWorld = null;
+			} else {
+				minecraftWorld = new WorldData(
+						mc.theWorld, mc.thePlayer);
+			}
 		}
 		if (minecraftWorld != null) {
 			minecraftWorld.invalidateChunkCache();
@@ -635,6 +641,7 @@ public abstract class AIHelper {
 		if (isFacingBlock(pos)) {
 			selectToolFor(pos);
 			overrideAttack();
+			stats.markIntentionalBlockBreak(pos);
 		}
 	}
 
@@ -786,14 +793,7 @@ public abstract class AIHelper {
 	 * Presses the use item key in the next game tick.
 	 */
 	public void overrideUseItem() {
-		if (resetUseItemKey == null) {
-			resetUseItemKey = mc.gameSettings.keyBindUseItem;
-			// useItemKeyJustPressed |= resetUseItemKey.getIsKeyPressed();
-		}
-		mc.gameSettings.keyBindUseItem = new InteractAlways(
-				mc.gameSettings.keyBindAttack.getKeyDescription(), 501,
-				mc.gameSettings.keyBindAttack.getKeyCategory(),
-				!useItemKeyJustPressed);
+		overrideKey(KeyType.USE);
 	}
 
 	/**
@@ -801,49 +801,27 @@ public abstract class AIHelper {
 	 */
 	public void overrideAttack() {
 		if (mc.thePlayer.isUsingItem()) {
-			System.err
-					.println("WARNING: Player is currently using an item, but attack was requested.");
+			LOGGER.warn("WARNING: Player is currently using an item, but attack was requested.");
 		}
-		if (resetAttackKey == null) {
-			resetAttackKey = mc.gameSettings.keyBindAttack;
-			// if (resetAttackKey.getIsKeyPressed()) {
-			// System.out.println("Attack was pressed.");
-			// }
-			// This just made problems...
-			// attackKeyJustPressed |= resetAttackKey.getIsKeyPressed();
-		}
-		mc.gameSettings.keyBindAttack = new InteractAlways(
-				mc.gameSettings.keyBindAttack.getKeyDescription(), 502,
-				mc.gameSettings.keyBindAttack.getKeyCategory(),
-				!attackKeyJustPressed);
+		overrideKey(KeyType.ATTACK);
 	}
 
 	/**
 	 * Presses the sneak key in the next game step.
 	 */
 	public void overrideSneak() {
-		if (resetSneakKey == null) {
-			resetSneakKey = mc.gameSettings.keyBindSneak;
-			// sneakKeyJustPressed |= resetSneakKey.getIsKeyPressed();
-		}
-		mc.gameSettings.keyBindSneak = new InteractAlways(
-				mc.gameSettings.keyBindSneak.getKeyDescription(), 503,
-				mc.gameSettings.keyBindSneak.getKeyCategory(),
-				!sneakKeyJustPressed);
+		overrideKey(KeyType.SNEAK);
 	}
 
 	/**
 	 * Presses the sneak key in the next game step.
 	 */
 	public void overrideSprint() {
-		if (resetSprintKey == null) {
-			resetSprintKey = mc.gameSettings.keyBindSprint;
-			// sneakKeyJustPressed |= resetSneakKey.getIsKeyPressed();
-		}
-		mc.gameSettings.keyBindSprint = new InteractAlways(
-				mc.gameSettings.keyBindSprint.getKeyDescription(), 504,
-				mc.gameSettings.keyBindSprint.getKeyCategory(),
-				!sprintKeyJustPressed);
+		overrideKey(KeyType.SPRINT);
+	}
+
+	private void overrideKey(KeyType type) {
+		keys.get(type).overridePressed();
 	}
 
 	/**
@@ -854,40 +832,21 @@ public abstract class AIHelper {
 			mc.thePlayer.movementInput = resetMovementInput;
 			resetMovementInput = null;
 		}
-		attackKeyJustPressed = resetAttackKey != null;
-		if (resetAttackKey != null) {
-			mc.gameSettings.keyBindAttack = resetAttackKey;
-			resetAttackKey = null;
-		}
-		useItemKeyJustPressed = resetUseItemKey != null;
-		if (resetUseItemKey != null) {
-			mc.gameSettings.keyBindUseItem = resetUseItemKey;
-			resetUseItemKey = null;
-		}
-		sneakKeyJustPressed = resetSneakKey != null;
-		if (resetSneakKey != null) {
-			mc.gameSettings.keyBindSneak = resetSneakKey;
-			resetSneakKey = null;
-		}
-		sprintKeyJustPressed = resetSprintKey != null;
-		if (resetSprintKey != null) {
-			mc.gameSettings.keyBindSprint = resetSprintKey;
-			resetSprintKey = null;
+	}
+	
+	protected void keyboardPostTick() {
+		for (KeyboardInputController k : keys.values()) {
+			k.doTick();
 		}
 	}
 
 	protected boolean userTookOver() {
-		final MovementInput mi = resetMovementInput == null ? mc.thePlayer.movementInput
-				: resetMovementInput;
-		final KeyBinding attack = resetAttackKey == null ? mc.gameSettings.keyBindAttack
-				: resetAttackKey;
-		final KeyBinding use = resetUseItemKey == null ? mc.gameSettings.keyBindUseItem
-				: resetUseItemKey;
-		final KeyBinding sneak = resetSneakKey == null ? mc.gameSettings.keyBindSneak
-				: resetSneakKey;
-
-		return mi.moveForward != 0 || mi.moveStrafe != 0 || mi.jump
-				|| attack.isKeyDown() || use.isKeyDown() || sneak.isKeyDown();
+		for (KeyboardInputController key : keys.values()) {
+			if (key.wasPressedByUser()) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	/**
@@ -906,7 +865,7 @@ public abstract class AIHelper {
 	 */
 	@SuppressWarnings("unchecked")
 	public List<Entity> getEntities(int dist, Predicate<Entity> selector) {
-		return mc.theWorld.func_175674_a(
+		return mc.theWorld.getEntitiesInAABBexcluding(
 				mc.getRenderViewEntity(),
 				mc.getRenderViewEntity().getEntityBoundingBox()
 						.addCoord(-dist, -dist, -dist)
@@ -1139,6 +1098,10 @@ public abstract class AIHelper {
 
 	public MapReader getActiveMapReader() {
 		return activeMapReader;
+	}
+	
+	public StatsManager getStats() {
+		return stats;
 	}
 
 }

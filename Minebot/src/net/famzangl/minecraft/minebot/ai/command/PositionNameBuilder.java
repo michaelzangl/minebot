@@ -51,7 +51,7 @@ public class PositionNameBuilder extends ParameterBuilder {
 	@Override
 	public Object getParameter(AIHelper helper, String[] arguments) {
 		try {
-			return CommandBase.func_175757_a(helper.getMinecraft().thePlayer,
+			return CommandBase.parseBlockPos(helper.getMinecraft().thePlayer,
 					arguments, 0, true);
 		} catch (final NumberInvalidException e) {
 			throw new CommandEvaluationException("Number format not supported.");

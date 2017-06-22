@@ -1,12 +1,6 @@
 package net.famzangl.minecraft.minebot.ai.path.world;
 
 import java.util.HashMap;
-import java.util.HashSet;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.Marker;
-import org.apache.logging.log4j.MarkerManager;
 
 import net.famzangl.minecraft.minebot.ai.command.BlockWithData;
 import net.minecraft.block.Block;
@@ -17,6 +11,11 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.WorldType;
 import net.minecraft.world.biome.BiomeGenBase;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.Marker;
+import org.apache.logging.log4j.MarkerManager;
 
 public class BlockBoundsCache {
 	private static final Marker MARKER_BOUNDS_PROBLEM = MarkerManager
@@ -101,6 +100,12 @@ public class BlockBoundsCache {
 
 			@Override
 			public boolean extendedLevelsInChunkCache() {
+				throw new UnsupportedOperationException();
+			}
+
+			@Override
+			public boolean isSideSolid(BlockPos pos, EnumFacing side,
+					boolean _default) {
 				throw new UnsupportedOperationException();
 			}
 		};

@@ -30,7 +30,6 @@ import net.famzangl.minecraft.minebot.ai.command.AICommand;
 import net.famzangl.minecraft.minebot.ai.command.AICommandInvocation;
 import net.famzangl.minecraft.minebot.ai.command.AICommandParameter;
 import net.famzangl.minecraft.minebot.ai.command.ParameterType;
-import net.famzangl.minecraft.minebot.ai.scripting.CommandJs.TickProvider;
 import net.famzangl.minecraft.minebot.ai.strategy.AIStrategy;
 import net.famzangl.minecraft.minebot.ai.strategy.AIStrategy.TickResult;
 import net.famzangl.minecraft.minebot.ai.task.error.StringTaskError;
@@ -302,7 +301,7 @@ public class CommandJs {
 		@Override
 		public void tickDone() {
 			synchronized (tickHelperMutex) {
-				LOGGER.error(MARKER_SYNC, "Script requests that we resume.");
+				LOGGER.trace(MARKER_SYNC, "Script requests that we resume.");
 				printError();
 				scriptInsideTick = false;
 				scriptWaitingForTick = false;
@@ -314,7 +313,7 @@ public class CommandJs {
 		@Override
 		public AIHelper getHelper() {
 			synchronized (tickHelperMutex) {
-				LOGGER.error(MARKER_SYNC,
+				LOGGER.trace(MARKER_SYNC,
 						"Synchronize to getting script helper.");
 				if (stopped) {
 					throw new RuntimeException("Stop.");
@@ -340,7 +339,7 @@ public class CommandJs {
 		@Override
 		public void setActiveStrategy(ScriptStrategy strategy, AIHelper helper) {
 			synchronized (activeStrategyMutex) {
-				LOGGER.error(MARKER_SYNC, "Change strategy to " + strategy);
+				LOGGER.trace(MARKER_SYNC, "Change strategy to " + strategy);
 				if (activeStrategy != null) {
 					activeStrategy.setActive(false, helper);
 				}
@@ -368,7 +367,7 @@ public class CommandJs {
 			synchronized (activeStrategyMutex) {
 				while (activeStrategy != null) {
 					if (pendingTicker != null) {
-						LOGGER.error(MARKER_SYNC,
+						LOGGER.trace(MARKER_SYNC,
 								"Handling strategy tick in js thread.");
 						tickHelper = pendingTicker.getHelper();
 						pendingTicker.run();

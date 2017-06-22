@@ -266,4 +266,8 @@ public class WorldData {
 		return new BlockWithData(getBlockIdWithMeta(position));
 	}
 
+	public long getWorldTime() {
+		return theWorld.getTotalWorldTime();
+	}
+
 }

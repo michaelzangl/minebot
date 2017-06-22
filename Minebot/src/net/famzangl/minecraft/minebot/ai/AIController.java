@@ -16,8 +16,6 @@
  *******************************************************************************/
 package net.famzangl.minecraft.minebot.ai;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.util.Hashtable;
 import java.util.Map.Entry;
 
@@ -25,14 +23,12 @@ import net.famzangl.minecraft.minebot.ai.command.AIChatController;
 import net.famzangl.minecraft.minebot.ai.command.IAIControllable;
 import net.famzangl.minecraft.minebot.ai.net.MinebotNetHandler;
 import net.famzangl.minecraft.minebot.ai.net.NetworkHelper;
-import net.famzangl.minecraft.minebot.ai.path.world.Pos;
 import net.famzangl.minecraft.minebot.ai.profiler.InterceptingProfiler;
 import net.famzangl.minecraft.minebot.ai.render.BuildMarkerRenderer;
 import net.famzangl.minecraft.minebot.ai.render.PosMarkerRenderer;
 import net.famzangl.minecraft.minebot.ai.strategy.AIStrategy;
 import net.famzangl.minecraft.minebot.ai.strategy.AIStrategy.TickResult;
 import net.famzangl.minecraft.minebot.ai.strategy.RunOnceStrategy;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.settings.KeyBinding;
@@ -55,6 +51,7 @@ import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.MarkerManager;
 import org.lwjgl.input.Keyboard;
+import org.lwjgl.opengl.Display;
 
 /**
  * The main class that handles the bot.
@@ -130,14 +127,13 @@ public class AIController extends AIHelper implements IAIControllable {
 
 	private PosMarkerRenderer markerRenderer;
 
-	private boolean skipNextTick;
-
 	private MouseHelper oldMouseHelper;
 
 	private BuildMarkerRenderer buildMarkerRenderer;
 	private NetworkHelper networkHelper;
 	private InterceptingProfiler profilerHelper;
 	private RenderTickEvent activeDrawEvent;
+	private boolean displayWasActiveSinceUngrab;
 
 	public AIController() {
 		AIChatController.getRegistry().setControlled(this);
@@ -147,7 +143,9 @@ public class AIController extends AIHelper implements IAIControllable {
 	public void connect(ClientConnectedToServerEvent e) {
 		networkHelper = MinebotNetHandler.inject(this, e.manager, e.handler);
 		profilerHelper = InterceptingProfiler.inject(getMinecraft());
-		// Hook into net.minecraft.client.renderer.RenderGlobal.drawBlockDamageTexture(Tessellator, WorldRenderer, Entity, float)
+		// Hook into
+		// net.minecraft.client.renderer.RenderGlobal.drawBlockDamageTexture(Tessellator,
+		// WorldRenderer, Entity, float)
 		profilerHelper.addLisener("hand", new Runnable() {
 			@Override
 			public void run() {
@@ -174,11 +172,6 @@ public class AIController extends AIHelper implements IAIControllable {
 
 		LOGGER.debug(MARKER_STRATEGY, "Strategy game tick. World time: "
 				+ getMinecraft().theWorld.getTotalWorldTime());
-		if (skipNextTick) {
-			skipNextTick = false;
-			LOGGER.debug(MARKER_STRATEGY, "Tick skip was requested");
-			return;
-		}
 		testUngrabMode();
 		invalidateObjectMouseOver();
 		resetAllInputs();
@@ -188,6 +181,8 @@ public class AIController extends AIHelper implements IAIControllable {
 			doUngrab = true;
 		}
 
+		getStats().setGameTickTimer(getWorld());
+		
 		AIStrategy newStrategy;
 		if (dead || stop.isPressed() || stop.isKeyDown()) {
 			// FIXME: Better way to determine of this stategy can be resumed.
@@ -231,12 +226,18 @@ public class AIController extends AIHelper implements IAIControllable {
 				strategyDescr = "";
 			}
 		}
+		
+		keyboardPostTick();
 		LOGGER.debug(MARKER_STRATEGY, "Strategy game tick done");
 
 		if (activeMapReader != null) {
 			activeMapReader.tick(this);
 		}
 
+	}
+
+	private boolean isStopPressed() {
+		return stop.isPressed() || stop.isKeyDown() || Keyboard.isKeyDown(stop.getKeyCode());
 	}
 
 	private void deactivateCurrentStrategy() {
@@ -264,35 +265,20 @@ public class AIController extends AIHelper implements IAIControllable {
 			doUngrab = false;
 		}
 
-		try {
-			// Dynamic 1.7.2 / 1.7.10 fix.
-			ScaledResolution res;
-			final Constructor<?> method = ScaledResolution.class
-					.getConstructors()[0];
-			final Object arg1 = method.getParameterTypes()[0] == Minecraft.class ? getMinecraft()
-					: getMinecraft().gameSettings;
-			res = (ScaledResolution) method.newInstance(arg1,
-					getMinecraft().displayWidth, getMinecraft().displayHeight);
+		ScaledResolution res = new ScaledResolution(getMinecraft());
 
-			String[] str;
-			synchronized (strategyDescrMutex) {
-				str = (strategyDescr == null ? "?" : strategyDescr).split("\n");
-			}
-			int y = 10;
-			for (String s : str) {
-				getMinecraft().fontRendererObj.drawStringWithShadow(
-						s,
-						res.getScaledWidth()
-								- getMinecraft().fontRendererObj
-										.getStringWidth(s) - 10, y, 16777215);
-				y += 15;
-			}
-		} catch (final InstantiationException e) {
-			e.printStackTrace();
-		} catch (final IllegalAccessException e) {
-			e.printStackTrace();
-		} catch (final InvocationTargetException e) {
-			e.printStackTrace();
+		String[] str;
+		synchronized (strategyDescrMutex) {
+			str = (strategyDescr == null ? "?" : strategyDescr).split("\n");
+		}
+		int y = 10;
+		for (String s : str) {
+			getMinecraft().fontRendererObj.drawStringWithShadow(
+					s,
+					res.getScaledWidth()
+							- getMinecraft().fontRendererObj.getStringWidth(s)
+							- 10, y, 16777215);
+			y += 15;
 		}
 	}
 
@@ -305,11 +291,13 @@ public class AIController extends AIHelper implements IAIControllable {
 			oldMouseHelper = getMinecraft().mouseHelper;
 		}
 		getMinecraft().mouseHelper = new UngrabMouseHelper();
+		displayWasActiveSinceUngrab = true;
 	}
 
 	private synchronized void testUngrabMode() {
+		displayWasActiveSinceUngrab &= Display.isActive();
 		if (oldMouseHelper != null) {
-			if (userTookOver()) {
+			if ((userTookOver() || !displayWasActiveSinceUngrab) && Display.isActive()) {
 				LOGGER.debug(MARKER_MOUSE, "Preparing to re-grab the mouse.");
 				// Tell minecraft what really happened.
 				getMinecraft().mouseHelper = oldMouseHelper;
@@ -345,7 +333,7 @@ public class AIController extends AIHelper implements IAIControllable {
 		}
 		activeDrawEvent = event;
 	}
-	
+
 	public void drawMakers() {
 		final Entity view = getMinecraft().getRenderViewEntity();
 		if (!(view instanceof EntityPlayerSP)) {

@@ -5,8 +5,6 @@ import net.famzangl.minecraft.minebot.ai.path.world.BlockSet;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSets;
 import net.famzangl.minecraft.minebot.ai.task.place.DestroyBlockTask;
 import net.famzangl.minecraft.minebot.ai.task.place.PlaceBlockAtFloorTask;
-import net.famzangl.minecraft.minebot.settings.MinebotSettingsRoot;
-import net.famzangl.minecraft.minebot.settings.PathfindingSetting;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemReed;
 import net.minecraft.util.BlockPos;

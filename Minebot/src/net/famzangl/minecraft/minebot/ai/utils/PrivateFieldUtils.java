@@ -43,37 +43,49 @@ public final class PrivateFieldUtils {
 	 */
 	public static <T> T getFieldValue(Object o, Class<?> baseClass,
 			Class<T> fieldType) {
+		try {
+			return (T) getField(o, baseClass, fieldType).get(o);
+		} catch (IllegalAccessException e) {
+			e.printStackTrace();
+			throw new IllegalArgumentException(e);
+		}
+	}
+
+	public static <T> Field getField(Object o, Class<?> baseClass,
+			Class<T> fieldType) {
 		if (o == null) {
 			throw new NullPointerException();
 		}
 		if (!baseClass.isAssignableFrom(o.getClass())) {
-			throw new IllegalArgumentException("Got a " + o.getClass().getName() + " but expected a " + baseClass.getName());
+			throw new IllegalArgumentException("Got a "
+					+ o.getClass().getName() + " but expected a "
+					+ baseClass.getName());
 		}
 		for (Field f : baseClass.getDeclaredFields()) {
-			if (typeEquals(f.getType(), fieldType) && !Modifier.isStatic(f.getModifiers())) {
+			if (typeEquals(f.getType(), fieldType)
+					&& !Modifier.isStatic(f.getModifiers())) {
 				f.setAccessible(true);
-				try {
-					return (T) f.get(o);
-				} catch (IllegalAccessException e) {
-					e.printStackTrace();
-					throw new IllegalArgumentException(e);
-				}
+				return f;
 			}
 		}
 
 		throw new IllegalArgumentException("No field of type " + fieldType
 				+ " in " + baseClass);
 	}
+
 	public static <T> void setFieldValue(Object o, Class<?> baseClass,
 			Class<T> fieldType, T value) {
 		if (o == null) {
 			throw new NullPointerException();
 		}
 		if (!baseClass.isAssignableFrom(o.getClass())) {
-			throw new IllegalArgumentException("Got a " + o.getClass().getName() + " but expected a " + baseClass.getName());
+			throw new IllegalArgumentException("Got a "
+					+ o.getClass().getName() + " but expected a "
+					+ baseClass.getName());
 		}
 		for (Field f : baseClass.getDeclaredFields()) {
-			if (typeEquals(f.getType(), fieldType) && !Modifier.isStatic(f.getModifiers())) {
+			if (typeEquals(f.getType(), fieldType)
+					&& !Modifier.isStatic(f.getModifiers())) {
 				f.setAccessible(true);
 				try {
 					f.set(o, value);
@@ -88,6 +100,7 @@ public final class PrivateFieldUtils {
 		throw new IllegalArgumentException("No field of type " + fieldType
 				+ " in " + baseClass);
 	}
+
 	public static boolean typeEquals(Class<?> a, Class<?> b) {
 		return a.equals(b);
 	}
