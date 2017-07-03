@@ -18,12 +18,15 @@ mkdir -p releases/$tag || exit 1
 for mod in Minebot AimBow; do
 	echo "Starting to compile $mod ..."
 	cd "$base/$mod"
+	rm -f "build/libs/"*".jar"
 	./gradlew build || exit 1
-	cp "build/libs/$(ls -t1 build/libs/ | tail -n 1)" "$base/releases/$tag" || exit 1
+	cp "build/libs/"*".jar" "$base/releases/$tag" || exit 1
+	#cp "build/libs/$(ls -t1 build/libs/ | tail -n 1)" "$base/releases/$tag" || exit 1
 done
 
 echo "Packing release"
 cd "$base/releases"
+rm -f "$tag.zip"
 zip "$tag.zip" $tag/*
 
 
