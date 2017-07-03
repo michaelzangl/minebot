@@ -17,6 +17,7 @@
 package net.famzangl.minecraft.minebot.ai.command;
 
 import java.util.Collection;
+import java.util.List;
 
 /**
  * This is the definition of a single argument to be passed on the command line.
@@ -42,10 +43,20 @@ public class ArgumentDefinition {
 		this.descriptionInfo = descriptionInfo;
 	}
 
+	public void getTabCompleteOptions(List<String> previousArguments, String currentStart,
+			Collection<String> addTo) {
+		getTabCompleteOptions(currentStart, addTo);
+	}
+	
 	public void getTabCompleteOptions(String currentStart,
 			Collection<String> addTo) {
 	}
 
+
+	public boolean couldEvaluateAgainst(List<String> previousArguments, String string) {
+		return couldEvaluateAgainst(string);
+	}
+	
 	/**
 	 * Check if this argument could be from that parameter. Checks e.g. for
 	 * integer values.

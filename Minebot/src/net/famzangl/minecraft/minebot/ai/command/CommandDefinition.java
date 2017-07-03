@@ -103,6 +103,9 @@ public class CommandDefinition {
 			case STRING:
 				builder = new StringNameBuilder(annot);
 				break;
+			case BLOCK_STATE:
+				builder = new BlockStateNameBuilder(annot);
+				break;
 			default:
 				throw new IllegalArgumentException("Unknown type: "
 						+ annot.type());
@@ -210,7 +213,7 @@ public class CommandDefinition {
 			return false;
 		}
 		for (int i = 0; i < arguments2.length; i++) {
-			if (!arguments.get(i).couldEvaluateAgainst(arguments2[i])) {
+			if (!arguments.get(i).couldEvaluateAgainst(Arrays.asList(arguments2).subList(0, i), arguments2[i])) {
 				return false;
 			}
 		}

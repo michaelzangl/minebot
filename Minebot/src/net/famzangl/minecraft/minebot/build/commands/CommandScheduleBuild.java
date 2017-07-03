@@ -35,7 +35,9 @@ import net.famzangl.minecraft.minebot.build.blockbuild.LogBuildTask;
 import net.famzangl.minecraft.minebot.build.blockbuild.SlabBuildTask;
 import net.famzangl.minecraft.minebot.build.blockbuild.StandingSignBuildTask;
 import net.famzangl.minecraft.minebot.build.blockbuild.StandingSignBuildTask.SignDirection;
+import net.minecraft.block.BlockStairs;
 import net.minecraft.block.BlockStairs.EnumHalf;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 
@@ -56,7 +58,7 @@ public class CommandScheduleBuild {
 
 		@Override
 		protected void singleRun(AIHelper helper) {
-			addTask(helper, task);
+			helper.buildManager.addTask(task);
 		}
 	}
 
@@ -82,6 +84,22 @@ public class CommandScheduleBuild {
 			task = new FenceBuildTask(forPosition, blockToPlace);
 		} else if (SlabBuildTask.BLOCKS.contains(blockToPlace)) {
 			task = new SlabBuildTask(forPosition, blockToPlace);
+		} else {
+			throw new CommandEvaluationException("Cannot build " + blockToPlace);
+		}
+		return new ScheduleTaskStrategy(task);
+	}
+
+
+	@AICommandInvocation()
+	public static AIStrategy runSimple(
+			AIHelper helper,
+			@AICommandParameter(type = ParameterType.FIXED, fixedName = "schedule", description = "") String nameArg,
+			@AICommandParameter(type = ParameterType.POSITION, description = "Where to place it (relative is to your current pos)") BlockPos forPosition,
+			@AICommandParameter(type = ParameterType.BLOCK_STATE, description = "The block", blockFilter=StairsBlockFilter.class) IBlockState blockToPlace) {
+		BuildNormalStairsTask task;
+		if (BuildNormalStairsTask.BLOCKS.contains(blockToPlace)) {
+			task = new BuildNormalStairsTask(forPosition, blockToPlace.getBlock(), blockToPlace.getValue(BlockStairs.FACING), blockToPlace.getValue(BlockStairs.HALF));
 		} else {
 			throw new CommandEvaluationException("Cannot build " + blockToPlace);
 		}
@@ -184,21 +202,21 @@ public class CommandScheduleBuild {
 
 	// TODO: Merge with Factory
 
-	@AICommandInvocation()
-	public static AIStrategy run(AIHelper helper,
-			@AICommandParameter(type = ParameterType.FIXED, fixedName = "schedule", description = "") String nameArg,
-			@AICommandParameter(type = ParameterType.POSITION, description = "Where to place it (relative is to your current pos)") BlockPos forPosition,
-			@AICommandParameter(type = ParameterType.BLOCK_NAME, description = "The block", blockFilter = StairsBlockFilter.class) BlockWithDataOrDontcare blockToPlace,
-			@AICommandParameter(type = ParameterType.ENUM, description = "The direction the stairs face") EnumFacing direction,
-			@AICommandParameter(type = ParameterType.ENUM, description = "Upper for inverted stairs", optional = true) EnumHalf half) {
-		if (BuildNormalStairsTask.BLOCKS.contains(blockToPlace)) {
-			addTask(helper,
-					new BuildNormalStairsTask(forPosition, blockToPlace.getBlock(), direction, half == null ? EnumHalf.BOTTOM : half));
-		} else {
-			throw new CommandEvaluationException("Cannot build " + blockToPlace);
-		}
-		return null;
-	}
+//	@AICommandInvocation()
+//	public static AIStrategy run(AIHelper helper,
+//			@AICommandParameter(type = ParameterType.FIXED, fixedName = "schedule", description = "") String nameArg,
+//			@AICommandParameter(type = ParameterType.POSITION, description = "Where to place it (relative is to your current pos)") BlockPos forPosition,
+//			@AICommandParameter(type = ParameterType.BLOCK_NAME, description = "The block", blockFilter = StairsBlockFilter.class) BlockWithDataOrDontcare blockToPlace,
+//			@AICommandParameter(type = ParameterType.ENUM, description = "The direction the stairs face") EnumFacing direction,
+//			@AICommandParameter(type = ParameterType.ENUM, description = "Upper for inverted stairs", optional = true) EnumHalf half) {
+//		if (BuildNormalStairsTask.BLOCKS.contains(blockToPlace)) {
+//			addTask(helper,
+//					new BuildNormalStairsTask(forPosition, blockToPlace.getBlock(), direction, half == null ? EnumHalf.BOTTOM : half));
+//		} else {
+//			throw new CommandEvaluationException("Cannot build " + blockToPlace);
+//		}
+//		return null;
+//	}
 
 	public static final class SignBlockFilter extends BlockFilter {
 		@Override
@@ -225,9 +243,5 @@ public class CommandScheduleBuild {
 		} else {
 			throw new CommandEvaluationException("Cannot build " + blockToPlace);
 		}
-	}
-
-	private static void addTask(AIHelper helper, BuildTask blockBuildTask) {
-		helper.buildManager.addTask(blockBuildTask);
 	}
 }

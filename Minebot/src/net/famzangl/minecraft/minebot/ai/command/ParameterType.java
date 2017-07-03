@@ -26,5 +26,6 @@ public enum ParameterType {
 	FILE,
 	POSITION,
 	ENUM,
-	STRING
+	STRING,
+	BLOCK_STATE
 }
