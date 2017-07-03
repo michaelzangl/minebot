@@ -1,5 +1,8 @@
 package net.famzangl.minecraft.minebot.ai.path.world;
 
+import java.lang.reflect.Field;
+import java.util.stream.Stream;
+
 import net.famzangl.minecraft.minebot.ai.command.BlockWithData;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockTorch;
@@ -8,10 +11,13 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.init.Blocks;
+import net.minecraft.util.BitArray;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.chunk.BlockStateContainer;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.storage.ExtendedBlockStorage;
 
@@ -30,21 +36,63 @@ public class WorldData {
 	 */
 	private static final int CACHE_INVALID = 0x10000000;
 	private static final double FLOOR_HEIGHT = .55;
+	
+	private static class FastBlockStorageAccess {
+		private static final int FORCED_SIZE = MathHelper.log2DeBruijn(Block.BLOCK_STATE_IDS.size());
+		private final BlockStateContainer data;
+		
+		private static final Field BITS_FIELD;
+		private static final Field STORAGE_FIELD;
+		private BitArray array;
+		static {
+			BITS_FIELD = Stream.of(BlockStateContainer.class.getDeclaredFields()).filter(f -> f.getType() == Integer.TYPE).findFirst().get();
+			BITS_FIELD.setAccessible(true);
+			STORAGE_FIELD = Stream.of(BlockStateContainer.class.getDeclaredFields()).filter(f -> f.getType() == BitArray.class).findFirst().get();
+			STORAGE_FIELD.setAccessible(true);
+		}
+
+		public FastBlockStorageAccess(ExtendedBlockStorage extendedBlockStorage) {
+			data = extendedBlockStorage.getData();
+			try {
+				int bits = BITS_FIELD.getInt(data);
+				if (bits != FORCED_SIZE) {
+					// Don't care about memory. We care about speed
+					data.onResize(FORCED_SIZE, Blocks.AIR.getDefaultState());
+				}
+				array = (BitArray) STORAGE_FIELD.get(data);
+			} catch (IllegalAccessException e) {
+				e.printStackTrace();
+			}
+		}
+
+		public int get(int lx, int ly, int lz) {
+			// Same as return Block.BLOCK_STATE_IDS.get(data.get(lx, ly, lz));
+			int index = ly << 8 | lz << 4 | lx;
+			return array.getAt(index);
+		}
+		
+	}
 
 	public static abstract class ChunkAccessor {
 		protected ExtendedBlockStorage[] blockStorage;
+		private FastBlockStorageAccess[] access;
 
 		public int getBlockIdWithMeta(int x, int y, int z) {
 			int blockId = 0;
 			if (y >> 4 < blockStorage.length) {
-				final ExtendedBlockStorage extendedblockstorage = blockStorage[y >> 4];
-
-				if (extendedblockstorage != null) {
+				if (access == null) {
+					access = new FastBlockStorageAccess[blockStorage.length];
+				}
+				FastBlockStorageAccess myAccess = access[y >> 4];
+				if (myAccess == null && blockStorage[y >> 4] != null) {
+					myAccess = new FastBlockStorageAccess(blockStorage[y >> 4]);
+					access[y >> 4] = myAccess;
+				}
+				if (myAccess != null) {
 					final int lx = x & 15;
 					final int ly = y & 15;
 					final int lz = z & 15;
-					//TODO: Make this faster again
-					blockId = Block.BLOCK_STATE_IDS.get(extendedblockstorage.get(lx, ly, lz));
+					blockId = myAccess.get(lx, ly, lz);
 				}
 			}
 
