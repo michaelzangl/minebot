@@ -69,7 +69,7 @@ public class TakeResultItem extends AITask {
 				&& shouldTakeStack(screen.inventorySlots.getSlot(slot)
 						.getStack())) {
 			aiHelper.getMinecraft().playerController.windowClick(
-					screen.inventorySlots.windowId, slot, 0, ClickType.PICKUP,
+					screen.inventorySlots.windowId, slot, 0, ClickType.QUICK_MOVE,
 					aiHelper.getMinecraft().player);
 			LOGGER.trace(MARKER_TAKE_RESULT, "Taking item");
 			tookItem = true;

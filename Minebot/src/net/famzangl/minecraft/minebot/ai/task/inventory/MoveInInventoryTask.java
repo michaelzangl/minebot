@@ -95,7 +95,7 @@ public abstract class MoveInInventoryTask extends AITask {
 							.size()
 					|| toStack >= screen.inventorySlots.inventoryItemStacks
 							.size()) {
-				LOGGER.error("Attempet to move : " + fromStack + " -> "
+				LOGGER.error("Attempt to move : " + fromStack + " -> "
 						+ toStack);
 				taskOperations.desync(new StringTaskError("Invalid item move specification."));
 				return;
@@ -150,29 +150,29 @@ public abstract class MoveInInventoryTask extends AITask {
 			boolean rightclickOnStart) {
 		int oldCount = getSlotContentCount(to);
 
-		click(aiHelper, from.slotNumber, rightclickOnStart ? ClickType.PICKUP : ClickType.PICKUP_ALL);
+		click(aiHelper, from.slotNumber, rightclickOnStart ? 1 : 0, ClickType.PICKUP);
 
-		click(aiHelper, to.slotNumber, ClickType.PICKUP);
+		click(aiHelper, to.slotNumber, 0, ClickType.PICKUP);
 		return getSlotContentCount(to) - oldCount;
 	}
 
 	// TODO: Check the click types
-	private void click(AIHelper aiHelper, int slotNumber, ClickType clickType) {
-		System.out.println("Click on " + slotNumber + " using " + clickType);
+	private void click(AIHelper aiHelper, int slotNumber,  int rightClick, ClickType clickType) {
+		LOGGER.trace(MARKER_MOVE, "Click on " + slotNumber + " using " + rightClick + "," + clickType);
 		final GuiContainer screen = (GuiContainer) aiHelper.getMinecraft().currentScreen;
 		aiHelper.getMinecraft().playerController.windowClick(
-				screen.inventorySlots.windowId, slotNumber, 1, ClickType.PICKUP,
+				screen.inventorySlots.windowId, slotNumber, rightClick, clickType,
 				aiHelper.getMinecraft().player);
 	}
 
 	private int moveStackPart(AIHelper aiHelper, Slot from, Slot to, int count) {
 		int oldCount = getSlotContentCount(to);
 
-		click(aiHelper, from.slotNumber, ClickType.PICKUP);
+		click(aiHelper, from.slotNumber, 0, ClickType.PICKUP);
 		for (int i = 0; i < count; i++) {
-			click(aiHelper, to.slotNumber, ClickType.PICKUP);
+			click(aiHelper, to.slotNumber, 1, ClickType.PICKUP);
 		}
-		click(aiHelper, from.slotNumber, ClickType.PICKUP_ALL);
+		click(aiHelper, from.slotNumber, 0, ClickType.PICKUP_ALL);
 		return getSlotContentCount(to) - oldCount;
 	}
 

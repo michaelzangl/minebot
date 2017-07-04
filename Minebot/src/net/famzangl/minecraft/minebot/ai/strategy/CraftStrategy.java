@@ -25,6 +25,7 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -53,6 +54,7 @@ import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.CraftingManager;
 import net.minecraft.item.crafting.IRecipe;
+import net.minecraft.item.crafting.Ingredient;
 import net.minecraft.item.crafting.ShapedRecipes;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.oredict.ShapedOreRecipe;
@@ -72,10 +74,7 @@ public class CraftStrategy extends PathFinderStrategy {
 	public static final class CraftingPossibility {
 		public static final int SUBTYPE_IGNORED = 32767;
 
-		private static final int WIDTH = 0;
-		private static final int HEIGHT = 1;
-
-		private final ItemWithSubtype[][] slots = new ItemWithSubtype[3][3];
+		private final ItemWithSubtype[][][] slots = new ItemWithSubtype[3][3][];
 
 		public CraftingPossibility(IRecipe recipe) {
 			LOGGER.trace(MARKER_RECIPE, "Parsing recipe: " + recipe);
@@ -84,17 +83,18 @@ public class CraftStrategy extends PathFinderStrategy {
 				LOGGER.trace(MARKER_RECIPE, "Interpreting ShapedRecipes: "
 						+ shapedRecipes.getRecipeOutput().getItem()
 								.getUnlocalizedName());
-				int[] dim = getSizes(shapedRecipes);
+				int width = shapedRecipes.recipeWidth;
+				int height = shapedRecipes.recipeHeight;
 
-				ItemStack[] items = PrivateFieldUtils.getFieldValue(
-						shapedRecipes, ShapedRecipes.class, ItemStack[].class);
-				LOGGER.trace(MARKER_RECIPE, "Found items of size " + dim[WIDTH]
-						+ "x" + dim[HEIGHT] + ": " + Arrays.toString(items));
-				for (int x = 0; x < dim[WIDTH]; x++) {
-					for (int y = 0; y < dim[HEIGHT]; y++) {
-						ItemStack itemStack = items[x + y * dim[WIDTH]];
-						if (itemStack != null) {
-							this.slots[x][y] = new ItemWithSubtype(itemStack);
+				LOGGER.trace(MARKER_RECIPE, "Found items of size " + width
+						+ "x" + height + ": " + shapedRecipes.recipeItems);
+				for (int x = 0; x < width; x++) {
+					for (int y = 0; y < height; y++) {
+						Ingredient itemStack = shapedRecipes.recipeItems.get(x + y * width);
+						if (itemStack != null && itemStack.getMatchingStacks().length > 0) {
+							this.slots[x][y] = Stream.of(itemStack.getMatchingStacks())
+									.map(ItemWithSubtype::new)
+									.toArray(ItemWithSubtype[]::new);
 						}
 					}
 				}
@@ -111,15 +111,13 @@ public class CraftStrategy extends PathFinderStrategy {
 							Object itemStack = shapedRecipes.getIngredients().get(x + y
 									* width);
 							if (itemStack instanceof ItemStack) {
-								this.slots[x][y] = new ItemWithSubtype(
-										(ItemStack) itemStack);
+								this.slots[x][y] = new ItemWithSubtype[] { new ItemWithSubtype(
+										(ItemStack) itemStack) };
 							} else if (itemStack instanceof List) {
-								List list = (List) itemStack;
-								this.slots[x][y] = new ItemWithSubtype(
-										(ItemStack) list.get(0));
-								if (list.size() > 1) {
-									LOGGER.warn(MARKER_RECIPE, "Multiple items found, only using first: " + list);
-								}
+								List<ItemStack> list = (List<ItemStack>) itemStack;
+								this.slots[x][y] = list.stream()
+										.map(ItemWithSubtype::new)
+										.toArray(ItemWithSubtype[]::new);
 							} else if (itemStack != null) {
 								LOGGER.error(MARKER_RECIPE, "Cannot handle " + itemStack.getClass());
 								throw new IllegalArgumentException("Cannot handle " + itemStack.getClass());
@@ -140,52 +138,11 @@ public class CraftStrategy extends PathFinderStrategy {
 			}
 		}
 
-		private ItemStack[] getItems(ShapedRecipes shapedRecipes) {
-			for (Field field : ShapedRecipes.class.getDeclaredFields()) {
-				if (field.getType().isArray()) {
-					Class<?> componentType = field.getType().getComponentType();
-					if (componentType == ItemStack.class) {
-						field.setAccessible(true);
-						try {
-							return (ItemStack[]) field.get(shapedRecipes);
-						} catch (IllegalArgumentException e) {
-							e.printStackTrace();
-						} catch (IllegalAccessException e) {
-							e.printStackTrace();
-						}
-					}
-				}
-			}
-			return null;
-		}
-
-		private int[] getSizes(ShapedRecipes shapedRecipes) {
-			int i = 0;
-			int[] sizes = new int[2];
-			for (Field field : ShapedRecipes.class.getDeclaredFields()) {
-				if (field.getType() == Integer.TYPE) {
-					field.setAccessible(true);
-					try {
-						sizes[i] = field.getInt(shapedRecipes);
-					} catch (IllegalArgumentException e) {
-						e.printStackTrace();
-					} catch (IllegalAccessException e) {
-						e.printStackTrace();
-					}
-					i++;
-					if (i >= sizes.length) {
-						break;
-					}
-				}
-			}
-			return sizes;
-		}
-
 		public ItemCountList getRequiredItems(int count) {
 			ItemCountList list = new ItemCountList();
-			for (ItemWithSubtype[] subtypes : slots) {
-				for (ItemWithSubtype subtype : subtypes) {
-					list.add(subtype, count);
+			for (ItemWithSubtype[][] subtypes : slots) {
+				for (ItemWithSubtype[] subtype : subtypes) {
+					list.add(subtype[0], count);
 				}
 			}
 			LOGGER.trace(MARKER_RECIPE, "Items required for " + this + ": "
@@ -194,14 +151,23 @@ public class CraftStrategy extends PathFinderStrategy {
 		}
 
 		public boolean goodForPosition(ItemWithSubtype item, int x, int y) {
-			return slots[x][y] != null ? item != null
-					&& (slots[x][y].equals(item) || slots[x][y].equals(item
-							.withSubtype(SUBTYPE_IGNORED))) : item == null;
+			if (slots[x][y] != null) {
+				if (item == null) {
+					return false;
+				} else {
+					ItemWithSubtype genericItem = item.withSubtype(SUBTYPE_IGNORED);
+					return Stream.of(slots[x][y]).anyMatch(
+									slot -> slot.equals(item) || slot.equals(genericItem)
+								);
+				}
+			} else {
+				return item == null;
+			}
 		}
 
 		@Override
 		public String toString() {
-			return "CraftingPossibility [slots=" + Arrays.toString(slots) + "]";
+			return "CraftingPossibility [slots=" + Arrays.deepToString(slots) + "]";
 		}
 
 	}
@@ -226,7 +192,7 @@ public class CraftStrategy extends PathFinderStrategy {
 						.map(CraftingPossibility::new)
 						.collect(Collectors.toList());
 			} catch (IllegalArgumentException e) {
-				System.err.println("Cannot craft:" + e.getMessage());
+				System.err.println("Cannot craft: " + e.getMessage());
 				return Collections.emptyList();
 			}
 		}
@@ -340,7 +306,7 @@ public class CraftStrategy extends PathFinderStrategy {
 					.getReachableForPos(currentPos);
 			CraftingTableData table = tables.get(0);
 			List<CraftingPossibility> possibilities = wish.getPossibility();
-			System.out.println("Crafting one of: " + possibilities);
+			LOGGER.trace("Crafting one of: " + possibilities);
 
 			ItemWithSubtype[][] grid = getCraftablePossibility(helper,
 					possibilities);
@@ -350,6 +316,8 @@ public class CraftStrategy extends PathFinderStrategy {
 				// FIXME: Desync. Error.
 				return;
 			}
+			
+			LOGGER.trace(MARKER_RECIPE, "Crafting: " + Arrays.deepToString(grid));
 
 			addTask(new UseItemOnBlockAtTask(table.pos) {
 				@Override
@@ -494,7 +462,7 @@ public class CraftStrategy extends PathFinderStrategy {
 
 	@Override
 	public String getDescription(AIHelper helper) {
-		return "Get items out of chest.";
+		return "Craft items.";
 	}
 
 }
