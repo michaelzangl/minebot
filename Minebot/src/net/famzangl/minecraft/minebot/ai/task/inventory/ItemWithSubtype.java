@@ -109,9 +109,9 @@ public class ItemWithSubtype {
 			ItemBlock itemBlock = (ItemBlock) item;
 			if (hasSubtype) {
 				int meta = getItem().getMetadata(itemDamage);
-				return new BlockWithData(itemBlock.block, meta);
+				return new BlockWithData(itemBlock.getBlock(), meta);
 			} else {
-				return new BlockWithDontcare(itemBlock.block);
+				return new BlockWithDontcare(itemBlock.getBlock());
 			}
 		} else {
 			return null;
