@@ -69,10 +69,11 @@ public class PlantPathFinder extends MovePathFinder {
 	}
 
 	public enum PlantType {
-		NORMAL(FARMLAND, Items.WHEAT_SEEDS, Items.CARROT, Items.POTATO),
+		NORMAL(FARMLAND, Items.WHEAT_SEEDS, Items.CARROT, Items.POTATO, Items.BEETROOT_SEEDS),
 		WHEAT(FARMLAND, Items.WHEAT_SEEDS),
 		CARROT(FARMLAND, Items.CARROT),
 		POTATO(FARMLAND, Items.POTATO),
+		BEETROOT(FARMLAND, Items.BEETROOT_SEEDS),
 		NETHERWART(NETHERWART_FARMLAND, Items.NETHER_WART);
 
 		public final BlockSet farmland;
