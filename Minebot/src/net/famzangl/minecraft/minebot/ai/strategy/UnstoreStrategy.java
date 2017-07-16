@@ -71,7 +71,7 @@ public class UnstoreStrategy extends PathFinderStrategy {
 					continue;
 				}
 				ItemStack itemInSlot = inventory.get(inventorySlot);
-				if (itemInSlot != null) {
+				if (itemInSlot != null && itemInSlot.getCount() > 0) {
 					if (!new SameItemFilter(itemInSlot)
 							.matches(slot.getFakeMcStack())) {
 						System.out
