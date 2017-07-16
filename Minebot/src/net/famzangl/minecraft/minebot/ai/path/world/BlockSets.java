@@ -18,6 +18,7 @@ public class BlockSets {
 	 */
 	public static final BlockSet SIMPLE_CUBE = new BlockSet(
 			Blocks.BEDROCK,
+            Blocks.END_BRICKS,
 			Blocks.BOOKSHELF,
 			Blocks.BRICK_BLOCK,
 			Blocks.BROWN_MUSHROOM_BLOCK,
@@ -33,7 +34,16 @@ public class BlockSets {
 			Blocks.DOUBLE_STONE_SLAB,
 			Blocks.DOUBLE_WOODEN_SLAB,
 			Blocks.EMERALD_BLOCK,
+            Blocks.PURPUR_BLOCK,
+            Blocks.PURPUR_PILLAR,
+            Blocks.PURPUR_SLAB,
+            Blocks.RED_NETHER_BRICK,
+            Blocks.BONE_BLOCK,
+            Blocks.PURPUR_DOUBLE_SLAB,
 			Blocks.EMERALD_ORE,
+            Blocks.CONCRETE,
+            Blocks.GLAZED_TERRACOTTA,
+            Blocks.OBSERVER,
 			// FIXME: Not a cube.
 			Blocks.FARMLAND, Blocks.FURNACE, Blocks.GLASS, Blocks.GLOWSTONE,
 			Blocks.GRASS, Blocks.GOLD_BLOCK, Blocks.GOLD_ORE,
@@ -51,17 +61,17 @@ public class BlockSets {
 			Blocks.OBSIDIAN, Blocks.PACKED_ICE, Blocks.PLANKS, Blocks.PUMPKIN,
 			Blocks.QUARTZ_BLOCK, Blocks.QUARTZ_ORE, Blocks.RED_MUSHROOM_BLOCK,
 			Blocks.REDSTONE_BLOCK, Blocks.REDSTONE_LAMP, Blocks.REDSTONE_ORE,
-			Blocks.SANDSTONE,
+			Blocks.SANDSTONE, Blocks.FROSTED_ICE,
 			Blocks.SNOW,
 			// FIXME: Not a cube.
-			Blocks.SOUL_SAND, Blocks.STAINED_GLASS,
+			Blocks.SOUL_SAND, Blocks.STAINED_GLASS, Blocks.GRASS_PATH,
 			Blocks.STAINED_HARDENED_CLAY, Blocks.STONE, Blocks.STONEBRICK,
 			Blocks.WOOL);
 
 	/**
 	 * Blocks that fall down.
 	 */
-	public static final BlockSet FALLING = new BlockSet(Blocks.GRAVEL,
+	public static final BlockSet FALLING = new BlockSet(Blocks.GRAVEL, Blocks.CONCRETE_POWDER,
 			Blocks.SAND);
 
 	public static final BlockSet AIR = new BlockSet(Blocks.AIR);
@@ -70,7 +80,7 @@ public class BlockSets {
 	 */
 	public static final BlockSet STAIRS = new BlockSet(Blocks.ACACIA_STAIRS,
 			Blocks.BIRCH_STAIRS, Blocks.BRICK_STAIRS, Blocks.DARK_OAK_STAIRS,
-			Blocks.JUNGLE_STAIRS, Blocks.NETHER_BRICK_STAIRS,
+			Blocks.JUNGLE_STAIRS, Blocks.NETHER_BRICK_STAIRS, Blocks.PURPUR_STAIRS,
 			Blocks.OAK_STAIRS, Blocks.SANDSTONE_STAIRS, Blocks.SPRUCE_STAIRS,
 			Blocks.STONE_BRICK_STAIRS, Blocks.STONE_STAIRS, Blocks.STONE_SLAB,
 			Blocks.WOODEN_SLAB, Blocks.QUARTZ_STAIRS);
@@ -106,6 +116,10 @@ public class BlockSets {
 			Blocks.NETHER_WART,
 			Blocks.STANDING_SIGN, 
 			Blocks.WALL_SIGN, 
+            Blocks.CHORUS_FLOWER,
+            Blocks.CHORUS_PLANT,
+            Blocks.END_ROD,
+            Blocks.BEETROOTS,
 			Blocks.DEADBUSH).unionWith(RAILS);
 
 	/**
@@ -202,6 +216,10 @@ public class BlockSets {
 	public static final BlockSet INDESTRUCTABLE = new BlockSet(
 			Blocks.BEDROCK,
 			Blocks.BARRIER,
+            //Fix SHULKER_BOX !!!!! Deals Damage to walking Player but found no matching category.
+            Blocks.SHULKER_BOX,
+            //Fix NETHER_WART_BLOCK !!!!! Deals Damage to walking Player but found no matching category.
+            Blocks.NETHER_WART_BLOCK,
 			Blocks.OBSIDIAN);
 
 	/**
