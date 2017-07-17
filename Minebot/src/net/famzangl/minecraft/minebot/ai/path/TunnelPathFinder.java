@@ -162,7 +162,7 @@ public class TunnelPathFinder extends AlongTrackPathFinder {
 
 	@Override
 	protected float rateDestination(int distance, int x, int y, int z) {
-		if (shouldTunnel(x, y, z)) {
+		if (shouldTunnel(distance, x, y, z)) {
 			return distance + 1;
 		} else {
 			return -1;
@@ -172,6 +172,7 @@ public class TunnelPathFinder extends AlongTrackPathFinder {
 	/**
 	 * Test if we should dig a tunnel to that position.
 	 * 
+	 * @param distance 
 	 * @param x
 	 *            The x pos.
 	 * @param y
@@ -180,7 +181,7 @@ public class TunnelPathFinder extends AlongTrackPathFinder {
 	 *            The z pos
 	 * @return
 	 */
-	private boolean shouldTunnel(int x, int y, int z) {
+	private boolean shouldTunnel(int distance, int x, int y, int z) {
 		if (y != cy || !isOnTrack(x, z)) {
 			// not on track
 			return false;
@@ -201,7 +202,8 @@ public class TunnelPathFinder extends AlongTrackPathFinder {
 			// we started something but got stopped by e.g. eat/,,,
 			return true;
 		} else {
-			return !isFree;
+			// More than 30 blocks: Walk there first, check next later
+			return !isFree || (distance > 30 && stepNumber > currentStepNumber) || (distance > 1 && stepNumber == length);
 		}
 	}
 
