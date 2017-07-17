@@ -36,7 +36,7 @@ public class BlockMetaSet extends BlockSet {
 
 	private void setBlock(int blockId) {
 		int bit = blockId * 16;
-		set[bit / 64] |= 0xffffl << (63);
+		set[bit / 64] |= 0xffffl << (blockId & 63);
 	}
 
 	private void setBlockAndMeta(int blockId, int meta) {

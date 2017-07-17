@@ -9,6 +9,7 @@ import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.MarkerManager;
 
 import net.minecraft.block.Block;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
@@ -131,6 +132,10 @@ public class WorldWithDelta extends WorldData {
 					+ meta + " out of range.");
 		}
 		setBlockIdAndMeta(x, y, z, blockId << 4 | meta);
+	}
+
+	public void setBlock(BlockPos pos, IBlockState block) {
+		setBlockIdAndMeta(pos.getX(), pos.getY(), pos.getZ(), Block.BLOCK_STATE_IDS.get(block));
 	}
 
 	private void setBlockIdAndMeta(int x, int y, int z, int blockWithMeta) {

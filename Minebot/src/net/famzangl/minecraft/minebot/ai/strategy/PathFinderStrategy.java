@@ -97,7 +97,7 @@ public class PathFinderStrategy extends TaskStrategy {
 		boolean wasInDesync = isDesync();
 		TickResult tickResult = super.onGameTick(helper);
 		// If we get a tick_again, we can start a new pathfinding.
-		if (pathFindingWorld == null && tickResult == tickResult.TICK_AGAIN
+		if (pathFindingWorld == null && tickResult == TickResult.TICK_AGAIN
 				&& !wasInDesync && !isDesync() && tasks.size() < 9
 				&& !tasks.isEmpty()) {
 			WorldWithDelta world = new WorldWithDelta(helper.getWorld());
@@ -112,10 +112,10 @@ public class PathFinderStrategy extends TaskStrategy {
 				}
 			}
 			pathFindingWorld = world;
-		} else if (tasks.size() < 9 && tickResult == tickResult.TICK_AGAIN) {
+		} else if (tasks.size() < 9 && tickResult == TickResult.TICK_AGAIN) {
 			debug("I want to presearch, but this requires "
 					+ (pathFindingWorld == null) + "&&"
-					+ (tickResult == tickResult.TICK_AGAIN) + "&&"
+					+ (tickResult == TickResult.TICK_AGAIN) + "&&"
 					+ (!wasInDesync) + "&&" + (!isDesync()) + "&&"
 					+ (tasks.size() < 9) + "&&" + (!tasks.isEmpty()));
 		}

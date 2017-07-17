@@ -31,10 +31,12 @@ import net.famzangl.minecraft.minebot.settings.MinebotSettingsRoot;
 import net.famzangl.minecraft.minebot.settings.PathfindingSetting;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockCrops;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemHoe;
+import net.minecraft.item.ItemSeeds;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
 
@@ -62,8 +64,8 @@ public class PlantPathFinder extends MovePathFinder {
 		@Override
 		public boolean applyToDelta(WorldWithDelta world) {
 			Item anyPlaceItem = seedFilter.type.items[0];
-			Block block = Block.getBlockFromItem(anyPlaceItem);
-			world.setBlock(pos, Block.getIdFromBlock(block), 0);
+			IBlockState block = ((ItemSeeds)anyPlaceItem).getPlant(null, null);
+			world.setBlock(pos, block);
 			return true;
 		}
 	}
