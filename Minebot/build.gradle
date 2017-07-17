@@ -10,7 +10,7 @@ buildscript {
 
 apply plugin: 'net.minecraftforge.gradle.forge'
 compileJava.options.encoding = 'UTF-8'
-version='1.12.0'
+version='1.12.1'
 group = "de.michaelzangl.minebot"
 archivesBaseName = project.projectDir.name
 
