@@ -19,12 +19,17 @@ package net.famzangl.minecraft.minebot.ai.path;
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.ClassItemFilter;
 import net.famzangl.minecraft.minebot.ai.ItemFilter;
+import net.famzangl.minecraft.minebot.ai.path.world.BlockBounds;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockMetaSet;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSet;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSets;
 import net.famzangl.minecraft.minebot.ai.path.world.WorldData;
 import net.famzangl.minecraft.minebot.ai.path.world.WorldWithDelta;
+import net.famzangl.minecraft.minebot.ai.task.CanWorkWhileApproaching;
+import net.famzangl.minecraft.minebot.ai.task.TaskOperations;
 import net.famzangl.minecraft.minebot.ai.task.UseItemOnBlockAtTask;
+import net.famzangl.minecraft.minebot.ai.task.UseItemTask;
+import net.famzangl.minecraft.minebot.ai.task.error.TaskError;
 import net.famzangl.minecraft.minebot.ai.task.place.DestroyBlockTask;
 import net.famzangl.minecraft.minebot.ai.task.place.PlaceBlockAtFloorTask;
 import net.famzangl.minecraft.minebot.settings.MinebotSettingsRoot;
@@ -38,7 +43,9 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemHoe;
 import net.minecraft.item.ItemSeeds;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
 
 public class PlantPathFinder extends MovePathFinder {
 	private static final BlockSet FARMLAND = new BlockSet(Blocks.FARMLAND);
@@ -48,7 +55,7 @@ public class PlantPathFinder extends MovePathFinder {
 	private static final BlockSet FARMLANDABLE = new BlockSet(Blocks.DIRT,
 			Blocks.GRASS);
 
-	private final class PlaceSeedsTask extends PlaceBlockAtFloorTask {
+	private final class PlaceSeedsTask extends PlaceBlockAtFloorTask implements CanWorkWhileApproaching {
 		private final SeedFilter seedFilter;
 
 		private PlaceSeedsTask(BlockPos pos, SeedFilter filter) {
@@ -66,6 +73,24 @@ public class PlantPathFinder extends MovePathFinder {
 			Item anyPlaceItem = seedFilter.type.items[0];
 			IBlockState block = ((ItemSeeds)anyPlaceItem).getPlant(null, null);
 			world.setBlock(pos, block);
+			return true;
+		}
+
+		@Override
+		public boolean doApproachWork(AIHelper helper) {
+			if (isFinished(helper)) {
+				return false;
+			}
+			runTick(helper, new TaskOperations() {
+				@Override
+				public boolean faceAndDestroyForNextTask() {
+					return false;
+				}
+				
+				@Override
+				public void desync(TaskError taskError) {
+				}
+			});
 			return true;
 		}
 	}
@@ -111,7 +136,9 @@ public class PlantPathFinder extends MovePathFinder {
 		}
 	}
 
-	private static class UseHoeTask extends UseItemOnBlockAtTask {
+	private static class UseHoeTask extends UseItemOnBlockAtTask implements CanWorkWhileApproaching {
+
+		private Vec3d facingPosition;
 
 		public UseHoeTask(BlockPos farmlandPos) {
 			super(new ClassItemFilter(ItemHoe.class), farmlandPos);
@@ -123,6 +150,37 @@ public class PlantPathFinder extends MovePathFinder {
 				world.setBlock(getPos(), Blocks.FARMLAND);
 			}
 			return true;
+		}
+
+		@Override
+		public boolean doApproachWork(AIHelper helper) {
+			if (isFinished(helper)) {
+				return false;
+			}
+			runTick(helper, new TaskOperations() {
+				@Override
+				public boolean faceAndDestroyForNextTask() {
+					return false;
+				}
+				
+				@Override
+				public void desync(TaskError taskError) {
+				}
+			});
+			return true;
+		}
+
+		protected void reFace(AIHelper aiHelper) {
+			if (facingPosition != null) {
+				aiHelper.face(facingPosition);
+			}
+		}
+
+		@Override
+		protected void notFacingBlock(AIHelper aiHelper) {
+			BlockBounds bounds = aiHelper.getWorld().getBlockBounds(getPos());
+			facingPosition = bounds.onlySide(EnumFacing.UP).random(getPos(), 0.7);
+			reFace(aiHelper);
 		}
 	}
 

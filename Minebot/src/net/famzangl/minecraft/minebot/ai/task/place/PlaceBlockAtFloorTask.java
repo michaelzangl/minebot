@@ -18,6 +18,7 @@ package net.famzangl.minecraft.minebot.ai.task.place;
 
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.ItemFilter;
+import net.famzangl.minecraft.minebot.ai.path.world.BlockBounds;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSets;
 import net.famzangl.minecraft.minebot.ai.task.AITask;
 import net.famzangl.minecraft.minebot.ai.task.BlockHalf;
@@ -25,11 +26,13 @@ import net.famzangl.minecraft.minebot.ai.task.TaskOperations;
 import net.famzangl.minecraft.minebot.ai.task.error.SelectTaskError;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
 
 public class PlaceBlockAtFloorTask extends AITask {
 	private final ItemFilter filter;
 	private int faceTimer;
 	protected final BlockPos pos;
+	private Vec3d positionToFace;
 
 	/**
 	 * 
@@ -75,6 +78,8 @@ public class PlaceBlockAtFloorTask extends AITask {
 	@Override
 	public void runTick(AIHelper aiHelper, TaskOperations taskOperations) {
 		if (faceTimer > 0) {
+			// Allows place while walking
+			reFace(aiHelper);
 			faceTimer--;
 		}
 		if (BlockSets.AIR.isAt(aiHelper.getWorld(), getPlaceAtPos())) {
@@ -85,6 +90,7 @@ public class PlaceBlockAtFloorTask extends AITask {
 					faceBlock(aiHelper, taskOperations);
 					faceTimer = 2;
 				} else {
+					reFace(aiHelper);
 					tryPlaceBlock(aiHelper);
 				}
 			}
@@ -92,7 +98,19 @@ public class PlaceBlockAtFloorTask extends AITask {
 	}
 
 	protected void faceBlock(AIHelper aiHelper, TaskOperations o) {
-		aiHelper.faceSideOf(getPlaceAtPos().offset(EnumFacing.DOWN), EnumFacing.UP);
+		positionToFace = getPositionToFace(aiHelper);
+		reFace(aiHelper);
+	}
+
+	private Vec3d getPositionToFace(AIHelper aiHelper) {
+		BlockBounds bounds = aiHelper.getWorld().getBlockBounds(pos.add(0, -1, 0));
+		return bounds.onlySide(EnumFacing.UP).random(pos.add(0, -1, 0), 0.8);
+	}
+
+	protected void reFace(AIHelper aiHelper) {
+		if (positionToFace != null) {
+			aiHelper.face(positionToFace);
+		}
 	}
 
 	protected void tryPlaceBlock(AIHelper aiHelper) {

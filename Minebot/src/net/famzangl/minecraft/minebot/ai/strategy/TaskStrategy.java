@@ -30,6 +30,7 @@ import net.famzangl.minecraft.minebot.ai.path.TaskReceiver;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSets;
 import net.famzangl.minecraft.minebot.ai.task.AITask;
 import net.famzangl.minecraft.minebot.ai.task.CanPrefaceAndDestroy;
+import net.famzangl.minecraft.minebot.ai.task.CanWorkWhileApproaching;
 import net.famzangl.minecraft.minebot.ai.task.SkipWhenSearchingPrefetch;
 import net.famzangl.minecraft.minebot.ai.task.TaskOperations;
 import net.famzangl.minecraft.minebot.ai.task.error.StrategyDeactivatedError;
@@ -54,8 +55,6 @@ public abstract class TaskStrategy extends AIStrategy implements
 	private static final Logger LOGGER = LogManager.getLogger(AIStrategy.class);
 	private static final int MAX_LOOKAHEAD = 9;
 	private static final int DESYNC_TIME = 5;
-	// Maximum distance for aiming at blocks to destroy.
-	private static final int MAX_PREDESTROY_DISTANCE = 4;
 	protected final LinkedList<AITask> tasks = new LinkedList<AITask>();
 
 	private int desyncTimer = 0;
@@ -105,19 +104,10 @@ public abstract class TaskStrategy extends AIStrategy implements
 			if (tasks.get(i).getClass()
 					.isAnnotationPresent(SkipWhenSearchingPrefetch.class)) {
 				continue;
-			} else if (task instanceof CanPrefaceAndDestroy) {
-				final CanPrefaceAndDestroy dTask = (CanPrefaceAndDestroy) task;
-				final List<BlockPos> positions = dTask
-						.getPredestroyPositions(temporaryHelper);
-				for (final BlockPos pos : positions) {
-					if (!BlockSets.AIR.isAt(temporaryHelper.getWorld(), pos)
-							&& pos.distanceSq(temporaryHelper
-									.getPlayerPosition()) < MAX_PREDESTROY_DISTANCE
-									* MAX_PREDESTROY_DISTANCE) {
-						temporaryHelper.faceAndDestroy(pos);
-						found = true;
-						break;
-					}
+			} else if (task instanceof CanWorkWhileApproaching) {
+				final CanWorkWhileApproaching dTask = (CanWorkWhileApproaching) task;
+				if (dTask.doApproachWork(temporaryHelper)) {
+					break;
 				}
 			} else {
 				LOGGER.trace(MARKER_PREFACING, "Prefetching showstopper: " + task);

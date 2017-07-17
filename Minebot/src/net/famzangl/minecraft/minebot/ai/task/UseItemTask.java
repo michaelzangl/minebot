@@ -30,6 +30,7 @@ import net.minecraft.util.math.RayTraceResult;
 public abstract class UseItemTask extends AITask {
 	private boolean clicked;
 	private final ItemFilter filter;
+	private int refocusCount;
 
 	public UseItemTask() {
 		this(null);
@@ -46,7 +47,10 @@ public abstract class UseItemTask extends AITask {
 
 	@Override
 	public void runTick(AIHelper aiHelper, TaskOperations taskOperations) {
-		if (!clicked) {
+		if (refocusCount > 0) {
+			reFace(aiHelper);
+			refocusCount--;
+		} else if (!clicked) {
 			if (filter != null) {
 				if (!aiHelper.selectCurrentItem(filter)) {
 					return;
@@ -60,15 +64,19 @@ public abstract class UseItemTask extends AITask {
 				return;
 			}
 			// Check is facing to make sure top facing check passed.
-			if (!aiHelper.isFacingBlock(position.getBlockPos())
-					|| !isBlockAllowed(aiHelper, position.getBlockPos())) {
+			if (!isBlockAllowed(aiHelper, position.getBlockPos())) {
 				notFacingBlock(aiHelper);
 				return;
 			}
 
+			reFace(aiHelper);
 			aiHelper.overrideUseItem();
+			refocusCount = 2;
 			clicked = true;
 		}
+	}
+
+	protected void reFace(AIHelper aiHelper) {
 	}
 
 	protected void notFacingBlock(AIHelper aiHelper) {
