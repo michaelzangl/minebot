@@ -44,6 +44,7 @@ import net.minecraft.init.Items;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.MouseHelper;
 import net.minecraft.util.math.BlockPos;
+import net.minecraftforge.event.entity.player.UseHoeEvent;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -235,6 +236,10 @@ public class AIController extends AIHelper implements IAIControllable {
 			activeMapReader.tick(this);
 		}
 
+	}
+	@SubscribeEvent
+	public void onUseHoe(UseHoeEvent evt) {
+		LOGGER.debug(MARKER_EVENT, "Hoe used at " + evt.getPos());
 	}
 
 	private boolean isStopPressed() {

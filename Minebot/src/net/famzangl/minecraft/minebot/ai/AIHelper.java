@@ -801,6 +801,7 @@ public abstract class AIHelper {
 	 * Presses the use item key in the next game tick.
 	 */
 	public void overrideUseItem() {
+		LOGGER.debug(MARKER_FACING, "Using item while facing " + getObjectMouseOver().getBlockPos());
 		overrideKey(KeyType.USE);
 	}
 

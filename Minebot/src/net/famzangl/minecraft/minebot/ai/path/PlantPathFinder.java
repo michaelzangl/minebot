@@ -28,14 +28,11 @@ import net.famzangl.minecraft.minebot.ai.path.world.WorldWithDelta;
 import net.famzangl.minecraft.minebot.ai.task.CanWorkWhileApproaching;
 import net.famzangl.minecraft.minebot.ai.task.TaskOperations;
 import net.famzangl.minecraft.minebot.ai.task.UseItemOnBlockAtTask;
-import net.famzangl.minecraft.minebot.ai.task.UseItemTask;
 import net.famzangl.minecraft.minebot.ai.task.error.TaskError;
 import net.famzangl.minecraft.minebot.ai.task.place.DestroyBlockTask;
 import net.famzangl.minecraft.minebot.ai.task.place.PlaceBlockAtFloorTask;
 import net.famzangl.minecraft.minebot.settings.MinebotSettingsRoot;
 import net.famzangl.minecraft.minebot.settings.PathfindingSetting;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockCrops;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
@@ -48,6 +45,11 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 
 public class PlantPathFinder extends MovePathFinder {
+	private static final BlockMetaSet GROWN_CROPS = new BlockMetaSet(Blocks.NETHER_WART, 3)
+			.unionWith(new BlockMetaSet(Blocks.WHEAT, 7))
+			.unionWith(new BlockMetaSet(Blocks.CARROTS, 7))
+			.unionWith(new BlockMetaSet(Blocks.POTATOES, 7))
+			.unionWith(new BlockMetaSet(Blocks.BEETROOTS, 3));
 	private static final BlockSet FARMLAND = new BlockSet(Blocks.FARMLAND);
 	private static final BlockSet NETHERWART_FARMLAND = new BlockSet(
 			Blocks.SOUL_SAND);
@@ -215,14 +217,7 @@ public class PlantPathFinder extends MovePathFinder {
 	}
 
 	private boolean isGrown(WorldData world, int x, int y, int z) {
-		final int blockWithMeta = world.getBlockIdWithMeta(x, y, z);
-		if (Block.getBlockById(blockWithMeta >> 4) instanceof BlockCrops) {
-			final int metadata = blockWithMeta & 0xf;
-			return metadata >= 7;
-		} else if (new BlockMetaSet(Blocks.NETHER_WART, 3).isAt(world, x, y, z)) {
-			return true;
-		}
-		return false;
+		return GROWN_CROPS.isAt(world, x, y, z);
 	}
 
 	@Override
