@@ -42,7 +42,22 @@ public class BlockSets {
             Blocks.PURPUR_DOUBLE_SLAB,
 			Blocks.EMERALD_ORE,
             Blocks.CONCRETE,
-            Blocks.GLAZED_TERRACOTTA,
+            Blocks.BLACK_GLAZED_TERRACOTTA,
+            Blocks.BLUE_GLAZED_TERRACOTTA,
+            Blocks.BROWN_GLAZED_TERRACOTTA,
+            Blocks.CYAN_GLAZED_TERRACOTTA,
+            Blocks.GRAY_GLAZED_TERRACOTTA,
+            Blocks.GREEN_GLAZED_TERRACOTTA,
+            Blocks.LIGHT_BLUE_GLAZED_TERRACOTTA,
+            Blocks.LIME_GLAZED_TERRACOTTA,
+            Blocks.MAGENTA_GLAZED_TERRACOTTA,
+            Blocks.ORANGE_GLAZED_TERRACOTTA,
+            Blocks.PINK_GLAZED_TERRACOTTA,
+            Blocks.PURPLE_GLAZED_TERRACOTTA,
+            Blocks.RED_GLAZED_TERRACOTTA,
+            Blocks.SILVER_GLAZED_TERRACOTTA,
+            Blocks.WHITE_GLAZED_TERRACOTTA,
+            Blocks.YELLOW_GLAZED_TERRACOTTA,
             Blocks.OBSERVER,
 			// FIXME: Not a cube.
 			Blocks.FARMLAND, Blocks.FURNACE, Blocks.GLASS, Blocks.GLOWSTONE,
@@ -217,7 +232,7 @@ public class BlockSets {
 			Blocks.BEDROCK,
 			Blocks.BARRIER,
             //Fix SHULKER_BOX !!!!! Deals Damage to walking Player but found no matching category.
-            Blocks.SHULKER_BOX,
+            // Blocks.SHULKER_BOX,
             //Fix NETHER_WART_BLOCK !!!!! Deals Damage to walking Player but found no matching category.
             Blocks.NETHER_WART_BLOCK,
 			Blocks.OBSIDIAN);
