@@ -51,6 +51,7 @@ public enum RenderMode {
 			Blocks.TORCH);
 	private static final BlockSet INTERESTING_BLOCKS = new BlockSet(
 			Blocks.CHEST,
+			Blocks.TRAPPED_CHEST,
 			Blocks.MOB_SPAWNER, 
 			Blocks.GOLD_BLOCK);
 
