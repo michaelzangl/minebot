@@ -16,6 +16,10 @@
  *******************************************************************************/
 package net.famzangl.minecraft.minebot.ai.path;
 
+import java.util.Comparator;
+import java.util.Optional;
+import java.util.stream.Stream;
+
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSet;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSets;
@@ -32,6 +36,7 @@ import net.famzangl.minecraft.minebot.ai.task.move.JumpMoveTask;
 import net.famzangl.minecraft.minebot.ai.task.place.PlantSaplingTask;
 import net.famzangl.minecraft.minebot.ai.utils.BlockCounter;
 import net.famzangl.minecraft.minebot.ai.utils.BlockCuboid;
+import net.famzangl.minecraft.minebot.ai.utils.BlockFilteredArea;
 import net.famzangl.minecraft.minebot.build.block.WoodType;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
@@ -83,8 +88,8 @@ public class TreePathFinder extends MovePathFinder {
 		/**
 		 * TODO: Increase for {@link WoodType#SPRUCE}
 		 */
-		private static final int TREE_TOP_OFFSET = 1;
-		private static final int SINGLE_TREE_SIDE_MAX = 4;
+		private int treeTopOffset = 1;
+		private int singleTreeSideMax = 4;
 		private int minX;
 		private int minZ;
 
@@ -110,6 +115,7 @@ public class TreePathFinder extends MovePathFinder {
 		 */
 		private int stairOffset;
 		private boolean topReached;
+		private WoodType woodType;
 
 		public LargeTreeState(int minX, int minY, int minZ) {
 			this.minX = minX;
@@ -145,16 +151,13 @@ public class TreePathFinder extends MovePathFinder {
 			setYOffsetByPosition(ignoredPlayerPos);
 			for (int y = playerStartY; y < 255; y++) {
 				BlockPos pos = getPosition(y);
-				if (!BlockSets.LOGS.isAt(world, pos.add(0, 3, 0)) || !allowedGroundBlocks.isAt(world, pos.add(0, -1, 0))) {
+				if (BlockSets.LOGS.isAt(world, pos.add(0, 3, 0))) {
+					topY = y + 3;
+				} else if (allowedGroundBlocks.isAt(world, pos.add(0, -1, 0))) {
+					// good
+				} else {
 					break;
 				}
-//				int trunkBlocks = countTrunkBlocks(world, y);
-//				int should = y <= ignoredPlayerPos.getY() + 1 ? 1
-//						: y <= ignoredPlayerPos.getY() + 2 ? 3 : 4;
-//				if (trunkBlocks < should) {
-//					break;
-//				}
-				topY = y + 3;
 			}
 
 			for (int y = playerStartY; y > 0; y--) {
@@ -164,6 +167,26 @@ public class TreePathFinder extends MovePathFinder {
 					break;
 				}
 				minY = y;
+			}
+			scanTreeType(world);
+		}
+
+		private void scanTreeType(WorldData world) {
+			BlockPos corner1 = new BlockPos(minX, minY, minZ);
+			BlockPos corner2 = new BlockPos(minX + 1, topY + 2, minZ + 1);
+			BlockCuboid trunk = new BlockCuboid(corner1, corner2);
+			BlockSet[] sets = Stream.of(WoodType.values())
+					.map(WoodType::getLogBlocks)
+					.toArray(BlockSet[]::new);
+			int[] counts = BlockCounter.countBlocks(world, trunk, sets);
+			woodType = Stream.of(WoodType.values()).min(Comparator.comparing(type -> counts[type.ordinal()])).orElse(WoodType.JUNGLE);
+			
+			if (woodType == WoodType.DARK_OAK) {
+				singleTreeSideMax = 2;
+				treeTopOffset = 2;
+			} else if (woodType == WoodType.SPRUCE) {
+				singleTreeSideMax = 1;
+				treeTopOffset = 3;
 			}
 		}
 
@@ -210,7 +233,7 @@ public class TreePathFinder extends MovePathFinder {
 			// dig up until the top.
 			BlockPos lastPos = pos;
 			if (!topReached) {
-				for (int y = pos.getY() + 1; y < topY - TREE_TOP_OFFSET; y++) {
+				for (int y = pos.getY() + 1; y < topY - treeTopOffset; y++) {
 					BlockPos digTo = getPosition(y);
 					if (!BlockSets.safeSideAndCeilingAround(world,
 							digTo.add(0, 1, 0))
@@ -232,10 +255,10 @@ public class TreePathFinder extends MovePathFinder {
 				addTask(new PrefaceBarrier());
 				// Destroy all logs above y.
 				addTask(new DestroyLogInRange(new BlockCuboid(
-						new BlockPos(minX - SINGLE_TREE_SIDE_MAX, y, minZ
-								- SINGLE_TREE_SIDE_MAX), new BlockPos(minX + 1
-								+ SINGLE_TREE_SIDE_MAX, y + 4, minZ + 1
-								+ SINGLE_TREE_SIDE_MAX))));
+						new BlockPos(minX - singleTreeSideMax, y, minZ
+								- singleTreeSideMax), new BlockPos(minX + 1
+								+ singleTreeSideMax, y + 4, minZ + 1
+								+ singleTreeSideMax))));
 			}
 
 			// plant saplings
