@@ -179,7 +179,7 @@ public class TreePathFinder extends MovePathFinder {
 					.map(WoodType::getLogBlocks)
 					.toArray(BlockSet[]::new);
 			int[] counts = BlockCounter.countBlocks(world, trunk, sets);
-			woodType = Stream.of(WoodType.values()).min(Comparator.comparing(type -> counts[type.ordinal()])).orElse(WoodType.JUNGLE);
+			woodType = Stream.of(WoodType.values()).max(Comparator.comparing(type -> counts[type.ordinal()])).orElse(WoodType.JUNGLE);
 			
 			if (woodType == WoodType.DARK_OAK) {
 				singleTreeSideMax = 2;
