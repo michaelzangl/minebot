@@ -207,7 +207,8 @@ public class MinebotNetHandler extends NetHandlerPlayClient implements
 	public void handleSoundEffect(SPacketSoundEffect packetIn) {
 		ResourceLocation name = packetIn.getSound().getSoundName();
 		//TODO: Check this name
-		if ("random".equals(name.getResourceDomain()) && "spalsh".equals(name.getResourcePath())) {
+		System.out.println(name.getResourcePath());
+		if ("entity.bobber.splash".equals(name.getResourcePath())) {
 			double x = packetIn.getX();
 			double y = packetIn.getY();
 			double z = packetIn.getZ();

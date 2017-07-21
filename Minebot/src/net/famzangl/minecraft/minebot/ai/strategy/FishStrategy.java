@@ -27,6 +27,7 @@ public class FishStrategy extends TaskStrategy {
 	public void searchTasks(AIHelper helper) {
 		System.out.println("Fish entity: " + helper.getMinecraft().player.fishEntity);
 		if (helper.getMinecraft().player.fishEntity == null) {
+			addTask(new WaitTask(3));
 			addTask(new ThrowFishingRodTask());
 			addTask(new WaitTask(20));
 		} else {
