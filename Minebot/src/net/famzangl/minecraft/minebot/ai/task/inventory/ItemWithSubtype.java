@@ -132,7 +132,7 @@ public class ItemWithSubtype {
 	}
 	
 	public static ItemWithSubtype fromStack(ItemStack stack) {
-		return stack == null ? null : new ItemWithSubtype(stack);
+		return stack == null || stack.isEmpty() ? null : new ItemWithSubtype(stack);
 	}
 	
 	/**
