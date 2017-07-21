@@ -47,6 +47,7 @@ public class CommandJs {
 	private static final Marker MARKER_ENGINE = MarkerManager
 			.getMarker("engine");
 	private static final Marker MARKER_SYNC = MarkerManager.getMarker("sync");
+	private static final Marker MARKER_SCRIPT = MarkerManager.getMarker("script");
 	private static final Logger LOGGER = LogManager.getLogger(CommandJs.class);
 
 	public static class ScriptStrategy {
@@ -178,12 +179,11 @@ public class CommandJs {
 				engine.put("minescript", new MineScript(this));
 				engine.eval(fis);
 			} catch (Throwable e) {
-				System.out.println("Error while executing the script.");
-				System.out.println("Your are using java "
+				LOGGER.error(MARKER_SCRIPT, () -> "Error while executing the script."
+						+ "Your are using java "
 						+ System.getProperty("java.version") + " "
 						+ System.getProperty("java.vendor") + " on "
-						+ System.getProperty("os.name"));
-				e.printStackTrace();
+						+ System.getProperty("os.name"), e);
 				synchronized (errorMutex) {
 					error = new StringTaskError(e.getMessage());
 				}
@@ -263,7 +263,6 @@ public class CommandJs {
 		 */
 		public TickResult runForTick(AIHelper helper) {
 			printError();
-			AIStrategy strat;
 
 			TickResult tickResult = runStrategyGameTick(helper);
 			if (tickResult != null) {
@@ -291,8 +290,7 @@ public class CommandJs {
 		private void printError() {
 			synchronized (errorMutex) {
 				if (error != null) {
-					AIChatController.addChatLine("JS Error: "
-							+ error.getMessage());
+					AIChatController.addChatLine("JS Error: " + error.getMessage());
 					error = null;
 				}
 			}
