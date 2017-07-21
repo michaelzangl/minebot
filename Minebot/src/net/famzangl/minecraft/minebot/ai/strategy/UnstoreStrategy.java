@@ -78,8 +78,7 @@ public class UnstoreStrategy extends PathFinderStrategy {
 								.println("This slot already contains an other item.");
 						noMoreWork[inventorySlot] = true;
 						continue;
-					} else if (itemInSlot.getMaxStackSize() >= Math
-							.min(itemInSlot.getMaxStackSize(), slot.amount)) {
+					} else if (itemInSlot.getCount() >= Math.min(itemInSlot.getMaxStackSize(), slot.amount)) {
 						System.out
 								.println("This slot already contains enough items.");
 						noMoreWork[inventorySlot] = true;
@@ -117,31 +116,28 @@ public class UnstoreStrategy extends PathFinderStrategy {
 
 				@Override
 				protected int getFromStack(AIHelper aiHelper) {
-					if (fromStack == -2) {
-						fromStack = -1;
-						GuiChest screen = (GuiChest) aiHelper.getMinecraft().currentScreen;
-						SameItemFilter filter = new SameItemFilter(
-								slot.getFakeMcStack());
-						List<Slot> inventorySlots = screen.inventorySlots.inventorySlots;
-						int fromStackRating = -1;
-						int missing = getMissingAmount(aiHelper,
-								getSlotContentCount(screen.inventorySlots
-										.getSlot(getToStack(aiHelper))));
-						for (int i = 0; i < inventorySlots.size() - 36; i++) {
-							Slot inventorySlot = inventorySlots.get(i);
-							if (filter.matches(inventorySlot.getStack())) {
-								int rating = rateSize(aiHelper,
-										inventorySlot.getStack().getMaxStackSize(), missing);
-								if (rating > fromStackRating) {
-									fromStackRating = rating;
-									fromStack = i;
-								}
+					fromStack = -1;
+					GuiChest screen = (GuiChest) aiHelper.getMinecraft().currentScreen;
+					SameItemFilter filter = new SameItemFilter(
+							slot.getFakeMcStack());
+					List<Slot> inventorySlots = screen.inventorySlots.inventorySlots;
+					int fromStackRating = -1;
+					int missing = getMissingAmount(aiHelper,
+							getSlotContentCount(screen.inventorySlots
+									.getSlot(getToStack(aiHelper))));
+					for (int i = 0; i < inventorySlots.size() - 36; i++) {
+						Slot inventorySlot = inventorySlots.get(i);
+						if (filter.matches(inventorySlot.getStack())) {
+							int rating = rateSize(aiHelper, getSlotContentCount(inventorySlot), missing);
+							if (rating > fromStackRating) {
+								fromStackRating = rating;
+								fromStack = i;
 							}
 						}
-						if (fromStack < 0) {
-							System.out.println("Empty stack.");
-							chestData.markAsEmptyFor(slot.getFakeMcStack(), true);
-						}
+					}
+					if (fromStack < 0) {
+						System.out.println("Empty stack.");
+						chestData.markAsEmptyFor(slot.getFakeMcStack(), true);
 					}
 
 					return fromStack;
