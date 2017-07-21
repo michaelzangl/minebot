@@ -185,7 +185,7 @@ public class ChestBlockHandler extends RangeBlockHandler<ChestData> {
 
 		public void registerByItemFrame(EntityItemFrame frame) {
 			ItemStack displayed = frame.getDisplayedItem();
-			if (displayed != null) {
+			if (displayed != null && !displayed.isEmpty()) {
 				allowItem(displayed);
 			}
 		}
