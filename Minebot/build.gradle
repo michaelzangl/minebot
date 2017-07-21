@@ -5,12 +5,22 @@ buildscript {
     }
     dependencies {
         classpath 'net.minecraftforge.gradle:ForgeGradle:2.3-SNAPSHOT'
+        classpath 'org.ajoberstar:grgit:1.1.0'
     }
 }
 
 apply plugin: 'net.minecraftforge.gradle.forge'
 compileJava.options.encoding = 'UTF-8'
-version='1.12.1'
+
+// VERSION
+def git = org.ajoberstar.grgit.Grgit.open(file('..'))
+def git_head = git.head()
+def git_tags = git.tag.list().findAll {
+    it.commit == git_head
+}
+version = git_tags.size() > 0 ? git_tags[0].getName() : git_head.abbreviatedId;
+println "Compiling version ${version}"
+
 group = "de.michaelzangl.minebot"
 archivesBaseName = project.projectDir.name
 
