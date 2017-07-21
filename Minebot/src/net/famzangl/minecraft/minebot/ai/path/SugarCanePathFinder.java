@@ -1,7 +1,6 @@
 package net.famzangl.minecraft.minebot.ai.path;
 
 import net.famzangl.minecraft.minebot.ai.BlockItemFilter;
-import net.famzangl.minecraft.minebot.ai.ClassItemFilter;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSet;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSets;
 import net.famzangl.minecraft.minebot.ai.task.place.DestroyBlockTask;

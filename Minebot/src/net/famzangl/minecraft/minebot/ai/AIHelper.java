@@ -19,7 +19,6 @@ package net.famzangl.minecraft.minebot.ai;
 import java.io.File;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Random;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;

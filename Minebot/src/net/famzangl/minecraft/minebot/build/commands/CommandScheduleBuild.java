@@ -36,9 +36,7 @@ import net.famzangl.minecraft.minebot.build.blockbuild.SlabBuildTask;
 import net.famzangl.minecraft.minebot.build.blockbuild.StandingSignBuildTask;
 import net.famzangl.minecraft.minebot.build.blockbuild.StandingSignBuildTask.SignDirection;
 import net.minecraft.block.BlockStairs;
-import net.minecraft.block.BlockStairs.EnumHalf;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 
 @AICommand(helpText = "Schedules a build task.", name = "minebuild")

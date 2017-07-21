@@ -20,7 +20,6 @@ import java.util.stream.Stream;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.monster.EntityPolarBear;
-import net.minecraft.entity.passive.EntityAnimal;
 import net.minecraft.entity.passive.EntityChicken;
 import net.minecraft.entity.passive.EntityCow;
 import net.minecraft.entity.passive.EntityDonkey;

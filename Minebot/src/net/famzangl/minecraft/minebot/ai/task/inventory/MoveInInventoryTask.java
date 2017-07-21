@@ -16,7 +16,6 @@
  *******************************************************************************/
 package net.famzangl.minecraft.minebot.ai.task.inventory;
 
-import java.util.AbstractList;
 import java.util.LinkedList;
 
 import org.apache.logging.log4j.Marker;
@@ -29,7 +28,6 @@ import net.famzangl.minecraft.minebot.ai.task.error.StringTaskError;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.inventory.ClickType;
 import net.minecraft.inventory.Slot;
-import net.minecraft.item.ItemStack;
 
 /**
  * Move a given amount from one slot to an other, empty slot in the current open

@@ -72,7 +72,6 @@ import net.famzangl.minecraft.minebot.build.commands.CommandStepNext;
 import net.famzangl.minecraft.minebot.build.commands.CommandStepPlace;
 import net.famzangl.minecraft.minebot.build.commands.CommandStepWalk;
 import net.minecraft.client.Minecraft;
-import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentString;
 
 /**

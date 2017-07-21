@@ -1,7 +1,6 @@
 package net.famzangl.minecraft.minebot.ai.path.world;
 
 import net.famzangl.minecraft.minebot.ai.utils.RandUtils;
-import net.minecraft.block.Block;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;

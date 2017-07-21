@@ -24,7 +24,6 @@ import net.famzangl.minecraft.minebot.ai.task.place.JumpingPlaceBlockAtSideTask;
 import net.famzangl.minecraft.minebot.ai.task.place.SneakAndPlaceAtSideTask;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockStairs.EnumHalf;
-import net.minecraft.command.CommandFill;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;

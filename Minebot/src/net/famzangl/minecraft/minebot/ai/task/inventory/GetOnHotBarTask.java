@@ -31,7 +31,6 @@ import net.minecraft.client.multiplayer.PlayerControllerMP;
 import net.minecraft.inventory.ClickType;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
-import net.minecraft.network.play.client.CPacketClientStatus;
 
 /**
  * Gets the item on the hotbar out of the inventory. Currently only uses slot 5.
