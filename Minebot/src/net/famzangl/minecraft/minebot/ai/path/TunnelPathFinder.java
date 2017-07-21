@@ -22,6 +22,7 @@ import java.util.Collections;
 import java.util.Hashtable;
 
 import net.famzangl.minecraft.minebot.ai.AIHelper;
+import net.famzangl.minecraft.minebot.ai.BlockItemFilter;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSet;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSets;
 import net.famzangl.minecraft.minebot.ai.path.world.WorldWithDelta;
@@ -32,6 +33,7 @@ import net.famzangl.minecraft.minebot.ai.task.SkipWhenSearchingPrefetch;
 import net.famzangl.minecraft.minebot.ai.task.TaskOperations;
 import net.famzangl.minecraft.minebot.ai.utils.BlockCuboid;
 import net.famzangl.minecraft.minebot.ai.utils.BlockFilteredArea;
+import net.minecraft.init.Blocks;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 
@@ -208,12 +210,7 @@ public class TunnelPathFinder extends AlongTrackPathFinder {
 	}
 
 	private int getStartCount(int stepNumber) {
-		Integer startCount = tunnelPositionStartCount.get(stepNumber);
-		if (startCount == null) {
-			return 0;
-		} else {
-			return startCount;
-		}
+		return tunnelPositionStartCount.getOrDefault(stepNumber, 0);
 	}
 
 	@Override
@@ -237,17 +234,19 @@ public class TunnelPathFinder extends AlongTrackPathFinder {
 				FREE_TUNNEL_BLOCKS.invert());
 		addTask(new DestroyInRangeTask(area));
 
-		final boolean isTorchStep = stepNumber % 8 == 0;
-		// TODO: Only check for right torch.
-		if (torches.right && isTorchStep && !containsTorches(tunnelArea)) {
-			addTorchesTask(currentPos, -dz, dx);
-		}
-		if (torches.left && isTorchStep && !containsTorches(tunnelArea)) {
-			addTorchesTask(currentPos, dz, -dx);
-		}
-		if (torches.floor && isTorchStep && !containsTorches(tunnelArea)) {
-			addTask(new PlaceTorchSomewhereTask(
-					Collections.singletonList(currentPos), EnumFacing.DOWN));
+		if (helper.canSelectItem(new BlockItemFilter(Blocks.TORCH))) {
+			final boolean isTorchStep = stepNumber % 8 == 0;
+			// TODO: Only check for right torch.
+			if (torches.right && isTorchStep && !containsTorches(tunnelArea)) {
+				addTorchesTask(currentPos, -dz, dx);
+			}
+			if (torches.left && isTorchStep && !containsTorches(tunnelArea)) {
+				addTorchesTask(currentPos, dz, -dx);
+			}
+			if (torches.floor && isTorchStep && !containsTorches(tunnelArea)) {
+				addTask(new PlaceTorchSomewhereTask(
+						Collections.singletonList(currentPos), EnumFacing.DOWN));
+			}
 		}
 		final boolean isBranchStep = stepNumber % 4 == 2;
 		if (addBranches && isBranchStep) {
