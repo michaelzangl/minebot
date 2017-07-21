@@ -163,7 +163,7 @@ public class MineScript {
 
 						@Override
 						public Vec3d getPositionVector() {
-							throw new UnsupportedOperationException();
+							return helper.getMinecraft().player.getPositionVector();
 						}
 
 						@Override
