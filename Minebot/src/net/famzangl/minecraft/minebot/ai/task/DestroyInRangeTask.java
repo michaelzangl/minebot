@@ -46,7 +46,7 @@ import net.minecraftforge.fml.common.gameevent.TickEvent.RenderTickEvent;
  */
 public class DestroyInRangeTask extends AITask implements CanPrefaceAndDestroy {
 	private static final Marker MARKER_DESTROY_IN_RANGE = MarkerManager.getMarker("destroy_in_range");
-	private class ClosestBlockFinder implements AreaVisitor {
+	private class ClosestBlockFinder implements AreaVisitor<WorldData> {
 		BlockPos next = null;
 		double currentMin = Float.POSITIVE_INFINITY;
 		private final AIHelper aiHelper;
@@ -65,20 +65,18 @@ public class DestroyInRangeTask extends AITask implements CanPrefaceAndDestroy {
 		}
 	}
 
-	private class ApplyToDelta implements AreaVisitor {
-
-
+	private class ApplyToDelta implements AreaVisitor<WorldWithDelta> {
 		public ApplyToDelta() {
 		}
 
 		@Override
-		public void visit(WorldData world, int x, int y, int z) {
+		public void visit(WorldWithDelta world, int x, int y, int z) {
 			if (isSafeToDestroy(world, x, y, z)) {
 				// FIXME: Use generics instead of cast.
-				((WorldWithDelta) world).setBlock(x, y, z, 0, 0);
+				world.setBlock(x, y, z, 0, 0);
 				y++;
 				while (isSafeFallingBlock(world, x, y, z)) {
-					((WorldWithDelta) world).setBlock(x, y, z, 0, 0);
+					world.setBlock(x, y, z, 0, 0);
 					y++;
 				}
 			} else {
@@ -92,7 +90,7 @@ public class DestroyInRangeTask extends AITask implements CanPrefaceAndDestroy {
 	private int facingAttempts;
 	private volatile BlockPos currentAttemptingPos;
 	private final ArrayList<BlockPos> failedBlocks = new ArrayList<BlockPos>();
-	private BlockArea range;
+	private BlockArea<WorldData> range;
 	private Vec3d facingPos;
 	private BlockPos lastFacingFor;
 
@@ -107,10 +105,10 @@ public class DestroyInRangeTask extends AITask implements CanPrefaceAndDestroy {
 	 *            The other corner
 	 */
 	public DestroyInRangeTask(BlockPos p1, BlockPos p2) {
-		this(new BlockCuboid(p1, p2));
+		this(new BlockCuboid<>(p1, p2));
 	}
 
-	public DestroyInRangeTask(BlockArea range) {
+	public DestroyInRangeTask(BlockArea<WorldData> range) {
 		this.range = range;
 	}
 

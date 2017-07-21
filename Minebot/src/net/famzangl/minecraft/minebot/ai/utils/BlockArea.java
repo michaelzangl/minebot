@@ -9,12 +9,12 @@ import net.minecraft.util.math.BlockPos;
  * 
  * @author Michael Zangl
  */
-public abstract class BlockArea {
-	public interface AreaVisitor {
-		public void visit(WorldData world, int x, int y, int z);
+public abstract class BlockArea<WorldT extends WorldData> {
+	public interface AreaVisitor<WorldT extends WorldData> {
+		public void visit(WorldT world, int x, int y, int z);
 	}
 
-	private static class VolumeVisitor implements AreaVisitor {
+	private static class VolumeVisitor implements AreaVisitor<WorldData> {
 		private int volume = 0;
 
 		@Override
@@ -23,22 +23,22 @@ public abstract class BlockArea {
 		}
 	}
 
-	public boolean contains(WorldData world, BlockPos position) {
+	public boolean contains(WorldT world, BlockPos position) {
 		return contains(world, position.getX(), position.getY(), position.getZ());
 	}
 
-	public abstract void accept(AreaVisitor visitor, WorldData world);
+	public abstract <WorldT2 extends WorldT> void accept(AreaVisitor<? super WorldT2> visitor, WorldT2 world);
 
-	public abstract boolean contains(WorldData world, int x, int y, int z);
+	public abstract boolean contains(WorldT world, int x, int y, int z);
 
-	public int getVolume(WorldData world) {
+	public int getVolume(WorldT world) {
 		VolumeVisitor volumeVisitor = new VolumeVisitor();
 		accept(volumeVisitor, world);
 		return volumeVisitor.volume;
 	}
 	
-	public BlockIntersection intersectWith(BlockArea other) {
-		return new BlockIntersection(this, other);
+	public BlockIntersection<WorldT> intersectWith(BlockArea<WorldT> other) {
+		return new BlockIntersection<>(this, other);
 	}
 
 }

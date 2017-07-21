@@ -44,7 +44,7 @@ public class PathFinderStrategy extends TaskStrategy {
 	private boolean noPathFound;
 	private final PosMarkerRenderer renderer = new PosMarkerRenderer(255, 128,
 			0);
-	private WorldData pathFindingWorld;;
+	protected WorldData pathFindingWorld;;
 
 	// private final HealthWatcher watcher = new HealthWatcher();
 

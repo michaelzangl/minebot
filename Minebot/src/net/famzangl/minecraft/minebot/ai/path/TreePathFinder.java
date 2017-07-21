@@ -17,7 +17,6 @@
 package net.famzangl.minecraft.minebot.ai.path;
 
 import java.util.Comparator;
-import java.util.Optional;
 import java.util.stream.Stream;
 
 import net.famzangl.minecraft.minebot.ai.AIHelper;
@@ -36,7 +35,6 @@ import net.famzangl.minecraft.minebot.ai.task.move.JumpMoveTask;
 import net.famzangl.minecraft.minebot.ai.task.place.PlantSaplingTask;
 import net.famzangl.minecraft.minebot.ai.utils.BlockCounter;
 import net.famzangl.minecraft.minebot.ai.utils.BlockCuboid;
-import net.famzangl.minecraft.minebot.ai.utils.BlockFilteredArea;
 import net.famzangl.minecraft.minebot.build.block.WoodType;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
@@ -174,7 +172,7 @@ public class TreePathFinder extends MovePathFinder {
 		private void scanTreeType(WorldData world) {
 			BlockPos corner1 = new BlockPos(minX, minY, minZ);
 			BlockPos corner2 = new BlockPos(minX + 1, topY + 2, minZ + 1);
-			BlockCuboid trunk = new BlockCuboid(corner1, corner2);
+			BlockCuboid<?> trunk = new BlockCuboid<>(corner1, corner2);
 			BlockSet[] sets = Stream.of(WoodType.values())
 					.map(WoodType::getLogBlocks)
 					.toArray(BlockSet[]::new);
@@ -192,7 +190,7 @@ public class TreePathFinder extends MovePathFinder {
 
 		private int countTrunkBlocks(WorldData world, int topY) {
 			BlockPos corner = new BlockPos(minX, topY, minZ);
-			BlockCuboid trunk = new BlockCuboid(corner, corner.add(1, 0, 1));
+			BlockCuboid<?> trunk = new BlockCuboid<>(corner, corner.add(1, 0, 1));
 			int trunkBlocks = BlockCounter.countBlocks(world, trunk, logs)[0];
 			return trunkBlocks;
 		}
@@ -254,7 +252,7 @@ public class TreePathFinder extends MovePathFinder {
 				addTask(new HorizontalMoveTask(digTo));
 				addTask(new PrefaceBarrier());
 				// Destroy all logs above y.
-				addTask(new DestroyLogInRange(new BlockCuboid(
+				addTask(new DestroyLogInRange(new BlockCuboid<>(
 						new BlockPos(minX - singleTreeSideMax, y, minZ
 								- singleTreeSideMax), new BlockPos(minX + 1
 								+ singleTreeSideMax, y + 4, minZ + 1
@@ -409,7 +407,7 @@ public class TreePathFinder extends MovePathFinder {
 			}
 		}
 		if (max > 0) {
-			addTask(new DestroyInRangeTask(new BlockCuboid(currentPos.add(0, 2,
+			addTask(new DestroyInRangeTask(new BlockCuboid<>(currentPos.add(0, 2,
 					0), currentPos.add(0, max, 0))));
 		}
 

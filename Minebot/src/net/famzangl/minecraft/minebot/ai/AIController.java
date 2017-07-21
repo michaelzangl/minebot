@@ -148,7 +148,7 @@ public class AIController extends AIHelper implements IAIControllable {
 		// Hook into
 		// net.minecraft.client.renderer.RenderGlobal.drawBlockDamageTexture(Tessellator,
 		// WorldRenderer, Entity, float)
-		profilerHelper.addLisener("hand", new Runnable() {
+		profilerHelper.addLisener("destroyProgress", new Runnable() {
 			@Override
 			public void run() {
 				drawMakers();

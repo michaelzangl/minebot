@@ -18,7 +18,7 @@ public class DestroyLogInRange extends DestroyInRangeTask {
 
 	private static final BlockSet LEAVES_OR_LOGS = BlockSets.LEAVES.unionWith(BlockSets.LOGS).unionWith(new BlockSet(Blocks.VINE));
 
-	public DestroyLogInRange(BlockArea range) {
+	public DestroyLogInRange(BlockArea<WorldData> range) {
 		super(range);
 	}
 

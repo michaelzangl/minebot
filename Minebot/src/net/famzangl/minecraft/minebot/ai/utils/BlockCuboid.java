@@ -13,7 +13,7 @@ import net.minecraft.util.math.Vec3i;
  * 
  * @author Michael Zangl
  */
-public class BlockCuboid extends BlockArea {
+public class BlockCuboid<WorldT extends WorldData> extends BlockArea<WorldT> {
 	/**
 	 * The minimum x, y, z coordinate
 	 */
@@ -47,8 +47,7 @@ public class BlockCuboid extends BlockArea {
 				* (max.getZ() - min.getZ() + 1);
 	}
 
-	@Override
-	public void accept(AreaVisitor visitor, WorldData world) {
+	public <WorldT2 extends WorldT> void accept(AreaVisitor<? super WorldT2> visitor, WorldT2 world) {
 		int minY = min.getY();
 		int maxY = max.getY();
 		for (int y = minY; y <= maxY; y++) {
@@ -56,7 +55,7 @@ public class BlockCuboid extends BlockArea {
 		}
 	}
 
-	private void acceptY(AreaVisitor visitor, int y, WorldData world) {
+	private <WorldT2 extends WorldT> void acceptY(AreaVisitor<? super WorldT2> visitor, int y, WorldT2 world) {
 		int minZ = min.getZ();
 		int maxZ = max.getZ();
 		int minX = min.getX();
@@ -75,25 +74,25 @@ public class BlockCuboid extends BlockArea {
 	 *            how much
 	 * @return The extended cuboid.
 	 */
-	public BlockCuboid extendXZ(int extend) {
-		return new BlockCuboid(min.add(-extend, 0, -extend), max.add(extend, 0,
+	public BlockCuboid<WorldT> extendXZ(int extend) {
+		return new BlockCuboid<>(min.add(-extend, 0, -extend), max.add(extend, 0,
 				extend));
 	}
 
-	public BlockCuboid extend(int amount, EnumFacing direction) {
+	public BlockCuboid<WorldT> extend(int amount, EnumFacing direction) {
 		return boundsWith(move(amount, direction));
 	}
 
-	private BlockCuboid boundsWith(BlockCuboid other) {
-		return new BlockCuboid(Pos.minPos(min, other.min), Pos.maxPos(max, other.max));
+	private BlockCuboid<WorldT> boundsWith(BlockCuboid<?> other) {
+		return new BlockCuboid<>(Pos.minPos(min, other.min), Pos.maxPos(max, other.max));
 	}
 
-	public BlockCuboid move(int amount, EnumFacing direction) {
+	public BlockCuboid<WorldT> move(int amount, EnumFacing direction) {
 		return move(Pos.ZERO.offset(direction, amount));
 	}
 
-	public BlockCuboid move(Vec3i vec) {
-		return new BlockCuboid(min.add(vec), max.add(vec));
+	public BlockCuboid<WorldT> move(Vec3i vec) {
+		return new BlockCuboid<>(min.add(vec), max.add(vec));
 	}
 
 	@Override
