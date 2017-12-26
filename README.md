@@ -21,6 +21,10 @@ Download + Installing (Stable version)
 
 * Extract the ZIP file and put the jar files in your minecraft mods directory.
 
+Getting Help
+============
+Use the [issue tracker](https://github.com/michaelzangl/minebot/issues) for bugs or to get help with your stuff. I'm not available in the minecraft forum any more (it's just to slow and blown-up).
+
 Building (Latest version)
 ========
 
