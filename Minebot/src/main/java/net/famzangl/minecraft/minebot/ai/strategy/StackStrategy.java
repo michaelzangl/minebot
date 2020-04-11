@@ -17,7 +17,7 @@
 package net.famzangl.minecraft.minebot.ai.strategy;
 
 import net.famzangl.minecraft.minebot.ai.AIHelper;
-import net.minecraftforge.fml.common.gameevent.TickEvent.RenderTickEvent;
+import net.minecraftforge.event.TickEvent;
 
 import java.util.HashSet;
 
@@ -94,7 +94,7 @@ public class StackStrategy extends AIStrategy {
 	}
 
 	@Override
-	public void drawMarkers(RenderTickEvent event, AIHelper helper) {
+	public void drawMarkers(TickEvent.RenderTickEvent event, AIHelper helper) {
 		AIStrategy current = stack.getCurrentStrategy();
 		if (current != null) {
 			current.drawMarkers(event, helper);

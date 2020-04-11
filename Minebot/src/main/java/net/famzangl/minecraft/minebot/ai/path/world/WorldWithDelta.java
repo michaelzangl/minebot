@@ -118,13 +118,15 @@ public class WorldWithDelta extends WorldData {
 	}
 
 	public void setBlock(BlockPos pos, Block block) {
-		setBlock(pos, block.getIdFromBlock(block), 0);
+		setBlock(pos, block.getDefaultState());
 	}
 
+	@Deprecated
 	public void setBlock(BlockPos pos, int blockId, int meta) {
 		setBlock(pos.getX(), pos.getY(), pos.getZ(), blockId, meta);
 	}
 
+	@Deprecated
 	public void setBlock(int x, int y, int z, int blockId, int meta) {
 		if (blockId > 0xfff || meta > 0xf) {
 			throw new IllegalArgumentException("block id/meta " + blockId + ":"
@@ -134,13 +136,14 @@ public class WorldWithDelta extends WorldData {
 	}
 
 	public void setBlock(BlockPos pos, BlockState block) {
-		setBlockIdAndMeta(pos.getX(), pos.getY(), pos.getZ(), Block.BLOCK_STATE_IDS.get(block));
+		setBlockIdAndMeta(pos.getX(), pos.getY(), pos.getZ(), Block.getStateId(block));
 	}
 
 	private void setBlockIdAndMeta(int x, int y, int z, int blockWithMeta) {
-		LOGGER.trace(MARKER_WORLD_DELTA, "Setblock at (" + x + "," + y + ","
-				+ z + ") with " + (blockWithMeta >> 4) + ":"
-				+ (blockWithMeta & 0xf));
+		if (LOGGER.isTraceEnabled()) {
+			LOGGER.trace(MARKER_WORLD_DELTA, "Setblock at (" + x + "," + y + "," + z +
+					") with " + Block.getStateById(blockWithMeta));
+		}
 		int chunkX = x >> 4;
 		int chunkZ = z >> 4;
 

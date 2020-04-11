@@ -25,9 +25,10 @@ import net.famzangl.minecraft.minebot.ai.utils.BlockArea;
 import net.famzangl.minecraft.minebot.ai.utils.BlockArea.AreaVisitor;
 import net.famzangl.minecraft.minebot.ai.utils.BlockCuboid;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
-import net.minecraftforge.fml.common.gameevent.TickEvent.RenderTickEvent;
+import net.minecraftforge.event.TickEvent;
 import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.MarkerManager;
 
@@ -129,8 +130,9 @@ public class DestroyInRangeTask extends AITask implements CanPrefaceAndDestroy {
 		if (noDestructionRequired(aiHelper.getWorld(), x, y, z)) {
 			return -1;
 		} else {
-			double distance = aiHelper.getMinecraft().player.getDistance(x + .5, y
+			double distanceSq = aiHelper.getMinecraft().player.getDistanceSq(x + .5, y
 					+ .5 - aiHelper.getMinecraft().player.getEyeHeight(), z + .5);
+			double distance = Math.sqrt(distanceSq);
 			// 0..1
 			double change = aiHelper
 					.getRequiredAngularChangeTo(x + .5, y + .5, z + .5)
@@ -205,8 +207,8 @@ public class DestroyInRangeTask extends AITask implements CanPrefaceAndDestroy {
 
 	protected BlockPos checkFacingAcceptableBlock(AIHelper aiHelper, BlockPos n, boolean isFacingRightDirection) {
 		RayTraceResult position = aiHelper.getObjectMouseOver();
-		if (isFacingRightDirection && position != null && position.typeOfHit == RayTraceResult.Type.BLOCK) {
-			BlockPos pos = position.getBlockPos();
+		if (isFacingRightDirection && position instanceof BlockRayTraceResult) {
+			BlockPos pos = ((BlockRayTraceResult) position).getPos();
 			if (isAcceptedFacingPos(aiHelper, n, pos)) {
 				return pos;
 			}
@@ -254,7 +256,7 @@ public class DestroyInRangeTask extends AITask implements CanPrefaceAndDestroy {
 	}
 
 	@Override
-	public void drawMarkers(RenderTickEvent event, AIHelper helper) {
+	public void drawMarkers(TickEvent.RenderTickEvent event, AIHelper helper) {
 		BlockPos currentAttemptingPos2 = currentAttemptingPos;
 		if (currentAttemptingPos2 != null) {
 			renderer.render(event, helper, currentAttemptingPos2);

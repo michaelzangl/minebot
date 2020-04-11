@@ -39,8 +39,8 @@ import java.util.LinkedList;
 public class ForBuildPathFinder extends MovePathFinder {
 
 	private static final int NEIGHBOURS_PER_DIRECTION = 6;
-	private static final BlockSet FENCES = new BlockSet(
-			Blocks.COBBLESTONE_WALL).unionWith(BlockSets.FENCE);
+	private static final BlockSet FENCES = BlockSet.builder().add(
+			Blocks.COBBLESTONE_WALL).add(BlockSets.FENCE).build();
 	/**
 	 * Task we want to prepare for.
 	 */
@@ -67,7 +67,7 @@ public class ForBuildPathFinder extends MovePathFinder {
 
 	@Override
 	protected boolean runSearch(BlockPos playerPosition) {
-		canBuildUp = helper.canSelectItem(new BlockItemFilter(Blocks.CARPET));
+		canBuildUp = helper.canSelectItem(new BlockItemFilter(BlockSets.CARPET));
 		return super.runSearch(playerPosition);
 	}
 

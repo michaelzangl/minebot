@@ -132,7 +132,7 @@ public class MinebotSettings {
 	}
 
 	public static File getDataDir() {
-		File dir = new File(Minecraft.getInstance().mcDataDir, "minebot");
+		File dir = new File(Minecraft.getInstance().gameDir, "minebot");
 		LOGGER.trace(MARKER_SETTINGS, "Data directory: " + dir);
 		if (!dir.isDirectory()) {
 			try {

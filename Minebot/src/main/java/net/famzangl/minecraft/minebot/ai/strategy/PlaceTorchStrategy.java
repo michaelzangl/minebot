@@ -23,7 +23,7 @@ import net.famzangl.minecraft.minebot.ai.path.world.BlockSets;
 import net.famzangl.minecraft.minebot.ai.path.world.WorldData;
 import net.famzangl.minecraft.minebot.settings.MinebotSettings;
 import net.minecraft.block.Blocks;
-import net.minecraft.client.entity.ClientPlayerEntity;
+import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 
@@ -85,8 +85,8 @@ public class PlaceTorchStrategy extends AIStrategy {
 		ClientPlayerEntity playerPosition = helper.getMinecraft().player;
 		BlockPos playerBlockPosition = helper.getPlayerPosition();
 		if (!done.contains(playerBlockPosition)
-				&& playerBlockPosition.distanceSqToCenter(playerPosition.posX,
-						playerBlockPosition.getY() + .5, playerPosition.posZ) < .3 * .3) {
+				&& playerBlockPosition.distanceSq(playerPosition.getPosX(),
+						playerBlockPosition.getY() + .5, playerPosition.getPosZ(), true) < .3 * .3) {
 			// we are close to the center of that block.
 			int light = helper.getLightAt(playerBlockPosition);
 			if (light <= torchLightLevel) {

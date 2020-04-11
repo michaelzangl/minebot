@@ -17,6 +17,7 @@
 package net.famzangl.minecraft.minebot.ai.command;
 
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSet;
+import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 
 import java.lang.annotation.ElementType;
@@ -33,21 +34,21 @@ public @interface AICommandParameter {
 	 *
 	 */
 	public static abstract class BlockFilter {
-		public abstract boolean matches(BlockWithDataOrDontcare block);
+		public abstract boolean matches(BlockState block);
 	}
 	
 	public static class AnyBlockFilter extends BlockFilter {
 		@Override
-		public boolean matches(BlockWithDataOrDontcare b) {
+		public boolean matches(BlockState b) {
 			return true;
 		}
 	}
 	
 	public static class SurvivalBlockFilter extends BlockFilter {
-		private static final BlockSet NON_SURVIVAL_BLOCKS = new BlockSet(Blocks.AIR, Blocks.COMMAND_BLOCK);
+		private static final BlockSet NON_SURVIVAL_BLOCKS = BlockSet.builder().add(Blocks.AIR, Blocks.COMMAND_BLOCK).build();
 
 		@Override
-		public boolean matches(BlockWithDataOrDontcare b) {
+		public boolean matches(BlockState b) {
 			return !NON_SURVIVAL_BLOCKS.contains(b);
 		}
 	}

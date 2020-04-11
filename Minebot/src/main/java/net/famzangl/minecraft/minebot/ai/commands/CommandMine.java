@@ -21,7 +21,6 @@ import net.famzangl.minecraft.minebot.ai.command.AICommand;
 import net.famzangl.minecraft.minebot.ai.command.AICommandInvocation;
 import net.famzangl.minecraft.minebot.ai.command.AICommandParameter;
 import net.famzangl.minecraft.minebot.ai.command.AICommandParameter.BlockFilter;
-import net.famzangl.minecraft.minebot.ai.command.BlockWithDataOrDontcare;
 import net.famzangl.minecraft.minebot.ai.command.ParameterType;
 import net.famzangl.minecraft.minebot.ai.command.SafeStrategyRule;
 import net.famzangl.minecraft.minebot.ai.path.MineBySettingsPathFinder;
@@ -31,6 +30,7 @@ import net.famzangl.minecraft.minebot.ai.path.OrebfuscatedMinePathFinder;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSet;
 import net.famzangl.minecraft.minebot.ai.strategy.AIStrategy;
 import net.famzangl.minecraft.minebot.ai.strategy.PathFinderStrategy;
+import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 
 @AICommand(helpText = "Mines for ores.\n"
@@ -38,9 +38,9 @@ import net.minecraft.block.Blocks;
 		+ "If blockName is given, only the block that is given is searched for.", name = "minebot")
 public class CommandMine {
 
-	public static BlockSet MINEABLE = new BlockSet(Blocks.AIR,
-			Blocks.LAVA, Blocks.FLOWING_LAVA, Blocks.WATER,
-			Blocks.FLOWING_WATER, Blocks.WATERLILY, Blocks.BEDROCK).invert();
+	public static BlockSet MINEABLE = BlockSet.builder().add(Blocks.AIR,
+			Blocks.LAVA, Blocks.WATER,
+			Blocks.LILY_PAD, Blocks.BEDROCK).build().invert();
 
 	@AICommandInvocation(safeRule = SafeStrategyRule.DEFEND_MINING)
 	public static AIStrategy run(
@@ -77,7 +77,7 @@ public class CommandMine {
 
 	public static final class MineBlockFilter extends BlockFilter {
 		@Override
-		public boolean matches(BlockWithDataOrDontcare b) {
+		public boolean matches(BlockState b) {
 			return MINEABLE.contains(b);
 		}
 	}
@@ -86,8 +86,8 @@ public class CommandMine {
 	public static AIStrategy run(
 			AIHelper helper,
 			@AICommandParameter(type = ParameterType.FIXED, fixedName = "mine", description = "") String nameArg,
-			@AICommandParameter(type = ParameterType.BLOCK_NAME, description = "The block to mine.", blockFilter = MineBlockFilter.class) BlockWithDataOrDontcare blockName) {
-		return new PathFinderStrategy(new MineSinglePathFinder(blockName.toBlockSet(),
+			@AICommandParameter(type = ParameterType.BLOCK_STATE, description = "The block to mine.", blockFilter = MineBlockFilter.class) BlockState blockName) {
+		return new PathFinderStrategy(new MineSinglePathFinder(BlockSet.builder().add(blockName).build(),
 				helper.getLookDirection(), helper.getPlayerPosition().getY()),
 				"Mining " + blockName);
 	}

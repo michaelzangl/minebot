@@ -62,7 +62,7 @@ public class ItemNameBuilder extends ParameterBuilder {
 					final String subKey = item.getRegistryName().getPath();
 					addKey(currentStart, addTo, subKey);
 				} else {
-					addKey(currentStart, addTo, BlockNameBuilder.toString(item.getRegistryName()));
+					addKey(currentStart, addTo, item.getRegistryName() + "");
 				}
 			});
 		}
@@ -123,7 +123,7 @@ public class ItemNameBuilder extends ParameterBuilder {
 			return null;
 		} else if (parts.length > 1) {
 			// Subtype
-			return item.withSubtype(parts[1]);
+			return item; // TODO.withSubtype(parts[1]);
 		} else {
 			return item;
 		}

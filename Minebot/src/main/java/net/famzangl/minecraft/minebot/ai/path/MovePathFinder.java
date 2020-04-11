@@ -52,22 +52,22 @@ public class MovePathFinder extends PathFinderField {
 	/**
 	 * Blocks that are destructable faster.
 	 */
-	protected final static BlockSet fastDestructableBlocks = new BlockSet(
+	protected final static BlockSet fastDestructableBlocks = BlockSet.builder().add(
 			Blocks.DIRT,
 			Blocks.GRAVEL, 
 			Blocks.SAND, 
-			Blocks.SANDSTONE);
+			Blocks.SANDSTONE).build();
 
 	/**
 	 * Blocks we should not dig through, e.g. because we cannot handle them
 	 * correctly.
 	 */
-	protected static final BlockSet defaultForbiddenBlocks = new BlockSet(
+	protected static final BlockSet defaultForbiddenBlocks = BlockSet.builder().add(
 			Blocks.BEDROCK, 
 			Blocks.CACTUS, 
 			Blocks.OBSIDIAN,
-			Blocks.PISTON_EXTENSION, 
-			Blocks.PISTON_HEAD);
+			Blocks.MOVING_PISTON,
+			Blocks.PISTON_HEAD).build();
 
 	/**
 	 * The AI helper

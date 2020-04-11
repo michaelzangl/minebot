@@ -58,8 +58,8 @@ public class SneakAndPlaceTask extends AITask {
 		this.startStandPosition = startStandPosition;
 		this.minBuildHeight = minBuildHeight;
 		final Direction foundInDir = AIHelper.getDirectionFor(destinationStandPosition.subtract(startStandPosition));
-		if (foundInDir.getFrontOffsetY() != 0 || foundInDir == null) {
-			throw new IllegalArgumentException();
+		if (foundInDir.getYOffset() != 0) {
+			throw new IllegalArgumentException("Illegal direction for this task: " + foundInDir);
 		}
 		inDirection = foundInDir;
 	}

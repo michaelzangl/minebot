@@ -20,7 +20,6 @@ import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.ClassItemFilter;
 import net.famzangl.minecraft.minebot.ai.ItemFilter;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockBounds;
-import net.famzangl.minecraft.minebot.ai.path.world.BlockMetaSet;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSet;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSets;
 import net.famzangl.minecraft.minebot.ai.path.world.WorldData;
@@ -35,27 +34,32 @@ import net.famzangl.minecraft.minebot.settings.MinebotSettingsRoot;
 import net.famzangl.minecraft.minebot.settings.PathfindingSetting;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
-import net.minecraft.init.Items;
+import net.minecraft.block.NetherWartBlock;
+import net.minecraft.item.HoeItem;
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemHoe;
-import net.minecraft.item.ItemSeeds;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
+import net.minecraftforge.common.IPlantable;
 
 public class PlantPathFinder extends MovePathFinder {
-	private static final BlockMetaSet GROWN_CROPS = new BlockMetaSet(Blocks.NETHER_WART, 3)
-			.unionWith(new BlockMetaSet(Blocks.WHEAT, 7))
-			.unionWith(new BlockMetaSet(Blocks.CARROTS, 7))
-			.unionWith(new BlockMetaSet(Blocks.POTATOES, 7))
-			.unionWith(new BlockMetaSet(Blocks.BEETROOTS, 3));
-	private static final BlockSet FARMLAND = new BlockSet(Blocks.FARMLAND);
-	private static final BlockSet NETHERWART_FARMLAND = new BlockSet(
-			Blocks.SOUL_SAND);
 
-	private static final BlockSet FARMLANDABLE = new BlockSet(Blocks.DIRT,
-			Blocks.GRASS);
+	private static final BlockSet GROWN_CROPS =
+			BlockSet.builder().add(
+					Blocks.NETHER_WART.getDefaultState().with(NetherWartBlock.AGE, 3),
+					Blocks.WHEAT.getDefaultState().with(NetherWartBlock.AGE, 7),
+					Blocks.CARROTS.getDefaultState().with(NetherWartBlock.AGE, 7),
+					Blocks.POTATOES.getDefaultState().with(NetherWartBlock.AGE, 7),
+					Blocks.BEETROOTS.getDefaultState().with(NetherWartBlock.AGE, 3)
+					).build();
+	private static final BlockSet FARMLAND = BlockSet.builder().add(Blocks.FARMLAND).build();
+	private static final BlockSet NETHERWART_FARMLAND =BlockSet.builder().add(
+			Blocks.SOUL_SAND).build();
+
+	private static final BlockSet FARMLANDABLE = BlockSet.builder().add(Blocks.DIRT,
+			Blocks.GRASS).build();
 
 	private final class PlaceSeedsTask extends PlaceBlockAtFloorTask implements CanWorkWhileApproaching {
 		private final SeedFilter seedFilter;
@@ -73,7 +77,8 @@ public class PlantPathFinder extends MovePathFinder {
 		@Override
 		public boolean applyToDelta(WorldWithDelta world) {
 			Item anyPlaceItem = seedFilter.type.items[0];
-			BlockState block = ((ItemSeeds)anyPlaceItem).getPlant(null, null);
+			BlockState block = ((IPlantable) anyPlaceItem)
+					.getPlant(null, null);
 			world.setBlock(pos, block);
 			return true;
 		}
@@ -143,7 +148,7 @@ public class PlantPathFinder extends MovePathFinder {
 		private Vec3d facingPosition;
 
 		public UseHoeTask(BlockPos farmlandPos) {
-			super(new ClassItemFilter(ItemHoe.class), farmlandPos);
+			super(new ClassItemFilter(HoeItem.class), farmlandPos);
 		}
 
 		@Override
@@ -207,9 +212,9 @@ public class PlantPathFinder extends MovePathFinder {
 			return distance + 1;
 		} else if (type.farmland == FARMLAND
 				&& BlockSets.AIR.isAt(world, x, y, z)
-				&& FARMLANDABLE.contains(helper.getBlock(x, y - 1, z))
+				&& FARMLANDABLE.isAt(world, x, y - 1, z)
 				&& helper.canSelectItem(new SeedFilter(type))
-				&& helper.canSelectItem(new ClassItemFilter(ItemHoe.class))) {
+				&& helper.canSelectItem(new ClassItemFilter(HoeItem.class))) {
 			return distance + 10;
 		} else {
 			return -1;

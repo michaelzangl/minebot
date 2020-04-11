@@ -21,12 +21,12 @@ import net.famzangl.minecraft.minebot.ai.command.AICommand;
 import net.famzangl.minecraft.minebot.ai.command.AICommandInvocation;
 import net.famzangl.minecraft.minebot.ai.command.AICommandParameter;
 import net.famzangl.minecraft.minebot.ai.command.AICommandParameter.BlockFilter;
-import net.famzangl.minecraft.minebot.ai.command.BlockWithDataOrDontcare;
 import net.famzangl.minecraft.minebot.ai.command.ParameterType;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSet;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSets;
 import net.famzangl.minecraft.minebot.ai.strategy.AIStrategy;
 import net.famzangl.minecraft.minebot.ai.strategy.CraftStrategy;
+import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 
 @AICommand(helpText = "Crafts items of the given type.", name = "minebot")
@@ -35,7 +35,7 @@ public class CommandCraft {
 	/**
 	 * Blocks that can not be crafted.
 	 */
-	private static final BlockSet simpleBlocks = new BlockSet(
+	private static final BlockSet simpleBlocks = BlockSet.builder().add(
 			Blocks.AIR, Blocks.BREWING_STAND, Blocks.NETHER_WART,
 			Blocks.CAULDRON, Blocks.FLOWER_POT, Blocks.WHEAT, Blocks.SUGAR_CANE,
 			Blocks.CAKE, Blocks.SKELETON_SKULL, Blocks.SKELETON_WALL_SKULL, Blocks.WITHER_SKELETON_SKULL,
@@ -46,14 +46,14 @@ public class CommandCraft {
 			Blocks.MELON_STEM,
 			Blocks.REDSTONE_WIRE,
 			Blocks.IRON_DOOR)
-			.unionWith(BlockSets.WALL_SIGN)
-			.unionWith(BlockSets.WOOL)
-			.unionWith(BlockSets.BED)
-			.unionWith(BlockSets.WOODEN_DOR).invert();
+			.add(BlockSets.WALL_SIGN)
+			.add(BlockSets.WOOL)
+			.add(BlockSets.BED)
+			.add(BlockSets.WOODEN_DOR).build().invert();
 
 	public static final class MyBlockFilter extends BlockFilter {
 		@Override
-		public boolean matches(BlockWithDataOrDontcare b) {
+		public boolean matches(BlockState b) {
 			return simpleBlocks.contains(b);
 		}
 	}
@@ -63,10 +63,11 @@ public class CommandCraft {
 			AIHelper helper,
 			@AICommandParameter(type = ParameterType.FIXED, fixedName = "craft", description = "") String nameArg,
 			@AICommandParameter(type = ParameterType.NUMBER, description = "Item count") int itemCount,
-			@AICommandParameter(type = ParameterType.BLOCK_NAME, description = "Block", blockFilter = MyBlockFilter.class) BlockWithDataOrDontcare itemType) {
+			@AICommandParameter(type = ParameterType.BLOCK_STATE, description = "Block", blockFilter = MyBlockFilter.class) BlockState itemType) {
 		return new CraftStrategy(itemCount, itemType);
 	}
 
+	/* TODO
 	@AICommandInvocation()
 	public static AIStrategy run(
 			AIHelper helper,
@@ -75,5 +76,5 @@ public class CommandCraft {
 			@AICommandParameter(type = ParameterType.NUMBER, description = "Item type") int itemType,
 			@AICommandParameter(type = ParameterType.NUMBER, description = "Item subtype", optional = true) Integer itemSubtype) {
 		return new CraftStrategy(itemCount, itemType, itemSubtype == null ? 0 : itemSubtype);
-	}
+	} */
 }

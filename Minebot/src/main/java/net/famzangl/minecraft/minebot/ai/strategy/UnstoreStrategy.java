@@ -29,7 +29,7 @@ import net.famzangl.minecraft.minebot.ai.task.OpenChestTask;
 import net.famzangl.minecraft.minebot.ai.task.WaitTask;
 import net.famzangl.minecraft.minebot.ai.task.inventory.MoveInInventoryTask;
 import net.minecraft.client.gui.screen.inventory.ChestScreen;
-import net.minecraft.inventory.Slot;
+import net.minecraft.inventory.container.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
@@ -104,7 +104,7 @@ public class UnstoreStrategy extends PathFinderStrategy {
 				@Override
 				protected int getToStack(AIHelper aiHelper) {
 					ChestScreen screen = (ChestScreen) aiHelper.getMinecraft().currentScreen;
-					int slots = screen.inventorySlots.inventorySlots.size();
+					int slots = screen.getContainer().inventorySlots.size();
 					int iSlot;
 					if (inventorySlot < 9) {
 						iSlot = inventorySlot + 3 * 9;
@@ -120,10 +120,10 @@ public class UnstoreStrategy extends PathFinderStrategy {
 					ChestScreen screen = (ChestScreen) aiHelper.getMinecraft().currentScreen;
 					SameItemFilter filter = new SameItemFilter(
 							slot.getFakeMcStack());
-					List<Slot> inventorySlots = screen.inventorySlots.inventorySlots;
+					List<Slot> inventorySlots = screen.getContainer().inventorySlots;
 					int fromStackRating = -1;
 					int missing = getMissingAmount(aiHelper,
-							getSlotContentCount(screen.inventorySlots
+							getSlotContentCount(screen.getContainer()
 									.getSlot(getToStack(aiHelper))));
 					for (int i = 0; i < inventorySlots.size() - 36; i++) {
 						Slot inventorySlot = inventorySlots.get(i);

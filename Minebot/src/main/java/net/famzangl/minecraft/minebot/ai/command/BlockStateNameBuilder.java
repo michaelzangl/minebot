@@ -16,17 +16,15 @@
  *******************************************************************************/
 package net.famzangl.minecraft.minebot.ai.command;
 
+import com.mojang.brigadier.StringReader;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.command.AICommandParameter.BlockFilter;
-import net.minecraft.block.Block;
-import net.minecraft.state.IProperty;
+import net.minecraft.block.BlockState;
+import net.minecraft.command.arguments.BlockStateParser;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.stream.Stream;
 
 public class BlockStateNameBuilder extends ParameterBuilder {
 
@@ -59,9 +57,9 @@ public class BlockStateNameBuilder extends ParameterBuilder {
 			@Override
 			public boolean couldEvaluateAgainst(String string) {
 				try {
-					Block block = CommandBase.getBlockByText(null, string);
-					return blockFilter.matches(new BlockWithDontcare(block));
-				} catch (NumberInvalidException e) {
+					BlockState blockState = parseArgument(string);
+					return blockFilter.matches(blockState);
+				} catch (CommandSyntaxException e) {
 					return false;
 				}
 			}
@@ -69,14 +67,16 @@ public class BlockStateNameBuilder extends ParameterBuilder {
 			@Override
 			public void getTabCompleteOptions(String currentStart,
 					Collection<String> addTo) {
-				Block.REGISTRY.getKeys()
+				// TODO
+				/*Block.REGISTRY.getKeys()
 					.stream()
 					.filter(name -> blockFilter.matches(new BlockWithDontcare(Block.REGISTRY.getObject(name))))
 					.map(Object::toString)
 					.filter(name -> name.startsWith(currentStart))
-					.forEach(addTo::add);
+					.forEach(addTo::add);*/
 			}
 		});
+		/* TODO
 		list.add(new ArgumentDefinition("Meta", "Meta value for that block, '" + DEFAULT_STATE + "' for default") {
 
 			public boolean couldEvaluateAgainst(List<String> previousArguments, String string) {
@@ -137,23 +137,19 @@ public class BlockStateNameBuilder extends ParameterBuilder {
 						.map(value -> property.getName(value));
 			}
 		});
-		
+		*/
+	}
+
+	private BlockState parseArgument(String string) throws CommandSyntaxException {
+		BlockStateParser state = new BlockStateParser(new StringReader(string), false).parse(false);
+		return state.getState();
 	}
 
 	@Override
 	public Object getParameter(AIHelper helper, String[] arguments) {
 		try {
-			Block block = CommandBase.getBlockByText(null, arguments[0]);
-			if (DEFAULT_STATE.equals(arguments[1])) {
-				return block.getDefaultState();
-			} else {
-				return CommandFill.convertArgToBlockState(block, arguments[1]);
-			}
-			
-		} catch (NumberInvalidException e) {
-			// Should not happen - we have an arg def for this
-			throw new RuntimeException(e);
-		} catch (InvalidBlockStateException e) {
+			return parseArgument(arguments[0]);
+		} catch (CommandSyntaxException e) {
 			// Should not happen - we have an arg def for this
 			throw new RuntimeException(e);
 		}

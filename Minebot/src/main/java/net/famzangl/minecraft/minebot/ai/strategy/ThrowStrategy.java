@@ -19,9 +19,9 @@ package net.famzangl.minecraft.minebot.ai.strategy;
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.ClassItemFilter;
 import net.famzangl.minecraft.minebot.ai.ItemFilter;
+import net.minecraft.item.ExperienceBottleItem;
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemExpBottle;
-import net.minecraft.item.ItemSnowball;
+import net.minecraft.item.SnowballItem;
 
 public class ThrowStrategy extends AIStrategy{
 	
@@ -32,7 +32,7 @@ public class ThrowStrategy extends AIStrategy{
 	private boolean failed;
 
 	public enum ThrowableThing {
-		SNOWBALL(ItemSnowball.class), XPBOTTLE(ItemExpBottle.class);
+		SNOWBALL(SnowballItem.class), XPBOTTLE(ExperienceBottleItem.class);
 		
 		private final Class<? extends Item> itemClass;
 

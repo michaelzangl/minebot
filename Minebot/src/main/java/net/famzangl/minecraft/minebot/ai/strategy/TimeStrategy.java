@@ -34,7 +34,7 @@ public abstract class TimeStrategy extends AIStrategy {
 	 * @return 0 or more.
 	 */
 	protected long getTimeElapsed(AIHelper helper) {
-		long time = helper.getMinecraft().world.getTotalWorldTime();
+		long time = helper.getMinecraft().world.getGameTime();
 		if (startTime < 0) {
 			startTime = time;
 			return 0;

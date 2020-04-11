@@ -52,8 +52,6 @@ import java.util.stream.Stream;
  *
  */
 public class TreePathFinder extends MovePathFinder {
-	private static final BlockSet TREE_STUFF = BlockSets.LEAVES
-			.unionWith(BlockSets.LOGS);
 	
 	private static class PrefaceBarrier extends AITask {
 
@@ -331,8 +329,8 @@ public class TreePathFinder extends MovePathFinder {
 		this.type = type;
 		this.replant = replant;
 		this.logs = type == null ? BlockSets.LOGS : type.getLogBlocks();
-		shortFootBlocks = shortFootBlocks.unionWith(BlockSets.LEAVES);
-		shortHeadBlocks = shortHeadBlocks.unionWith(BlockSets.LEAVES);
+		shortFootBlocks = BlockSet.builder().add(shortFootBlocks).add(BlockSets.LEAVES).build();
+		shortHeadBlocks = BlockSet.builder().add(shortHeadBlocks).add(BlockSets.LEAVES).build();
 	}
 
 	private static final int TREE_HEIGHT = 7;

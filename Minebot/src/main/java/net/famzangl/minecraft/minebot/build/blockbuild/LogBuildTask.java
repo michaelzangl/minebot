@@ -17,13 +17,13 @@
 package net.famzangl.minecraft.minebot.build.blockbuild;
 
 import net.famzangl.minecraft.minebot.ai.BlockItemFilter;
-import net.famzangl.minecraft.minebot.ai.command.BlockWithDataOrDontcare;
-import net.famzangl.minecraft.minebot.ai.path.world.BlockMetaSet;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSet;
+import net.famzangl.minecraft.minebot.ai.path.world.BlockSets;
 import net.famzangl.minecraft.minebot.ai.path.world.Pos;
 import net.famzangl.minecraft.minebot.build.block.LogItemFilter;
 import net.famzangl.minecraft.minebot.build.block.WoodType;
 import net.famzangl.minecraft.minebot.build.block.WoodType.LogDirection;
+import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
 
 /**
@@ -33,14 +33,7 @@ import net.minecraft.util.math.BlockPos;
  *
  */
 public class LogBuildTask extends BlockBuildTask {
-	public static final BlockSet NORMAL_LOGS;
-	static {
-		BlockMetaSet logs = new BlockMetaSet();
-		for (LogDirection d : LogDirection.values()) {
-			logs = logs.unionWith(d.blocks);
-		}
-		NORMAL_LOGS = logs;
-	}
+	public static final BlockSet NORMAL_LOGS = BlockSets.LOGS;
 	public static final BlockPos[] UP_DOWN_POS = new BlockPos[] { Pos.ZERO };
 	public static final BlockPos[] NORTH_SOUTH_POS = new BlockPos[] {
 			new BlockPos(0, 1, 1), new BlockPos(0, 1, -1) };
@@ -48,7 +41,7 @@ public class LogBuildTask extends BlockBuildTask {
 			new BlockPos(1, 1, 0), new BlockPos(-1, 1, 0) };
 
 	public LogBuildTask(BlockPos forPosition,
-			BlockWithDataOrDontcare blockWithMeta) {
+			BlockState blockWithMeta) {
 		super(forPosition, blockWithMeta);
 	}
 
@@ -75,6 +68,6 @@ public class LogBuildTask extends BlockBuildTask {
 		LogDirection oldDir = LogDirection.forData(blockToPlace);
 		LogDirection newDir = rotateSteps % 2 == 0 ? oldDir : oldDir.rotateY();
 		WoodType wt = WoodType.getFor(blockToPlace);
-		return new LogBuildTask(add, wt.getBlockWithMeta(newDir));
+		return new LogBuildTask(add, wt.getBlockState(newDir));
 	}
 }

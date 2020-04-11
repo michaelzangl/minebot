@@ -19,17 +19,17 @@ package net.famzangl.minecraft.minebot.build.blockbuild;
 import net.famzangl.minecraft.minebot.ai.ClassItemFilter;
 import net.famzangl.minecraft.minebot.ai.ItemFilter;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSet;
+import net.famzangl.minecraft.minebot.ai.path.world.BlockSets;
 import net.famzangl.minecraft.minebot.ai.task.AITask;
 import net.famzangl.minecraft.minebot.ai.task.place.SignPlaceOnGroundTask;
-import net.minecraft.block.Blocks;
-import net.minecraft.item.ItemSign;
+import net.minecraft.item.SignItem;
 import net.minecraft.util.math.BlockPos;
 
 import java.util.Arrays;
 
 public class StandingSignBuildTask extends BuildFlatOnGroundTask {
 
-	public static final BlockSet BLOCKS = new BlockSet(Blocks.STANDING_SIGN);
+	public static final BlockSet BLOCKS = BlockSets.SIGN;
 	
 	private final SignDirection direction;
 
@@ -62,7 +62,7 @@ public class StandingSignBuildTask extends BuildFlatOnGroundTask {
 
 	@Override
 	public ItemFilter getRequiredItem() {
-		return new ClassItemFilter(ItemSign.class);
+		return new ClassItemFilter(SignItem.class);
 	}
 
 	@Override

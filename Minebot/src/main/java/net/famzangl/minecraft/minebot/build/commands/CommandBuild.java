@@ -34,7 +34,7 @@ import net.famzangl.minecraft.minebot.build.ForBuildPathFinder;
 import net.famzangl.minecraft.minebot.build.NextTaskTask;
 import net.famzangl.minecraft.minebot.build.blockbuild.BuildTask;
 import net.minecraft.util.math.BlockPos;
-import net.minecraftforge.fml.common.gameevent.TickEvent.RenderTickEvent;
+import net.minecraftforge.event.TickEvent;
 
 import java.util.List;
 
@@ -126,7 +126,7 @@ public class CommandBuild {
 		}
 
 		@Override
-		public void drawMarkers(RenderTickEvent event, AIHelper helper) {
+		public void drawMarkers(TickEvent.RenderTickEvent event, AIHelper helper) {
 			renderer.render(event, helper, positions);
 		}
 

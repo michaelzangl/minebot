@@ -38,7 +38,6 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.FenceBlock;
 import net.minecraft.block.FenceGateBlock;
 import net.minecraft.block.SlabBlock;
-import net.minecraft.block.WallBannerBlock;
 import net.minecraft.block.WallBlock;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
@@ -156,7 +155,7 @@ public abstract class AIHelper {
 	}
 
 	public static File getMinebotDir() {
-		File dir = new File(mc.mcDataDir, "minebot");
+		File dir = new File(mc.gameDir, "minebot");
 		if (!dir.exists()) {
 			dir.mkdir();
 		}
@@ -229,9 +228,21 @@ public abstract class AIHelper {
 	 * @param pos
 	 * @return
 	 */
+	@Deprecated
 	public Block getBlock(BlockPos pos) {
 		// TODO: Warn that no delta is used.
 		return getBlock(pos.getX(), pos.getY(), pos.getZ());
+	}
+
+	/**
+	 * Gets the real current block at that position.
+	 *
+	 * @param pos
+	 * @return
+	 */
+	public BlockState getBlockState(BlockPos pos) {
+		// TODO: Warn that no delta is used.
+		return getMinecraft().world.getBlockState(pos);
 	}
 
 	/**
@@ -244,7 +255,12 @@ public abstract class AIHelper {
 	 */
 	public Block getBlock(int x, int y, int z) {
 		// TODO: Warn that no delta is used.
-		return getMinecraft().world.getBlockState(new BlockPos(x, y, z)).getBlock();
+		return getBlockState(x, y, z).getBlock();
+	}
+
+	public BlockState getBlockState(int x, int y, int z) {
+		// TODO: Warn that no delta is used.
+		return getBlockState(new BlockPos(x, y, z));
 	}
 
 	public WorldData getWorld() {
@@ -404,7 +420,7 @@ public abstract class AIHelper {
 		if (!isFacingBlock(x, y, z, blockSide)) {
 			return false;
 		} else {
-			final double fy = getObjectMouseOver().hitVec.y - y;
+			final double fy = getObjectMouseOver().getHitVec().y - y;
 			return half != BlockHalf.LOWER_HALF && fy > .5
 					|| half != BlockHalf.UPPER_HALF && fy <= .5;
 		}
@@ -470,16 +486,16 @@ public abstract class AIHelper {
 				|| block instanceof WallBlock) {
 			maxY = 1.5;
 		} else if (block instanceof SlabBlock) {
-			final int blockMetadata = getWorld().getBlockIdWithMeta(x, y, z) & 0xf;
+			final int blockMetadata = getWorld().getBlockStateId(x, y, z) & 0xf;
 			maxY = (blockMetadata & 0x8) == 0 ? 0.5 : 1;
 		} else {
 			// TODO: Provide with the right block state
 			//Use BlockBoundsCache.getBounds(blockWithMeta);
-			try {
-				maxY = block.getBoundingBox(null, null, null).maxY;
-			}catch (NullPointerException e) {
+			// try {
+			// 	maxY = block.getDefaultState(null, null, null).maxY;
+			// }catch (NullPointerException e) {
 				maxY = 1;
-			}
+			// }
 		}
 
 		return y - 1 + maxY;
@@ -619,7 +635,7 @@ public abstract class AIHelper {
 		if (bestRatingSlot < 0 || bestRatingSlot >= 9) {
 			bestRatingSlot = 0;
 		}
-		int block = pos == null ? -1 : getWorld().getBlockIdWithMeta(pos);
+		int block = pos == null ? -1 : getWorld().getBlockStateId(pos);
 		float bestRating = rater.rateTool(
 				getMinecraft().player.inventory.getStackInSlot(bestRatingSlot), block);
 		for (int i = 0; i < 9; ++i) {
@@ -798,7 +814,7 @@ public abstract class AIHelper {
 	 * Presses the use item key in the next game tick.
 	 */
 	public void overrideUseItem() {
-		LOGGER.debug(MARKER_FACING, "Using item while facing " + getObjectMouseOver().getBlockPos());
+		LOGGER.debug(MARKER_FACING, "Using item while facing " + ((BlockRayTraceResult)getObjectMouseOver()).getPos());
 		overrideKey(KeyType.USE);
 	}
 
@@ -893,7 +909,7 @@ public abstract class AIHelper {
 		double mindist = Double.MAX_VALUE;
 		Entity found = null;
 		for (final Entity e : entities) {
-			final double mydist = e.getDistanceSqToEntity(getMinecraft().player);
+			final double mydist = e.getDistanceSq(getMinecraft().player);
 			if (mydist < mindist) {
 				found = e;
 				mindist = mydist;
@@ -970,7 +986,7 @@ public abstract class AIHelper {
 		boolean arrived = distTo > MIN_DISTANCE_ERROR;
 		if (arrived) {
 			if (face) {
-				face(x, getMinecraft().player.getEyeHeight() + getMinecraft().player.posY, z, 1,
+				face(x, getMinecraft().player.getEyeHeight() + getMinecraft().player.getPosY(), z, 1,
 						.1f);
 			}
 			double speed = 1;
@@ -1059,7 +1075,7 @@ public abstract class AIHelper {
 	public static Direction getDirectionForXZ(int x, int z) {
 		if (x != 0 || z != 0) {
 			for (final Direction d : Direction.values()) {
-				if (d.getXOffset() == x && d.getFrontOffsetZ() == z) {
+				if (d.getXOffset() == x && d.getZOffset() == z) {
 					return d;
 				}
 			}

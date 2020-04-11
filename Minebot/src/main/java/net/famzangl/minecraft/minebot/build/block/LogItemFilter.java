@@ -35,12 +35,6 @@ public class LogItemFilter extends BlockItemFilter {
 	}
 
 	@Override
-	public boolean matches(ItemStack itemStack) {
-		return super.matches(itemStack)
-				&& (itemStack.getItemDamage() & 3) == logType.lowerBits;
-	}
-
-	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = super.hashCode();

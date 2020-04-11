@@ -4,7 +4,7 @@ import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.strategy.TintStrategy;
 import net.famzangl.minecraft.minebot.ai.task.inventory.PutItemInContainerTask;
 import net.minecraft.client.gui.screen.EnchantmentScreen;
-import net.minecraft.inventory.Slot;
+import net.minecraft.inventory.container.Slot;
 import net.minecraft.item.DyeColor;
 import net.minecraft.item.ItemStack;
 
@@ -22,7 +22,7 @@ public class PutLapisInTableTask extends PutItemInContainerTask {
 	protected int getStackToPut(AIHelper aiHelper) {
 		final EnchantmentScreen screen = (EnchantmentScreen) aiHelper.getMinecraft().currentScreen;
 		for (int i = TABLE_INV_OFFSET; i < 9 * 4 + TABLE_INV_OFFSET; i++) {
-			final Slot slot = screen.inventorySlots.getSlot(i);
+			Slot slot = screen.getContainer().getSlot(i);
 			if (slot == null || !slot.canTakeStack(aiHelper.getMinecraft().player)) {
 				continue;
 			}

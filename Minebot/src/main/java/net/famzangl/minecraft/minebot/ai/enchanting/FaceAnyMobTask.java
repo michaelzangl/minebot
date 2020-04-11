@@ -22,7 +22,7 @@ import net.famzangl.minecraft.minebot.ai.task.AITask;
 import net.famzangl.minecraft.minebot.ai.task.TaskOperations;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLiving;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.util.math.AxisAlignedBB;
 
 import java.util.List;
@@ -33,7 +33,7 @@ public class FaceAnyMobTask extends AITask {
 		@Override
 		public boolean apply(Entity var1) {
 			// TODO: better filter
-			return var1 instanceof EntityLiving;
+			return var1 instanceof LivingEntity;
 		}
 	}
 

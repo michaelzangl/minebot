@@ -20,13 +20,17 @@ import com.google.common.collect.ImmutableList;
 import com.mojang.blaze3d.platform.GlStateManager;
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.minecraft.client.renderer.BufferBuilder;
+import net.minecraft.client.renderer.Matrix4f;
 import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.Vector3f;
 import net.minecraft.client.renderer.vertex.VertexFormat;
 import net.minecraft.client.renderer.vertex.VertexFormatElement;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.event.TickEvent;
 import org.lwjgl.opengl.GL11;
+
+import java.util.Vector;
 
 /**
  * Helps rendering markers.
@@ -36,13 +40,14 @@ import org.lwjgl.opengl.GL11;
  */
 public class RenderHelper {
 
-	private static final double MAX = 1.05;
-	private static final double MIN = -0.05;
+	private static final float MAX = 1.05f;
+	private static final float MIN = -0.05f;
 
     public static final VertexFormat VF = new VertexFormat(ImmutableList.of(
     				new VertexFormatElement(0, VertexFormatElement.Type.FLOAT, VertexFormatElement.Usage.POSITION, 3),
         	new VertexFormatElement(0, VertexFormatElement.Type.UBYTE, VertexFormatElement.Usage.COLOR, 4)
 	));
+	private Matrix4f matrix;
 
 	public void renderStart(TickEvent.RenderTickEvent event, AIHelper helper) {
 		final Entity player = helper.getMinecraft().getRenderViewEntity();
@@ -59,41 +64,26 @@ public class RenderHelper {
 		preRender();
         Tessellator tessellator = Tessellator.getInstance();
         BufferBuilder worldrenderer = tessellator.getBuffer();
-        worldrenderer.setTranslation(-x, -y, -z);
+        matrix = new Matrix4f();
+        matrix.translate(new Vector3f((float)-x, (float)-y, (float)-z));
         worldrenderer.begin(GL11.GL_QUADS, VF);
        // worldrenderer.markDirty();
 	}
 
     private void preRender()
     {
-        GlStateManager.disableTexture2D();
-        GlStateManager.enableBlend();
-        GlStateManager.tryBlendFuncSeparate(GL11.GL_DST_COLOR, GL11.GL_SRC_COLOR, 1, 0);
+    	// TODO: See net.minecraft.client.renderer.WorldRenderer.renderWorldBorder
 
-        GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-        GlStateManager.doPolygonOffset(-3.0F, -3.0F);
-        GlStateManager.enablePolygonOffset();
-        GlStateManager.alphaFunc(516, 0.1F);
-        GlStateManager.enableAlpha();
-        GlStateManager.pushMatrix();
     }
 
     private void postRender()
     {
-        GlStateManager.disableAlpha();
-        GlStateManager.doPolygonOffset(0.0F, 0.0F);
-        GlStateManager.disablePolygonOffset();
-        GlStateManager.enableAlpha();
-        GlStateManager.depthMask(true);
-        GlStateManager.popMatrix();
-        GlStateManager.disableBlend();
-        GlStateManager.enableTexture2D();
+    	// TODO …
     }
 	protected void renderEnd() {
 		final Tessellator tessellator = Tessellator.getInstance();
 		BufferBuilder worldrenderer = tessellator.getBuffer();
 		tessellator.draw();
-		worldrenderer.setTranslation(0.0D, 0.0D, 0.0D);
 		postRender();
 	}
 
@@ -105,34 +95,34 @@ public class RenderHelper {
 	}
 
 	private void renderMarkerP(BufferBuilder worldRenderer, int x, int y, int z) {
-		worldRenderer.pos(x + MIN, y + MAX, z + MIN);
-		worldRenderer.pos(x + MIN, y + MAX, z + MAX);
-		worldRenderer.pos(x + MAX, y + MAX, z + MAX);
-		worldRenderer.pos(x + MAX, y + MAX, z + MIN);
+		worldRenderer.pos(matrix, x + MIN, y + MAX, z + MIN).endVertex();
+		worldRenderer.pos(matrix, x + MIN, y + MAX, z + MAX).endVertex();;
+		worldRenderer.pos(matrix, x + MAX, y + MAX, z + MAX).endVertex();;
+		worldRenderer.pos(matrix, x + MAX, y + MAX, z + MIN).endVertex();;
 
-		worldRenderer.pos(x + MIN, y + MIN, z + MIN);
-		worldRenderer.pos(x + MIN, y + MIN, z + MAX);
-		worldRenderer.pos(x + MIN, y + MAX, z + MAX);
-		worldRenderer.pos(x + MIN, y + MAX, z + MIN);
+		worldRenderer.pos(matrix, x + MIN, y + MIN, z + MIN).endVertex();;
+		worldRenderer.pos(matrix, x + MIN, y + MIN, z + MAX).endVertex();;
+		worldRenderer.pos(matrix, x + MIN, y + MAX, z + MAX).endVertex();;
+		worldRenderer.pos(matrix, x + MIN, y + MAX, z + MIN).endVertex();;
 
-		worldRenderer.pos(x + MAX, y + MAX, z + MIN);
-		worldRenderer.pos(x + MAX, y + MAX, z + MAX);
-		worldRenderer.pos(x + MAX, y + MIN, z + MAX);
-		worldRenderer.pos(x + MAX, y + MIN, z + MIN);
+		worldRenderer.pos(matrix, x + MAX, y + MAX, z + MIN).endVertex();;
+		worldRenderer.pos(matrix, x + MAX, y + MAX, z + MAX).endVertex();;
+		worldRenderer.pos(matrix, x + MAX, y + MIN, z + MAX).endVertex();;
+		worldRenderer.pos(matrix, x + MAX, y + MIN, z + MIN).endVertex();;
 
-		worldRenderer.pos(x + MIN, y + MIN, z + MIN);
-		worldRenderer.pos(x + MIN, y + MAX, z + MIN);
-		worldRenderer.pos(x + MAX, y + MAX, z + MIN);
-		worldRenderer.pos(x + MAX, y + MIN, z + MIN);
+		worldRenderer.pos(matrix, x + MIN, y + MIN, z + MIN).endVertex();;
+		worldRenderer.pos(matrix, x + MIN, y + MAX, z + MIN).endVertex();;
+		worldRenderer.pos(matrix, x + MAX, y + MAX, z + MIN).endVertex();;
+		worldRenderer.pos(matrix, x + MAX, y + MIN, z + MIN).endVertex();;
 
-		worldRenderer.pos(x + MIN, y + MAX, z + MAX);
-		worldRenderer.pos(x + MIN, y + MIN, z + MAX);
-		worldRenderer.pos(x + MAX, y + MIN, z + MAX);
-		worldRenderer.pos(x + MAX, y + MAX, z + MAX);
+		worldRenderer.pos(matrix, x + MIN, y + MAX, z + MAX).endVertex();;
+		worldRenderer.pos(matrix, x + MIN, y + MIN, z + MAX).endVertex();;
+		worldRenderer.pos(matrix, x + MAX, y + MIN, z + MAX).endVertex();;
+		worldRenderer.pos(matrix, x + MAX, y + MAX, z + MAX).endVertex();;
 
-		worldRenderer.pos(x + MIN, y + MIN, z + MAX);
-		worldRenderer.pos(x + MIN, y + MIN, z + MIN);
-		worldRenderer.pos(x + MAX, y + MIN, z + MIN);
-		worldRenderer.pos(x + MAX, y + MIN, z + MAX);
+		worldRenderer.pos(matrix, x + MIN, y + MIN, z + MAX).endVertex();;
+		worldRenderer.pos(matrix, x + MIN, y + MIN, z + MIN).endVertex();;
+		worldRenderer.pos(matrix, x + MAX, y + MIN, z + MIN).endVertex();;
+		worldRenderer.pos(matrix, x + MAX, y + MIN, z + MAX).endVertex();;
 	}
 }

@@ -20,9 +20,9 @@ import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.task.AITask;
 import net.famzangl.minecraft.minebot.ai.task.TaskOperations;
 import net.famzangl.minecraft.minebot.ai.task.error.StringTaskError;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.inventory.ClickType;
-import net.minecraft.inventory.Slot;
+import net.minecraft.client.gui.screen.inventory.ContainerScreen;
+import net.minecraft.inventory.container.ClickType;
+import net.minecraft.inventory.container.Slot;
 import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.MarkerManager;
 
@@ -81,7 +81,7 @@ public abstract class MoveInInventoryTask extends AITask {
 
 	@Override
 	public void runTick(AIHelper aiHelper, TaskOperations taskOperations) {
-		final Screen screen = aiHelper.getMinecraft().currentScreen;
+		final ContainerScreen<?> screen = (ContainerScreen<?>) aiHelper.getMinecraft().currentScreen;
 		if (screen == null) {
 			taskOperations.desync(new StringTaskError("Expected container to be open"));
 			return;
@@ -96,18 +96,18 @@ public abstract class MoveInInventoryTask extends AITask {
 			int toStack = getToStack(aiHelper);
 			if (fromStack < 0
 					|| toStack < 0
-					|| fromStack >= screen.inventorySlots.inventoryItemStacks
+					|| fromStack >= screen.getContainer().inventorySlots
 							.size()
-					|| toStack >= screen.inventorySlots.inventoryItemStacks
+					|| toStack >= screen.getContainer().inventorySlots
 							.size()) {
 				LOGGER.error("Attempt to move : " + fromStack + " -> "
 						+ toStack);
 				taskOperations.desync(new StringTaskError("Invalid item move specification."));
 				return;
 			}
-			Slot from = screen.inventorySlots.getSlot(fromStack);
+			Slot from = screen.getContainer().getSlot(fromStack);
 
-			Slot to = screen.inventorySlots.getSlot(toStack);
+			Slot to = screen.getContainer().getSlot(toStack);
 			
 			int amount = getMissingAmount(aiHelper, getSlotContentCount(to));
 
@@ -205,9 +205,9 @@ public abstract class MoveInInventoryTask extends AITask {
 			int clickKey = getClickKey();
 			ClickType clickType = getClickType();
 			LOGGER.trace(MARKER_MOVE, "Click on " + slotNumber + " using " + clickKey + "," + clickType);
-			final ContainerScreen screen = (ContainerScreen) aiHelper.getMinecraft().currentScreen;
+			final ContainerScreen<?> screen = (ContainerScreen<?>) aiHelper.getMinecraft().currentScreen;
 			aiHelper.getMinecraft().playerController.windowClick(
-					screen.inventorySlots.windowId, slotNumber, clickKey, clickType,
+					screen.getContainer().windowId, slotNumber, clickKey, clickType,
 					aiHelper.getMinecraft().player);
 		}
 

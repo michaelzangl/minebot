@@ -18,21 +18,25 @@ package net.famzangl.minecraft.minebot;
 
 import net.famzangl.minecraft.minebot.ai.AIController;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockBoundsCache;
-import net.minecraftforge.fml.common.FMLCommonHandler;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.common.Mod.EventHandler;
-import net.minecraftforge.fml.common.Mod.Instance;
-import net.minecraftforge.fml.common.event.FMLInitializationEvent;
+import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
+import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.core.LoggerContext;
 import org.apache.logging.log4j.core.config.Configuration;
 
 import java.net.URISyntaxException;
 
-@Mod(modid = "minebot-mod", name = "Minebot", version = "0.4")
+@Mod("minebot-mod")
 public class MinebotMod {
-	@Instance(value = "minebot-mod")
 	public static MinebotMod instance;
+
+	public MinebotMod() {
+		instance = this;
+		FMLJavaModLoadingContext.get().getModEventBus().addListener(this::init);
+	}
 	
 	static {
 		// logging
@@ -49,16 +53,17 @@ public class MinebotMod {
 	}
 	
 	// Note: 6364136223846793005L * 0xc097ef87329e28a5l = 1
-	
-	@EventHandler
-	public void init(FMLInitializationEvent event) {
+
+	public void init(FMLCommonSetupEvent event) {
 		BlockBoundsCache.initialize();
-		FMLCommonHandler.instance().bus().register(new PlayerUpdateHandler());
+		FMLJavaModLoadingContext.get().getModEventBus().addListener(new PlayerUpdateHandler()::onPlayerTick);
 		final AIController controller = new AIController();
 		controller.initialize();
 	}
 
 	public static String getVersion() {
-		return MinebotMod.class.getAnnotation(Mod.class).version();
+		// TODO: Get version
+		return "TODO";
+		//return MinebotMod.class.getAnnotation(Mod.class).version();
 	}
 }

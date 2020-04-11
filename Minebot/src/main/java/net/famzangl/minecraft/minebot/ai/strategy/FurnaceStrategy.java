@@ -33,8 +33,8 @@ import net.famzangl.minecraft.minebot.ai.task.error.StringTaskError;
 import net.famzangl.minecraft.minebot.ai.task.inventory.ItemWithSubtype;
 import net.famzangl.minecraft.minebot.ai.task.inventory.MoveInInventoryTask;
 import net.famzangl.minecraft.minebot.ai.task.inventory.TakeResultItem;
-import net.minecraft.client.gui.ScreenScreen;
-import net.minecraft.client.gui.inventory.FurnaceScreen;
+import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.screen.inventory.FurnaceScreen;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
@@ -182,7 +182,7 @@ public class FurnaceStrategy extends PathFinderStrategy {
 
 			@Override
 			protected void runOnce(AIHelper aiHelper, TaskOperations taskOperations) {
-				ScreenScreen gui = aiHelper.getMinecraft().currentScreen;
+				Screen gui = aiHelper.getMinecraft().currentScreen;
 				if (!(gui instanceof FurnaceScreen)) {
 					taskOperations.desync(new StringTaskError("No furnace open"));
 				} else {

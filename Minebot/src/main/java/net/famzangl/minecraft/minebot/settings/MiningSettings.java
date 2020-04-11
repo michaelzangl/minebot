@@ -42,8 +42,8 @@ public class MiningSettings {
 		factorMap.setBlock(Blocks.EMERALD_ORE, 5);
 		pointsMap.setBlock(Blocks.EMERALD_ORE, 5);
 
-		factorMap.setBlock(Blocks.QUARTZ_ORE, 1);
-		pointsMap.setBlock(Blocks.QUARTZ_ORE, 0);
+		factorMap.setBlock(Blocks.NETHER_QUARTZ_ORE, 1);
+		pointsMap.setBlock(Blocks.NETHER_QUARTZ_ORE, 0);
 
 		factorMap.setBlock(Blocks.GLOWSTONE, 2);
 		pointsMap.setBlock(Blocks.GLOWSTONE, 0);

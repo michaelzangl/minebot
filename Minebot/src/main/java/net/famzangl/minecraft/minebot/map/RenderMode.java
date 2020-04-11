@@ -17,11 +17,11 @@ import java.util.Hashtable;
 public enum RenderMode {
 	UNDERGROUND(new UndergroundRenderer(), "-underground"), MAP(
 			new MapRenderer(), ""), BIOME(new BiomeRenderer(), "-biome");
-	private static final BlockSet GLOBAL_COVER_BLACKLIST = new BlockSet(
+	private static final BlockSet GLOBAL_COVER_BLACKLIST = BlockSet.builder().add(
 			Blocks.STONE_SLAB,
 			Blocks.AIR)
-			.unionWith(BlockSets.WOODEN_SLAB);
-	private static final BlockSet IGNORED_COVER_BLOCKS = new BlockSet(
+			.add(BlockSets.WOODEN_SLAB).build();
+	private static final BlockSet IGNORED_COVER_BLOCKS = BlockSet.builder().add(
 			Blocks.AIR,
 			Blocks.TORCH, 
 			Blocks.WATER, 
@@ -29,27 +29,29 @@ public enum RenderMode {
 			Blocks.LAVA, 
 			Blocks.SNOW,
 			Blocks.ICE)
-			.unionWith(GLOBAL_COVER_BLACKLIST)
-			.unionWith(BlockSets.LEAVES)
-			.unionWith(BlockSets.LOGS);
-	private static final BlockSet UNDERGROUND_BLOCKS = new BlockSet(
-			Blocks.AIR,
-			Blocks.TORCH);
-	private static final BlockSet STRUCTURE_BLOCKS = new BlockSet(
+			.add(GLOBAL_COVER_BLACKLIST)
+			.add(BlockSets.LEAVES)
+			.add(BlockSets.LOGS).build();
+	private static final BlockSet UNDERGROUND_BLOCKS = BlockSet.builder().add(
+			Blocks.AIR)
+			.add(BlockSets.TORCH)
+			.build();
+	private static final BlockSet STRUCTURE_BLOCKS = BlockSet.builder().add(
 			Blocks.OAK_FENCE, 
 			Blocks.END_PORTAL_FRAME,
 			Blocks.END_STONE,
 			Blocks.BOOKSHELF, 
 			Blocks.PRISMARINE, 
 			Blocks.NETHER_BRICKS,
-			Blocks.NETHER_WART,
-			Blocks.TORCH)
-			.unionWith(BlockSets.PLANKS);
-	private static final BlockSet INTERESTING_BLOCKS = new BlockSet(
+			Blocks.NETHER_WART)
+			.add(BlockSets.TORCH)
+			.add(BlockSets.PLANKS)
+			.build();
+	private static final BlockSet INTERESTING_BLOCKS = BlockSet.builder().add(
 			Blocks.CHEST,
 			Blocks.TRAPPED_CHEST,
 			Blocks.SPAWNER,
-			Blocks.GOLD_BLOCK);
+			Blocks.GOLD_BLOCK).build();
 
 	private interface IRenderer {
 		/**
@@ -100,7 +102,7 @@ public enum RenderMode {
 			do {
 				--height;
 				state = chunk.getBlockState(new BlockPos(dx, height, dz));
-			} while ((GLOBAL_COVER_BLACKLIST.contains(state.getBlock()) || state
+			} while ((GLOBAL_COVER_BLACKLIST.contains(state) || state
 					.getBlock().getMaterialColor(state, world.getBackingWorld(), new BlockPos(dx, height, dz)) == MaterialColor.AIR)
 					&& height > 0);
 

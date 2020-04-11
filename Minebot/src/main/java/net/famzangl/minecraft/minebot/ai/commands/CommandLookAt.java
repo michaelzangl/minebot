@@ -28,9 +28,9 @@ public class CommandLookAt {
 			@AICommandParameter(type = ParameterType.FIXED, fixedName = "look", description = "") String nameArg,
 			@AICommandParameter(type = ParameterType.ENUM, description = "direction") Direction direction) {
 		Vec3d offset = new Vec3d(direction.getXOffset(),
-				direction.getFrontOffsetY()
+				direction.getYOffset()
 						+ helper.getMinecraft().player.getEyeHeight(),
-				direction.getFrontOffsetZ());
+				direction.getZOffset());
 		return run(helper,
 				helper.getWorld().getExactPlayerPosition().add(offset));
 	}

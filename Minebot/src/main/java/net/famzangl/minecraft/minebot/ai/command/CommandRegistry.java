@@ -16,6 +16,9 @@
  *******************************************************************************/
 package net.famzangl.minecraft.minebot.ai.command;
 
+import com.mojang.brigadier.context.StringRange;
+import com.mojang.brigadier.suggestion.Suggestion;
+import com.mojang.brigadier.suggestion.Suggestions;
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.net.MinebotNetHandler;
 import net.famzangl.minecraft.minebot.ai.strategy.AIStrategy;
@@ -29,7 +32,8 @@ import net.famzangl.minecraft.minebot.ai.strategy.PlayerComesActionStrategy;
 import net.famzangl.minecraft.minebot.ai.strategy.StackStrategy;
 import net.famzangl.minecraft.minebot.ai.strategy.StrategyStack;
 import net.minecraft.network.ThreadQuickExitException;
-import net.minecraft.network.play.server.SPacketTabComplete;
+import net.minecraft.network.play.client.CTabCompletePacket;
+import net.minecraft.network.play.server.STabCompletePacket;
 import net.minecraft.util.math.BlockPos;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
@@ -46,6 +50,7 @@ import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class CommandRegistry {
 
@@ -207,20 +212,20 @@ public class CommandRegistry {
 		return asList;
 	}
 
-	public String[] fillTabComplete(MinebotNetHandler minebotNetHandler, String[] serverResponse,
+	public Suggestions fillTabComplete(MinebotNetHandler minebotNetHandler, Suggestions serverResponse,
 			String lastSendTabComplete) {
 		String command = getCommandId(lastSendTabComplete);
-		LinkedHashSet<String> res = new LinkedHashSet<String>();
+		LinkedHashSet<Suggestion> res = new LinkedHashSet<>();
 		for (String c : commandTable.keySet()) {
 			if (c.startsWith(command)) {
-				res.add("/" + c);
+				res.add(new Suggestion(serverResponse.getRange(), "/" + c));
 			}
 		}
 		if (res.isEmpty())
 			return serverResponse;
-		res.addAll(Arrays.asList(serverResponse));
-		
-		return res.toArray(new String[0]);
+		res.addAll(serverResponse.getList());
+
+		return new Suggestions(serverResponse.getRange(), new ArrayList<>(res));
 	}
 
 	public boolean interceptCommand(String m) {
@@ -253,7 +258,8 @@ public class CommandRegistry {
 		return commandId;
 	}
 
-	public boolean interceptTab(String m, final MinebotNetHandler respondTo) {
+	public boolean interceptTab(CTabCompletePacket in, final MinebotNetHandler respondTo) {
+		String m = in.getCommand();
 		if (!m.startsWith("/")) {
 			return false;
 		}
@@ -265,8 +271,12 @@ public class CommandRegistry {
 					+ combine(args));
 			List<String> options = addTabCompletionOptions(commandId, args,
 					null);
-			final SPacketTabComplete packet = new SPacketTabComplete(
-					options.toArray(new String[options.size()]));
+			final STabCompletePacket packet = new STabCompletePacket(
+					in.getTransactionId(),
+					new Suggestions(
+					new StringRange(0, 0),
+					options.stream().map(it -> new Suggestion(new StringRange(0, 0), it))
+					.collect(Collectors.toList())));
 			new Thread("Tab response") {
 				public void run() {
 					try {

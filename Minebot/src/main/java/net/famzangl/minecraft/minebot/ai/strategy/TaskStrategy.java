@@ -26,7 +26,7 @@ import net.famzangl.minecraft.minebot.ai.task.TaskOperations;
 import net.famzangl.minecraft.minebot.ai.task.error.StrategyDeactivatedError;
 import net.famzangl.minecraft.minebot.ai.task.error.StringTaskError;
 import net.famzangl.minecraft.minebot.ai.task.error.TaskError;
-import net.minecraftforge.fml.common.gameevent.TickEvent.RenderTickEvent;
+import net.minecraftforge.event.TickEvent;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.Marker;
@@ -215,7 +215,7 @@ public abstract class TaskStrategy extends AIStrategy implements
 	}
 	
 	@Override
-	public void drawMarkers(RenderTickEvent event, AIHelper helper) {
+	public void drawMarkers(TickEvent.RenderTickEvent event, AIHelper helper) {
 		AITask activeTask2 = activeTask;
 		if (activeTask2 != null) {
 			activeTask2.drawMarkers(event, helper);

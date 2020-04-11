@@ -29,10 +29,11 @@ import net.famzangl.minecraft.minebot.ai.task.FaceAndInteractTask;
 import net.famzangl.minecraft.minebot.ai.task.TaskOperations;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.passive.AnimalEntity;
-import net.minecraft.init.Items;
 import net.minecraft.item.DyeColor;
-import net.minecraft.item.ItemSeeds;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
+import net.minecraft.util.math.EntityRayTraceResult;
+import net.minecraft.util.math.RayTraceResult;
 
 public class FeedAnimalsStrategy extends TaskStrategy {
 
@@ -71,10 +72,13 @@ public class FeedAnimalsStrategy extends TaskStrategy {
 						@Override
 						public boolean matches(ItemStack itemStack) {
 							return itemStack == null
-									|| itemStack.getItem() == null
+									|| itemStack.isEmpty()
 									|| !(itemStack.getItem() == Items.WHEAT
-											|| itemStack.getItem() == Items.CARROT || itemStack
-											.getItem() instanceof ItemSeeds);
+											|| itemStack.getItem() == Items.CARROT
+									|| itemStack.getItem() == Items.BEETROOT_SEEDS
+									|| itemStack.getItem() == Items.MELON_SEEDS
+									|| itemStack.getItem() == Items.PUMPKIN_SEEDS
+									|| itemStack.getItem() == Items.WHEAT_SEEDS);
 						}
 					});
 					super.runTick(aiHelper, taskOperations);
@@ -82,13 +86,14 @@ public class FeedAnimalsStrategy extends TaskStrategy {
 
 				@Override
 				protected void doInteractWithCurrent(AIHelper aiHelper) {
-					final Entity over = aiHelper.getObjectMouseOver().entityHit;
-					if (over instanceof AnimalEntity
-							&& aiHelper.selectCurrentItem(new FilterFeedingItem(
-									(AnimalEntity) over))) {
-						super.doInteractWithCurrent(aiHelper);
-					} else if (found == over) {
-						interacted = true;
+					RayTraceResult rayTrace = aiHelper.getObjectMouseOver();
+					if (rayTrace instanceof EntityRayTraceResult) {
+						Entity over = ((EntityRayTraceResult) rayTrace).getEntity();
+						if (over instanceof AnimalEntity && aiHelper.selectCurrentItem(new FilterFeedingItem((AnimalEntity) over))) {
+							super.doInteractWithCurrent(aiHelper);
+						} else if (found == over) {
+							interacted = true;
+						}
 					}
 				}
 			});

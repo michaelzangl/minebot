@@ -30,7 +30,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.passive.SheepEntity;
 import net.minecraft.entity.passive.WolfEntity;
 import net.minecraft.item.DyeColor;
-import net.minecraft.item.ItemDye;
+import net.minecraft.item.DyeItem;
 import net.minecraft.item.ItemStack;
 
 public class TintStrategy extends TaskStrategy {
@@ -81,8 +81,8 @@ public class TintStrategy extends TaskStrategy {
 			// FIXME: Color id.
 			return itemStack != null
 					&& itemStack.getItem() != null
-					&& itemStack.getItem() instanceof ItemDye
-					&& (color == null || 15 - itemStack.getItemDamage() == color
+					&& itemStack.getItem() instanceof DyeItem
+					&& (color == null || 15 - itemStack.getDamage() == color
 							.ordinal());
 		}
 
@@ -97,7 +97,7 @@ public class TintStrategy extends TaskStrategy {
 		final ClientPlayerEntity owner = helper.getMinecraft().player;
 		// FIXME: Check.
 		final DyeColor holdingColor = DyeColor.values()[15 - owner.inventory
-				.getCurrentItem().getItemDamage()];
+				.getCurrentItem().getDamage()];
 		final Predicate<Entity> wolfSelector = new WolfSelector(owner);
 		final Predicate<Entity> sheepSelector = new SheepSelector();
 

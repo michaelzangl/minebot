@@ -17,7 +17,6 @@
 package net.famzangl.minecraft.minebot.ai.path;
 
 import net.famzangl.minecraft.minebot.ai.AIHelper;
-import net.famzangl.minecraft.minebot.ai.command.BlockWithDataOrDontcare;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSet;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSets;
 import net.famzangl.minecraft.minebot.ai.path.world.WorldData;
@@ -26,6 +25,7 @@ import net.famzangl.minecraft.minebot.ai.utils.BlockArea.AreaVisitor;
 import net.famzangl.minecraft.minebot.ai.utils.BlockCuboid;
 import net.famzangl.minecraft.minebot.ai.utils.BlockFilteredArea;
 import net.famzangl.minecraft.minebot.ai.utils.BlockIntersection;
+import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.util.math.BlockPos;
 
@@ -45,20 +45,20 @@ public class ClearAreaPathfinder extends MovePathFinder {
 	private final BlockCuboid area;
 	private ClearMode mode;
 
-	private static final BlockSet CLEARED_BLOCKS = new BlockSet(Blocks.AIR,
-			Blocks.TORCH);
+	private static final BlockSet CLEARED_BLOCKS = BlockSet.builder().add(Blocks.AIR,
+			Blocks.TORCH, Blocks.WALL_TORCH).build();
 
 	private final BlockSet clearedBlocks;
 
 	public ClearAreaPathfinder(BlockCuboid area,
-			BlockWithDataOrDontcare block, ClearMode mode) {
+							   BlockState block, ClearMode mode) {
 		this.area = area;
 		this.mode = mode;
 		topY = area.getMax().getY();
 		if (block == null) {
 			clearedBlocks = CLEARED_BLOCKS;
 		} else {
-			clearedBlocks = block.toBlockSet().invert();
+			clearedBlocks = BlockSet.builder().add(block).build().invert();
 		}
 	}
 

@@ -5,6 +5,7 @@ import net.famzangl.minecraft.minebot.ai.path.world.BlockSet;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSets;
 import net.famzangl.minecraft.minebot.ai.path.world.WorldData;
 import net.famzangl.minecraft.minebot.ai.utils.BlockArea;
+import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.util.math.BlockPos;
 
@@ -16,7 +17,7 @@ import net.minecraft.util.math.BlockPos;
  */
 public class DestroyLogInRange extends DestroyInRangeTask {
 
-	private static final BlockSet LEAVES_OR_LOGS = BlockSets.LEAVES.unionWith(BlockSets.LOGS).unionWith(new BlockSet(Blocks.VINE));
+	private static final BlockSet LEAVES_OR_LOGS = BlockSet.builder().add(BlockSets.LEAVES).add(BlockSets.LOGS).add(Blocks.VINE).build();
 
 	public DestroyLogInRange(BlockArea<WorldData> range) {
 		super(range);

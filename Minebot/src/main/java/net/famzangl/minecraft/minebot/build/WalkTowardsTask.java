@@ -24,7 +24,6 @@ import net.famzangl.minecraft.minebot.ai.task.AITask;
 import net.famzangl.minecraft.minebot.ai.task.TaskOperations;
 import net.famzangl.minecraft.minebot.ai.task.error.SelectTaskError;
 import net.famzangl.minecraft.minebot.ai.task.move.HorizontalMoveTask;
-import net.minecraft.block.Blocks;
 import net.minecraft.util.Direction;
 import net.minecraft.util.MovementInput;
 import net.minecraft.util.math.BlockPos;
@@ -41,10 +40,8 @@ import java.util.LinkedList;
  */
 public class WalkTowardsTask extends AITask {
 
-	private static final BlockSet CARPETS = new BlockSet(
-			Blocks.CARPET);
-
-	private static final BlockItemFilter CARPET = new BlockItemFilter(CARPETS);
+	private static final BlockItemFilter CARPET = new BlockItemFilter(BlockSets.CARPET);
+	public static final BlockSet AIR_OR_CARPET = BlockSet.builder().add(BlockSets.AIR).add(BlockSets.CARPET).build();
 	private final BlockPos fromPos;
 	private final BlockPos nextPos;
 	private final boolean placeCarpets;
@@ -140,10 +137,10 @@ public class WalkTowardsTask extends AITask {
 	 */
 	private int getUpperCarpetY(AIHelper aiHelper) {
 		int upperCarpet = -1;
-		for (int y = BlockSets.AIR.unionWith(CARPETS).isAt(aiHelper.getWorld(),
+		for (int y = AIR_OR_CARPET.isAt(aiHelper.getWorld(),
 				fromPos) ? fromPos.getY() : fromPos.getY() + 1; y < nextPos
 				.getY(); y++) {
-			if (CARPETS.contains(aiHelper.getBlock(fromPos.getX(), y, fromPos.getZ()))) {
+			if (BlockSets.CARPET.contains(aiHelper.getBlockState(fromPos.getX(), y, fromPos.getZ()))) {
 				upperCarpet = y;
 			} else {
 				break;

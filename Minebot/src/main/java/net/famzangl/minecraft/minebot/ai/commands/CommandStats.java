@@ -13,7 +13,6 @@ import net.minecraft.block.Blocks;
 
 @AICommand(helpText = "Dump all signs to a text file.", name = "minebot")
 public class CommandStats {
-	private static final BlockSet SIGNS = new BlockSet(Blocks.STANDING_SIGN, Blocks.WALL_SIGN);
 	@AICommandInvocation()
 	public static AIStrategy run(
 			AIHelper helper,

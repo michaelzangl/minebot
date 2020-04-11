@@ -66,7 +66,7 @@ public class CommandTunnel {
 
 		final BlockPos pos = helper.getPlayerPosition();
 		final TunnelPathFinder tunnel = new TunnelPathFinder(
-				inDirection.getXOffset(), inDirection.getFrontOffsetZ(),
+				inDirection.getXOffset(), inDirection.getZOffset(),
 				pos.getX(), pos.getY(), pos.getZ(), addToSide, addToTop,
 				torches, length);
 		return new PathFinderStrategy(tunnel, null) {

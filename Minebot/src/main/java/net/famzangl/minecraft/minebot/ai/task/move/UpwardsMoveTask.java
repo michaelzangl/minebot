@@ -42,8 +42,8 @@ public class UpwardsMoveTask extends JumpingPlaceBlockAtFloorTask {
 	/**
 	 * FIXME: Find a nice, central place for digging times.
 	 */
-	private static final BlockSet hardBlocks = new BlockSet(
-			Blocks.OBSIDIAN);
+	private static final BlockSet hardBlocks = BlockSet.builder().add(Blocks.OBSIDIAN).build();
+
 
 	public UpwardsMoveTask(BlockPos pos, ItemFilter filter) {
 		super(pos, filter);
@@ -55,7 +55,7 @@ public class UpwardsMoveTask extends JumpingPlaceBlockAtFloorTask {
 			if (!aiHelper.isStandingOn(pos.add(0, -1, 0))) {
 				taskOperations.desync(new PositionTaskError(pos.add(0, -1, 0)));
 			}
-			if (hardBlocks.contains(aiHelper.getBlock(pos.add(0, 1, 0)))) {
+			if (hardBlocks.contains(aiHelper.getBlockState(pos.add(0, 1, 0)))) {
 				obsidianMining = true;
 			}
 			aiHelper.faceAndDestroy(pos.add(0, 1, 0));

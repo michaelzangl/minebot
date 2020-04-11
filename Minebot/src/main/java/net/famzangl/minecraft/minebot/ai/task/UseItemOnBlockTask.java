@@ -18,7 +18,6 @@ package net.famzangl.minecraft.minebot.ai.task;
 
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSet;
-import net.minecraft.block.Block;
 import net.minecraft.util.math.BlockPos;
 
 
@@ -37,8 +36,7 @@ public abstract class UseItemOnBlockTask extends UseItemTask {
 
 	@Override
 	protected boolean isBlockAllowed(AIHelper aiHelper, BlockPos pos) {
-		final Block block = aiHelper.getBlock(pos);
-		return allowedBlocks.contains(block);
+		return allowedBlocks.contains(aiHelper.getBlockState(pos));
 	}
 
 }

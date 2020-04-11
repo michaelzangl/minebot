@@ -33,6 +33,6 @@ public class CommandEnchant {
 			AIHelper helper,
 			@AICommandParameter(type = ParameterType.FIXED, fixedName = "enchant", description = "") String nameArg,
 			@AICommandParameter(type = ParameterType.NUMBER, description = "Filter item id", optional = true) Integer itemId) {
-		return new EnchantStrategy(itemId == null ? null : new ItemWithSubtype(itemId, 0));
+		return new EnchantStrategy(itemId == null ? null : new ItemWithSubtype(itemId));
 	}
 }

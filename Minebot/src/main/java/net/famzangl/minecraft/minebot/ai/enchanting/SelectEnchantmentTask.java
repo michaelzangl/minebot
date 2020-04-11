@@ -21,9 +21,7 @@ import net.famzangl.minecraft.minebot.ai.task.AITask;
 import net.famzangl.minecraft.minebot.ai.task.TaskOperations;
 import net.famzangl.minecraft.minebot.ai.task.error.StringTaskError;
 import net.minecraft.client.gui.screen.EnchantmentScreen;
-import net.minecraft.inventory.ContainerEnchantment;
-
-import java.lang.reflect.Field;
+import net.minecraft.inventory.container.EnchantmentContainer;
 
 public class SelectEnchantmentTask extends AITask {
 
@@ -37,9 +35,9 @@ public class SelectEnchantmentTask extends AITask {
 			return false;
 		} else {
 			final EnchantmentScreen screen = (EnchantmentScreen) aiHelper.getMinecraft().currentScreen;
-			return screen.inventorySlots.getSlot(0).getHasStack()
-					&& screen.inventorySlots.getSlot(0).getStack()
-							.isItemEnchanted();
+			return !screen.getContainer().getInventory().get(0).isEmpty()
+					&& screen.getContainer().getInventory().get(0).getStack()
+							.isEnchanted();
 		}
 	}
 
@@ -51,22 +49,18 @@ public class SelectEnchantmentTask extends AITask {
 			return;
 		}
 		final EnchantmentScreen screen = (EnchantmentScreen) aiHelper.getMinecraft().currentScreen;
-		if (!screen.inventorySlots.getSlot(0).getHasStack()) {
+		if (screen.getContainer().getInventory().get(0).isEmpty()) {
 			System.out.println("No stack in slot.");
 			taskOperations.desync(new StringTaskError("No stack in enchantment table."));
 			return;
 		}
-		if (screen.inventorySlots.getSlot(0).getStack().isItemEnchanted()) {
+		if (screen.getContainer().getInventory().get(0).getStack().isEnchanted()) {
 			System.out.println("Already enchanted.");
 			return;
 		}
 
 		try {
-			final Field field = EnchantmentScreen.class
-					.getDeclaredField("field_147075_G");
-			field.setAccessible(true);
-			final ContainerEnchantment enchantment = (ContainerEnchantment) field
-					.get(screen);
+			final EnchantmentContainer enchantment = screen.getContainer();
 
 			hasFailed = !attemptEnchanting(aiHelper, enchantment, E_SLOT);
 		} catch (final Throwable e) {
@@ -76,7 +70,7 @@ public class SelectEnchantmentTask extends AITask {
 		}
 	}
 
-	private boolean attemptEnchanting(AIHelper aiHelper, ContainerEnchantment c,
+	private boolean attemptEnchanting(AIHelper aiHelper, EnchantmentContainer c,
 			int slot) {
 		if (c.enchantLevels[slot] == 0) {
 			System.out.println("No enchantment levels computed yet.");

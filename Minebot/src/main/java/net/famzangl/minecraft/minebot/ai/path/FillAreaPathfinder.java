@@ -18,7 +18,6 @@ package net.famzangl.minecraft.minebot.ai.path;
 
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.command.AICommandParameter.BlockFilter;
-import net.famzangl.minecraft.minebot.ai.command.BlockWithDataOrDontcare;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSet;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSets;
 import net.famzangl.minecraft.minebot.ai.task.WaitTask;
@@ -27,6 +26,7 @@ import net.famzangl.minecraft.minebot.build.blockbuild.AbstractBuildTask;
 import net.famzangl.minecraft.minebot.build.blockbuild.BlockBuildTask;
 import net.famzangl.minecraft.minebot.settings.MinebotSettingsRoot;
 import net.famzangl.minecraft.minebot.settings.PathfindingSetting;
+import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -37,13 +37,13 @@ public class FillAreaPathfinder extends MovePathFinder {
 	private static final Marker MARKER_FILL = MarkerManager.getMarker("fill");
 	private static final Logger LOGGER = LogManager.getLogger(AIHelper.class);
 	private static final BlockSet PLACEABLE_BLOCKS = BlockSets.SIMPLE_CUBE;
-	private static final BlockSet GROUND_BLOCKS = BlockSets.SIMPLE_CUBE
-			.unionWith(BlockSets.FALLING);
+	private static final BlockSet GROUND_BLOCKS = BlockSet.builder().add(BlockSets.SIMPLE_CUBE).add(
+			BlockSets.FALLING).build();
 
 	public static class FillBlocks extends BlockFilter {
 
 		@Override
-		public boolean matches(BlockWithDataOrDontcare block) {
+		public boolean matches(BlockState block) {
 			return PLACEABLE_BLOCKS.contains(block);
 		}
 
@@ -51,10 +51,10 @@ public class FillAreaPathfinder extends MovePathFinder {
 
 	private final BlockCuboid fillCuboid;
 	private int currentFillLayer;
-	private final BlockWithDataOrDontcare blockToPlace;
+	private final BlockState blockToPlace;
 
 	public FillAreaPathfinder(BlockCuboid cuboid,
-			BlockWithDataOrDontcare blockToPlace) {
+			BlockState blockToPlace) {
 		fillCuboid = cuboid;
 		this.blockToPlace = blockToPlace;
 		currentFillLayer = cuboid.getMin().getY();

@@ -16,9 +16,9 @@
  *******************************************************************************/
 package net.famzangl.minecraft.minebot;
 
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.gameevent.TickEvent.PlayerTickEvent;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraftforge.event.TickEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
 import org.apache.commons.lang3.StringEscapeUtils;
 
 import java.io.BufferedReader;
@@ -105,13 +105,12 @@ public class PlayerUpdateHandler {
 		sendThread = Executors.newFixedThreadPool(2);
 	}
 
-	@SubscribeEvent
-	public void onPlayerTick(PlayerTickEvent evt) {
+	public void onPlayerTick(TickEvent.PlayerTickEvent evt) {
 		if (toLoaded && to == null) {
 			return;
 		}
-		final EntityPlayer player = evt.player;
-		final String name = player.getDisplayName().getUnformattedText();
+		final PlayerEntity player = evt.player;
+		final String name = player.getDisplayName().getString();
 		final Long blocked = blockTimes.get(name);
 		if (blocked != null && blocked > System.currentTimeMillis()) {
 			return;
@@ -120,8 +119,8 @@ public class PlayerUpdateHandler {
 
 		final String json = String
 				.format("{\"players\":[{\"username\": \"%s\", \"x\": %d, \"y\" : %d, \"z\": %d, \"world\" : \"world\"}]}",
-						StringEscapeUtils.escapeJava(name), (int) player.posX,
-						(int) player.posY, (int) player.posZ);
+						StringEscapeUtils.escapeJava(name), (int) player.getPosX(),
+						(int) player.getPosY(), (int) player.getPosZ());
 		sendThread.execute(new SendToServerTask(json));
 	}
 }

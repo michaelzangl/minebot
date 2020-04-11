@@ -35,7 +35,7 @@ import net.minecraft.util.math.BlockPos;
  */
 public class DownwardsMoveTask extends AITask {
 
-	private static final BlockSet hardBlocks = new BlockSet(Blocks.OBSIDIAN);
+	private static final BlockSet hardBlocks = BlockSet.builder().add(Blocks.OBSIDIAN).build();
 
 	private boolean obsidianMining;
 	private BlockPos pos;

@@ -31,7 +31,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.passive.AnimalEntity;
 import net.minecraft.item.DyeColor;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.ItemSword;
+import net.minecraft.item.SwordItem;
 
 import java.util.HashSet;
 
@@ -106,7 +106,7 @@ public class KillAnimalsStrategy extends FaceInteractStrategy {
 			helper.selectCurrentItem(new ItemFilter() {
 				@Override
 				public boolean matches(ItemStack itemStack) {
-					return itemStack != null && itemStack.getItem() instanceof ItemSword;
+					return itemStack != null && itemStack.getItem() instanceof SwordItem;
 				}
 			});
 			boolean interacted = super.doInteractWithCurrent(entityHit, helper);

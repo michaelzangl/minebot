@@ -73,9 +73,6 @@ public class CommandDefinition {
 			final AICommandParameter annot = findParameterAnnotation(method,
 					parameterAnnotations[parameter]);
 			switch (annot.type()) {
-			case BLOCK_NAME:
-				builder = new BlockNameBuilder(annot);
-				break;
 			case FIXED:
 				builder = new FixedNameBuilder(annot);
 				break;

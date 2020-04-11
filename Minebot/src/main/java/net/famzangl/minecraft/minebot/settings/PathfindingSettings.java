@@ -5,22 +5,25 @@ import net.famzangl.minecraft.minebot.ai.path.world.BlockSets;
 import net.minecraft.block.Blocks;
 
 public class PathfindingSettings {
-	private static final BlockSet defaultUpwardsBlocks = new BlockSet(
+	private static final BlockSet defaultUpwardsBlocks = BlockSet.builder().add(
 			Blocks.DIRT, Blocks.STONE, Blocks.COBBLESTONE, Blocks.SAND,
-			Blocks.NETHERRACK);
-	private static final BlockSet allowedForUpwards = BlockSets.SAFE_GROUND
-			.unionWith(BlockSets.FEET_CAN_WALK_THROUGH);
-	private static final BlockSet destructableBlocks = BlockSets.SAFE_AFTER_DESTRUCTION
-			.unionWith(BlockSets.SAFE_CEILING).unionWith(BlockSets.FALLING)
-			.intersectWith(BlockSets.INDESTRUCTABLE.invert());
+			Blocks.NETHERRACK).build();
+	private static final BlockSet allowedForUpwards = BlockSet.builder().add(BlockSets.SAFE_GROUND)
+			.add(BlockSets.FEET_CAN_WALK_THROUGH).build();
+	private static final BlockSet destructableBlocks =
+			BlockSet.builder().add(BlockSets.SAFE_AFTER_DESTRUCTION)
+			.add(BlockSets.SAFE_CEILING).add(BlockSets.FALLING)
+			.build();
+			// TODO:	.intersectWith(BlockSets.INDESTRUCTABLE.invert())
+
 
 	private PathfindingSetting destructive = new PathfindingSetting(
 			BlockSets.SAFE_GROUND, allowedForUpwards, destructableBlocks,
 			destructableBlocks, defaultUpwardsBlocks);
 	private PathfindingSetting nonDestructiveLumberjack = new PathfindingSetting(
 			BlockSets.SAFE_GROUND, BlockSets.SAFE_GROUND,
-			BlockSets.FEET_CAN_WALK_THROUGH.unionWith(BlockSets.TREE_BLOCKS),
-			BlockSets.HEAD_CAN_WALK_THROUGH.unionWith(BlockSets.TREE_BLOCKS),
+			BlockSet.builder().add(BlockSets.FEET_CAN_WALK_THROUGH).add(BlockSets.TREE_BLOCKS).build(),
+			BlockSet.builder().add(BlockSets.HEAD_CAN_WALK_THROUGH).add(BlockSets.TREE_BLOCKS).build(),
 			defaultUpwardsBlocks);
 	private PathfindingSetting nonDestructive = new PathfindingSetting(
 			BlockSets.SAFE_GROUND, BlockSets.SAFE_GROUND,

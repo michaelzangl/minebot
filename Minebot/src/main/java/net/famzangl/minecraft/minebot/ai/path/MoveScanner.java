@@ -23,14 +23,14 @@ import net.famzangl.minecraft.minebot.ai.path.world.BlockSets;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.monster.EntityCreeper;
-import net.minecraft.entity.monster.EntitySkeleton;
-import net.minecraft.entity.monster.EntitySpider;
-import net.minecraft.entity.monster.EntityZombie;
+import net.minecraft.entity.monster.CreeperEntity;
+import net.minecraft.entity.monster.SkeletonEntity;
+import net.minecraft.entity.monster.SpiderEntity;
+import net.minecraft.entity.monster.ZombieEntity;
 import net.minecraft.util.ClassInheritanceMultiMap;
+import net.minecraft.util.palette.PalettedContainer;
 import net.minecraft.world.chunk.Chunk;
-import net.minecraft.world.chunk.PalettedContainer;
-import net.minecraft.world.chunk.storage.ExtendedBlockStorage;
+import net.minecraft.world.chunk.ChunkSection;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -122,9 +122,9 @@ public class MoveScanner {
 		 * @param policy
 		 */
 		public void scanBlocks(Chunk chunk, int chunkY, ScannerPolicy policy) {
-			ExtendedBlockStorage storage = chunk.getBlockStorageArray()[chunkY];
+			ChunkSection storage = chunk.getSections()[chunkY];
 			
-			PalettedContainer data = storage.getData();
+			PalettedContainer<BlockState> data = storage.getData();
 //			char[] array = storage.getData();
 			for (int y = 0; y < 16; y++) {
 				for (int z = 0; z < 16; z++) {
@@ -145,9 +145,9 @@ public class MoveScanner {
 				Entity e = (Entity) o;
 				int distance = policy.getDangerDistanceFor(e);
 				if (distance > 0) {
-					int lx = ((int) Math.floor(e.posX + .5)) & 0xf;
-					int ly = ((int) Math.floor(e.posX + .5)) & 0xf;
-					int lz = ((int) Math.floor(e.posX + .5)) & 0xf;
+					int lx = ((int) Math.floor(e.getPosX() + .5)) & 0xf;
+					int ly = ((int) Math.floor(e.getPosY() + .5)) & 0xf;
+					int lz = ((int) Math.floor(e.getPosZ() + .5)) & 0xf;
 					int local = local(lx, ly, lz);
 					if (dangerZone[local] < distance) {
 						dangerZone[local] = (byte) distance;
@@ -591,19 +591,19 @@ public class MoveScanner {
 		 */
 		int getPositionFlags(int blockWithMeta) {
 			int flag = 0;
-			if (safeCeiling.containsWithMeta(blockWithMeta)) {
+			if (safeCeiling.contains(blockWithMeta)) {
 				flag |= BLOCK_IS_SAFE_CEILING;
 			}
-			if (safeHead.containsWithMeta(blockWithMeta)) {
+			if (safeHead.contains(blockWithMeta)) {
 				flag |= BLOCK_IS_SAFE_HEAD;
 			}
-			if (safeFoot.containsWithMeta(blockWithMeta)) {
+			if (safeFoot.contains(blockWithMeta)) {
 				flag |= BLOCK_IS_SAFE_FOOT;
 			}
-			if (safeFloor.containsWithMeta(blockWithMeta)) {
+			if (safeFloor.contains(blockWithMeta)) {
 				flag |= BLOCK_IS_SAFE_GROUND;
 			}
-			if (safeSide.containsWithMeta(blockWithMeta)) {
+			if (safeSide.contains(blockWithMeta)) {
 				flag |= BLOCK_IS_SAFE_SIDE;
 			}
 			return flag;
@@ -614,13 +614,13 @@ public class MoveScanner {
 		}
 
 		public int getDangerDistanceFor(Entity e) {
-			if (e instanceof EntitySpider) {
+			if (e instanceof SpiderEntity) {
 				return 20;
-			} else if (e instanceof EntitySkeleton) {
+			} else if (e instanceof SkeletonEntity) {
 				return 30;
-			} else if (e instanceof EntityCreeper) {
+			} else if (e instanceof CreeperEntity) {
 				return 20;
-			} else if (e instanceof EntityZombie) {
+			} else if (e instanceof ZombieEntity) {
 				return 20;
 			} else {
 				return 0;

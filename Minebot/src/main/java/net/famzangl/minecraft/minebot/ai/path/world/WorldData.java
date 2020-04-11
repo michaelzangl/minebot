@@ -1,10 +1,9 @@
 package net.famzangl.minecraft.minebot.ai.path.world;
 
-import net.famzangl.minecraft.minebot.ai.command.BlockWithData;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
-import net.minecraft.block.TorchBlock;
+import net.minecraft.block.HorizontalBlock;
 import net.minecraft.block.WallSignBlock;
 import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.minecraft.client.world.ClientWorld;
@@ -18,6 +17,7 @@ import net.minecraft.util.palette.PalettedContainer;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.ChunkSection;
 
+import javax.annotation.Nonnull;
 import java.lang.reflect.Field;
 import java.util.stream.Stream;
 
@@ -103,7 +103,7 @@ public class WorldData {
 	public static class ChunkAccessorUnmodified extends ChunkAccessor {
 
 		public ChunkAccessorUnmodified(Chunk chunk) {
-			blockStorage = chunk.getBlockStorageArray();
+			blockStorage = chunk.getSections();
 		}
 	}
 
@@ -131,7 +131,7 @@ public class WorldData {
 	 * @param z
 	 * @return
 	 */
-	public int getBlockIdWithMeta(int x, int y, int z) {
+	public int getBlockStateId(int x, int y, int z) {
 		if (y < 0 || y >= 258) {
 			return BARRIER_ID;
 		} else if (y >= 256) {
@@ -200,32 +200,28 @@ public class WorldData {
 	}
 
 	public int getBlockId(int x, int y, int z) {
-		return getBlockIdWithMeta(x, y, z) >> 4;
+		return getBlockStateId(x, y, z) >> 4;
 	}
 
-	public int getBlockIdWithMeta(BlockPos pos) {
-		return getBlockIdWithMeta(pos.getX(), pos.getY(), pos.getZ());
+	public int getBlockStateId(BlockPos pos) {
+		return getBlockStateId(pos.getX(), pos.getY(), pos.getZ());
 	}
 
 	public BlockState getBlockState(BlockPos pos) {
-		BlockState iblockstate = (BlockState) Block.BLOCK_STATE_IDS
-				.getByValue(getBlockIdWithMeta(pos));
-		return iblockstate != null ? iblockstate : Blocks.AIR.getDefaultState();
+		return Block.getStateById(getBlockStateId(pos));
 	}
 
 	public boolean isSideTorch(BlockPos pos) {
-		int id = getBlockIdWithMeta(pos);
-		// TODO: Convert this to a block set.
-		return BlockSets.TORCH.containsWithMeta(id)
-				&& getBlockState(pos).get(TorchBlock.FACING) != Direction.UP;
+		int id = getBlockStateId(pos);
+		return BlockSets.WALL_TORCHES.contains(id);
 	}
 
 	public BlockPos getHangingOnBlock(BlockPos pos) {
 		BlockState meta = getBlockState(pos);
 		Direction facing = null;
-		if (BlockSets.TORCH.contains(meta.getBlock())) {
+		if (BlockSets.TORCH.contains(meta)) {
 			facing = getTorchDirection(meta);
-		} else if (BlockSets.WALL_SIGN.contains(meta.getBlock())) {
+		} else if (BlockSets.WALL_SIGN.contains(meta)) {
 			facing = getSignDirection(meta);
 			// TODO Ladder and other hanging blocks.
 		} else if (BlockSets.FEET_CAN_WALK_THROUGH.contains(meta)) {
@@ -237,22 +233,28 @@ public class WorldData {
 	/**
 	 * Get the sign/ladder/dispenser/dropper direction
 	 * 
-	 * @param meta
+	 * @param metaValue
 	 * @return
 	 */
 	private Direction getSignDirection(BlockState metaValue) {
 		return (Direction) metaValue.get(WallSignBlock.FACING);
 	}
 
-	// TODO: Move somewhere else.
 	/**
-	 * The direction the torch is facing. Default would be up.
+	 * The direction the torch is facing. Floor would be up. Works for floor and wall torches, readstone and normal.
 	 * 
-	 * @param metaValue
-	 * @return
+	 * @param metaValue The block state
+	 * @return The direction
 	 */
+	@Nonnull
 	public Direction getTorchDirection(BlockState metaValue) {
-		return (Direction) metaValue.get(BlockTorch.FACING);
+		if (BlockSets.TORCH.contains(metaValue)) {
+			return Direction.UP;
+		} else if (BlockSets.WALL_TORCHES.contains(metaValue)) {
+			return metaValue.get(HorizontalBlock.HORIZONTAL_FACING);
+		} else {
+		 throw new IllegalArgumentException("Not a torch meta: " + metaValue);
+		}
 	}
 
 	/**
@@ -287,7 +289,7 @@ public class WorldData {
 	}
 
 	public BlockBounds getBlockBounds(int x, int y, int z) {
-		BlockBounds res = BlockBounds.forBlockWithMeta(getBlockIdWithMeta(x, y,
+		BlockBounds res = BlockBounds.forBlockWithMeta(getBlockStateId(x, y,
 				z));
 		if (res == BlockBounds.UNKNOWN_BLOCK) {
 			// TODO: Replace this.
@@ -311,12 +313,8 @@ public class WorldData {
 		return this;
 	}
 
-	public BlockWithData getBlock(BlockPos position) {
-		return new BlockWithData(getBlockIdWithMeta(position));
-	}
-
 	public long getWorldTime() {
-		return theWorld.getTotalWorldTime();
+		return theWorld.getGameTime();
 	}
 
 }

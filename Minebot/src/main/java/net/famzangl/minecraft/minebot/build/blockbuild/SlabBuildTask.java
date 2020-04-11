@@ -16,38 +16,36 @@
  *******************************************************************************/
 package net.famzangl.minecraft.minebot.build.blockbuild;
 
-import net.famzangl.minecraft.minebot.ai.BlockItemFilter;
-import net.famzangl.minecraft.minebot.ai.command.BlockWithDataOrDontcare;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSet;
+import net.famzangl.minecraft.minebot.ai.path.world.BlockSets;
 import net.famzangl.minecraft.minebot.ai.task.AITask;
 import net.famzangl.minecraft.minebot.ai.task.BlockHalf;
 import net.famzangl.minecraft.minebot.ai.task.place.JumpingPlaceAtHalfTask;
 import net.famzangl.minecraft.minebot.ai.task.place.SneakAndPlaceAtHalfTask;
-import net.famzangl.minecraft.minebot.build.block.SlabFilter;
-import net.famzangl.minecraft.minebot.build.block.SlabType;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.SlabBlock;
+import net.minecraft.state.properties.SlabType;
 import net.minecraft.util.math.BlockPos;
 
 public class SlabBuildTask extends BlockBuildTask {
 
-	public static final BlockSet BLOCKS = SlabType.BLOCKS;
-	private final SlabType slabType;
+			// Only the lower and the upper ones, but not the double slabs
+	public static final BlockSet BLOCKS =
+			BlockSet.builder().add(BlockSets.LOWER_SLABS)
+			.add(BlockSets.UPPER_SLABS).build();
 
-	public SlabBuildTask(BlockPos forPosition, BlockWithDataOrDontcare block) {
+	public SlabBuildTask(BlockPos forPosition, BlockState block) {
 		super(forPosition, block);
-		this.slabType = SlabType.getForSlabBlock(block);
+		SlabType half = blockToPlace.get(SlabBlock.TYPE);
+		if (half != SlabType.BOTTOM && half != SlabType.TOP) {
+			throw new IllegalArgumentException("Not a real slab: " + half);
+		}
 	}
 	
 	protected BlockHalf getHalf() {
-		if (slabType.getBlock().containedIn(blockToPlace.toBlockSet())) {
-			return BlockHalf.LOWER_HALF;
-		} else {
-			return BlockHalf.UPPER_HALF;
-		}
-	}
+		SlabType half = blockToPlace.get(SlabBlock.TYPE);
 
-	@Override
-	protected BlockItemFilter getItemToPlaceFilter() {
-		return new SlabFilter(slabType);
+		return half == SlabType.TOP ? BlockHalf.UPPER_HALF : BlockHalf.LOWER_HALF;
 	}
 
 	@Override

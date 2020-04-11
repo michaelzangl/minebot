@@ -20,7 +20,7 @@ import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.path.world.RecordingWorld;
 import net.famzangl.minecraft.minebot.ai.path.world.WorldWithDelta;
 import net.famzangl.minecraft.minebot.ai.strategy.TaskStrategy;
-import net.minecraftforge.fml.common.gameevent.TickEvent.RenderTickEvent;
+import net.minecraftforge.event.TickEvent;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -139,7 +139,7 @@ public abstract class AITask {
 	public void onCanceled() {
 	}
 
-	public void drawMarkers(RenderTickEvent event, AIHelper helper) {
+	public void drawMarkers(TickEvent.RenderTickEvent event, AIHelper helper) {
 	}
 
 }

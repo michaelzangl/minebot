@@ -21,7 +21,6 @@ import net.famzangl.minecraft.minebot.ai.command.AICommand;
 import net.famzangl.minecraft.minebot.ai.command.AICommandInvocation;
 import net.famzangl.minecraft.minebot.ai.command.AICommandParameter;
 import net.famzangl.minecraft.minebot.ai.command.AICommandParameter.BlockFilter;
-import net.famzangl.minecraft.minebot.ai.command.BlockWithDataOrDontcare;
 import net.famzangl.minecraft.minebot.ai.command.CommandEvaluationException;
 import net.famzangl.minecraft.minebot.ai.command.ParameterType;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSet;
@@ -35,17 +34,16 @@ import net.famzangl.minecraft.minebot.build.blockbuild.LogBuildTask;
 import net.famzangl.minecraft.minebot.build.blockbuild.SlabBuildTask;
 import net.famzangl.minecraft.minebot.build.blockbuild.StandingSignBuildTask;
 import net.famzangl.minecraft.minebot.build.blockbuild.StandingSignBuildTask.SignDirection;
-import net.minecraft.block.BlockStairs;
 import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
 
 @AICommand(helpText = "Schedules a build task.", name = "minebuild")
 public class CommandScheduleBuild {
 
-	public static final BlockSet SIMPLE_WHITELIST = BlockBuildTask.BLOCKS
-			.unionWith(FenceBuildTask.BLOCKS)
-			.unionWith(LogBuildTask.NORMAL_LOGS)
-			.unionWith(SlabBuildTask.BLOCKS);
+	public static final BlockSet SIMPLE_WHITELIST = BlockSet.builder().add(BlockBuildTask.BLOCKS)
+			.add(FenceBuildTask.BLOCKS)
+			.add(LogBuildTask.NORMAL_LOGS)
+			.add(SlabBuildTask.BLOCKS).build();
 
 	private static final class ScheduleTaskStrategy extends RunOnceStrategy {
 		private final BuildTask task;
@@ -62,7 +60,7 @@ public class CommandScheduleBuild {
 
 	public static final class RunSimpleFilter extends BlockFilter {
 		@Override
-		public boolean matches(BlockWithDataOrDontcare b) {
+		public boolean matches(BlockState b) {
 			return SIMPLE_WHITELIST.contains(b);
 		}
 	}
@@ -72,7 +70,7 @@ public class CommandScheduleBuild {
 			AIHelper helper,
 			@AICommandParameter(type = ParameterType.FIXED, fixedName = "schedule", description = "") String nameArg,
 			@AICommandParameter(type = ParameterType.POSITION, description = "Where to place it (relative is to your current pos)") BlockPos forPosition,
-			@AICommandParameter(type = ParameterType.BLOCK_NAME, description = "The block", blockFilter = RunSimpleFilter.class) BlockWithDataOrDontcare blockToPlace) {
+			@AICommandParameter(type = ParameterType.BLOCK_STATE, description = "The block", blockFilter = RunSimpleFilter.class) BlockState blockToPlace) {
 		final BuildTask task;
 		if (BlockBuildTask.BLOCKS.contains(blockToPlace)) {
 			task = new BlockBuildTask(forPosition, blockToPlace);
@@ -88,21 +86,6 @@ public class CommandScheduleBuild {
 		return new ScheduleTaskStrategy(task);
 	}
 
-
-	@AICommandInvocation()
-	public static AIStrategy runSimple(
-			AIHelper helper,
-			@AICommandParameter(type = ParameterType.FIXED, fixedName = "schedule", description = "") String nameArg,
-			@AICommandParameter(type = ParameterType.POSITION, description = "Where to place it (relative is to your current pos)") BlockPos forPosition,
-			@AICommandParameter(type = ParameterType.BLOCK_STATE, description = "The block", blockFilter=StairsBlockFilter.class) BlockState blockToPlace) {
-		BuildNormalStairsTask task;
-		if (BuildNormalStairsTask.BLOCKS.contains(blockToPlace)) {
-			task = new BuildNormalStairsTask(forPosition, blockToPlace.getBlock(), blockToPlace.getValue(BlockStairs.FACING), blockToPlace.getValue(BlockStairs.HALF));
-		} else {
-			throw new CommandEvaluationException("Cannot build " + blockToPlace);
-		}
-		return new ScheduleTaskStrategy(task);
-	}
 
 	// public static final class RunColoredFilter extends BlockFilter {
 	// @Override
@@ -122,7 +105,7 @@ public class CommandScheduleBuild {
 	// forPosition,
 	// @AICommandParameter(type = ParameterType.BLOCK_NAME, description =
 	// "The block", blockFilter = RunColoredFilter.class)
-	// BlockWithDataOrDontcare blockToPlace,
+	// BlockState blockToPlace,
 	// @AICommandParameter(type = ParameterType.COLOR, description =
 	// "The color") DyeColor color) {
 	// if (ColoredCubeBuildTask.BLOCKS.contains(blockToPlace)) {
@@ -136,7 +119,7 @@ public class CommandScheduleBuild {
 
 	// public static final class WoodBlockFilter extends BlockFilter {
 	// @Override
-	// public boolean matches(BlockWithDataOrDontcare b) {
+	// public boolean matches(BlockState b) {
 	// return WoodBuildTask.BLOCKS.contains(b);
 	// }
 	// }
@@ -164,7 +147,7 @@ public class CommandScheduleBuild {
 
 	public static final class LogBlockFilter extends BlockFilter {
 		@Override
-		public boolean matches(BlockWithDataOrDontcare b) {
+		public boolean matches(BlockState b) {
 			return LogBuildTask.BLOCKS.contains(b);
 		}
 	}
@@ -193,7 +176,7 @@ public class CommandScheduleBuild {
 
 	public static final class StairsBlockFilter extends BlockFilter {
 		@Override
-		public boolean matches(BlockWithDataOrDontcare b) {
+		public boolean matches(BlockState b) {
 			return BuildNormalStairsTask.BLOCKS.contains(b);
 		}
 	}
@@ -204,7 +187,7 @@ public class CommandScheduleBuild {
 //	public static AIStrategy run(AIHelper helper,
 //			@AICommandParameter(type = ParameterType.FIXED, fixedName = "schedule", description = "") String nameArg,
 //			@AICommandParameter(type = ParameterType.POSITION, description = "Where to place it (relative is to your current pos)") BlockPos forPosition,
-//			@AICommandParameter(type = ParameterType.BLOCK_NAME, description = "The block", blockFilter = StairsBlockFilter.class) BlockWithDataOrDontcare blockToPlace,
+//			@AICommandParameter(type = ParameterType.BLOCK_NAME, description = "The block", blockFilter = StairsBlockFilter.class) BlockState blockToPlace,
 //			@AICommandParameter(type = ParameterType.ENUM, description = "The direction the stairs face") Direction direction,
 //			@AICommandParameter(type = ParameterType.ENUM, description = "Upper for inverted stairs", optional = true) EnumHalf half) {
 //		if (BuildNormalStairsTask.BLOCKS.contains(blockToPlace)) {
@@ -218,7 +201,7 @@ public class CommandScheduleBuild {
 
 	public static final class SignBlockFilter extends BlockFilter {
 		@Override
-		public boolean matches(BlockWithDataOrDontcare b) {
+		public boolean matches(BlockState b) {
 			return StandingSignBuildTask.BLOCKS.contains(b);
 		}
 	}
@@ -228,7 +211,7 @@ public class CommandScheduleBuild {
 			AIHelper helper,
 			@AICommandParameter(type = ParameterType.FIXED, fixedName = "schedule", description = "") String nameArg,
 			@AICommandParameter(type = ParameterType.POSITION, description = "Where to place it (relative is to your current pos)") BlockPos forPosition,
-			@AICommandParameter(type = ParameterType.BLOCK_NAME, description = "The block", blockFilter = SignBlockFilter.class) BlockWithDataOrDontcare blockToPlace,
+			@AICommandParameter(type = ParameterType.BLOCK_STATE, description = "The block", blockFilter = SignBlockFilter.class) BlockState blockToPlace,
 			@AICommandParameter(type = ParameterType.ENUM, description = "The direction of the sign") SignDirection direction,
 			@AICommandParameter(type = ParameterType.STRING, description = "The first line. Replace space with §.", optional = true) String text1,
 			@AICommandParameter(type = ParameterType.STRING, description = "The second line. Replace space with §.", optional = true) String text2,

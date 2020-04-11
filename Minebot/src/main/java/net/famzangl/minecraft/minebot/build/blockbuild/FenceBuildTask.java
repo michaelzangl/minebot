@@ -17,9 +17,9 @@
 package net.famzangl.minecraft.minebot.build.blockbuild;
 
 import net.famzangl.minecraft.minebot.ai.BlockItemFilter;
-import net.famzangl.minecraft.minebot.ai.command.BlockWithDataOrDontcare;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSet;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSets;
+import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.util.math.BlockPos;
 
@@ -28,12 +28,12 @@ public class FenceBuildTask extends AbstractBuildTask {
 	public static final BlockPos[] STANDABLE = new BlockPos[] { new BlockPos(-1, 1, 0),
 			new BlockPos(0, 1, -1), new BlockPos(1, 1, 0), new BlockPos(0, 1, 1), };
 
-	public static final BlockSet BLOCKS = new BlockSet(
-			Blocks.COBBLESTONE_WALL).unionWith(BlockSets.FENCE);
+	public static final BlockSet BLOCKS = BlockSet.builder().add(
+			Blocks.COBBLESTONE_WALL).add(BlockSets.FENCE).build();
 
-	private final BlockWithDataOrDontcare fenceBlock;
+	private final BlockState fenceBlock;
 
-	public FenceBuildTask(BlockPos forPosition, BlockWithDataOrDontcare fenceBlock) {
+	public FenceBuildTask(BlockPos forPosition, BlockState fenceBlock) {
 		super(forPosition);
 		if (!BLOCKS.contains(fenceBlock)) {
 			throw new IllegalArgumentException();
@@ -42,7 +42,7 @@ public class FenceBuildTask extends AbstractBuildTask {
 	}
 	@Override
 	protected BlockItemFilter getItemToPlaceFilter() {
-		return new BlockItemFilter(fenceBlock.toBlockSet());
+		return new BlockItemFilter(fenceBlock);
 	}
 
 	@Override

@@ -19,7 +19,6 @@ package net.famzangl.minecraft.minebot.ai.selectors;
 import com.google.common.base.Predicate;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.passive.EntityTameable;
 import net.minecraft.entity.passive.TameableEntity;
 
 import java.lang.reflect.Method;
@@ -34,7 +33,7 @@ public class OwnTameableSelector implements Predicate<Entity> {
 
 	@Override
 	public boolean apply(Entity entity) {
-		return entity instanceof TameableEntity && isMine((EntityTameable) entity);
+		return entity instanceof TameableEntity && isMine((TameableEntity) entity);
 	}
 
 	private boolean isMine(TameableEntity entity) {

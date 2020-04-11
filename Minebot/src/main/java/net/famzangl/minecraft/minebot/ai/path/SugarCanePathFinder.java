@@ -10,8 +10,8 @@ import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 
 public class SugarCanePathFinder extends WalkingPathfinder {
-	private static final BlockSet SUGAR_CANE_GROUND = new BlockSet(Blocks.SAND, Blocks.GRASS, Blocks.DIRT);
-	private static final BlockSet SUGAR_CANE = new BlockSet(Blocks.SUGAR_CANE);
+	private static final BlockSet SUGAR_CANE_GROUND = BlockSet.builder().add(Blocks.SAND, Blocks.GRASS, Blocks.DIRT).build();
+	private static final BlockSet SUGAR_CANE = BlockSet.builder().add(Blocks.SUGAR_CANE).build();
 
 	@Override
 	protected float rateDestination(int distance, int x, int y, int z) {

@@ -16,8 +16,6 @@
  *******************************************************************************/
 package net.famzangl.minecraft.minebot.ai.path.world;
 
-import net.famzangl.minecraft.minebot.ai.command.BlockWithData;
-import net.famzangl.minecraft.minebot.ai.command.BlockWithDataOrDontcare;
 import net.famzangl.minecraft.minebot.ai.utils.BlockCuboid;
 import net.famzangl.minecraft.minebot.ai.utils.BlockFilteredArea;
 import net.minecraft.block.Block;
@@ -27,7 +25,10 @@ import net.minecraft.util.math.BlockPos;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.IntStream;
 
 /**
  * A set of blocks, identified by Id.
@@ -35,108 +36,53 @@ import java.util.List;
  * @author Michael Zangl
  *
  */
-public class BlockSet implements Iterable<BlockWithData> {
-
-	// Should be approx. one cache line.
-	public static int MAX_BLOCKIDS = 4096;
+public class BlockSet implements Iterable<BlockState> {
 
 	protected final long[] set;
+	// State of all bits after the last one in the set.
+	private final boolean remaining;
 
-	public BlockSet(int... ids) {
-		this();
+	private BlockSet(int[] ids) {
+		int maxId = IntStream.of(ids).max().orElse(0);
+		set = new long[maxId / 64 + 1];
 		for (int i : ids) {
 			setBlock(i);
 		}
+		remaining = false;
 	}
 
-	public BlockSet(Block... blocks) {
-		this();
-		for (Block b : blocks) {
-			setBlock(Block.getIdFromBlock(b));
-		}
+	private BlockSet(long[] set, boolean remaining) {
+		this.set = set;
+		this.remaining = remaining;
 	}
 
-	BlockSet() {
-		set = new long[getSetLength()];
-	}
-
-	protected int getSetLength() {
-		return MAX_BLOCKIDS / 64;
+	public static Builder builder() {
+		return new Builder();
 	}
 
 	private void setBlock(int i) {
-		set[i / 64] |= 1l << (i & 63);
+		set[i / 64] |= 1L << (i & 63);
 	}
 
-	// private void clearBlock(int i) {
-	// set[i / 64] &= ~(1 << (i & 63));
-	// }
-
-	private boolean contains(int blockId) {
-		return containsWithMeta(blockId << 4);
-	}
-
-	public boolean containsAll(int blockId) {
-		return contains(blockId);
-	}
-
-	public boolean containsAny(int blockId) {
-		return contains(blockId);
-	}
-
-	public boolean contains(Block block) {
-		return contains(Block.getIdFromBlock(block));
-	}
-
-	@Deprecated
-	public boolean contains(BlockState meta) {
-		return contains(meta.getBlock());
-	}
-
-	public boolean containsWithMeta(int blockWithMeta) {
-		int bit = blockWithMeta >> 4;
-		long query = set[bit / 64];
-		return (query & (1l << (bit & 63))) != 0;
-	}
-
-	public BlockSet intersectWith(BlockSet bs2) {
-		BlockSet bs1 = bs2.compatibleSet(this);
-		bs2 = bs1.compatibleSet(bs2);
-		BlockSet res = bs1.newSet();
-		for (int i = 0; i < res.set.length; i++) {
-			res.set[i] = bs1.set[i] & bs2.set[i];
+	public boolean contains(int blockStateId) {
+		int index = blockStateId / 64;
+		if (index >= set.length) {
+			return remaining;
 		}
-		return res;
+		long query = set[index];
+		return (query & (1L << (blockStateId & 63))) != 0;
 	}
 
-	protected BlockSet compatibleSet(BlockSet bs1) {
-		return bs1;
-	}
-
-	BlockSet newSet() {
-		return new BlockSet();
-	}
-
-	protected BlockSet convertToMetaSet() {
-		return BlockMetaSet.fromBlockSet(this);
-	}
-
-	public BlockSet unionWith(BlockSet bs2) {
-		BlockSet bs1 = bs2.compatibleSet(this);
-		bs2 = bs1.compatibleSet(bs2);
-		BlockSet res = bs1.newSet();
-		for (int i = 0; i < res.set.length; i++) {
-			res.set[i] = bs1.set[i] | bs2.set[i];
-		}
-		return res;
+	public boolean contains(BlockState state) {
+		return contains(Block.getStateId(state));
 	}
 
 	public BlockSet invert() {
-		BlockSet res = newSet();
-		for (int i = 0; i < res.set.length; i++) {
-			res.set[i] = ~set[i];
+		long[] newSet = new long[set.length];
+		for (int i = 0; i < set.length; i++) {
+			newSet[i] = ~set[i];
 		}
-		return res;
+		return new BlockSet(newSet, !remaining);
 	}
 
 	/**
@@ -149,7 +95,7 @@ public class BlockSet implements Iterable<BlockWithData> {
 	 * @return
 	 */
 	public boolean isAt(WorldData world, BlockPos pos) {
-		return containsWithMeta(world.getBlockIdWithMeta(pos));
+		return isAt(world, pos.getX(), pos.getY(), pos.getZ());
 	}
 
 	/**
@@ -166,7 +112,7 @@ public class BlockSet implements Iterable<BlockWithData> {
 	 * @return
 	 */
 	public boolean isAt(WorldData world, int x, int y, int z) {
-		return containsWithMeta(world.getBlockIdWithMeta(x, y, z));
+		return contains(world.getBlockStateId(x, y, z));
 	}
 
 	/**
@@ -225,44 +171,43 @@ public class BlockSet implements Iterable<BlockWithData> {
 
 	@Override
 	public String toString() {
-		StringBuilder builder = new StringBuilder();
-		builder.append("BlockSet [");
-		getBlockString(builder);
-		builder.append("]");
-		return builder.toString();
+		return "BlockSet[" + getBlockString() + "]";
 	}
 
-	public void getBlockString(StringBuilder builder) {
-		boolean needsComma = false;
-		for (int i = 0; i < MAX_BLOCKIDS; i++) {
-			String str = getForBlock(i);
-			if (str != null) {
-				if (needsComma) {
-					builder.append(", ");
-				} else {
-					needsComma = true;
-				}
-				builder.append(str);
+	public String getBlockString() {
+		Map<Block, List<BlockState>> map = new LinkedHashMap<>();
+		for (BlockState state : this) {
+			map.computeIfAbsent(state.getBlock(), __ -> new ArrayList<>()).add(state);
+		}
+		StringBuilder sb = new StringBuilder();
+		map.forEach((block, states) -> {
+			if (sb.length() > 0) {
+				sb.append(", ");
 			}
-		}
-	}
+			sb.append(block.getNameTextComponent().getString())
+					.append(" (");
 
-	protected String getForBlock(int blockId) {
-		if (contains(blockId)) {
-			return Block.getBlockById(blockId).getLocalizedName() + " ("
-					+ blockId + ")";
-		} else {
-			return null;
-		}
-	}
-
-	public boolean contains(BlockWithDataOrDontcare forBlock) {
-		return forBlock.containedIn(this);
+			if (block.getStateContainer().getValidStates().size() == states.size()) {
+				sb.append(block.getRegistryName().toString());
+			} else {
+				// Not all of block contained, add states
+				states.forEach(state -> {
+					sb.append(block.getRegistryName().toString());
+					sb.append("@");
+					state.getProperties().forEach(prop -> {
+						sb.append(prop.getName());
+						sb.append(state.get(prop).toString());
+					});
+				});
+			}
+			sb.append(")");
+		});
+		return sb.toString();
 	}
 
 	@Override
-	public Iterator<BlockWithData> iterator() {
-		return new Iterator<BlockWithData>() {
+	public Iterator<BlockState> iterator() {
+		return new Iterator<BlockState>() {
 			int nextId = -1;
 
 			@Override
@@ -270,22 +215,23 @@ public class BlockSet implements Iterable<BlockWithData> {
 				if (nextId < 0) {
 					scanNext();
 				}
-				return nextId < MAX_BLOCKIDS * 16;
+				return nextId < set.length * 64;
 			}
 
 			private void scanNext() {
 				do {
 					nextId++;
-				} while (nextId < MAX_BLOCKIDS * 16
-						&& !containsWithMeta(nextId));
+				} while (nextId < set.length * 64
+						&& !contains(nextId));
 			}
 
 			@Override
-			public BlockWithData next() {
+			public BlockState next() {
 				if (!hasNext()) {
 					throw new IllegalStateException();
 				}
-				BlockWithData next = new BlockWithData(nextId);
+
+				BlockState next = Block.getStateById(nextId);
 				scanNext();
 				return next;
 			}
@@ -295,5 +241,59 @@ public class BlockSet implements Iterable<BlockWithData> {
 				throw new UnsupportedOperationException();
 			}
 		};
+	}
+
+	public static class Builder {
+		// May contain duplicates => we don't care
+		private final List<Integer> statesToAdd = new ArrayList<>();
+		private Builder() {
+		}
+
+		private Builder add(int stateId) {
+			statesToAdd.add(stateId);
+			return this;
+		}
+
+		private Builder add(int... stateIds) {
+			for (int stateId : stateIds) {
+				add(stateId);
+			}
+			return this;
+		}
+
+		public Builder add(BlockState state) {
+			statesToAdd.add(Block.getStateId(state));
+			return this;
+		}
+
+		public Builder add(BlockState ...states) {
+			for (BlockState state : states) {
+				add(state);
+			}
+			return this;
+		}
+
+		public Builder add(Block block) {
+			block.getStateContainer().getValidStates().forEach(this::add);
+			return this;
+		}
+
+		public Builder add(Block... blocks) {
+			for (Block block : blocks) {
+				add(block);
+			}
+			return this;
+		}
+
+		public Builder add(BlockSet blockSet) {
+			for (BlockState stateId: blockSet) {
+				add(stateId);
+			}
+			return this;
+		}
+
+		public BlockSet build() {
+			return new BlockSet(statesToAdd.stream().mapToInt(it -> it).toArray());
+		}
 	}
 }

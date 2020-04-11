@@ -20,9 +20,12 @@ import net.famzangl.minecraft.minebot.ai.path.world.BlockSet;
 import net.famzangl.minecraft.minebot.ai.path.world.WorldData;
 import net.famzangl.minecraft.minebot.ai.utils.BlockArea.AreaVisitor;
 import net.famzangl.minecraft.minebot.ai.utils.BlockCuboid;
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class BlockRangeScanner {
 	private static final int HORIZONTAL_SCAN = 100;
@@ -38,7 +41,7 @@ public class BlockRangeScanner {
 		
 	}
 	
-	private final BlockHandler[] handlersCache = new BlockHandler[4096];
+	private BlockHandler[] handlersCache = new BlockHandler[0];
 	
 	private final ArrayList<BlockHandler> handlers = new ArrayList<BlockHandler>();
 	
@@ -50,10 +53,12 @@ public class BlockRangeScanner {
 	
 	public void addHandler(BlockHandler h) {
 		handlers.add(h);
-		for (int i = 0; i < BlockSet.MAX_BLOCKIDS; i++) {
-			if (h.getIds().containsAny(i)) {
-				handlersCache[i] = h;
+		for (BlockState block : h.getIds()) {
+			int i = Block.getStateId(block);
+			if (handlersCache.length < i) {
+				handlersCache = Arrays.copyOf(handlersCache, Math.max(handlersCache.length * 2, i + 1));
 			}
+			handlersCache[i] = h;
 		}
 	}
 

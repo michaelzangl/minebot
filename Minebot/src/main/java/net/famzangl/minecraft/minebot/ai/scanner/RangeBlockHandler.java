@@ -29,8 +29,8 @@ import java.util.Hashtable;
 import java.util.Map.Entry;
 
 public abstract class RangeBlockHandler<ReachData> implements BlockHandler {
-	private static final BlockSet THROUGH_REACHABLE = new BlockSet(
-			Blocks.AIR, Blocks.TORCH);
+	private static final BlockSet THROUGH_REACHABLE = BlockSet.builder().add(
+			Blocks.AIR, Blocks.TORCH).build();
 	private final Hashtable<BlockPos, ArrayList<ReachData>> reachable = new Hashtable<BlockPos, ArrayList<ReachData>>();
 
 	@Override
@@ -61,7 +61,7 @@ public abstract class RangeBlockHandler<ReachData> implements BlockHandler {
 			int y = pos.getY() - dhor;
 			for (int dvert = 1; dvert <= dvertMax; dvert++) {
 				int x = pos.getX() + dvert * d.getXOffset();
-				int z = pos.getZ() + dvert * d.getFrontOffsetZ();
+				int z = pos.getZ() + dvert * d.getZOffset();
 				if (!THROUGH_REACHABLE.isAt(world, x, y, z)) {
 					dvertMax = dvert;
 				} else if (dvert > 1) {

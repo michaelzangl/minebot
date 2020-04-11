@@ -16,8 +16,8 @@
  *******************************************************************************/
 package net.famzangl.minecraft.minebot.stats;
 
-import net.famzangl.minecraft.minebot.ai.command.BlockWithData;
 import net.famzangl.minecraft.minebot.ai.path.world.WorldData;
+import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
 
 import java.util.ArrayList;
@@ -72,9 +72,9 @@ public class BlockBreakStats {
 
 	private static class BlockBreakStatBreak {
 		private BlockPos pos;
-		private BlockWithData block;
+		private BlockState block;
 
-		public BlockBreakStatBreak(BlockPos pos, BlockWithData block) {
+		public BlockBreakStatBreak(BlockPos pos, BlockState block) {
 			this.pos = pos;
 			this.block = block;
 		}
@@ -107,11 +107,11 @@ public class BlockBreakStats {
 	}
 
 	public void addBlockBreak(WorldData world, BlockPos pos) {
-		BlockWithData block = world.getBlock(pos);
+		BlockState block = world.getBlockState(pos);
 		addBlockBreak(pos, block);
 	}
 
-	public synchronized void addBlockBreak(BlockPos pos, BlockWithData block) {
+	public synchronized void addBlockBreak(BlockPos pos, BlockState block) {
 		currentTickEntries.add(new BlockBreakStatBreak(pos, block));
 	}
 

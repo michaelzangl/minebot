@@ -17,7 +17,6 @@
 package net.famzangl.minecraft.minebot.ai.command;
 
 import net.famzangl.minecraft.minebot.ai.AIHelper;
-import net.famzangl.minecraft.minebot.ai.ColoredBlockItemFilter;
 import net.minecraft.item.DyeColor;
 
 import java.util.ArrayList;
@@ -33,7 +32,12 @@ public class ColorNameBuilder extends ParameterBuilder {
 
 		@Override
 		public boolean couldEvaluateAgainst(String string) {
-			return ColoredBlockItemFilter.colorFromStringNull(string) != null;
+			for (DyeColor v : DyeColor.values()) {
+				if (v.getName().equalsIgnoreCase(string)) {
+					return true;
+				}
+			}
+			return false;
 		}
 
 		@Override
@@ -58,7 +62,12 @@ public class ColorNameBuilder extends ParameterBuilder {
 
 	@Override
 	public Object getParameter(AIHelper helper, String[] arguments) {
-		return ColoredBlockItemFilter.colorFromString(arguments[0]);
+		for (DyeColor v : DyeColor.values()) {
+			if (v.getName().equalsIgnoreCase(arguments[0])) {
+				return v;
+			}
+		}
+		throw new IllegalArgumentException("Unknown color: " + arguments[0]);
 	}
 	
 	@Override

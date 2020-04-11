@@ -16,7 +16,7 @@
  *******************************************************************************/
 package net.famzangl.minecraft.minebot.ai.task.inventory;
 
-import net.minecraft.entity.player.InventoryPlayer;
+import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
 
 import java.util.Hashtable;
@@ -38,7 +38,7 @@ public class ItemCountList {
 		counts.putAll(from.counts);
 	}
 
-	public ItemCountList(InventoryPlayer from) {
+	public ItemCountList(PlayerInventory from) {
 		for (ItemStack i : from.mainInventory) {
 			if (i != null && i.getItem() != null) {
 				this.add(new ItemWithSubtype(i), i.getMaxStackSize());

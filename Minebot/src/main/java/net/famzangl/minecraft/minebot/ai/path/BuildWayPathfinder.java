@@ -18,7 +18,6 @@ package net.famzangl.minecraft.minebot.ai.path;
 
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.BlockItemFilter;
-import net.famzangl.minecraft.minebot.ai.command.BlockWithDontcare;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSet;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSets;
 import net.famzangl.minecraft.minebot.ai.task.AITask;
@@ -27,15 +26,16 @@ import net.famzangl.minecraft.minebot.ai.task.PlaceBlockTask;
 import net.famzangl.minecraft.minebot.ai.task.PlaceTorchSomewhereTask;
 import net.famzangl.minecraft.minebot.ai.task.inventory.GetOnHotBarTask;
 import net.famzangl.minecraft.minebot.build.WalkTowardsTask;
-import net.famzangl.minecraft.minebot.build.block.SlabFilter;
-import net.famzangl.minecraft.minebot.build.block.SlabType;
 import net.famzangl.minecraft.minebot.build.blockbuild.AbstractBuildTask;
 import net.famzangl.minecraft.minebot.build.blockbuild.BlockBuildTask;
 import net.famzangl.minecraft.minebot.build.blockbuild.SlabBuildTask;
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -65,8 +65,10 @@ import java.util.Collections;
  * 
  */
 public class BuildWayPathfinder extends AlongTrackPathFinder {
+	private static final Logger LOGGER = LogManager.getLogger(BuildWayPathfinder.class);
 
-	private static final SlabType FLOOR = SlabType.COBBLESTONE;
+	private static final BlockState FLOOR = Blocks.COBBLESTONE_SLAB.getDefaultState();
+	public static final BlockSet FLOOR_BLOCKS = BlockSet.builder().add(FLOOR).build();
 
 	private static final Block BRIDGE_SIDE = Blocks.COBBLESTONE;
 	private static final Block BRIDGE_WALL = Blocks.COBBLESTONE_WALL;
@@ -77,7 +79,7 @@ public class BuildWayPathfinder extends AlongTrackPathFinder {
 	}
 
 	public BuildWayPathfinder(Direction dir, BlockPos pos) {
-		this(dir.getXOffset(), dir.getFrontOffsetZ(), pos.getX(), pos
+		this(dir.getXOffset(), dir.getZOffset(), pos.getX(), pos
 				.getY() + 1, pos.getZ());
 	}
 
@@ -114,13 +116,13 @@ public class BuildWayPathfinder extends AlongTrackPathFinder {
 		 * @param currentPos
 		 */
 		public void addConstructionTasks(BlockPos currentPos) {
-			addTask(new GetOnHotBarTask(new SlabFilter(FLOOR)));
+			addTask(new GetOnHotBarTask(new BlockItemFilter(FLOOR)));
 			if (placeTorch) {
 				addTask(new GetOnHotBarTask(new BlockItemFilter(Blocks.TORCH)));
 			}
 
 			final BlockPos first = getPos(0, -1);
-			final AITask placeTask = new SlabBuildTask(first, FLOOR.getBlock()).getPlaceBlockTask(currentPos
+			final AITask placeTask = new SlabBuildTask(first, FLOOR).getPlaceBlockTask(currentPos
 					.subtract(first));
 			addTask(placeTask);
 
@@ -130,7 +132,7 @@ public class BuildWayPathfinder extends AlongTrackPathFinder {
 
 			for (int i = 1; i < width; i++) {
 				final BlockPos current = getPos(i, -1);
-				addTask(new SlabBuildTask(current, FLOOR.getBlock())
+				addTask(new SlabBuildTask(current, FLOOR)
 						.getPlaceBlockTask(getPos(i - 1, 0).subtract(current)));
 			}
 
@@ -174,23 +176,23 @@ public class BuildWayPathfinder extends AlongTrackPathFinder {
 
 		protected final void addNearSide() {
 			final AbstractBuildTask task = new BlockBuildTask(getPos(-1, -1),
-					new BlockWithDontcare(BRIDGE_SIDE));
+					BRIDGE_SIDE.getDefaultState());
 			addTask(task.getPlaceBlockTask(getPos(1, 1).subtract(getPos(0, 0))));
 		}
 
 		protected final void addFarSide() {
 			final AbstractBuildTask task = new BlockBuildTask(getPos(width, -1),
-					new BlockWithDontcare(BRIDGE_SIDE));
+					BRIDGE_SIDE.getDefaultState());
 			addTask(task
 					.getPlaceBlockTask(getPos(-1, 1).subtract(getPos(0, 0))));
 		}
 	}
 
 	private class NormalWayType extends WayPiece {
-		private final BlockSet airLike = BlockSets.AIR
-				.unionWith(BlockSets.FEET_CAN_WALK_THROUGH);;
-		private final BlockSet COVERED = BlockSets.SIMPLE_CUBE
-				.unionWith(BlockSets.FALLING);
+		private final BlockSet airLike = BlockSet.builder().add(BlockSets.AIR)
+				.add(BlockSets.FEET_CAN_WALK_THROUGH).build();
+		private final BlockSet COVERED = BlockSet.builder().add(BlockSets.SIMPLE_CUBE)
+				.add(BlockSets.FALLING).build();
 
 		public NormalWayType(int stepIndex) {
 			super(stepIndex);
@@ -216,7 +218,7 @@ public class BuildWayPathfinder extends AlongTrackPathFinder {
 		}
 
 		private boolean isAirlike(int u, int dy) {
-			final Block block = helper.getBlock(getPos(u, dy));
+			final BlockState block = world.getBlockState(getPos(u, dy));
 			return airLike.contains(block);
 		}
 	}
@@ -239,7 +241,7 @@ public class BuildWayPathfinder extends AlongTrackPathFinder {
 			addFarSide();
 			super.addFarSideBuildTasks();
 			addTask(new PlaceBlockTask(getPos(width, -1), Direction.UP,
-					BRIDGE_WALL));
+					BlockSet.builder().add(BRIDGE_WALL).build()));
 			if (placeTorch) {
 				addTask(new PlaceTorchSomewhereTask(
 						Collections.singletonList(getPos(width, 1)),
@@ -252,7 +254,7 @@ public class BuildWayPathfinder extends AlongTrackPathFinder {
 			addNearSide();
 			super.addNearSideBuildTasks();
 			addTask(new PlaceBlockTask(getPos(-1, -1), Direction.UP,
-					BRIDGE_WALL));
+					BlockSet.builder().add(BRIDGE_WALL).build()));
 			if (placeTorch) {
 				addTask(new PlaceTorchSomewhereTask(
 						Collections.singletonList(getPos(-1, 1)),
@@ -394,13 +396,13 @@ public class BuildWayPathfinder extends AlongTrackPathFinder {
 	}
 
 	public boolean addContinuingTask(BlockPos playerPosition) {
-		System.out.println("Seatch at " + playerPosition + ", on track: "
+		LOGGER.debug("Seatch at " + playerPosition + ", on track: "
 				+ isOnTrack(playerPosition.getX(), playerPosition.getZ())
 				+ ", cy= " + (cy - 1) + " right block: "
-				+ new BlockSet(FLOOR.slabBlock).isAt(world, playerPosition));
+				+ FLOOR_BLOCKS.isAt(world, playerPosition));
 		if (isOnTrack(playerPosition.getX(), playerPosition.getZ())
 				&& playerPosition.getY() == cy - 1
-				&& new BlockSet(FLOOR.slabBlock).isAt(world, playerPosition)) {
+				&& FLOOR_BLOCKS.isAt(world, playerPosition)) {
 			final int currentStep = getStepNumber(playerPosition.getX(),
 					playerPosition.getZ());
 			final WayPiece next = getSuggestedWayType(currentStep + 1);

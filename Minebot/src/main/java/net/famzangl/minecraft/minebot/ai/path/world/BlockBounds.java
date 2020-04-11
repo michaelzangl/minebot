@@ -49,7 +49,7 @@ public class BlockBounds {
 	public static final BlockBounds UNKNOWN_BLOCK = new BlockBounds(0, 1);
 
 	public static final BlockBounds FULL_BLOCK = new BlockBounds(0, 1);
-	private static final BlockSet FULL_BLOCKS = BlockSets.SIMPLE_CUBE.unionWith(BlockSets.AIR);
+	private static final BlockSet FULL_BLOCKS = BlockSet.builder().add(BlockSets.SIMPLE_CUBE).add(BlockSets.AIR).build();
 	public static final BlockBounds LOWER_HALF_BLOCK = new BlockBounds(0, 0.5);
 	private static final BlockSet LOWER_HALF_BLOCKS = BlockSets.LOWER_SLABS;
 	public static final BlockBounds UPPER_HALF_BLOCK = new BlockBounds(0.5, 1);

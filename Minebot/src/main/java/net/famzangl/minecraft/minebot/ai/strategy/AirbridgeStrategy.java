@@ -3,6 +3,7 @@ package net.famzangl.minecraft.minebot.ai.strategy;
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.BlockItemFilter;
 import net.famzangl.minecraft.minebot.ai.command.AIChatController;
+import net.famzangl.minecraft.minebot.ai.path.world.BlockSet;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSets;
 import net.famzangl.minecraft.minebot.ai.path.world.WorldData;
 import net.famzangl.minecraft.minebot.ai.task.AITask;
@@ -87,14 +88,14 @@ public class AirbridgeStrategy extends TaskStrategy {
 
 		@Override
 		public boolean isFinished(AIHelper aiHelper) {
-			return aiHelper.getMinecraft().world.getTotalWorldTime() >= startTime + LAG_TEST_DELAY;
+			return aiHelper.getMinecraft().world.getGameTime() >= startTime + LAG_TEST_DELAY;
 		}
 
 		public AITask getTrigger() {
 			return new RunOnceTask() {
 				@Override
 				protected void runOnce(AIHelper aiHelper, TaskOperations taskOperations) {
-					startTime = aiHelper.getMinecraft().world.getTotalWorldTime();
+					startTime = aiHelper.getMinecraft().world.getGameTime();
 				}
 			};
 		}
@@ -146,7 +147,7 @@ public class AirbridgeStrategy extends TaskStrategy {
 		this.length = length;
 		this.toLeft = toLeft;
 		this.toRight = toRight;
-		if (direction.getFrontOffsetY() != 0) {
+		if (direction.getYOffset() != 0) {
 			throw new IllegalArgumentException("Can only work horizontally.");
 		}
 	}
@@ -264,7 +265,7 @@ public class AirbridgeStrategy extends TaskStrategy {
 			return false;
 		}
 		BlockCuboid floor = getSidewardsArea(buildPos.add(0, -1, 0));
-		if (!BlockSets.AIR.unionWith(BlockSets.LOWER_SLABS).isAt(world, floor)) {
+		if (!BlockSet.builder().add(BlockSets.AIR).add(BlockSets.LOWER_SLABS).build().isAt(world, floor)) {
 			return false;
 		} else {
 			return new BlockFilteredArea(floor, BlockSets.AIR).getVolume(world) > 0;

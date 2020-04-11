@@ -21,6 +21,7 @@ import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.selectors.AndSelector;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.MovementInput;
+import net.minecraft.util.math.EntityRayTraceResult;
 import net.minecraft.util.math.RayTraceResult;
 
 import java.util.ArrayList;
@@ -62,22 +63,24 @@ public abstract class FaceInteractStrategy extends AIStrategy {
 		}
 
 		final RayTraceResult position = helper.getObjectMouseOver();
-		if (position != null && position.typeOfHit == RayTraceResult.Type.ENTITY
-				&& doInteractWithCurrent(position.entityHit, helper)) {
+		if (position != null && position instanceof EntityRayTraceResult
+				&& doInteractWithCurrent(((EntityRayTraceResult) position).getEntity(), helper)) {
 			ticksRun = 0;
 		} else {
-			final double speed = helper.getMinecraft().player.motionX
-					* helper.getMinecraft().player.motionX
-					+ helper.getMinecraft().player.motionZ
-					* helper.getMinecraft().player.motionZ;
-			helper.face(found.posX, found.posY, found.posZ);
+			double dx = helper.getMinecraft().player.getMotion().x;
+			double dz = helper.getMinecraft().player.getMotion().z;
+			final double speed = dx
+					* dx
+					+ dz
+					* dz;
+			helper.face(found.getPosX(), found.getPosY(), found.getPosZ());
 			final MovementInput movement = new MovementInput();
 			if (speed < 0.01 && ticksRun > 8) {
 				movement.jump = ++ticksSlow > 5;
 			} else {
 				ticksSlow = 0;
 			}
-			movement.field_192832_b = 1;
+			movement.moveForward = 1;
 			helper.overrideMovement(movement);
 			ticksRun++;
 			if (ticksSlow > 3 * 20 || ticksRun > 20 * 20) {

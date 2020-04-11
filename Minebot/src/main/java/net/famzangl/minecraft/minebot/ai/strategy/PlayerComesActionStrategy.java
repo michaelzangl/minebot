@@ -18,13 +18,13 @@ package net.famzangl.minecraft.minebot.ai.strategy;
 
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 
 public class PlayerComesActionStrategy extends CloseEntityActionStrategy {
 
 	@Override
 	protected boolean matches(AIHelper helper, Entity player) {
-		return player instanceof EntityPlayer && player != helper.getMinecraft().player;
+		return player instanceof PlayerEntity && player != helper.getMinecraft().player;
 	}
 
 	@Override

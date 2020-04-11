@@ -25,7 +25,7 @@ import net.minecraft.client.gui.screen.EnchantmentScreen;
 public class ClickOnEnchantmentTable extends UseItemOnBlockTask {
 
 	public ClickOnEnchantmentTable() {
-		super(new BlockSet(Blocks.ENCHANTING_TABLE));
+		super(BlockSet.builder().add(Blocks.ENCHANTING_TABLE).build());
 	}
 
 	@Override

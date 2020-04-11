@@ -18,8 +18,8 @@ package net.famzangl.minecraft.minebot.ai.task;
 
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.BlockItemFilter;
+import net.famzangl.minecraft.minebot.ai.path.world.BlockSet;
 import net.famzangl.minecraft.minebot.ai.task.error.SelectTaskError;
-import net.minecraft.block.Block;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 
@@ -33,8 +33,8 @@ import net.minecraft.util.math.BlockPos;
 public class PlaceBlockTask extends AITask {
 	private final BlockPos placeOn;
 	private final Direction onSide;
+	private final BlockSet blocks;
 	private int attemptsLeft = 20;
-	private final Block block;
 
 	/**
 	 * 
@@ -42,28 +42,28 @@ public class PlaceBlockTask extends AITask {
 	 *            Where to place the block on (the existing block to click).
 	 * @param onSide
 	 *            On which side the block should be placed.
-	 * @param block
+	 * @param blocks
 	 *            The Block to place.
 	 */
-	public PlaceBlockTask(BlockPos placeOn, Direction onSide, Block block) {
+	public PlaceBlockTask(BlockPos placeOn, Direction onSide, BlockSet blocks) {
 		super();
-		if (placeOn == null || onSide == null || block == null) {
+		if (placeOn == null || onSide == null || blocks == null) {
 			throw new NullPointerException();
 		}
 		this.placeOn = placeOn;
 		this.onSide = onSide;
-		this.block = block;
+		this.blocks = blocks;
 	}
 
 	@Override
 	public boolean isFinished(AIHelper aiHelper) {
 		return attemptsLeft <= 0
-				|| Block.isEqualTo(aiHelper.getBlock(placeOn.offset(onSide)), block);
+				|| blocks.contains(aiHelper.getBlockState(placeOn.offset(onSide)));
 	}
 
 	@Override
 	public void runTick(AIHelper aiHelper, TaskOperations taskOperations) {
-		final BlockItemFilter itemFilter = new BlockItemFilter(block);
+		final BlockItemFilter itemFilter = new BlockItemFilter(blocks);
 		if (!aiHelper.selectCurrentItem(itemFilter)) {
 			taskOperations.desync(new SelectTaskError(itemFilter));
 		}

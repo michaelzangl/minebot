@@ -25,7 +25,7 @@ import net.famzangl.minecraft.minebot.ai.scanner.ChestBlockHandler.ChestData;
 import net.famzangl.minecraft.minebot.ai.task.OpenChestTask;
 import net.famzangl.minecraft.minebot.ai.task.WaitTask;
 import net.famzangl.minecraft.minebot.ai.task.inventory.PutInChestTask;
-import net.minecraft.client.gui.inventory.ChestScreen;
+import net.minecraft.client.gui.screen.inventory.ChestScreen;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;

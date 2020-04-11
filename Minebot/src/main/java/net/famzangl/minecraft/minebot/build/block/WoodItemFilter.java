@@ -17,6 +17,7 @@
 package net.famzangl.minecraft.minebot.build.block;
 
 import net.famzangl.minecraft.minebot.ai.BlockItemFilter;
+import net.famzangl.minecraft.minebot.ai.path.world.BlockSets;
 import net.minecraft.block.Blocks;
 import net.minecraft.item.ItemStack;
 
@@ -31,14 +32,8 @@ public class WoodItemFilter extends BlockItemFilter {
 	private final WoodType woodType;
 
 	public WoodItemFilter(WoodType woodType) {
-		super(Blocks.PLANKS);
+		super(BlockSets.PLANKS);
 		this.woodType = woodType;
-	}
-
-	@Override
-	public boolean matches(ItemStack itemStack) {
-		return super.matches(itemStack)
-				&& itemStack.getItemDamage() == woodType.ordinal();
 	}
 
 	@Override

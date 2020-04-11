@@ -37,7 +37,7 @@ import java.util.List;
  *
  */
 public class HorizontalMoveTask extends AITask implements CanPrefaceAndDestroy {
-	private static final BlockSet hardBlocks = new BlockSet(Blocks.OBSIDIAN);
+	private static final BlockSet hardBlocks = BlockSet.builder().add(Blocks.OBSIDIAN).build();
 	static final int OBSIDIAN_TIME = 10 * 20;
 	protected final BlockPos pos;
 	private boolean hasObsidianLower;

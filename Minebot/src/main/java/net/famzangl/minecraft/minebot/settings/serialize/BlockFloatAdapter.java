@@ -1,19 +1,21 @@
 package net.famzangl.minecraft.minebot.settings.serialize;
 
-import com.google.gson.JsonArray;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
-import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockFloatMap;
-import net.famzangl.minecraft.minebot.ai.path.world.BlockSet;
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.registry.Registry;
 
 import java.lang.reflect.Type;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map.Entry;
 
 public class BlockFloatAdapter implements JsonSerializer<BlockFloatMap>,
@@ -29,21 +31,18 @@ public class BlockFloatAdapter implements JsonSerializer<BlockFloatMap>,
 				JsonObject values = valuesElement
 						.getAsJsonObject();
 				for (Entry<String, JsonElement> e : values.entrySet()) {
-					int blockId;
+					List<BlockState> blockStates;
 					if (e.getKey().matches("\\d+")) {
-						blockId = Integer.parseInt(e.getKey());
+						int blockStateId = Integer.parseInt(e.getKey());
+						blockStates = Collections.singletonList(Block.getStateById(blockStateId));
 					} else {
-						blockId = Block.getIdFromBlock(Block.getBlockFromName(e
-								.getKey()));
+						blockStates = Registry.BLOCK.getOrDefault(new ResourceLocation(e.getKey()))
+								.getStateContainer().getValidStates();
 					}
 					if (e.getValue().isJsonArray()) {
-						for (int i = 0; i < 16; i++) {
-							JsonElement value = e.getValue().getAsJsonArray()
-									.get(i);
-							map.set(blockId * 16 + i, value.getAsFloat());
-						}
+						// Compatibility. TODO: Use block properties
 					} else {
-						map.setBlock(blockId, e.getValue().getAsFloat());
+						blockStates.forEach(state -> map.set(state, e.getValue().getAsFloat()));
 					}
 				}
 			}
@@ -67,6 +66,8 @@ public class BlockFloatAdapter implements JsonSerializer<BlockFloatMap>,
 		res.addProperty("defaultValue", defaultValue);
 		JsonObject valueMap = new JsonObject();
 
+		throw new IllegalStateException("TODO");
+		/*
 		for (int blockId = 0; blockId < BlockSet.MAX_BLOCKIDS; blockId++) {
 			boolean hasSameValue = true;
 			float last = 0;
@@ -96,6 +97,7 @@ public class BlockFloatAdapter implements JsonSerializer<BlockFloatMap>,
 		}
 		res.add("values", valueMap);
 		return res;
+		*/
 	}
 
 }

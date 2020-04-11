@@ -25,13 +25,13 @@ import net.minecraft.util.math.BlockPos;
 
 public class ItemPlaceOnGroundTask extends BuildFlatOnGroundTask {
 
-	public static final BlockSet BLOCKS = new BlockSet(
+	public static final BlockSet BLOCKS = BlockSet.builder().add(
 			Blocks.DIRT,
 			Blocks.STONE, 
 			Blocks.COBBLESTONE,
 			Blocks.BEACON, 
 			Blocks.BOOKSHELF,
-			Blocks.BRICK_BLOCK,
+			Blocks.BRICKS,
 			Blocks.CAKE, 
 			Blocks.COAL_BLOCK,
 			Blocks.COAL_ORE, 
@@ -51,21 +51,21 @@ public class ItemPlaceOnGroundTask extends BuildFlatOnGroundTask {
 			Blocks.IRON_ORE, 
 			Blocks.LAPIS_BLOCK, 
 			Blocks.LAPIS_ORE,
-			Blocks.MELON_BLOCK, 
+			Blocks.MELON,
 			Blocks.MOSSY_COBBLESTONE, 
-			Blocks.NETHER_BRICK,
+			Blocks.NETHER_BRICKS,
 			Blocks.NETHERRACK,
 			Blocks.OBSIDIAN,
 			Blocks.PUMPKIN,
 			Blocks.QUARTZ_BLOCK,
-			Blocks.QUARTZ_ORE, 
+			Blocks.NETHER_QUARTZ_ORE,
 			Blocks.RED_MUSHROOM_BLOCK,
 			Blocks.REDSTONE_BLOCK, 
 			Blocks.REDSTONE_LAMP, 
 			Blocks.REDSTONE_ORE,
 			Blocks.SAND,
-			Blocks.STONEBRICK, 
-			Blocks.TNT);
+			Blocks.STONE_BRICKS,
+			Blocks.TNT).build();
 	private final Block block;
 
 	protected ItemPlaceOnGroundTask(BlockPos forPosition, Block block) {

@@ -17,20 +17,21 @@
 package net.famzangl.minecraft.minebot.build.blockbuild;
 
 import net.famzangl.minecraft.minebot.ai.BlockItemFilter;
-import net.famzangl.minecraft.minebot.ai.command.BlockWithDataOrDontcare;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSet;
+import net.famzangl.minecraft.minebot.ai.path.world.BlockSets;
+import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.util.math.BlockPos;
 
 public class BlockBuildTask extends AbstractBuildTask {
 
-	public static final BlockSet BLOCKS = new BlockSet(
+	public static final BlockSet BLOCKS = BlockSet.builder().add(
 			Blocks.DIRT,
 			Blocks.STONE,
 			Blocks.COBBLESTONE,
 			Blocks.BEACON,
 			Blocks.BOOKSHELF,
-			Blocks.BRICK_BLOCK,
+			Blocks.BRICKS,
 			Blocks.CAKE,
 			Blocks.COAL_BLOCK,
 			Blocks.COAL_ORE,
@@ -50,36 +51,38 @@ public class BlockBuildTask extends AbstractBuildTask {
 			Blocks.IRON_ORE,
 			Blocks.LAPIS_BLOCK, 
 			Blocks.LAPIS_ORE,
-			Blocks.MELON_BLOCK, 
+			Blocks.MELON,
 			Blocks.MOSSY_COBBLESTONE, 
-			Blocks.NETHER_BRICK,
+			Blocks.NETHER_BRICKS,
 			Blocks.NETHERRACK,
 			Blocks.OBSIDIAN, 
 			Blocks.PUMPKIN,
 			Blocks.QUARTZ_BLOCK,
-			Blocks.QUARTZ_ORE, 
+			Blocks.NETHER_QUARTZ_ORE,
+			Blocks.CHISELED_QUARTZ_BLOCK,
 			Blocks.RED_MUSHROOM_BLOCK,
 			Blocks.REDSTONE_BLOCK,
 			Blocks.REDSTONE_LAMP, 
 			Blocks.REDSTONE_ORE,
 			Blocks.SAND, 
-			Blocks.STONEBRICK,
-			Blocks.TNT,
-			Blocks.PLANKS,
-			Blocks.WOOL,
-			Blocks.STAINED_GLASS, 
-			Blocks.STAINED_HARDENED_CLAY);
-	protected final BlockWithDataOrDontcare blockToPlace;
+			Blocks.STONE_BRICKS,
+			Blocks.TNT)
+			.add(BlockSets.PLANKS).add(BlockSets.WOOL)
+			.add(BlockSets.STAINED_GLASS)
+			.add(BlockSets.TERRACOTTA)
+			.add(BlockSets.GLAZED_TERRACOTTA)
+			.build();
+	protected final BlockState blockToPlace;
 
 	public BlockBuildTask(BlockPos forPosition,
-			BlockWithDataOrDontcare blockToPlace) {
+						  BlockState blockToPlace) {
 		super(forPosition);
 		this.blockToPlace = blockToPlace;
 	}
 
 	@Override
 	protected BlockItemFilter getItemToPlaceFilter() {
-		return new BlockItemFilter(blockToPlace.toBlockSet());
+		return new BlockItemFilter(BlockSet.builder().add(blockToPlace).build());
 	}
 	
 
@@ -91,6 +94,7 @@ public class BlockBuildTask extends AbstractBuildTask {
 
 	@Override
 	public Object[] getCommandArguments() {
-		return new Object[] { blockToPlace.toBlockString() };
+		// TODO: Add subtypes
+		return new Object[] { blockToPlace.getBlock().getRegistryName() + ""};
 	}
 }

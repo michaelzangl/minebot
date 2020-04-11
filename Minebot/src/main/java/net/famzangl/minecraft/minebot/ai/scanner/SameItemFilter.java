@@ -38,8 +38,8 @@ public final class SameItemFilter implements ItemFilter {
 			return false;
 		} else if (itemStack.getItem() != displayed.getItem()) {
 			return false;
-		} else if (itemStack.getHasSubtypes()
-				&& itemStack.getItemDamage() != displayed.getItemDamage()) {
+		} else if (!itemStack.isDamageable()
+				&& itemStack.getDamage() != displayed.getDamage()) {
 			return false;
 		} else if (!ItemStack.areItemStackTagsEqual(itemStack, displayed)) {
 			return false;

@@ -16,10 +16,10 @@
  *******************************************************************************/
 package net.famzangl.minecraft.minebot.ai;
 
-import net.famzangl.minecraft.minebot.ai.command.BlockWithDataOrDontcare;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSet;
 import net.famzangl.minecraft.minebot.ai.task.inventory.ItemWithSubtype;
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
 import net.minecraft.item.ItemStack;
 
 /**
@@ -33,15 +33,15 @@ public class BlockItemFilter implements HumanReadableItemFilter {
 	private final BlockSet matched;
 
 	public BlockItemFilter(Block... matched) {
-		this(new BlockSet(matched));
-	}
-	
-	public BlockItemFilter(BlockSet matched) {
-		this.matched = matched;
+		this(BlockSet.builder().add(matched).build());
 	}
 
-	public BlockItemFilter(BlockWithDataOrDontcare blockWithData) {
-		this(blockWithData.toBlockSet());
+	public BlockItemFilter(BlockState... matched) {
+		this(BlockSet.builder().add(matched).build());
+	}
+
+	public BlockItemFilter(BlockSet matched) {
+		this.matched = matched;
 	}
 
 	@Override
@@ -51,8 +51,8 @@ public class BlockItemFilter implements HumanReadableItemFilter {
 	}
 
 	protected boolean matchesItem(ItemStack itemStack) {
-		BlockWithDataOrDontcare blockType = new ItemWithSubtype(itemStack).getBlockType();
-		return blockType != null && matched.contains(blockType);
+		Block blockType = new ItemWithSubtype(itemStack).getBlockType();
+		return blockType != null && matched.contains(blockType.getDefaultState());
 	}
 
 	@Override
@@ -87,9 +87,7 @@ public class BlockItemFilter implements HumanReadableItemFilter {
 
 	@Override
 	public String getDescription() {
-		final StringBuilder str = new StringBuilder();
-		matched.getBlockString(str);
-		return str.toString();
+		return matched.getBlockString();
 	}
 
 }

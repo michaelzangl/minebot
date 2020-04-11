@@ -16,9 +16,9 @@
  *******************************************************************************/
 package net.famzangl.minecraft.minebot.ai.path;
 
-import net.famzangl.minecraft.minebot.ai.command.BlockWithData;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockFloatMap;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSet;
+import net.minecraft.block.BlockState;
 import net.minecraft.util.Direction;
 
 public class MineSinglePathFinder extends MinePathfinder {
@@ -34,7 +34,7 @@ public class MineSinglePathFinder extends MinePathfinder {
 	@Override
 	protected BlockFloatMap getFactorProvider() {
 		BlockFloatMap map = new BlockFloatMap();
-		for (BlockWithData block : blocks) {
+		for (BlockState block : blocks) {
 			map.set(block, 1);
 		}
 		map.setDefault(0);

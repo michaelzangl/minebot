@@ -19,6 +19,7 @@ package net.famzangl.minecraft.minebot.ai.input;
 import net.minecraft.client.GameSettings;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.settings.KeyBinding;
+import net.minecraft.client.util.InputMappings;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.Marker;
@@ -34,6 +35,7 @@ public class KeyboardInputController {
 	private static final Marker MARKER_KEY = MarkerManager.getMarker("key");
 	private static final Logger LOGGER = LogManager
 			.getLogger(KeyboardInputController.class);
+	private final InputMappings.Input fakeKey;
 
 	private static abstract class KeyAdapter {
 
@@ -84,13 +86,14 @@ public class KeyboardInputController {
 	private Minecraft mc;
 	private KeyType key;
 	private boolean isOverride;
-	private int oldKeyCode;
+	private InputMappings.Input oldKeyCode;
 	private boolean wasOverride;
 
 	public KeyboardInputController(Minecraft mc, KeyType key) {
 		this.mc = mc;
 		this.key = key;
-		oldKeyCode = key.getBinding(mc).getKeyCodeDefault();
+		this.fakeKey = InputMappings.getInputByCode(key.keyCode, 0);
+		oldKeyCode = key.getBinding(mc).getDefault();
 	}
 
 	/**
@@ -110,11 +113,11 @@ public class KeyboardInputController {
 			if (!wasOverride) {
 				LOGGER.trace(MARKER_KEY, "Simulate a key press down for " + key);
 				// Map to a temporary key
-				binding.setKeyCode(key.keyCode);
+				binding.bind(fakeKey);
 				KeyBinding.resetKeyBindingArrayAndHash();
 				// Simulate press of that key.
-				KeyBinding.setKeyBindState(key.keyCode, true);
-				KeyBinding.onTick(key.keyCode);
+				KeyBinding.setKeyBindState(fakeKey, true);
+				KeyBinding.onTick(fakeKey);
 			} else {
 				LOGGER.trace(MARKER_KEY, "Key should still be down. " + key);
 			}
@@ -124,8 +127,8 @@ public class KeyboardInputController {
 		} else {
 			if (wasOverride) {
 				LOGGER.trace(MARKER_KEY, "Key override deactivated: " + key);
-				KeyBinding.setKeyBindState(key.keyCode, false);
-				binding.setKeyCode(oldKeyCode);
+				KeyBinding.setKeyBindState(fakeKey, false);
+				binding.bind(oldKeyCode);
 				KeyBinding.resetKeyBindingArrayAndHash();
 			}
 		}

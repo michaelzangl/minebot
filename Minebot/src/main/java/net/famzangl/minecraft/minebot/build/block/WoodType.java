@@ -16,13 +16,14 @@
  *******************************************************************************/
 package net.famzangl.minecraft.minebot.build.block;
 
-import net.famzangl.minecraft.minebot.ai.command.BlockWithData;
-import net.famzangl.minecraft.minebot.ai.command.BlockWithDataOrDontcare;
-import net.famzangl.minecraft.minebot.ai.path.world.BlockMetaSet;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSet;
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
+import net.minecraft.block.LogBlock;
 import net.minecraft.util.Direction;
+
+import java.util.stream.Stream;
 
 /**
  * A type of wood used in the game.
@@ -33,39 +34,36 @@ import net.minecraft.util.Direction;
  *
  */
 public enum WoodType {
-	OAK(Blocks.OAK_LOG, 0, net.minecraft.block.WoodType.OAK),
-	SPRUCE(Blocks.SPRUCE_LOG, 1, net.minecraft.block.WoodType.SPRUCE),
-	BIRCH(Blocks.BIRCH_LOG, 2, net.minecraft.block.WoodType.BIRCH),
-	JUNGLE(Blocks.JUNGLE_LOG, 3, net.minecraft.block.WoodType.JUNGLE),
-	ACACIA(Blocks.ACACIA_LOG, 0, net.minecraft.block.WoodType.ACACIA),
-	DARK_OAK(Blocks.DARK_OAK_LOG, 1, net.minecraft.block.WoodType.DARK_OAK);
+	OAK(Blocks.OAK_LOG, 0, net.minecraft.block.WoodType.OAK, Blocks.OAK_SAPLING),
+	SPRUCE(Blocks.SPRUCE_LOG, 1, net.minecraft.block.WoodType.SPRUCE, Blocks.SPRUCE_SAPLING),
+	BIRCH(Blocks.BIRCH_LOG, 2, net.minecraft.block.WoodType.BIRCH, Blocks.BIRCH_SAPLING),
+	JUNGLE(Blocks.JUNGLE_LOG, 3, net.minecraft.block.WoodType.JUNGLE, Blocks.JUNGLE_SAPLING),
+	ACACIA(Blocks.ACACIA_LOG, 0, net.minecraft.block.WoodType.ACACIA, Blocks.ACACIA_SAPLING),
+	DARK_OAK(Blocks.DARK_OAK_LOG, 1, net.minecraft.block.WoodType.DARK_OAK, Blocks.DARK_OAK_SAPLING);
 
+
+	// TODO: Replace with block.get(LogBlock.AXIS) / Direction.Axis
 	public enum LogDirection {
-		X(Direction.Axis.X, 1 << 2),
-		Y(Direction.Axis.Y, 0),
-		Z(Direction.Axis.Z, 2 << 2);
+		X(Direction.Axis.X),
+		Y(Direction.Axis.Y),
+		Z(Direction.Axis.Z);
 
-		public final int higherBits;
 		public final Direction.Axis axis;
-		public final BlockSet blocks;
 
-		private LogDirection(Direction.Axis axis, int higherBits) {
+		private LogDirection(Direction.Axis axis) {
 			this.axis = axis;
-			this.higherBits = higherBits;
-			BlockMetaSet set = new BlockMetaSet();
-			for (WoodType w : WoodType.values()) {
-				set = set.unionWith(w.block, w.lowerBits + higherBits);
-			}
-			blocks = set;
 		}
 
-		public static LogDirection forData(BlockWithDataOrDontcare block) {
-			for (LogDirection d : LogDirection.values()) {
-				if (block.containedIn(d.blocks)) {
-					return d;
-				}
+		public static LogDirection forData(BlockState block) {
+			Direction.Axis axis = block.get(LogBlock.AXIS);
+			if (axis == null) {
+				throw new IllegalArgumentException("Not a log: " + block);
 			}
-			throw new IllegalArgumentException("Illegal Log Block: " + block);
+			return forDirection(axis);
+		}
+
+		private static LogDirection forDirection(Direction.Axis axis) {
+			return Stream.of(values()).filter(it -> it.axis == axis).findAny().get();
 		}
 
 		public LogDirection rotateY() {
@@ -83,15 +81,21 @@ public enum WoodType {
 	public final Block block;
 	public final int lowerBits;
 	public final net.minecraft.block.WoodType plankType;
+	private final Block sapling;
+	private final BlockSet logBlocks;
 
-	private WoodType(Block block, int lowerBits, net.minecraft.block.WoodType plankType) {
+
+	private WoodType(Block block, int lowerBits, net.minecraft.block.WoodType plankType, Block sapling) {
 		this.block = block;
 		this.lowerBits = lowerBits;
 		this.plankType = plankType;
+		this.sapling = sapling;
+
+		logBlocks = BlockSet.builder().add(block).build();
 	}
 
-	private boolean matches(BlockWithDataOrDontcare block2) {
-		return block2.containedIn(getLogBlocks());
+	private boolean matches(BlockState block2) {
+		return getLogBlocks().contains(block2);
 	}
 
 	/**
@@ -100,14 +104,10 @@ public enum WoodType {
 	 * @return
 	 */
 	public BlockSet getLogBlocks() {
-		BlockMetaSet set = new BlockMetaSet();
-		for (LogDirection a : LogDirection.values()) {
-			set = set.unionWith(block, a.higherBits + lowerBits);
-		}
-		return set;
+		return logBlocks;
 	}
 
-	public static WoodType getFor(BlockWithDataOrDontcare block2) {
+	public static WoodType getFor(BlockState block2) {
 		for (WoodType t : values()) {
 			if (t.matches(block2)) {
 				return t;
@@ -117,7 +117,11 @@ public enum WoodType {
 		throw new IllegalArgumentException("Cannot convert to log: " + block2);
 	}
 
-	public BlockWithData getBlockWithMeta(LogDirection direction) {
-		return new BlockWithData(block, lowerBits | direction.higherBits);
+	public BlockState getBlockState(LogDirection newDir) {
+		return block.getDefaultState().with(LogBlock.AXIS, newDir.axis);
+	}
+
+	public Block getSapling() {
+		return sapling;
 	}
 }

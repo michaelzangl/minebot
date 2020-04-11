@@ -21,8 +21,9 @@ import net.famzangl.minecraft.minebot.ai.task.AITask;
 import net.famzangl.minecraft.minebot.ai.task.TaskOperations;
 import net.famzangl.minecraft.minebot.ai.task.error.StringTaskError;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.inventory.ClickType;
-import net.minecraft.inventory.Slot;
+import net.minecraft.client.gui.screen.inventory.ContainerScreen;
+import net.minecraft.inventory.container.ClickType;
+import net.minecraft.inventory.container.Slot;
 
 /**
  * Put items in a currently opened container.
@@ -38,16 +39,16 @@ public abstract class PutItemInContainerTask extends AITask {
 
 	@Override
 	public boolean isFinished(AIHelper aiHelper) {
-		final Screen screen = aiHelper.getMinecraft().currentScreen;
+		final ContainerScreen<?> screen = (ContainerScreen<?>) aiHelper.getMinecraft().currentScreen;
 		return screen != null
 				&& placed
-				&& (slotToPlace < 0 || isFull || !screen.inventorySlots
+				&& (slotToPlace < 0 || isFull || !screen.getContainer()
 						.getSlot(slotToPlace).getHasStack());
 	}
 
 	@Override
 	public void runTick(AIHelper aiHelper, TaskOperations taskOperations) {
-		final Screen screen = aiHelper.getMinecraft().currentScreen;
+		final ContainerScreen<?> screen = (ContainerScreen<?>) aiHelper.getMinecraft().currentScreen;
 		if (screen == null) {
 			taskOperations.desync(new StringTaskError("Expected container to be open"));
 			return;
@@ -59,12 +60,12 @@ public abstract class PutItemInContainerTask extends AITask {
 			taskOperations.desync(new StringTaskError("No item to put in that slot."));
 		} else {
 			System.out.println("Moving from slot: " + slotToPlace);
-			Slot slot = screen.inventorySlots.getSlot(slotToPlace);
+			Slot slot = screen.getContainer().getSlot(slotToPlace);
 			int oldContent, newContent = getSlotContentCount(slot);
 			do {
 				oldContent = newContent;
 				aiHelper.getMinecraft().playerController.windowClick(
-						screen.inventorySlots.windowId, slotToPlace, 0, ClickType.QUICK_MOVE,
+						screen.getContainer().windowId, slotToPlace, 0, ClickType.QUICK_MOVE,
 						aiHelper.getMinecraft().player);
 				newContent = getSlotContentCount(slot);
 			} while (newContent != oldContent);

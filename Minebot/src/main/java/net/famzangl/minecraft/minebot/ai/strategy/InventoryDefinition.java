@@ -53,13 +53,13 @@ public class InventoryDefinition {
 			this.slotIndex = slotIndex;
 			this.amount = amount;
 			this.itemId = itemId;
-			this.damageValue = damageValue;
+			this.damageValue = damageValue; // < TODO
 		}
 		public ItemWithSubtype getItem() {
 			if (itemId == 0) {
 				return null;
 			}
-			return new ItemWithSubtype(itemId, damageValue);
+			return new ItemWithSubtype(itemId);
 		}
 
 		public ItemStack getFakeMcStack() {
@@ -83,7 +83,7 @@ public class InventoryDefinition {
 			stack.getItem();
 			slots.add(new InventorySlot(i, stack.getMaxStackSize(), Item
 					.getIdFromItem(stack.getItem()),
-					stack.getHasSubtypes() ? stack.getItemDamage() : -1));
+					stack.isDamageable() ? stack.getDamage() : -1));
 		}
 	}
 

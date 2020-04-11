@@ -19,7 +19,6 @@ package net.famzangl.minecraft.minebot.ai.enchanting;
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.task.inventory.PutItemInContainerTask;
 import net.minecraft.client.gui.screen.EnchantmentScreen;
-import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 
 /**
@@ -35,12 +34,12 @@ public class PutItemInTableTask extends PutItemInContainerTask {
 	protected int getStackToPut(AIHelper aiHelper) {
 		final EnchantmentScreen screen = (EnchantmentScreen) aiHelper.getMinecraft().currentScreen;
 		for (int i = TABLE_INV_OFFSET; i < 9 * 4 + TABLE_INV_OFFSET; i++) {
-			final Slot slot = screen.inventorySlots.getSlot(i);
-			if (slot == null || !slot.canTakeStack(aiHelper.getMinecraft().player)) {
+			ItemStack slot = screen.getContainer().getInventory().get(i);
+			if (slot.isEmpty()/* TODO: || !slot.canTake(aiHelper.getMinecraft().player) */) {
 				continue;
 			}
 			final ItemStack stack = slot.getStack();
-			if (stack != null && stack.isItemEnchantable()) {
+			if (stack != null && stack.isEnchanted()) {
 				return i;
 			}
 		}

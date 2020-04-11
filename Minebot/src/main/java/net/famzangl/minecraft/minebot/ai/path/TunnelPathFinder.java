@@ -131,8 +131,8 @@ public class TunnelPathFinder extends AlongTrackPathFinder {
 		}
 	}
 
-	private final static BlockSet FREE_TUNNEL_BLOCKS = BlockSets.AIR
-			.unionWith(BlockSets.TORCH);
+	private final static BlockSet FREE_TUNNEL_BLOCKS = BlockSet.builder().add(BlockSets.AIR)
+			.add(BlockSets.TORCH).build();
 
 	private BitSet finishedTunnels = new BitSet();
 	private BitSet inQueueTunnels = new BitSet();

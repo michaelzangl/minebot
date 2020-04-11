@@ -28,9 +28,8 @@ import net.famzangl.minecraft.minebot.ai.selectors.OneOfListSelector;
 import net.famzangl.minecraft.minebot.ai.task.FaceAndInteractTask;
 import net.minecraft.entity.Entity;
 import net.minecraft.item.DyeColor;
+import net.minecraft.item.DyeItem;
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemDye;
-import net.minecraft.item.ItemFood;
 import net.minecraft.item.ItemStack;
 
 import java.util.ArrayList;
@@ -51,9 +50,9 @@ public class LetAnimalsSitStrategy extends TaskStrategy {
 		}
 
 		private boolean interactsWithWolf(Item item) {
-			return item instanceof ItemFood
-					&& ((ItemFood) item).isWolfsFavoriteMeat()
-					|| item instanceof ItemDye;
+			return item.getFood() != null
+					&& item.getFood().isMeat()
+					|| item instanceof DyeItem;
 		}
 	}
 

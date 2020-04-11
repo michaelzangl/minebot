@@ -81,8 +81,8 @@ public class JumpingPlaceAtHalfTask extends JumpingPlaceBlockAtFloorTask {
 			aiHelper.faceSideOf(facingBlock, dir.getOpposite(),
 					getSide(dir) == BlockHalf.UPPER_HALF ? 0.5 : 0,
 					getSide(dir) == BlockHalf.LOWER_HALF ? 0.5 : 1,
-					aiHelper.getMinecraft().player.posX - pos.getX(),
-					aiHelper.getMinecraft().player.posZ - pos.getZ(),
+					aiHelper.getMinecraft().player.getPosX() - pos.getX(),
+					aiHelper.getMinecraft().player.getPosZ() - pos.getZ(),
 					lookingDirection);
 			return true;
 		}

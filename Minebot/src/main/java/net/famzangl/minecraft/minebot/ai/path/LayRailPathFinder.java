@@ -45,7 +45,7 @@ public class LayRailPathFinder extends AlongTrackPathFinder {
 	@Override
 	protected float rateDestination(int distance, int x, int y, int z) {
 		if (isRedstoneBlockPosition(x, y, z)
-				&& !new BlockSet(Blocks.REDSTONE_BLOCK).isAt(world, x, y, z)) {
+				&& !BlockSet.builder().add(Blocks.REDSTONE_BLOCK).build().isAt(world, x, y, z)) {
 			return distance + 2;
 		} else if (isOnTrack(x, z) && y == cy
 				&& !BlockSets.RAILS.isAt(world, x, y, z)) {
@@ -72,7 +72,7 @@ public class LayRailPathFinder extends AlongTrackPathFinder {
 			addTask(new UpwardsMoveTask(currentPos.add(0, 1, 0),
 					new BlockItemFilter(Blocks.REDSTONE_BLOCK)));
 		} else if (placeAccRail(currentPos.getX(), currentPos.getZ())) {
-			if (!new BlockSet(Blocks.REDSTONE_BLOCK).isAt(world, currentPos.add(0, -1, 0))
+			if (!BlockSet.builder().add(Blocks.REDSTONE_BLOCK).build().isAt(world, currentPos.add(0, -1, 0))
 					&& BlockSets.safeSideAround(world, currentPos.add(0,-1,0))
 					&& BlockSets.SAFE_GROUND.isAt(world, currentPos.add(0,-2,0))) {
 				addTask(new DownwardsMoveTask(currentPos.add(0, -1, 0)));

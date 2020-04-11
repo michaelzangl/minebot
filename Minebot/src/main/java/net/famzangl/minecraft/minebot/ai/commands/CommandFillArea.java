@@ -20,7 +20,6 @@ import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.command.AICommand;
 import net.famzangl.minecraft.minebot.ai.command.AICommandInvocation;
 import net.famzangl.minecraft.minebot.ai.command.AICommandParameter;
-import net.famzangl.minecraft.minebot.ai.command.BlockWithDataOrDontcare;
 import net.famzangl.minecraft.minebot.ai.command.ParameterType;
 import net.famzangl.minecraft.minebot.ai.command.SafeStrategyRule;
 import net.famzangl.minecraft.minebot.ai.path.FillAreaPathfinder;
@@ -28,6 +27,7 @@ import net.famzangl.minecraft.minebot.ai.strategy.AIStrategy;
 import net.famzangl.minecraft.minebot.ai.strategy.PathFinderStrategy;
 import net.famzangl.minecraft.minebot.ai.utils.BlockCuboid;
 import net.famzangl.minecraft.minebot.build.commands.CommandClearArea;
+import net.minecraft.block.BlockState;
 
 @AICommand(name = "minebuild", helpText = "Fill an area with a given block.")
 public class CommandFillArea {
@@ -35,7 +35,7 @@ public class CommandFillArea {
 	public static AIStrategy run(
 			AIHelper helper,
 			@AICommandParameter(type = ParameterType.FIXED, fixedName = "fill", description = "") String nameArg,
-			@AICommandParameter(type = ParameterType.BLOCK_NAME, blockFilter=FillAreaPathfinder.FillBlocks.class, description = "The block to place") BlockWithDataOrDontcare block) {
+			@AICommandParameter(type = ParameterType.BLOCK_STATE, blockFilter=FillAreaPathfinder.FillBlocks.class, description = "The block to place") BlockState block) {
 		BlockCuboid area = CommandClearArea.getArea(helper);
 		if (area != null)  {
 			return new PathFinderStrategy(new FillAreaPathfinder(area, block), "Filling with " + block.toString());

@@ -45,7 +45,7 @@ public class CommandBuildRail {
 		final BlockPos playerPosition = helper.getPlayerPosition();
 		return new PathFinderStrategy(
 				new LayRailPathFinder(inDirection.getXOffset(),
-						inDirection.getFrontOffsetZ(), playerPosition.getX(), playerPosition.getY(), playerPosition.getZ()),
+						inDirection.getZOffset(), playerPosition.getX(), playerPosition.getY(), playerPosition.getZ()),
 				"Building a railway");
 	}
 }

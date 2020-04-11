@@ -34,6 +34,6 @@ public class TakeEnchantedItemTask extends TakeResultItem {
 
 	@Override
 	protected boolean shouldTakeStack(ItemStack stack) {
-		return stack.isItemEnchanted();
+		return stack.isEnchanted();
 	}
 }

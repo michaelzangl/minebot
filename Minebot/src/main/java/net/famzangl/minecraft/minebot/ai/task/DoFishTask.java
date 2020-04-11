@@ -18,7 +18,7 @@ package net.famzangl.minecraft.minebot.ai.task;
 
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.net.NetworkHelper;
-import net.minecraft.entity.projectile.EntityFishHook;
+import net.minecraft.entity.projectile.FishingBobberEntity;
 import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.MarkerManager;
 
@@ -39,7 +39,7 @@ public class DoFishTask extends AITask {
 
 	@Override
 	public boolean isFinished(AIHelper aiHelper) {
-		return revoked || aiHelper.getMinecraft().player.fishEntity == null;
+		return revoked || aiHelper.getMinecraft().player.fishingBobber == null;
 	}
 
 	@Override
@@ -70,7 +70,7 @@ public class DoFishTask extends AITask {
 			sendReset = false;
 		}
 		return minebotNetHandler
-				.fishIsCaptured(helper.getMinecraft().player.fishEntity);
+				.fishIsCaptured(helper.getMinecraft().player.fishingBobber);
 	}
 
 	/**
@@ -81,12 +81,12 @@ public class DoFishTask extends AITask {
 	 * @return
 	 */
 	private boolean fishIsCapturedSP(AIHelper helper) {
-		final EntityFishHook fishEntity = helper.getMinecraft().player.fishEntity;
+		FishingBobberEntity fishEntity = helper.getMinecraft().player.fishingBobber;
 		if (fishEntity == null) {
 			return false;
 		}
-		if (fishEntity.motionY < -0.05) {
-			LOGGER.trace(MARKER_FISH, "Fish motion: " + fishEntity.motionY + ", " + fishEntity.posY);
+		if (fishEntity.getMotion().y < -0.05) {
+			LOGGER.trace(MARKER_FISH, "Fish motion: " + fishEntity.getMotion().x + ", " + fishEntity.getMotion().getZ());
 			rightMotion--;
 		} else {
 			rightMotion = 2;

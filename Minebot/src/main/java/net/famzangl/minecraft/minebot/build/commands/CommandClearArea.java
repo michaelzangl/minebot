@@ -21,7 +21,6 @@ import net.famzangl.minecraft.minebot.ai.command.AIChatController;
 import net.famzangl.minecraft.minebot.ai.command.AICommand;
 import net.famzangl.minecraft.minebot.ai.command.AICommandInvocation;
 import net.famzangl.minecraft.minebot.ai.command.AICommandParameter;
-import net.famzangl.minecraft.minebot.ai.command.BlockWithDataOrDontcare;
 import net.famzangl.minecraft.minebot.ai.command.ParameterType;
 import net.famzangl.minecraft.minebot.ai.command.SafeStrategyRule;
 import net.famzangl.minecraft.minebot.ai.path.ClearAreaPathfinder;
@@ -29,6 +28,7 @@ import net.famzangl.minecraft.minebot.ai.path.ClearAreaPathfinder.ClearMode;
 import net.famzangl.minecraft.minebot.ai.strategy.AIStrategy;
 import net.famzangl.minecraft.minebot.ai.strategy.PathFinderStrategy;
 import net.famzangl.minecraft.minebot.ai.utils.BlockCuboid;
+import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
 
 @AICommand(helpText = "Clears the selected area.", name = "minebuild")
@@ -70,7 +70,7 @@ public class CommandClearArea {
 	public static AIStrategy run(
 			AIHelper helper,
 			@AICommandParameter(type = ParameterType.FIXED, fixedName = "clear", description = "") String nameArg,
-			@AICommandParameter(type = ParameterType.BLOCK_NAME, description = "restrict to block", optional = true) BlockWithDataOrDontcare block,
+			@AICommandParameter(type = ParameterType.BLOCK_STATE, description = "restrict to block", optional = true) BlockState block,
 			@AICommandParameter(type = ParameterType.ENUM, description = "clear mode", optional = true) ClearMode mode) {
 		BlockCuboid area =  getArea(helper);
 		if (area != null)  {

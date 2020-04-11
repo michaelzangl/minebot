@@ -16,12 +16,14 @@
  *******************************************************************************/
 package net.famzangl.minecraft.minebot.ai.task.inventory;
 
-import net.famzangl.minecraft.minebot.ai.command.BlockWithData;
-import net.famzangl.minecraft.minebot.ai.command.BlockWithDataOrDontcare;
-import net.famzangl.minecraft.minebot.ai.command.BlockWithDontcare;
+import net.minecraft.block.Block;
+import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.registry.Registry;
+
+import java.util.Objects;
 
 /**
  * A simple (itemid, damagevalue) touple.
@@ -34,85 +36,42 @@ import net.minecraft.item.ItemStack;
 public class ItemWithSubtype {
 
 	private final int itemId;
-	private final int itemDamage;
-	private final boolean hasSubtype;
 
 	public ItemWithSubtype(ItemStack stack) {
-		this(Item.getIdFromItem(stack.getItem()), stack.getItemDamage());
+		this(Item.getIdFromItem(stack.getItem()));
 	}
 
-	public ItemWithSubtype(int itemId, int itemDamage) {
+	public ItemWithSubtype(int itemId) {
 		this.itemId = itemId;
-		this.itemDamage = itemDamage;
-		this.hasSubtype = getItem().getHasSubtypes();
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+		ItemWithSubtype that = (ItemWithSubtype) o;
+		return itemId == that.itemId;
 	}
 
 	@Override
 	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + (hasSubtype ? 1231 : 1237);
-		if (hasSubtype) {
-			result = prime * result + itemDamage;
-		}
-		result = prime * result + itemId;
-		return result;
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		ItemWithSubtype other = (ItemWithSubtype) obj;
-		if (hasSubtype != other.hasSubtype)
-			return false;
-		if (itemId != other.itemId)
-			return false;
-		if (hasSubtype && itemDamage != other.itemDamage)
-			return false;
-		return true;
+		return Objects.hash(itemId);
 	}
 
 	@Override
 	public String toString() {
-		return hasSubtype ? itemId + ":" + itemDamage : itemId + "";
-	}
-
-	public ItemWithSubtype withSubtype(int subtype) {
-		return new ItemWithSubtype(itemId, subtype);
-	}
-
-	public ItemWithSubtype withSubtype(String string) {
-		int subtype;
-		if (string.matches("\\d{1,3}")) {
-			subtype = Integer.parseInt(string);
-			if (subtype >= 64) {
-				throw new IllegalArgumentException("Subtype " + subtype + " too big.");
-			}
-		} else {
-			throw new IllegalArgumentException("Could not parse subtype: " + string);
-		}
-		return withSubtype(subtype);
+		return itemId + "";
 	}
 
 	public Item getItem() {
 		return Item.getItemById(itemId);
 	}
 	
-	public BlockWithDataOrDontcare getBlockType() {
+	public Block getBlockType() {
 		Item item = getItem();
-		if (item instanceof ItemBlock) {
-			ItemBlock itemBlock = (ItemBlock) item;
-			if (hasSubtype) {
-				int meta = getItem().getMetadata(itemDamage);
-				return new BlockWithData(itemBlock.getBlock(), meta);
-			} else {
-				return new BlockWithDontcare(itemBlock.getBlock());
-			}
+		if (item instanceof BlockItem) {
+			BlockItem itemBlock = (BlockItem) item;
+			return itemBlock.getBlock();
 		} else {
 			return null;
 		}
@@ -125,9 +84,6 @@ public class ItemWithSubtype {
 		}
 		ItemStack stack = new ItemStack(item);
 		stack.setCount(size);
-		if (stack.getHasSubtypes()) {
-			stack.setItemDamage(itemDamage);
-		}
 		return stack;
 	}
 	
@@ -141,10 +97,7 @@ public class ItemWithSubtype {
 	 * @return
 	 */
 	public static ItemWithSubtype fromTypeName(String name) {
-		Item item = Item.getByNameOrId(name);
-		if (item == null) {
-			return null;
-		}
-		return new ItemWithSubtype(Item.getIdFromItem(item), 0);
+		Item item = Registry.ITEM.getOrDefault(new ResourceLocation(name));
+		return new ItemWithSubtype(Item.getIdFromItem(item));
 	}
 }

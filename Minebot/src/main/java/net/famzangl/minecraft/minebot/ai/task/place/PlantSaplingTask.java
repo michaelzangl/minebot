@@ -21,7 +21,6 @@ import net.famzangl.minecraft.minebot.ai.BlockItemFilter;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSet;
 import net.famzangl.minecraft.minebot.build.block.WoodType;
 import net.minecraft.block.Blocks;
-import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
 
 /**
@@ -33,25 +32,13 @@ import net.minecraft.util.math.BlockPos;
 public class PlantSaplingTask extends PlaceBlockAtFloorTask {
 
 	private static final class SaplingFilter extends BlockItemFilter {
-		private WoodType type;
 
 		private SaplingFilter(WoodType type) {
-			super(Blocks.SAPLING);
-			this.type = type;
-		}
-		
-		@Override
-		public boolean matches(ItemStack itemStack) {
-			return super.matches(itemStack) && isOfWood(itemStack);
-		}
-
-		private boolean isOfWood(ItemStack itemStack) {
-			return type == null || itemStack.getItemDamage() == type.plankType.getMetadata();
+			super(type.getSapling());
 		}
 	}
 
-	private final static BlockSet PLANTABLE = new BlockSet(
-			Blocks.DIRT, Blocks.GRASS);
+	private final static BlockSet PLANTABLE = BlockSet.builder().add(Blocks.DIRT, Blocks.GRASS).build();
 
 	public PlantSaplingTask(BlockPos pos, WoodType type) {
 		super(pos, new SaplingFilter(type));
@@ -59,7 +46,7 @@ public class PlantSaplingTask extends PlaceBlockAtFloorTask {
 
 	@Override
 	public boolean isFinished(AIHelper aiHelper) {
-		if (!PLANTABLE.contains(aiHelper.getBlock(pos.add(0, -1, 0)))) {
+		if (!PLANTABLE.contains(aiHelper.getBlockState(pos.add(0, -1, 0)))) {
 			return true;
 		}
 

@@ -14,8 +14,8 @@ public class MatchesRater extends Rater {
 		return item != null
 				&& forBlockAndMeta >= 0
 				&& item.getItem() != null
-				&& item.getItem().getStrVsBlock(item,
-						Block.getStateById(forBlockAndMeta >> 4)) > 1;
+				&& item.getItem().canHarvestBlock(item,
+					Block.getStateById(forBlockAndMeta));
 	}
 
 	@Override

@@ -18,7 +18,7 @@ package net.famzangl.minecraft.minebot.ai.selectors;
 
 import com.google.common.base.Predicate;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.passive.EntitySheep;
+import net.minecraft.entity.passive.SheepEntity;
 import net.minecraft.entity.passive.WolfEntity;
 import net.minecraft.item.DyeColor;
 
@@ -34,8 +34,8 @@ public final class ColorSelector implements Predicate<Entity> {
 	public boolean apply(Entity var1) {
 		if (var1 instanceof WolfEntity) {
 			return ((WolfEntity) var1).getCollarColor() == color;
-		} else if (var1 instanceof EntitySheep) {
-			return ((EntitySheep) var1).getFleeceColor() == color;
+		} else if (var1 instanceof SheepEntity) {
+			return ((SheepEntity) var1).getFleeceColor() == color;
 		} else {
 			return false;
 		}

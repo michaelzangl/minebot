@@ -33,10 +33,12 @@ public class OrebfuscatedMinePathFinder extends MineBySettingsPathFinder {
 	// Blocks.emerald_ore, Blocks.redstone_ore);
 	// See
 	// https://github.com/lishid/Orebfuscator/blob/master/src/com/lishid/orebfuscator/OrebfuscatorConfig.java
-	private static final BlockSet targetBlocks = new BlockSet(1, 4, 5, 14, 15,
-			16, 21, 46, 48, 49, 56, 73, 82, 129, 13, 87, 88, 112, 153);
-	private static final BlockSet visibleMakingBlocks = new BlockSet(
-			Blocks.GRAVEL, Blocks.DIRT).unionWith(targetBlocks).invert();
+	private static final BlockSet targetBlocks =
+			BlockSet.builder().add(Blocks.STONE).build();
+			// TODO: new BlockSet(1, 4, 5, 14, 15,
+			//16, 21, 46, 48, 49, 56, 73, 82, 129, 13, 87, 88, 112, 153);
+	private static final BlockSet visibleMakingBlocks = BlockSet.builder().add(
+			Blocks.GRAVEL, Blocks.DIRT).add(targetBlocks).build().invert();
 	
 	@Override
 	protected void onPreRunSearch(BlockPos playerPosition) {
@@ -50,7 +52,7 @@ public class OrebfuscatedMinePathFinder extends MineBySettingsPathFinder {
 			int d = ignoredAbs(x - searchCenter.getX(),
 					preferedDirection.getXOffset())
 					+ ignoredAbs(z - searchCenter.getZ(),
-							preferedDirection.getFrontOffsetZ());
+							preferedDirection.getZOffset());
 			return distance + maxDistancePoints + 10 + d * 5;
 		} else if (/*
 					 * searchCenter.distance(new Pos(x, y, z)) < 10 &&

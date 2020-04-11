@@ -17,7 +17,6 @@
 package net.famzangl.minecraft.minebot.ai.strategy;
 
 import net.famzangl.minecraft.minebot.ai.AIHelper;
-import net.famzangl.minecraft.minebot.ai.command.BlockWithDataOrDontcare;
 import net.famzangl.minecraft.minebot.ai.enchanting.CloseScreenTask;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSet;
 import net.famzangl.minecraft.minebot.ai.path.world.WorldData;
@@ -31,11 +30,11 @@ import net.famzangl.minecraft.minebot.ai.task.inventory.ItemCountList;
 import net.famzangl.minecraft.minebot.ai.task.inventory.ItemWithSubtype;
 import net.famzangl.minecraft.minebot.ai.task.inventory.PutOnCraftingTableTask;
 import net.famzangl.minecraft.minebot.ai.task.inventory.TakeResultItem;
+import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
-import net.minecraft.client.gui.inventory.ContainerScreen;
+import net.minecraft.client.gui.screen.inventory.ContainerScreen;
 import net.minecraft.client.gui.screen.inventory.CraftingScreen;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.CraftingManager;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.item.crafting.Ingredient;
 import net.minecraft.item.crafting.ShapedRecipe;
@@ -151,7 +150,7 @@ public class CraftStrategy extends PathFinderStrategy {
 				if (item == null) {
 					return false;
 				} else {
-					ItemWithSubtype genericItem = item.withSubtype(SUBTYPE_IGNORED);
+					ItemWithSubtype genericItem = item;
 					return Stream.of(slots[x][y]).anyMatch(
 									slot -> slot.equals(item) || slot.equals(genericItem)
 								);
@@ -178,7 +177,8 @@ public class CraftStrategy extends PathFinderStrategy {
 		}
 
 		public List<CraftingPossibility> getPossibility() {
-			try {
+			return Collections.emptyList();
+			/* TODO try {
 				return CraftingManager.REGISTRY.getKeys().stream()
 						.map(id -> CraftingManager.REGISTRY.getObject(id))
 						.filter(recipe -> {
@@ -190,7 +190,7 @@ public class CraftStrategy extends PathFinderStrategy {
 			} catch (IllegalArgumentException e) {
 				System.err.println("Cannot craft: " + e.getMessage());
 				return Collections.emptyList();
-			}
+			}*/
 		}
 
 		@Override
@@ -215,7 +215,7 @@ public class CraftStrategy extends PathFinderStrategy {
 
 	public final static class CraftingTableHandler extends
 			RangeBlockHandler<CraftingTableData> {
-		private static final BlockSet IDS = new BlockSet(Blocks.CRAFTING_TABLE);
+		private static final BlockSet IDS = BlockSet.builder().add(Blocks.CRAFTING_TABLE).build();
 
 		private final Hashtable<BlockPos, CraftingTableData> found = new Hashtable<BlockPos, CraftingTableData>();
 
@@ -434,17 +434,15 @@ public class CraftStrategy extends PathFinderStrategy {
 		}
 	}
 
-	public CraftStrategy(int amount, int itemId, int subtype) {
-		this(amount, new ItemWithSubtype(itemId, subtype));
-	}
-
 	public CraftStrategy(int amount, ItemWithSubtype item) {
 		super(new CraftingTableFinder(new CraftingWish(amount, item)),
 				"Crafting");
 	}
 
-	public CraftStrategy(int amount, BlockWithDataOrDontcare itemType) {
-		this(amount, itemType.getItemType());
+	public CraftStrategy(int amount, BlockState itemType) {
+		super(null, null);
+		throw new UnsupportedOperationException("TODO");
+		// TODO this(amount, new ItemWithSubtype(itemType));
 	}
 
 	@Override

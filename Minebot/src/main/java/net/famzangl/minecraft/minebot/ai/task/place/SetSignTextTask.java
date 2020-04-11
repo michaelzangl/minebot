@@ -19,8 +19,8 @@ package net.famzangl.minecraft.minebot.ai.task.place;
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.task.AITask;
 import net.famzangl.minecraft.minebot.ai.task.TaskOperations;
-import net.minecraft.client.gui.inventory.EditScreenSign;
-import net.minecraft.tileentity.TileEntitySign;
+import net.minecraft.client.gui.screen.EditSignScreen;
+import net.minecraft.tileentity.SignTileEntity;
 import net.minecraft.util.SharedConstants;
 import net.minecraft.util.math.BlockPos;
 
@@ -70,16 +70,16 @@ public class SetSignTextTask extends AITask {
 	public void runTick(AIHelper aiHelper, TaskOperations taskOperations) {
 		if (!guiOpened) {
 			// wait
-			guiOpened = aiHelper.getMinecraft().currentScreen instanceof EditScreenSign;
+			guiOpened = aiHelper.getMinecraft().currentScreen instanceof EditSignScreen;
 		} else {
 			if (timer == 0) {
-				TileEntitySign sign = (TileEntitySign) aiHelper.getMinecraft().world
+				SignTileEntity sign = (SignTileEntity) aiHelper.getMinecraft().world
 						.getTileEntity(pos);
 				// sign.signText = text;
 			} else if (timer == 5) {
 				// EditScreenSign edit = (EditScreenSign)
 				// h.getMinecraft().currentScreen;
-				aiHelper.getMinecraft().displayScreenScreen(null);
+				aiHelper.getMinecraft().displayGuiScreen(null);
 			}
 			timer++;
 		}

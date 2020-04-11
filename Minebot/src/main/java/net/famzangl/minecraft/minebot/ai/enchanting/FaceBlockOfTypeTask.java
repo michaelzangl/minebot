@@ -34,7 +34,7 @@ public class FaceBlockOfTypeTask extends AITask {
 	}
 
 	private BlockPos getPos(AIHelper aiHelper) {
-		List<BlockPos> positions = new BlockSet(Blocks.ENCHANTING_TABLE).findBlocks(aiHelper.getWorld(), aiHelper.getPlayerPosition(), 2);
+		List<BlockPos> positions = BlockSet.builder().add(Blocks.ENCHANTING_TABLE).build().findBlocks(aiHelper.getWorld(), aiHelper.getPlayerPosition(), 2);
 		final BlockPos pos = positions.isEmpty() ? null : positions.get(1);
 		return pos;
 	}

@@ -7,13 +7,14 @@ import net.famzangl.minecraft.minebot.ai.command.AICommandInvocation;
 import net.famzangl.minecraft.minebot.ai.command.AICommandParameter;
 import net.famzangl.minecraft.minebot.ai.command.ParameterType;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSet;
+import net.famzangl.minecraft.minebot.ai.path.world.BlockSets;
 import net.famzangl.minecraft.minebot.ai.strategy.AIStrategy;
 import net.famzangl.minecraft.minebot.ai.strategy.RunOnceStrategy;
 import net.famzangl.minecraft.minebot.settings.MinebotSettings;
-import net.minecraft.block.BlockSign;
+import net.minecraft.block.AbstractSignBlock;
 import net.minecraft.block.Blocks;
+import net.minecraft.tileentity.SignTileEntity;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.tileentity.TileEntitySign;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
 
@@ -26,7 +27,7 @@ import java.util.Calendar;
 
 @AICommand(helpText = "Dump all signs to a text file.", name = "minebot")
 public class CommandDumpSigns {
-	private static final BlockSet SIGNS = new BlockSet(Blocks.STANDING_SIGN, Blocks.WALL_SIGN);
+	private static final BlockSet SIGNS = BlockSet.builder().add(BlockSets.SIGN).add(BlockSets.WALL_SIGN).build();
 	@AICommandInvocation()
 	public static AIStrategy run(
 			AIHelper helper,
@@ -65,19 +66,19 @@ public class CommandDumpSigns {
 			}
 
 			private void dumpAtPos(AIHelper helper, PrintStream out, BlockPos p) {
-				BlockSign block = (BlockSign) helper.getBlock(p);
+				AbstractSignBlock block = (AbstractSignBlock) helper.getBlock(p);
 				TileEntity tileentity = helper.getMinecraft().world
 						.getTileEntity(p);
-				if (tileentity instanceof TileEntitySign) {
+				if (tileentity instanceof SignTileEntity) {
 					out.print(p.getX());
 					out.print("\t");
 					out.print(p.getY());
 					out.print("\t");
 					out.print(p.getZ());
-					ITextComponent[] texts = ((TileEntitySign) tileentity).signText;
+					ITextComponent[] texts = ((SignTileEntity) tileentity).signText;
 					for (ITextComponent t : texts) {
 						out.append("\t");
-						out.print(t == null ? "" : t.getUnformattedText());
+						out.print(t == null ? "" : t.getString());
 					}
 					out.println();
 				} else {

@@ -12,8 +12,8 @@ import java.util.ArrayList;
 
 public class BuildTaskFactories {
 
-	public static final BlockSet IGNORED_ON_RECONSTRUCT = BlockSets.AIR
-			.unionWith(new BlockSet(Blocks.BARRIER));
+	public static final BlockSet IGNORED_ON_RECONSTRUCT =
+			BlockSet.builder().add(BlockSets.AIR).add(Blocks.BARREL).build();
 
 	private static final ArrayList<BuildTaskFactory> factories = new ArrayList<BuildTaskFactory>();
 

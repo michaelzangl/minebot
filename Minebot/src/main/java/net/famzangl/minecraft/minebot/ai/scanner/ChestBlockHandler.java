@@ -37,8 +37,8 @@ import java.util.List;
 import java.util.Map.Entry;
 
 public class ChestBlockHandler extends RangeBlockHandler<ChestData> {
-	private static final BlockSet CHEST = new BlockSet(Blocks.CHEST,
-			Blocks.TRAPPED_CHEST);
+	private static final BlockSet CHEST = BlockSet.builder().add(Blocks.CHEST,
+			Blocks.TRAPPED_CHEST).build();
 
 	public static class AbstractChestData {
 		protected final BlockPos pos;
@@ -301,7 +301,7 @@ public class ChestBlockHandler extends RangeBlockHandler<ChestData> {
 	 * @return
 	 */
 	private Direction getDirection(ItemFrameEntity itemFrame) {
-		return itemFrame.facingDirection;
+		return itemFrame.getHorizontalFacing();
 	}
 
 	public int getExpectedPutRating(BlockPos pos, ItemStack stack) {

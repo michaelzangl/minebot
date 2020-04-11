@@ -18,7 +18,7 @@ public class RecordingWorld extends WorldWithDelta {
 
 	@Override
 	public void setBlock(int x, int y, int z, int blockId, int meta) {
-		int currentBlock = getBlockIdWithMeta(x, y, z);
+		int currentBlock = getBlockStateId(x, y, z);
 		if (currentBlock >> 4 != 0) {
 			timeInTicks += getTimeToDestroy(new BlockPos(x, y, z), currentBlock);
 		}

@@ -30,7 +30,7 @@ import net.famzangl.minecraft.minebot.ai.scanner.RangeBlockHandler;
 import net.famzangl.minecraft.minebot.ai.task.UseItemOnBlockAtTask;
 import net.famzangl.minecraft.minebot.ai.task.inventory.ItemWithSubtype;
 import net.minecraft.block.Blocks;
-import net.minecraft.client.gui.EnchantmentScreen;
+import net.minecraft.client.gui.screen.EnchantmentScreen;
 import net.minecraft.util.math.BlockPos;
 
 import java.util.ArrayList;
@@ -52,7 +52,7 @@ public class EnchantStrategy extends PathFinderStrategy {
 
 	public final static class EnchantingTableHandler extends
 			RangeBlockHandler<EnchantingTableData> {
-		private static final BlockSet IDS = new BlockSet(Blocks.ENCHANTING_TABLE);
+		private static final BlockSet IDS = BlockSet.builder().add(Blocks.ENCHANTING_TABLE).build();
 
 		private final Hashtable<BlockPos, EnchantingTableData> found = new Hashtable<BlockPos, EnchantingTableData>();
 

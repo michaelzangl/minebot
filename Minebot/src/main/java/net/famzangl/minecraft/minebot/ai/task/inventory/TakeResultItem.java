@@ -64,11 +64,11 @@ public class TakeResultItem extends AITask {
 			return;
 		}
 		final ContainerScreen<?> screen = (ContainerScreen<?>) currentScreen;
-		if (screen.inventorySlots.getSlot(slot).getHasStack()
-				&& shouldTakeStack(screen.inventorySlots.getSlot(slot)
+		if (!screen.getContainer().getInventory().get(slot).isEmpty()
+				&& shouldTakeStack(screen.getContainer().getInventory().get(slot)
 						.getStack())) {
 			aiHelper.getMinecraft().playerController.windowClick(
-					screen.inventorySlots.windowId, slot, 0, ClickType.QUICK_MOVE,
+					screen.getContainer().windowId, slot, 0, ClickType.QUICK_MOVE,
 					aiHelper.getMinecraft().player);
 			LOGGER.trace(MARKER_TAKE_RESULT, "Taking item");
 			tookItem = true;

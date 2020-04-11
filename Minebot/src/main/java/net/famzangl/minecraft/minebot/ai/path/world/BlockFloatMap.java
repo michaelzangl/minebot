@@ -1,7 +1,7 @@
 package net.famzangl.minecraft.minebot.ai.path.world;
 
-import net.famzangl.minecraft.minebot.ai.command.BlockWithData;
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
 
 import java.util.Arrays;
 
@@ -11,11 +11,10 @@ import java.util.Arrays;
  * @author Michael Zangl
  */
 public class BlockFloatMap {
-	private float[] floats = new float[BlockSet.MAX_BLOCKIDS * 16];
+	private float[] floats = new float[] {Float.NaN, Float.NaN, Float.NaN, Float.NaN};
 	private float defaultValue = Float.NaN;
 
 	public BlockFloatMap() {
-		Arrays.fill(floats, Float.NaN);
 	}
 
 	public void setDefault(float defaultValue) {
@@ -34,18 +33,16 @@ public class BlockFloatMap {
 		this.defaultValue = defaultValue;
 	}
 
-	public void setBlock(int blockId, float value) {
-		for (int i = 0; i < 16; i++) {
-			floats[blockId * 16 + i] = value;
-		}
-	}
-
-	public void set(int blockWithMeta, float value) {
+	private void set(int blockWithMeta, float value) {
 		floats[blockWithMeta] = value;
 	}
 
-	public void set(BlockWithData block, float value) {
-		set(block.getBlockWithMeta(), value);
+	public void set(BlockState block, float value) {
+		set(Block.getStateId(block), value);
+	}
+
+	public float get(BlockState blockAndMeta) {
+		return get(Block.getStateId(blockAndMeta));
 	}
 
 	public float get(int blockAndMeta) {
@@ -53,9 +50,9 @@ public class BlockFloatMap {
 	}
 
 	public float getMax() {
-		float max = Float.NaN;
+		float max = defaultValue;
 		for (float f : floats) {
-			if (f != Float.NaN && (f > max || Float.isNaN(max))) {
+			if (!Float.isNaN(f) && (f > max || Float.isNaN(max))) {
 				max = f;
 			}
 		}
@@ -63,9 +60,19 @@ public class BlockFloatMap {
 	}
 
 	public void setBlock(Block block, float value) {
-		setBlock(Block.getIdFromBlock(block), value);
+		block.getStateContainer().getValidStates().forEach(state -> setBlockState(state, value));
 	}
-	
+
+	public void setBlockState(BlockState blockState, float value) {
+		int stateId = Block.getStateId(blockState);
+		if (floats.length <= stateId) {
+			float[] newFloats = Arrays.copyOf(floats, Math.max(stateId + 1, floats.length * 2));
+			Arrays.fill(newFloats, floats.length, newFloats.length, Float.NaN);
+			this.floats = newFloats;
+		}
+		floats[stateId] = value;
+	}
+
 	public float getDefaultValue() {
 		return defaultValue;
 	}

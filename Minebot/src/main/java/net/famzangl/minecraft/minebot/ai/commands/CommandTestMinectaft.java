@@ -5,7 +5,6 @@ import net.famzangl.minecraft.minebot.ai.command.AICommand;
 import net.famzangl.minecraft.minebot.ai.command.AICommandInvocation;
 import net.famzangl.minecraft.minebot.ai.command.AICommandParameter;
 import net.famzangl.minecraft.minebot.ai.command.ParameterType;
-import net.famzangl.minecraft.minebot.ai.path.world.BlockMetaSet;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSet;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSets;
 import net.famzangl.minecraft.minebot.ai.path.world.WorldData;
@@ -15,6 +14,7 @@ import net.famzangl.minecraft.minebot.ai.utils.BlockArea;
 import net.famzangl.minecraft.minebot.ai.utils.BlockArea.AreaVisitor;
 import net.famzangl.minecraft.minebot.ai.utils.BlockCuboid;
 import net.minecraft.block.Blocks;
+import net.minecraft.block.SandBlock;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.util.math.BlockPos;
 
@@ -101,7 +101,7 @@ public class CommandTestMinectaft {
 		AreaVisitor visitor = new AreaVisitor() {
 			@Override
 			public void visit(WorldData world, int x, int y, int z) {
-				world.getBlockIdWithMeta(x, y, z);
+				world.getBlockStateId(x, y, z);
 			}
 		};
 		long start = start();
@@ -140,7 +140,7 @@ public class CommandTestMinectaft {
 			for (int y = minY; y <= maxY; y++) {
 				for (int x = minX; x <= maxX; x++) {
 					for (int z = minZ; z <= maxZ; z++) {
-						world.getBlockIdWithMeta(x, y, z);
+						world.getBlockStateId(x, y, z);
 					}
 				}
 			}
@@ -216,12 +216,10 @@ public class CommandTestMinectaft {
 	private static void accessBlockMetaSetAroundPlayer(WorldData world) {
 		BlockArea area = blocksAroundPlayer(world);
 		BlockSet setC = BlockSets.SAFE_CEILING;
-		BlockMetaSet sand = new BlockMetaSet(Blocks.SAND, 0);
-		final BlockSet set = setC.unionWith(sand);
 		AreaVisitor visitor = new AreaVisitor() {
 			@Override
 			public void visit(WorldData world, int x, int y, int z) {
-				set.isAt(world, x, y, z);
+				setC.isAt(world, x, y, z);
 			}
 		};
 		long start = start();

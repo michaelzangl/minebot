@@ -27,6 +27,7 @@ import net.minecraft.client.gui.screen.inventory.FurnaceScreen;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.container.FurnaceFuelSlot;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.crafting.FurnaceRecipe;
 import net.minecraft.tileentity.FurnaceTileEntity;
 import net.minecraft.util.math.BlockPos;
 
@@ -67,8 +68,9 @@ public class FurnaceBlockHandler extends RangeBlockHandler<FurnaceData> {
 		}
 
 		public boolean couldPut(ItemWithSubtype item) {
-			ItemStack result = FurnaceRecipes.instance().getSmeltingResult(
-					item.getFakeMCStack(1));
+			// TODO ItemStack result = FurnaceRecipe.instance().getSmeltingResult(
+				//	item.getFakeMCStack(1));
+			ItemStack result = null;
 			if (result == null)
 				return false;
 			if (setResultItem != null && !setResultItem.equals(item))

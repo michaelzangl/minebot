@@ -24,10 +24,10 @@ import net.famzangl.minecraft.minebot.ai.selectors.ColorSelector;
 import net.famzangl.minecraft.minebot.ai.selectors.ItemSelector;
 import net.famzangl.minecraft.minebot.ai.selectors.OrSelector;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.passive.EntitySheep;
+import net.minecraft.entity.passive.SheepEntity;
 import net.minecraft.item.DyeColor;
-import net.minecraft.item.ItemShears;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.ShearsItem;
 
 public class ShearStrategy extends FaceInteractStrategy {
 	private final DyeColor color;
@@ -40,15 +40,15 @@ public class ShearStrategy extends FaceInteractStrategy {
 		@Override
 		public boolean matches(ItemStack itemStack) {
 			return itemStack != null
-					&& itemStack.getItem() instanceof ItemShears;
+					&& itemStack.getItem() instanceof ShearsItem;
 		}
 	}
 
 	private final class SheepSelector implements Predicate<Entity> {
 		@Override
 		public boolean apply(Entity var1) {
-			return var1 instanceof EntitySheep
-					&& !((EntitySheep) var1).getSheared() && !((EntitySheep) var1).isChild();
+			return var1 instanceof SheepEntity
+					&& !((SheepEntity) var1).getSheared() && !((SheepEntity) var1).isChild();
 		}
 	}
 	

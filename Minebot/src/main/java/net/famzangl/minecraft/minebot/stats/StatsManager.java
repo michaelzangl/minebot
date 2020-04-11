@@ -16,9 +16,9 @@
  *******************************************************************************/
 package net.famzangl.minecraft.minebot.stats;
 
-import net.famzangl.minecraft.minebot.ai.command.BlockWithData;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSets;
 import net.famzangl.minecraft.minebot.ai.path.world.WorldData;
+import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
 
 import java.util.HashMap;
@@ -37,10 +37,10 @@ public class StatsManager {
 	private static class IntentionalBreak {
 
 		private long gameTickTimer;
-		private BlockWithData block;
+		private BlockState block;
 		private BlockPos pos;
 
-		public IntentionalBreak(long gameTickTimer, BlockWithData block,
+		public IntentionalBreak(long gameTickTimer, BlockState block,
 				BlockPos pos) {
 			this.gameTickTimer = gameTickTimer;
 			this.block = block;
@@ -101,7 +101,7 @@ public class StatsManager {
 	 * @param pos
 	 */
 	public synchronized void markIntentionalBlockBreak(BlockPos pos) {
-		BlockWithData block = world.getBlock(pos);
+		BlockState block = world.getBlockState(pos);
 		if (!BlockSets.AIR.isAt(world, pos)) {
 			intentionalBreaks.put(pos, new IntentionalBreak(gameTickTimer,
 					block, pos));

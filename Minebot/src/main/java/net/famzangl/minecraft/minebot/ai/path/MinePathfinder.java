@@ -21,12 +21,11 @@ import net.famzangl.minecraft.minebot.ai.path.world.BlockSet;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSets;
 import net.famzangl.minecraft.minebot.ai.task.DestroyInRangeTask;
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
 import net.minecraft.util.Direction;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 
 import java.util.Random;
-import java.util.Set;
 
 public abstract class MinePathfinder extends MovePathFinder {
 	protected static final float MIN_FACTOR = 0.1f;
@@ -102,15 +101,17 @@ public abstract class MinePathfinder extends MovePathFinder {
 			if (factors == null) {
 				throw new NullPointerException("No points map provided.");
 			}
-			for (ResourceLocation k : (Set<ResourceLocation>) Block.REGISTRY
-					.getKeys()) {
-				int id = Block.getIdFromBlock((Block) Block.REGISTRY
-						.getObject(k));
-				// TODO: Do this better...
-				float f = factors.get(id * 16);
+			for (BlockState state : Block.BLOCK_STATE_IDS) {
+				float f = factors.get(state);
 				if (f > 0) {
-					headAllowedBlocks.intersectWith(new BlockSet(id));
-					footAllowedBlocks.intersectWith(new BlockSet(id));
+					headAllowedBlocks = BlockSet.builder()
+							.add(headAllowedBlocks)
+							.add(state)
+							.build();
+					footAllowedBlocks = BlockSet.builder()
+							.add(footAllowedBlocks)
+							.add(state)
+							.build();
 				}
 			}
 		}
@@ -152,9 +153,9 @@ public abstract class MinePathfinder extends MovePathFinder {
 					badDirectionMalus = dx * preferedDirectionInfluence;
 				}
 			} else if (preferedDirection != null
-					&& preferedDirection.getFrontOffsetZ() != 0) {
+					&& preferedDirection.getZOffset() != 0) {
 				final int dz = z - current.getZ();
-				if (Math.signum(dz) != preferedDirection.getFrontOffsetZ()) {
+				if (Math.signum(dz) != preferedDirection.getZOffset()) {
 					badDirectionMalus = dz * preferedDirectionInfluence;
 				}
 			}
@@ -172,7 +173,7 @@ public abstract class MinePathfinder extends MovePathFinder {
 	}
 
 	private float rateOreBlockDistance(int distance, int x, int y, int z) {
-		final int id = world.getBlockIdWithMeta(x, y, z);
+		final int id = world.getBlockStateId(x, y, z);
 		final float point = points.get(id);
 
 		final float factor = factors.get(id);
@@ -185,7 +186,7 @@ public abstract class MinePathfinder extends MovePathFinder {
 	}
 
 	protected boolean isOreBlock(int x, int y, int z) {
-		return factors.get(world.getBlockIdWithMeta(x, y, z)) > 0;
+		return factors.get(world.getBlockStateId(x, y, z)) > 0;
 	}
 
 	@Override

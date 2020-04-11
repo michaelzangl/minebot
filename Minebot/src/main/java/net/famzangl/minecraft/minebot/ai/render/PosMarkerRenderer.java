@@ -18,7 +18,7 @@ package net.famzangl.minecraft.minebot.ai.render;
 
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.minecraft.util.math.BlockPos;
-import net.minecraftforge.fml.common.gameevent.TickEvent.RenderTickEvent;
+import net.minecraftforge.event.TickEvent;
 
 /**
  * Renders the marker boxes for indicating pos1/pos2
@@ -38,8 +38,8 @@ public class PosMarkerRenderer extends RenderHelper {
 		this.b = b;
 	}
 
-	public void render(RenderTickEvent event, AIHelper helper,
-			BlockPos... markerPos) {
+	public void render(TickEvent.RenderTickEvent event, AIHelper helper,
+					   BlockPos... markerPos) {
 		renderStart(event, helper);
 
 		float part = 1.0f;
