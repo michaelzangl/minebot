@@ -36,6 +36,9 @@ Building Minebot is straight forward. You need linux, git and the normal java de
 * Run ./release.sh
 * Extract that ZIP file in your minecraft mods directory
 
+If you encounter exceptions during the build, try running this in the minebot directory:
+`./gradlew --no-daemon build`
+
 Developing Minebot
 ==================
 

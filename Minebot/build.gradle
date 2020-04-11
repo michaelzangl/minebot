@@ -1,15 +1,15 @@
 buildscript {
     repositories {
         jcenter()
-        maven { url = "http://files.minecraftforge.net/maven" }
+        maven { url = 'https://files.minecraftforge.net/maven' }
     }
     dependencies {
-        classpath 'net.minecraftforge.gradle:ForgeGradle:2.3-SNAPSHOT'
+        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '3.+', changing: true
         classpath 'org.ajoberstar:grgit:1.1.0'
     }
 }
 
-apply plugin: 'net.minecraftforge.gradle.forge'
+apply plugin: 'net.minecraftforge.gradle'
 compileJava.options.encoding = 'UTF-8'
 
 // VERSION
@@ -22,50 +22,41 @@ version = git_tags.size() > 0 ? git_tags[0].getName() : git_head.abbreviatedId;
 println "Compiling version ${version}"
 
 group = "de.michaelzangl.minebot"
-archivesBaseName = project.projectDir.name
+archivesBaseName = 'Minebot'
 
-sourceCompatibility = targetCompatibility = '1.8'
-compileJava {
-    sourceCompatibility = targetCompatibility = '1.8'
-}
-
+sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = '1.8' // Need this here so eclipse task generates correctly.
 
 minecraft {
-    version = "1.12-14.21.0.2344"
-    runDir = "run"
-
     // the mappings can be changed at any time, and must be in the following format.
     // snapshot_YYYYMMDD   snapshot are built nightly.
     // stable_#            stables are built at the discretion of the MCP team.
     // Use non-default mappings at your own risk. they may not allways work.
     // simply re-run your setup task after changing the mappings to update your workspace.
-    mappings = "snapshot_20170617"
-}
+    mappings channel: 'snapshot', version: '20200225-1.15.1'
 
-sourceSets.main{
-    java{
-        srcDirs 'src'
-    }
-    resources{
-        srcDirs 'resources'
+    runs {
+        client {
+            workingDirectory project.file('run')
+        }
     }
 }
 
-processResources
-{
-    inputs.property "version", project.version
-    inputs.property "mcversion", project.minecraft.version
+dependencies {
+    minecraft 'net.minecraftforge:forge:1.15.2-31.1.43'
+}
 
-    // replace stuff in mcmod.info, nothing else
-    from(sourceSets.main.resources.srcDirs) {
-        include 'mcmod.info'
-                
-        // replace version and mcversion
-        expand 'version':project.version, 'mcversion':project.minecraft.version
-    }
-        
-    // copy everything else, thats not the mcmod.info
-    from(sourceSets.main.resources.srcDirs) {
-        exclude 'mcmod.info'
+jar {
+    manifest {
+        attributes([
+            "Specification-Title": "minebot",
+            "Specification-Vendor": "Michael Zangl",
+            "Specification-Version": "1", // We are version 1 of ourselves
+            "Implementation-Title": project.name,
+            "Implementation-Version": "${version}",
+            "Implementation-Vendor" :"Michael Zangl",
+            "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
+        ])
     }
 }
+
+jar.finalizedBy('reobfJar') 
