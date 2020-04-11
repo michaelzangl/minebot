@@ -16,13 +16,13 @@
  *******************************************************************************/
 package net.famzangl.minecraft.minebot.ai.command;
 
+import net.famzangl.minecraft.minebot.ai.path.world.BlockSet;
+import net.minecraft.block.Blocks;
+
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
-
-import net.famzangl.minecraft.minebot.ai.path.world.BlockSet;
-import net.minecraft.init.Blocks;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.PARAMETER)

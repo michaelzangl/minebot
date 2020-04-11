@@ -16,31 +16,31 @@
  *******************************************************************************/
 package net.famzangl.minecraft.minebot.ai.selectors;
 
+import com.google.common.base.Predicate;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.passive.EntityTameable;
+import net.minecraft.entity.passive.TameableEntity;
+
 import java.lang.reflect.Method;
 
-import com.google.common.base.Predicate;
-
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.passive.EntityTameable;
-
 public class OwnTameableSelector implements Predicate<Entity> {
-	private final EntityLivingBase owner;
+	private final LivingEntity owner;
 
-	public OwnTameableSelector(EntityLivingBase owner) {
+	public OwnTameableSelector(LivingEntity owner) {
 		super();
 		this.owner = owner;
 	}
 
 	@Override
 	public boolean apply(Entity entity) {
-		return entity instanceof EntityTameable && isMine((EntityTameable) entity);
+		return entity instanceof TameableEntity && isMine((EntityTameable) entity);
 	}
 
-	private boolean isMine(EntityTameable entity) {
+	private boolean isMine(TameableEntity entity) {
 		Method method;
 		try {
-			method = EntityTameable.class.getMethod("func_152113_b");
+			method = TameableEntity.class.getMethod("func_152113_b");
 
 			if (method != null) {
 				// 1.7.10. No fix so far...

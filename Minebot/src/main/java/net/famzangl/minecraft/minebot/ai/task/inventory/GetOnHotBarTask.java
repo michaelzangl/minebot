@@ -16,21 +16,20 @@
  *******************************************************************************/
 package net.famzangl.minecraft.minebot.ai.task.inventory;
 
-import org.apache.logging.log4j.Marker;
-import org.apache.logging.log4j.MarkerManager;
-
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.ItemFilter;
 import net.famzangl.minecraft.minebot.ai.task.AITask;
 import net.famzangl.minecraft.minebot.ai.task.SkipWhenSearchingPrefetch;
 import net.famzangl.minecraft.minebot.ai.task.TaskOperations;
 import net.famzangl.minecraft.minebot.ai.task.error.SelectTaskError;
-import net.minecraft.client.entity.EntityPlayerSP;
-import net.minecraft.client.gui.inventory.GuiInventory;
+import net.minecraft.client.entity.ClientPlayerEntity;
+import net.minecraft.client.gui.screen.inventory.InventoryScreen;
 import net.minecraft.client.multiplayer.PlayerControllerMP;
 import net.minecraft.inventory.ClickType;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
+import org.apache.logging.log4j.Marker;
+import org.apache.logging.log4j.MarkerManager;
 
 /**
  * Gets the item on the hotbar out of the inventory. Currently only uses slot 5.
@@ -57,8 +56,8 @@ public class GetOnHotBarTask extends AITask {
 
 	@Override
 	public void runTick(AIHelper aiHelper, TaskOperations taskOperations) {
-		if (aiHelper.getMinecraft().currentScreen instanceof GuiInventory) {
-			final GuiInventory screen = (GuiInventory) aiHelper.getMinecraft().currentScreen;
+		if (aiHelper.getMinecraft().currentScreen instanceof InventoryScreen) {
+			final InventoryScreen screen = (InventoryScreen) aiHelper.getMinecraft().currentScreen;
 			for (int i = 9; i < 9 * 4; i++) {
 				final Slot slot = screen.inventorySlots.getSlot(i);
 				final ItemStack stack = slot.getStack();
@@ -79,7 +78,7 @@ public class GetOnHotBarTask extends AITask {
 //							new CPacketClientStatus(
 //									CPacketClientStatus.State.));
 			aiHelper.getMinecraft().displayGuiScreen(
-					new GuiInventory(aiHelper.getMinecraft().player));
+					new InventoryScreen(aiHelper.getMinecraft().player));
 			inventoryOpened = true;
 		} else {
 			taskOperations.desync(new SelectTaskError(itemFiler));
@@ -93,10 +92,10 @@ public class GetOnHotBarTask extends AITask {
 	 * @param screen
 	 * @param i
 	 */
-	private void swap(AIHelper aiHelper, GuiInventory screen, int i) {
+	private void swap(AIHelper aiHelper, InventoryScreen screen, int i) {
 		final PlayerControllerMP playerController = aiHelper.getMinecraft().playerController;
 		final int windowId = screen.inventorySlots.windowId;
-		final EntityPlayerSP player = aiHelper.getMinecraft().player;
+		final ClientPlayerEntity player = aiHelper.getMinecraft().player;
 		playerController.windowClick(windowId, i, 0, ClickType.PICKUP, player);
 		playerController.windowClick(windowId, 35 + 5, 0, ClickType.PICKUP, player);
 		playerController.windowClick(windowId, i, 0, ClickType.PICKUP, player);

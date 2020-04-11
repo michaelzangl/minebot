@@ -20,8 +20,8 @@ import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.settings.MinebotSettings;
 import net.famzangl.minecraft.minebot.settings.MinebotSettingsRoot;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiMainMenu;
-import net.minecraft.client.multiplayer.WorldClient;
+import net.minecraft.client.gui.screen.MainMenuScreen;
+import net.minecraft.client.world.ClientWorld;
 
 /**
  * This stategy takes over whenever an event happens.
@@ -87,8 +87,8 @@ public abstract class ValueActionStrategy extends AIStrategy {
 			final Minecraft mc = helper.getMinecraft();
 
 			mc.world.sendQuittingDisconnectingPacket();
-			mc.loadWorld((WorldClient) null);
-			mc.displayGuiScreen(new GuiMainMenu());
+			mc.loadWorld((ClientWorld) null);
+			mc.displayGuiScreen(new MainMenuScreen());
 			shouldLogOut = false;
 			return TickResult.TICK_HANDLED;
 		} else if (shouldStop) {

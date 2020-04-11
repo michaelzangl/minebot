@@ -16,13 +16,7 @@
  *******************************************************************************/
 package net.famzangl.minecraft.minebot.ai.commands;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-
 import com.google.common.base.Function;
-
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.command.AIChatController;
 import net.famzangl.minecraft.minebot.ai.command.AICommand;
@@ -34,8 +28,13 @@ import net.famzangl.minecraft.minebot.ai.command.FixedNameBuilder.FixedArgumentD
 import net.famzangl.minecraft.minebot.ai.command.ParameterType;
 import net.famzangl.minecraft.minebot.ai.strategy.AIStrategy;
 import net.famzangl.minecraft.minebot.ai.strategy.StopStrategy;
-import net.minecraft.client.entity.EntityPlayerSP;
+import net.minecraft.client.entity.ClientPlayerEntity;
 import net.minecraft.util.text.TextComponentString;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 
 @AICommand(helpText = "Gives help about the minebot commands.\n"
 		+ "It can display an index of commands or can give help to a specific command.", name = "minebot")
@@ -107,7 +106,7 @@ final public class CommandHelp {
 			@AICommandParameter(type = ParameterType.FIXED, fixedName = "help", description = "") String nameArg,
 			@AICommandParameter(type = ParameterType.COMMAND, description = "command help") String commandName) {
 		boolean found = false;
-		final EntityPlayerSP player = helper.getMinecraft().player;
+		final ClientPlayerEntity player = helper.getMinecraft().player;
 		for (final CommandDefinition command : AIChatController.getRegistry()
 				.getAllCommands()) {
 			final ArrayList<ArgumentDefinition> args = command.getArguments();
@@ -126,7 +125,7 @@ final public class CommandHelp {
 		return new StopStrategy();
 	}
 
-	private static void printHelp(EntityPlayerSP player,
+	private static void printHelp(ClientPlayerEntity player,
 			CommandDefinition command) {
 		final CommandToTextConverter conv = new CommandToTextConverter();
 

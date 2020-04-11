@@ -1,10 +1,10 @@
 package net.famzangl.minecraft.minebot.ai.utils;
 
-import java.util.Collection;
-import java.util.HashSet;
-
 import net.famzangl.minecraft.minebot.ai.path.world.WorldData;
 import net.minecraft.util.math.BlockPos;
+
+import java.util.Collection;
+import java.util.HashSet;
 
 public class BlockPosList extends BlockArea {
 

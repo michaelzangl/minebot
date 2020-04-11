@@ -16,21 +16,21 @@
  *******************************************************************************/
 package net.famzangl.minecraft.minebot.ai.animals;
 
-import java.util.stream.Stream;
-
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.monster.EntityPolarBear;
-import net.minecraft.entity.passive.EntityChicken;
-import net.minecraft.entity.passive.EntityCow;
-import net.minecraft.entity.passive.EntityDonkey;
-import net.minecraft.entity.passive.EntityHorse;
-import net.minecraft.entity.passive.EntityLlama;
-import net.minecraft.entity.passive.EntityOcelot;
-import net.minecraft.entity.passive.EntityParrot;
-import net.minecraft.entity.passive.EntityPig;
-import net.minecraft.entity.passive.EntityRabbit;
-import net.minecraft.entity.passive.EntitySheep;
-import net.minecraft.entity.passive.EntityWolf;
+import net.minecraft.entity.passive.ChickenEntity;
+import net.minecraft.entity.passive.CowEntity;
+import net.minecraft.entity.passive.OcelotEntity;
+import net.minecraft.entity.passive.ParrotEntity;
+import net.minecraft.entity.passive.PigEntity;
+import net.minecraft.entity.passive.PolarBearEntity;
+import net.minecraft.entity.passive.RabbitEntity;
+import net.minecraft.entity.passive.SheepEntity;
+import net.minecraft.entity.passive.WolfEntity;
+import net.minecraft.entity.passive.horse.DonkeyEntity;
+import net.minecraft.entity.passive.horse.HorseEntity;
+import net.minecraft.entity.passive.horse.LlamaEntity;
+
+import java.util.stream.Stream;
 
 /**
  * A list of animal types we can filter for.
@@ -40,18 +40,18 @@ import net.minecraft.entity.passive.EntityWolf;
  */
 public enum AnimalyType {
 	ANY(null),
-	COW(EntityCow.class),
-	CHICKEN(EntityChicken.class),
-	PIG(EntityPig.class),
-	POLARBEAR(EntityPolarBear.class, false),
-	SHEEP(EntitySheep.class),
-	WOLF(EntityWolf.class, false),
-	OCELOT(EntityOcelot.class),
-	RABBIT(EntityRabbit.class),
-	HORSE(EntityHorse.class),
-	DONKEY(EntityDonkey.class),
-	PARROT(EntityParrot.class),
-	LLAMA(EntityLlama.class, false);
+	COW(CowEntity.class),
+	CHICKEN(ChickenEntity.class),
+	PIG(PigEntity.class),
+	POLARBEAR(PolarBearEntity.class, false),
+	SHEEP(SheepEntity.class),
+	WOLF(WolfEntity.class, false),
+	OCELOT(OcelotEntity.class),
+	RABBIT(RabbitEntity.class),
+	HORSE(HorseEntity.class),
+	DONKEY(DonkeyEntity.class),
+	PARROT(ParrotEntity.class),
+	LLAMA(LlamaEntity.class, false);
 
 	private Class<?> animalClass;
 	private boolean inDefaultList;

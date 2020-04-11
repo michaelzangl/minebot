@@ -16,21 +16,17 @@
  *******************************************************************************/
 package net.famzangl.minecraft.minebot.ai.command;
 
+import net.famzangl.minecraft.minebot.ai.AIHelper;
+import net.famzangl.minecraft.minebot.ai.command.AICommandParameter.BlockFilter;
+import net.minecraft.block.Block;
+import net.minecraft.state.IProperty;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
-
-import net.famzangl.minecraft.minebot.ai.AIHelper;
-import net.famzangl.minecraft.minebot.ai.command.AICommandParameter.BlockFilter;
-import net.minecraft.block.Block;
-import net.minecraft.block.properties.IProperty;
-import net.minecraft.command.CommandBase;
-import net.minecraft.command.CommandFill;
-import net.minecraft.command.InvalidBlockStateException;
-import net.minecraft.command.NumberInvalidException;
 
 public class BlockStateNameBuilder extends ParameterBuilder {
 

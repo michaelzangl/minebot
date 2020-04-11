@@ -17,7 +17,7 @@
 package net.famzangl.minecraft.minebot.ai.strategy;
 
 import net.famzangl.minecraft.minebot.ai.AIHelper;
-import net.minecraft.client.entity.EntityPlayerSP;
+import net.minecraft.client.entity.player.ClientPlayerEntity;
 
 /**
  * Blindly walks to the given position.
@@ -56,8 +56,8 @@ public class WalkTowardsStrategy extends AIStrategy {
 
 	@Override
 	public String getDescription(AIHelper helper) {
-		EntityPlayerSP player = helper.getMinecraft().player;
-		double dist = player == null ? 0 : player.getDistance(x, player.posY, z);
-		return "Walking to " + x + ", " + z + " (" + Math.round(dist) + "m)";
+		ClientPlayerEntity player = helper.getMinecraft().player;
+		double distSq = player == null ? 0 : player.getDistanceSq(x, player.getPosY(), z);
+		return "Walking to " + x + ", " + z + " (" + Math.round(Math.sqrt(distSq)) + "m)";
 	}
 }

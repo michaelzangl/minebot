@@ -16,18 +16,18 @@
  *******************************************************************************/
 package net.famzangl.minecraft.minebot.ai.path.world;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
-
 import net.famzangl.minecraft.minebot.ai.command.BlockWithData;
 import net.famzangl.minecraft.minebot.ai.command.BlockWithDataOrDontcare;
 import net.famzangl.minecraft.minebot.ai.utils.BlockCuboid;
 import net.famzangl.minecraft.minebot.ai.utils.BlockFilteredArea;
 import net.minecraft.block.Block;
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * A set of blocks, identified by Id.
@@ -89,7 +89,7 @@ public class BlockSet implements Iterable<BlockWithData> {
 	}
 
 	@Deprecated
-	public boolean contains(IBlockState meta) {
+	public boolean contains(BlockState meta) {
 		return contains(meta.getBlock());
 	}
 

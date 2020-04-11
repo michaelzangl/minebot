@@ -16,16 +16,16 @@
  *******************************************************************************/
 package net.famzangl.minecraft.minebot.build.blockbuild;
 
-import java.util.Arrays;
-
 import net.famzangl.minecraft.minebot.ai.ClassItemFilter;
 import net.famzangl.minecraft.minebot.ai.ItemFilter;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSet;
 import net.famzangl.minecraft.minebot.ai.task.AITask;
 import net.famzangl.minecraft.minebot.ai.task.place.SignPlaceOnGroundTask;
-import net.minecraft.init.Blocks;
+import net.minecraft.block.Blocks;
 import net.minecraft.item.ItemSign;
 import net.minecraft.util.math.BlockPos;
+
+import java.util.Arrays;
 
 public class StandingSignBuildTask extends BuildFlatOnGroundTask {
 

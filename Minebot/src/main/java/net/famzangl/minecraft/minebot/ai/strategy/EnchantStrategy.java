@@ -16,11 +16,6 @@
  *******************************************************************************/
 package net.famzangl.minecraft.minebot.ai.strategy;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Hashtable;
-import java.util.Map.Entry;
-
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.enchanting.CloseScreenTask;
 import net.famzangl.minecraft.minebot.ai.enchanting.PutItemInTableTask;
@@ -34,9 +29,14 @@ import net.famzangl.minecraft.minebot.ai.scanner.BlockRangeScanner;
 import net.famzangl.minecraft.minebot.ai.scanner.RangeBlockHandler;
 import net.famzangl.minecraft.minebot.ai.task.UseItemOnBlockAtTask;
 import net.famzangl.minecraft.minebot.ai.task.inventory.ItemWithSubtype;
-import net.minecraft.client.gui.GuiEnchantment;
-import net.minecraft.init.Blocks;
+import net.minecraft.block.Blocks;
+import net.minecraft.client.gui.EnchantmentScreen;
 import net.minecraft.util.math.BlockPos;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Hashtable;
+import java.util.Map.Entry;
 
 public class EnchantStrategy extends PathFinderStrategy {
 
@@ -110,7 +110,7 @@ public class EnchantStrategy extends PathFinderStrategy {
 				@Override
 				public boolean isFinished(AIHelper aiHelper) {
 					return super.isFinished(aiHelper)
-							&& aiHelper.getMinecraft().currentScreen instanceof GuiEnchantment;
+							&& aiHelper.getMinecraft().currentScreen instanceof EnchantmentScreen;
 				};
 			});
 			addTask(new PutItemInTableTask());

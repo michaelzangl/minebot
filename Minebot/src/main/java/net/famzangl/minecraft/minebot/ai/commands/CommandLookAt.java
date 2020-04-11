@@ -7,7 +7,7 @@ import net.famzangl.minecraft.minebot.ai.command.AICommandParameter;
 import net.famzangl.minecraft.minebot.ai.command.ParameterType;
 import net.famzangl.minecraft.minebot.ai.strategy.AIStrategy;
 import net.famzangl.minecraft.minebot.ai.strategy.LookAtStrategy;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraft.util.math.Vec3d;
 
 @AICommand(name = "minebot", helpText = "Look at a given position")
@@ -26,8 +26,8 @@ public class CommandLookAt {
 	public static AIStrategy run(
 			AIHelper helper,
 			@AICommandParameter(type = ParameterType.FIXED, fixedName = "look", description = "") String nameArg,
-			@AICommandParameter(type = ParameterType.ENUM, description = "direction") EnumFacing direction) {
-		Vec3d offset = new Vec3d(direction.getFrontOffsetX(),
+			@AICommandParameter(type = ParameterType.ENUM, description = "direction") Direction direction) {
+		Vec3d offset = new Vec3d(direction.getXOffset(),
 				direction.getFrontOffsetY()
 						+ helper.getMinecraft().player.getEyeHeight(),
 				direction.getFrontOffsetZ());

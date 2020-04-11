@@ -34,13 +34,13 @@ public abstract class BuildTask {
 //			BlockPos worldPos) throws UnknownBlockException {
 //		int blockWithMeta = world.getBlockIdWithMeta(worldPos);
 //		
-//		final IBlockState blockState = h.getMinecraft().world.getBlockState(worldPos);
+//		final BlockState blockState = h.getMinecraft().world.getBlockState(worldPos);
 //		final int blockMetadata = h.getWorld().getBlockIdWithMeta(worldPos) & 0xf;
 //		if (BlockBuildTask.BLOCKS.contains(b)) {
 //			return new TaskDescription(name, CubeBuildTask.STANDABLE);
 //		} else if (ColoredCubeBuildTask.BLOCKS.contains(b)) {
 //			return new TaskDescription(name + " "
-//					+ EnumDyeColor.byMetadata(blockMetadata).getName(),
+//					+ DyeColor.byMetadata(blockMetadata).getName(),
 //					CubeBuildTask.STANDABLE);
 //		} else if (FenceBuildTask.BLOCKS.contains(b)) {
 //			return new TaskDescription(name, FenceBuildTask.STANDABLE);
@@ -71,19 +71,19 @@ public abstract class BuildTask {
 //							+ WoodType.values()[blockMetadata].toString()
 //									.toLowerCase(), CubeBuildTask.STANDABLE);
 //		} else if (BuildNormalStairsTask.BLOCKS.contains(b)) {
-//			EnumFacing dir;
+//			Direction dir;
 //			switch (blockMetadata & 0x3) {
 //			case 0:
-//				dir = EnumFacing.WEST;
+//				dir = Direction.WEST;
 //				break;
 //			case 1:
-//				dir = EnumFacing.EAST;
+//				dir = Direction.EAST;
 //				break;
 //			case 2:
-//				dir = EnumFacing.NORTH;
+//				dir = Direction.NORTH;
 //				break;
 //			default:
-//				dir = EnumFacing.SOUTH;
+//				dir = Direction.SOUTH;
 //				break;
 //			}
 //			final BlockPos p1 = Pos.fromDir(dir.getOpposite()).add(0, 1, 0);
@@ -106,7 +106,7 @@ public abstract class BuildTask {
 //			for (final SlabType t : SlabType.values()) {
 //				if (t.slabBlock == b && t.meta == (blockMetadata & 0x7)) {
 //					Half up;
-//					EnumFacing[] standable;
+//					Direction[] standable;
 //					if ((blockMetadata & 0x8) == 0) {
 //						up = Half.LOWER;
 //						standable = JumpingPlaceAtHalfTask.TRY_FOR_LOWER;
@@ -174,7 +174,7 @@ public abstract class BuildTask {
 	/**
 	 * @param add
 	 * @param rotateSteps
-	 *            0..3 Steps of EnumFacing.rotate(UP).
+	 *            0..3 Steps of Direction.rotate(UP).
 	 * @param mirror
 	 *            Applied after rotate (if possible);
 	 * @return

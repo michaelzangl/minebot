@@ -25,7 +25,7 @@ import net.famzangl.minecraft.minebot.ai.command.SafeStrategyRule;
 import net.famzangl.minecraft.minebot.ai.path.BuildWayPathfinder;
 import net.famzangl.minecraft.minebot.ai.strategy.AIStrategy;
 import net.famzangl.minecraft.minebot.ai.strategy.BuildWayStrategy;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 
 @AICommand(helpText = "Build a nice way", name = "minebot")
@@ -35,7 +35,7 @@ public class CommandBuildWay {
 	public static AIStrategy run(
 			AIHelper helper,
 			@AICommandParameter(type = ParameterType.FIXED, fixedName = "way", description = "") String nameArg) {
-		final EnumFacing dir = helper.getLookDirection();
+		final Direction dir = helper.getLookDirection();
 		final BlockPos pos = helper.getPlayerPosition();
 
 		return new BuildWayStrategy(new BuildWayPathfinder(dir, pos));

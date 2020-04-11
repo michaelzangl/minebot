@@ -16,9 +16,6 @@
  *******************************************************************************/
 package net.famzangl.minecraft.minebot.build;
 
-import java.util.Arrays;
-import java.util.LinkedList;
-
 import net.famzangl.minecraft.minebot.ai.BlockItemFilter;
 import net.famzangl.minecraft.minebot.ai.path.MovePathFinder;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSet;
@@ -27,8 +24,11 @@ import net.famzangl.minecraft.minebot.ai.task.move.AlignToGridTask;
 import net.famzangl.minecraft.minebot.build.blockbuild.BuildTask;
 import net.famzangl.minecraft.minebot.settings.MinebotSettingsRoot;
 import net.famzangl.minecraft.minebot.settings.PathfindingSetting;
-import net.minecraft.init.Blocks;
+import net.minecraft.block.Blocks;
 import net.minecraft.util.math.BlockPos;
+
+import java.util.Arrays;
+import java.util.LinkedList;
 
 /**
  * This path finder finds the way to th next build task.

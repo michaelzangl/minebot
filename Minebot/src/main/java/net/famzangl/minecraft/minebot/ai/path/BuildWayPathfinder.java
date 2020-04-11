@@ -16,10 +16,6 @@
  *******************************************************************************/
 package net.famzangl.minecraft.minebot.ai.path;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.BlockItemFilter;
 import net.famzangl.minecraft.minebot.ai.command.BlockWithDontcare;
@@ -37,9 +33,13 @@ import net.famzangl.minecraft.minebot.build.blockbuild.AbstractBuildTask;
 import net.famzangl.minecraft.minebot.build.blockbuild.BlockBuildTask;
 import net.famzangl.minecraft.minebot.build.blockbuild.SlabBuildTask;
 import net.minecraft.block.Block;
-import net.minecraft.init.Blocks;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.block.Blocks;
+import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 
 /**
  * Build a way. it is covered with cobblestone slabs. Bridge profile:
@@ -76,8 +76,8 @@ public class BuildWayPathfinder extends AlongTrackPathFinder {
 		super(dx, dz, cx, cy, cz, -1);
 	}
 
-	public BuildWayPathfinder(EnumFacing dir, BlockPos pos) {
-		this(dir.getFrontOffsetX(), dir.getFrontOffsetZ(), pos.getX(), pos
+	public BuildWayPathfinder(Direction dir, BlockPos pos) {
+		this(dir.getXOffset(), dir.getFrontOffsetZ(), pos.getX(), pos
 				.getY() + 1, pos.getZ());
 	}
 
@@ -238,12 +238,12 @@ public class BuildWayPathfinder extends AlongTrackPathFinder {
 		protected void addFarSideBuildTasks() {
 			addFarSide();
 			super.addFarSideBuildTasks();
-			addTask(new PlaceBlockTask(getPos(width, -1), EnumFacing.UP,
+			addTask(new PlaceBlockTask(getPos(width, -1), Direction.UP,
 					BRIDGE_WALL));
 			if (placeTorch) {
 				addTask(new PlaceTorchSomewhereTask(
 						Collections.singletonList(getPos(width, 1)),
-						EnumFacing.DOWN));
+						Direction.DOWN));
 			}
 		}
 
@@ -251,12 +251,12 @@ public class BuildWayPathfinder extends AlongTrackPathFinder {
 		protected void addNearSideBuildTasks() {
 			addNearSide();
 			super.addNearSideBuildTasks();
-			addTask(new PlaceBlockTask(getPos(-1, -1), EnumFacing.UP,
+			addTask(new PlaceBlockTask(getPos(-1, -1), Direction.UP,
 					BRIDGE_WALL));
 			if (placeTorch) {
 				addTask(new PlaceTorchSomewhereTask(
 						Collections.singletonList(getPos(-1, 1)),
-						EnumFacing.DOWN));
+						Direction.DOWN));
 			}
 		}
 
@@ -279,7 +279,7 @@ public class BuildWayPathfinder extends AlongTrackPathFinder {
 			if (placeTorch) {
 				addTask(new PlaceTorchSomewhereTask(Arrays.asList(getPos(0, 1),
 						getPos(0, 0), getPos(-1, 1)), getForwardDirection()
-						.rotateY(), EnumFacing.DOWN));
+						.rotateY(), Direction.DOWN));
 			}
 		}
 
@@ -290,7 +290,7 @@ public class BuildWayPathfinder extends AlongTrackPathFinder {
 				addTask(new PlaceTorchSomewhereTask(Arrays.asList(
 						getPos(width - 1, 1), getPos(width - 1, 0),
 						getPos(width, 1)), getForwardDirection().rotateYCCW(),
-						EnumFacing.DOWN));
+						Direction.DOWN));
 			}
 		}
 	}
@@ -327,7 +327,7 @@ public class BuildWayPathfinder extends AlongTrackPathFinder {
 			if (placeTorch) {
 				addTask(new PlaceTorchSomewhereTask(
 						Collections.singletonList(getPos(width, 0)),
-						EnumFacing.DOWN));
+						Direction.DOWN));
 			}
 		}
 
@@ -340,7 +340,7 @@ public class BuildWayPathfinder extends AlongTrackPathFinder {
 			if (placeTorch) {
 				addTask(new PlaceTorchSomewhereTask(
 						Collections.singletonList(getPos(-1, 0)),
-						EnumFacing.DOWN));
+						Direction.DOWN));
 			}
 		}
 	}
@@ -354,7 +354,7 @@ public class BuildWayPathfinder extends AlongTrackPathFinder {
 		return wayTypes.get(progress);
 	}
 
-	public EnumFacing getForwardDirection() {
+	public Direction getForwardDirection() {
 		return AIHelper.getDirectionForXZ(dx, dz);
 	}
 

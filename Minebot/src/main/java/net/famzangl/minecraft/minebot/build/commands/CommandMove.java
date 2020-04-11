@@ -16,9 +16,6 @@
  *******************************************************************************/
 package net.famzangl.minecraft.minebot.build.commands;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.command.AICommand;
 import net.famzangl.minecraft.minebot.ai.command.AICommandInvocation;
@@ -28,8 +25,11 @@ import net.famzangl.minecraft.minebot.ai.path.world.Pos;
 import net.famzangl.minecraft.minebot.ai.strategy.AIStrategy;
 import net.famzangl.minecraft.minebot.build.blockbuild.BuildTask;
 import net.famzangl.minecraft.minebot.build.blockbuild.MirrorDirection;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Move all scheduled builds by x.
@@ -148,7 +148,7 @@ public class CommandMove {
 	public static AIStrategy run(
 			AIHelper helper,
 			@AICommandParameter(type = ParameterType.FIXED, fixedName = "move", description = "") String nameArg,
-			@AICommandParameter(type = ParameterType.ENUM, fixedName = "", description = "Direction") final EnumFacing dir,
+			@AICommandParameter(type = ParameterType.ENUM, fixedName = "", description = "Direction") final Direction dir,
 			@AICommandParameter(type = ParameterType.NUMBER, fixedName = "", description = "How much") final int howMuch) {
 		return new MoveStrategy(Pos.ZERO.offset(dir, howMuch), null, null);
 	}

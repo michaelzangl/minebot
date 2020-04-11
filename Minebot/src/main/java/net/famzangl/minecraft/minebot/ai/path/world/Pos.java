@@ -16,7 +16,7 @@
  *******************************************************************************/
 package net.famzangl.minecraft.minebot.ai.path.world;
 
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 
 /**
@@ -32,11 +32,11 @@ public class Pos {
 	private Pos() {
 	}
 
-	public static BlockPos fromDir(EnumFacing dir) {
+	public static BlockPos fromDir(Direction dir) {
 		return ZERO.offset(dir);
 	}
 
-	public static BlockPos[] fromDir(EnumFacing[] standable) {
+	public static BlockPos[] fromDir(Direction[] standable) {
 		final BlockPos[] res = new BlockPos[standable.length];
 		for (int i = 0; i < res.length; i++) {
 			res[i] = fromDir(standable[i]);

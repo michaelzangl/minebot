@@ -16,10 +16,13 @@
  *******************************************************************************/
 package net.famzangl.minecraft.minebot.ai;
 
-import net.minecraft.client.gui.GuiScreen;
 
-public class UngrabScreen extends GuiScreen {
+import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.util.text.StringTextComponent;
+
+public class UngrabScreen extends Screen {
 	public UngrabScreen() {
-		this.allowUserInput = true;
+		super(new StringTextComponent(""));
+		this.passEvents = true;
 	}
 }

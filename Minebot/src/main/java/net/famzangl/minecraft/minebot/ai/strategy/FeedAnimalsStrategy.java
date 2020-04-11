@@ -17,7 +17,6 @@
 package net.famzangl.minecraft.minebot.ai.strategy;
 
 import com.google.common.base.Predicate;
-
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.ItemFilter;
 import net.famzangl.minecraft.minebot.ai.selectors.AndSelector;
@@ -29,22 +28,22 @@ import net.famzangl.minecraft.minebot.ai.selectors.XPOrbSelector;
 import net.famzangl.minecraft.minebot.ai.task.FaceAndInteractTask;
 import net.famzangl.minecraft.minebot.ai.task.TaskOperations;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.passive.EntityAnimal;
+import net.minecraft.entity.passive.AnimalEntity;
 import net.minecraft.init.Items;
-import net.minecraft.item.EnumDyeColor;
+import net.minecraft.item.DyeColor;
 import net.minecraft.item.ItemSeeds;
 import net.minecraft.item.ItemStack;
 
 public class FeedAnimalsStrategy extends TaskStrategy {
 
 	private static final int DISTANCE = 20;
-	private final EnumDyeColor color;
+	private final DyeColor color;
 
 	public FeedAnimalsStrategy() {
 		this(null);
 	}
 
-	public FeedAnimalsStrategy(EnumDyeColor color) {
+	public FeedAnimalsStrategy(DyeColor color) {
 		this.color = color;
 	}
 
@@ -84,9 +83,9 @@ public class FeedAnimalsStrategy extends TaskStrategy {
 				@Override
 				protected void doInteractWithCurrent(AIHelper aiHelper) {
 					final Entity over = aiHelper.getObjectMouseOver().entityHit;
-					if (over instanceof EntityAnimal
+					if (over instanceof AnimalEntity
 							&& aiHelper.selectCurrentItem(new FilterFeedingItem(
-									(EntityAnimal) over))) {
+									(AnimalEntity) over))) {
 						super.doInteractWithCurrent(aiHelper);
 					} else if (found == over) {
 						interacted = true;

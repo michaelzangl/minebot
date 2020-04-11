@@ -16,11 +16,11 @@
  *******************************************************************************/
 package net.famzangl.minecraft.minebot.ai.scripting;
 
-import java.io.File;
-
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.strategy.AIStrategy;
-import net.minecraftforge.fml.common.gameevent.TickEvent.RenderTickEvent;
+import net.minecraftforge.event.TickEvent;
+
+import java.io.File;
 
 /**
  * This class manages the description of a script (top right corner).
@@ -69,7 +69,7 @@ public class DescriptionBuilder {
 		return str;
 	}
 	
-	public synchronized void drawMarkers(RenderTickEvent event, AIHelper helper) {
+	public synchronized void drawMarkers(TickEvent.RenderTickEvent event, AIHelper helper) {
 		if (activeStrategy != null) {
 			activeStrategy.drawMarkers(event, helper);
 		}

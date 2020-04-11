@@ -22,7 +22,7 @@ import net.famzangl.minecraft.minebot.ai.path.world.BlockSets;
 import net.famzangl.minecraft.minebot.ai.task.AITask;
 import net.famzangl.minecraft.minebot.ai.task.TaskOperations;
 import net.famzangl.minecraft.minebot.ai.task.error.SelectTaskError;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraft.util.MovementInput;
 import net.minecraft.util.math.BlockPos;
 
@@ -40,7 +40,7 @@ public class SneakAndPlaceTask extends AITask {
 	/**
 	 * Direction we need to walk.
 	 */
-	private final EnumFacing inDirection;
+	private final Direction inDirection;
 	private final double minBuildHeight;
 	private int faceTimer;
 
@@ -57,7 +57,7 @@ public class SneakAndPlaceTask extends AITask {
 		this.filter = filter;
 		this.startStandPosition = startStandPosition;
 		this.minBuildHeight = minBuildHeight;
-		final EnumFacing foundInDir = AIHelper.getDirectionFor(destinationStandPosition.subtract(startStandPosition));
+		final Direction foundInDir = AIHelper.getDirectionFor(destinationStandPosition.subtract(startStandPosition));
 		if (foundInDir.getFrontOffsetY() != 0 || foundInDir == null) {
 			throw new IllegalArgumentException();
 		}
@@ -80,7 +80,7 @@ public class SneakAndPlaceTask extends AITask {
 		}
 		if (aiHelper.sneakFrom(getFromPos(), inDirection, faceWhileSneaking())) {
 			final boolean hasRequiredHeight = aiHelper.getMinecraft().player
-					.getEntityBoundingBox().minY > minBuildHeight - 0.05;
+					.getBoundingBox().minY > minBuildHeight - 0.05;
 			if (hasRequiredHeight) {
 				if (faceTimer == 0) {
 					if (faceBlock(aiHelper, taskOperations)) {

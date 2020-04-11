@@ -16,17 +16,17 @@
  *******************************************************************************/
 package net.famzangl.minecraft.minebot.ai.scanner;
 
+import net.famzangl.minecraft.minebot.ai.path.world.BlockSet;
+import net.famzangl.minecraft.minebot.ai.path.world.WorldData;
+import net.famzangl.minecraft.minebot.ai.scanner.BlockRangeScanner.BlockHandler;
+import net.minecraft.block.Blocks;
+import net.minecraft.util.Direction;
+import net.minecraft.util.math.BlockPos;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Hashtable;
 import java.util.Map.Entry;
-
-import net.famzangl.minecraft.minebot.ai.path.world.BlockSet;
-import net.famzangl.minecraft.minebot.ai.path.world.WorldData;
-import net.famzangl.minecraft.minebot.ai.scanner.BlockRangeScanner.BlockHandler;
-import net.minecraft.init.Blocks;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.math.BlockPos;
 
 public abstract class RangeBlockHandler<ReachData> implements BlockHandler {
 	private static final BlockSet THROUGH_REACHABLE = new BlockSet(
@@ -48,19 +48,19 @@ public abstract class RangeBlockHandler<ReachData> implements BlockHandler {
 	}
 
 	protected void addPositionToCache(WorldData world, BlockPos pos, ReachData c) {
-		for (EnumFacing d : new EnumFacing[] { EnumFacing.NORTH,
-				EnumFacing.SOUTH, EnumFacing.EAST, EnumFacing.WEST }) {
+		for (Direction d : new Direction[] { Direction.NORTH,
+				Direction.SOUTH, Direction.EAST, Direction.WEST }) {
 			addPositions(world, pos, c, d);
 		}
 	}
 
 	private void addPositions(WorldData world, BlockPos pos, ReachData c,
-			EnumFacing d) {
+			Direction d) {
 		int dvertMax = 4;
 		for (int dhor = 0; dhor < 4; dhor++) {
 			int y = pos.getY() - dhor;
 			for (int dvert = 1; dvert <= dvertMax; dvert++) {
-				int x = pos.getX() + dvert * d.getFrontOffsetX();
+				int x = pos.getX() + dvert * d.getXOffset();
 				int z = pos.getZ() + dvert * d.getFrontOffsetZ();
 				if (!THROUGH_REACHABLE.isAt(world, x, y, z)) {
 					dvertMax = dvert;

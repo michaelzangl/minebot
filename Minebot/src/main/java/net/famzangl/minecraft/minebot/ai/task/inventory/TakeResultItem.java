@@ -16,17 +16,16 @@
  *******************************************************************************/
 package net.famzangl.minecraft.minebot.ai.task.inventory;
 
-import org.apache.logging.log4j.Marker;
-import org.apache.logging.log4j.MarkerManager;
-
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.task.AITask;
 import net.famzangl.minecraft.minebot.ai.task.TaskOperations;
 import net.famzangl.minecraft.minebot.ai.task.error.StringTaskError;
-import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.client.gui.inventory.GuiContainer;
-import net.minecraft.inventory.ClickType;
+import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.screen.inventory.ContainerScreen;
+import net.minecraft.inventory.container.ClickType;
 import net.minecraft.item.ItemStack;
+import org.apache.logging.log4j.Marker;
+import org.apache.logging.log4j.MarkerManager;
 
 /**
  * Take the resulting items from the crafting/enchanting/... table.
@@ -37,11 +36,11 @@ import net.minecraft.item.ItemStack;
 public class TakeResultItem extends AITask {
 	private static final Marker MARKER_TAKE_RESULT = MarkerManager
 			.getMarker("take_result");
-	private final Class<? extends GuiContainer> containerClass;
+	private final Class<? extends ContainerScreen<?>> containerClass;
 	private final int slot;
 	private boolean tookItem;
 
-	public TakeResultItem(Class<? extends GuiContainer> containerClass, int slot) {
+	public TakeResultItem(Class<? extends ContainerScreen<?>> containerClass, int slot) {
 		this.containerClass = containerClass;
 		this.slot = slot;
 	}
@@ -53,7 +52,7 @@ public class TakeResultItem extends AITask {
 
 	@Override
 	public void runTick(AIHelper aiHelper, TaskOperations taskOperations) {
-		GuiScreen currentScreen = aiHelper.getMinecraft().currentScreen;
+		Screen currentScreen = aiHelper.getMinecraft().currentScreen;
 		if (!containerClass.isInstance(currentScreen)) {
 			LOGGER.error(
 					MARKER_TAKE_RESULT,
@@ -64,7 +63,7 @@ public class TakeResultItem extends AITask {
 			tookItem = true;
 			return;
 		}
-		final GuiContainer screen = (GuiContainer) currentScreen;
+		final ContainerScreen<?> screen = (ContainerScreen<?>) currentScreen;
 		if (screen.inventorySlots.getSlot(slot).getHasStack()
 				&& shouldTakeStack(screen.inventorySlots.getSlot(slot)
 						.getStack())) {

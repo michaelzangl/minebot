@@ -16,12 +16,12 @@
  *******************************************************************************/
 package net.famzangl.minecraft.minebot.ai.command;
 
-import java.util.ArrayList;
-
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.NumberInvalidException;
 import net.minecraft.util.math.BlockPos;
+
+import java.util.ArrayList;
 
 public class PositionNameBuilder extends ParameterBuilder {
 

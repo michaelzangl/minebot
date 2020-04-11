@@ -1,9 +1,9 @@
 package net.famzangl.minecraft.minebot.ai.utils;
 
-import java.util.ArrayList;
-
 import net.famzangl.minecraft.minebot.ai.path.world.WorldData;
 import net.minecraft.util.math.BlockPos;
+
+import java.util.ArrayList;
 
 /**
  * This class wraps a block area and simply reverses the accept()-Method.

@@ -16,11 +16,6 @@
  *******************************************************************************/
 package net.famzangl.minecraft.minebot.ai.path;
 
-import java.util.ArrayList;
-import java.util.BitSet;
-import java.util.Collections;
-import java.util.Hashtable;
-
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.BlockItemFilter;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSet;
@@ -33,9 +28,14 @@ import net.famzangl.minecraft.minebot.ai.task.SkipWhenSearchingPrefetch;
 import net.famzangl.minecraft.minebot.ai.task.TaskOperations;
 import net.famzangl.minecraft.minebot.ai.utils.BlockCuboid;
 import net.famzangl.minecraft.minebot.ai.utils.BlockFilteredArea;
-import net.minecraft.init.Blocks;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.block.Blocks;
+import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
+
+import java.util.ArrayList;
+import java.util.BitSet;
+import java.util.Collections;
+import java.util.Hashtable;
 
 public class TunnelPathFinder extends AlongTrackPathFinder {
 	/**
@@ -245,7 +245,7 @@ public class TunnelPathFinder extends AlongTrackPathFinder {
 			}
 			if (torches.floor && isTorchStep && !containsTorches(tunnelArea)) {
 				addTask(new PlaceTorchSomewhereTask(
-						Collections.singletonList(currentPos), EnumFacing.DOWN));
+						Collections.singletonList(currentPos), Direction.DOWN));
 			}
 		}
 		final boolean isBranchStep = stepNumber % 4 == 2;
@@ -290,7 +290,7 @@ public class TunnelPathFinder extends AlongTrackPathFinder {
 					.getY(), currentPos.getZ() + dirZ * i));
 		}
 		addTask(new PlaceTorchSomewhereTask(positions,
-				AIHelper.getDirectionForXZ(dirX, dirZ), EnumFacing.DOWN));
+				AIHelper.getDirectionForXZ(dirX, dirZ), Direction.DOWN));
 	}
 
 	public String getProgress() {

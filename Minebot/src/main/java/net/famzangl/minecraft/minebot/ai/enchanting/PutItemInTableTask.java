@@ -18,7 +18,7 @@ package net.famzangl.minecraft.minebot.ai.enchanting;
 
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.task.inventory.PutItemInContainerTask;
-import net.minecraft.client.gui.GuiEnchantment;
+import net.minecraft.client.gui.screen.EnchantmentScreen;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 
@@ -33,7 +33,7 @@ public class PutItemInTableTask extends PutItemInContainerTask {
 
 	@Override
 	protected int getStackToPut(AIHelper aiHelper) {
-		final GuiEnchantment screen = (GuiEnchantment) aiHelper.getMinecraft().currentScreen;
+		final EnchantmentScreen screen = (EnchantmentScreen) aiHelper.getMinecraft().currentScreen;
 		for (int i = TABLE_INV_OFFSET; i < 9 * 4 + TABLE_INV_OFFSET; i++) {
 			final Slot slot = screen.inventorySlots.getSlot(i);
 			if (slot == null || !slot.canTakeStack(aiHelper.getMinecraft().player)) {

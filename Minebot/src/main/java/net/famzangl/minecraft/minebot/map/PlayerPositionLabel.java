@@ -1,13 +1,11 @@
 package net.famzangl.minecraft.minebot.map;
 
-import java.awt.Dimension;
+import net.minecraft.util.math.BlockPos;
+
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-
-import net.minecraft.util.math.BlockPos;
 
 public final class PlayerPositionLabel extends JPanel {
 	

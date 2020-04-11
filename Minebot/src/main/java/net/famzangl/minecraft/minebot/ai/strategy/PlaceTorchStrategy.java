@@ -16,20 +16,20 @@
  *******************************************************************************/
 package net.famzangl.minecraft.minebot.ai.strategy;
 
-import java.util.HashSet;
-import java.util.Queue;
-import java.util.concurrent.ConcurrentLinkedQueue;
-
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.BlockItemFilter;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSet;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSets;
 import net.famzangl.minecraft.minebot.ai.path.world.WorldData;
 import net.famzangl.minecraft.minebot.settings.MinebotSettings;
-import net.minecraft.client.entity.EntityPlayerSP;
-import net.minecraft.init.Blocks;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.block.Blocks;
+import net.minecraft.client.entity.ClientPlayerEntity;
+import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
+
+import java.util.HashSet;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 /**
  * Place a torch on the floor if the light level is below x.
@@ -39,9 +39,9 @@ public class PlaceTorchStrategy extends AIStrategy {
 
 	public static class PosAndDir {
 		public final BlockPos place;
-		public final EnumFacing dir;
+		public final Direction dir;
 
-		public PosAndDir(BlockPos place, EnumFacing dir) {
+		public PosAndDir(BlockPos place, Direction dir) {
 			super();
 			this.place = place;
 			this.dir = dir;
@@ -82,7 +82,7 @@ public class PlaceTorchStrategy extends AIStrategy {
 		if (!helper.canSelectItem(TORCH_FILTER)) {
 			return false;
 		}
-		EntityPlayerSP playerPosition = helper.getMinecraft().player;
+		ClientPlayerEntity playerPosition = helper.getMinecraft().player;
 		BlockPos playerBlockPosition = helper.getPlayerPosition();
 		if (!done.contains(playerBlockPosition)
 				&& playerBlockPosition.distanceSqToCenter(playerPosition.posX,
@@ -103,8 +103,8 @@ public class PlaceTorchStrategy extends AIStrategy {
 		attemptPositions.clear();
 		for (BlockPos pos : new BlockPos[] { world.getPlayerPosition(),
 				world.getPlayerPosition().add(0, 1, 0) }) {
-			for (EnumFacing f : EnumFacing.values()) {
-				if (f != EnumFacing.UP) {
+			for (Direction f : Direction.values()) {
+				if (f != Direction.UP) {
 					loadAttemptPosition(world, new PosAndDir(pos, f));
 				}
 			}

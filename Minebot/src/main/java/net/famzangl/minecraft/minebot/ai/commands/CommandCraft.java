@@ -27,7 +27,7 @@ import net.famzangl.minecraft.minebot.ai.path.world.BlockSet;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSets;
 import net.famzangl.minecraft.minebot.ai.strategy.AIStrategy;
 import net.famzangl.minecraft.minebot.ai.strategy.CraftStrategy;
-import net.minecraft.init.Blocks;
+import net.minecraft.block.Blocks;
 
 @AICommand(helpText = "Crafts items of the given type.", name = "minebot")
 public class CommandCraft {
@@ -36,16 +36,20 @@ public class CommandCraft {
 	 * Blocks that can not be crafted.
 	 */
 	private static final BlockSet simpleBlocks = new BlockSet(
-			Blocks.AIR, Blocks.BREWING_STAND, Blocks.BED, Blocks.NETHER_WART,
-			Blocks.CAULDRON, Blocks.FLOWER_POT, Blocks.WHEAT, Blocks.REEDS,
-			Blocks.CAKE, Blocks.SKULL, Blocks.PISTON_HEAD,
-			Blocks.PISTON_EXTENSION, Blocks.LIT_REDSTONE_ORE,
-			Blocks.POWERED_REPEATER, Blocks.PUMPKIN_STEM, Blocks.STANDING_SIGN,
-			Blocks.POWERED_COMPARATOR, Blocks.TRIPWIRE,
-			Blocks.LIT_REDSTONE_LAMP, Blocks.MELON_STEM,
-			Blocks.UNLIT_REDSTONE_TORCH, Blocks.UNPOWERED_COMPARATOR,
-			Blocks.REDSTONE_WIRE, Blocks.WALL_SIGN, Blocks.UNPOWERED_REPEATER,
-			Blocks.IRON_DOOR, Blocks.WOOL).unionWith(BlockSets.WOODEN_DOR).invert();
+			Blocks.AIR, Blocks.BREWING_STAND, Blocks.NETHER_WART,
+			Blocks.CAULDRON, Blocks.FLOWER_POT, Blocks.WHEAT, Blocks.SUGAR_CANE,
+			Blocks.CAKE, Blocks.SKELETON_SKULL, Blocks.SKELETON_WALL_SKULL, Blocks.WITHER_SKELETON_SKULL,
+			Blocks.WITHER_SKELETON_WALL_SKULL, Blocks.PISTON_HEAD,
+			Blocks.MOVING_PISTON, Blocks.REDSTONE_WIRE,
+			Blocks.PUMPKIN_STEM,
+			Blocks.TRIPWIRE,
+			Blocks.MELON_STEM,
+			Blocks.REDSTONE_WIRE,
+			Blocks.IRON_DOOR)
+			.unionWith(BlockSets.WALL_SIGN)
+			.unionWith(BlockSets.WOOL)
+			.unionWith(BlockSets.BED)
+			.unionWith(BlockSets.WOODEN_DOR).invert();
 
 	public static final class MyBlockFilter extends BlockFilter {
 		@Override

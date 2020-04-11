@@ -37,7 +37,7 @@ public class EntityPos {
 	public final double speed;
 	
 	public EntityPos(Entity e) {
-		this(e.posX, e.posY, e.posZ, e.motionX, e.motionY, e.motionZ, e.rotationYaw, e.rotationPitch);
+		this(e.getPosX(), e.getPosY(), e.getPosZ(), e.getMotion().x, e.getMotion().y, e.getMotion().z, e.rotationYaw, e.rotationPitch);
 	}
 
 	public EntityPos(double x, double y, double z, double motionX,

@@ -1,25 +1,19 @@
 package net.famzangl.minecraft.minebot.map;
 
-import java.awt.Color;
-import java.awt.Graphics;
-import java.awt.Point;
+import net.famzangl.minecraft.minebot.map.MapReader.ImagePos;
+import net.famzangl.minecraft.minebot.map.MapReader.MultiModeImage;
+import net.famzangl.minecraft.minebot.map.MapReader.WriteableImage;
+import net.famzangl.minecraft.minebot.map.PlayerPositionLabel.FollowPlayerListener;
+import net.minecraft.util.math.BlockPos;
+
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
-
-import javax.swing.AbstractAction;
-import javax.swing.Action;
-import javax.swing.JComponent;
-import javax.swing.JPanel;
-
-import net.famzangl.minecraft.minebot.map.MapReader.ImagePos;
-import net.famzangl.minecraft.minebot.map.MapReader.MultiModeImage;
-import net.famzangl.minecraft.minebot.map.MapReader.WriteableImage;
-import net.famzangl.minecraft.minebot.map.PlayerPositionLabel.FollowPlayerListener;
-import net.minecraft.util.math.BlockPos;
 
 /**
  * This panel displays the map.

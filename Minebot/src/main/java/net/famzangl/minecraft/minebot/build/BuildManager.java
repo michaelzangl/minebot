@@ -16,14 +16,14 @@
  *******************************************************************************/
 package net.famzangl.minecraft.minebot.build;
 
+import net.famzangl.minecraft.minebot.ai.ItemFilter;
+import net.famzangl.minecraft.minebot.ai.path.world.Pos;
+import net.famzangl.minecraft.minebot.build.blockbuild.BuildTask;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
-
-import net.famzangl.minecraft.minebot.ai.ItemFilter;
-import net.famzangl.minecraft.minebot.ai.path.world.Pos;
-import net.famzangl.minecraft.minebot.build.blockbuild.BuildTask;
 
 /**
  * This build manager exists once per AI helper (that means once per game). It

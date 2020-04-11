@@ -5,13 +5,13 @@ import net.famzangl.minecraft.minebot.ai.path.world.BlockSet;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSets;
 import net.famzangl.minecraft.minebot.ai.task.place.DestroyBlockTask;
 import net.famzangl.minecraft.minebot.ai.task.place.PlaceBlockAtFloorTask;
-import net.minecraft.init.Blocks;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.block.Blocks;
+import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 
 public class SugarCanePathFinder extends WalkingPathfinder {
 	private static final BlockSet SUGAR_CANE_GROUND = new BlockSet(Blocks.SAND, Blocks.GRASS, Blocks.DIRT);
-	private static final BlockSet SUGAR_CANE = new BlockSet(Blocks.REEDS);
+	private static final BlockSet SUGAR_CANE = new BlockSet(Blocks.SUGAR_CANE);
 
 	@Override
 	protected float rateDestination(int distance, int x, int y, int z) {
@@ -32,10 +32,10 @@ public class SugarCanePathFinder extends WalkingPathfinder {
 			// not on sand
 			return false;
 		}
-		for (EnumFacing d : EnumFacing.values()) {
-			if (d.getFrontOffsetY() == 0) {
-				if (BlockSets.WATER.isAt(world, x + d.getFrontOffsetX(), y - 1,
-						z + d.getFrontOffsetZ())) {
+		for (Direction d : Direction.values()) {
+			if (d.getXOffset() == 0) {
+				if (BlockSets.WATER.isAt(world, x + d.getXOffset(), y - 1,
+						z + d.getZOffset())) {
 					return true;
 				}
 			}
@@ -51,7 +51,7 @@ public class SugarCanePathFinder extends WalkingPathfinder {
 			addTask(new DestroyBlockTask(top));
 		} else if (BlockSets.AIR.isAt(world, currentPos)) {
 			//TODO: Test if this is the correct filter
-			addTask(new PlaceBlockAtFloorTask(currentPos, new BlockItemFilter(Blocks.REEDS)));
+			addTask(new PlaceBlockAtFloorTask(currentPos, new BlockItemFilter(Blocks.SUGAR_CANE)));
 		}
 	}
 }

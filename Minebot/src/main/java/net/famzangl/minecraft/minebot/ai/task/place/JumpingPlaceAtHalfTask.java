@@ -16,17 +16,16 @@
  *******************************************************************************/
 package net.famzangl.minecraft.minebot.ai.task.place;
 
-import org.apache.logging.log4j.Marker;
-import org.apache.logging.log4j.MarkerManager;
-
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.ItemFilter;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSets;
 import net.famzangl.minecraft.minebot.ai.task.BlockHalf;
 import net.famzangl.minecraft.minebot.ai.task.TaskOperations;
 import net.famzangl.minecraft.minebot.ai.task.error.StringTaskError;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
+import org.apache.logging.log4j.Marker;
+import org.apache.logging.log4j.MarkerManager;
 
 /**
  * Place a block at the given upper/lower side of its adjacent blocks by
@@ -39,16 +38,16 @@ import net.minecraft.util.math.BlockPos;
 public class JumpingPlaceAtHalfTask extends JumpingPlaceBlockAtFloorTask {
 	private static final Marker MARKER_JUMPING_PLACE_HALF = MarkerManager.getMarker("jumping_place_half");
 
-	public final static EnumFacing[] TRY_FOR_LOWER = new EnumFacing[] {
-			EnumFacing.DOWN, EnumFacing.EAST, EnumFacing.NORTH,
-			EnumFacing.WEST, EnumFacing.SOUTH };
+	public final static Direction[] TRY_FOR_LOWER = new Direction[] {
+			Direction.DOWN, Direction.EAST, Direction.NORTH,
+			Direction.WEST, Direction.SOUTH };
 
-	public final static EnumFacing[] TRY_FOR_UPPER = new EnumFacing[] {
-			EnumFacing.EAST, EnumFacing.NORTH, EnumFacing.WEST,
-			EnumFacing.SOUTH };
+	public final static Direction[] TRY_FOR_UPPER = new Direction[] {
+			Direction.EAST, Direction.NORTH, Direction.WEST,
+			Direction.SOUTH };
 
 	protected BlockHalf side;
-	protected EnumFacing lookingDirection = null;
+	protected Direction lookingDirection = null;
 
 	private int attempts;
 
@@ -60,7 +59,7 @@ public class JumpingPlaceAtHalfTask extends JumpingPlaceBlockAtFloorTask {
 
 	@Override
 	protected void faceBlock(AIHelper aiHelper, TaskOperations taskOperations) {
-		final EnumFacing[] dirs = getBuildDirs();
+		final Direction[] dirs = getBuildDirs();
 		for (int i = 0; i < dirs.length; i++) {
 			if (faceSideBlock(aiHelper, dirs[attempts++ % dirs.length])) {
 				return;
@@ -69,11 +68,11 @@ public class JumpingPlaceAtHalfTask extends JumpingPlaceBlockAtFloorTask {
 		taskOperations.desync(new StringTaskError("Could not face anywhere to place."));
 	}
 
-	protected EnumFacing[] getBuildDirs() {
+	protected Direction[] getBuildDirs() {
 		return side == BlockHalf.UPPER_HALF ? TRY_FOR_UPPER : TRY_FOR_LOWER;
 	}
 
-	protected boolean faceSideBlock(AIHelper aiHelper, EnumFacing dir) {
+	protected boolean faceSideBlock(AIHelper aiHelper, Direction dir) {
 		LOGGER.trace(MARKER_JUMPING_PLACE_HALF, "Facing side " + dir);
 		BlockPos facingBlock = getPlaceAtPos().offset(dir);
 		if (BlockSets.AIR.isAt(aiHelper.getWorld(), facingBlock)) {
@@ -89,14 +88,14 @@ public class JumpingPlaceAtHalfTask extends JumpingPlaceBlockAtFloorTask {
 		}
 	}
 
-	protected BlockHalf getSide(EnumFacing dir) {
-		return dir == EnumFacing.DOWN ? BlockHalf.UPPER_HALF
+	protected BlockHalf getSide(Direction dir) {
+		return dir == Direction.DOWN ? BlockHalf.UPPER_HALF
 				: BlockHalf.LOWER_HALF;
 	}
 
 	@Override
 	protected boolean isFacingRightBlock(AIHelper aiHelper) {
-		for (final EnumFacing d : getBuildDirs()) {
+		for (final Direction d : getBuildDirs()) {
 			if (isFacing(aiHelper, d)) {
 				return true;
 			}

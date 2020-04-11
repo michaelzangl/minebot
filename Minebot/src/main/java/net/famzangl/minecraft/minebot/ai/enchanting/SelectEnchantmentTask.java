@@ -16,14 +16,14 @@
  *******************************************************************************/
 package net.famzangl.minecraft.minebot.ai.enchanting;
 
-import java.lang.reflect.Field;
-
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.task.AITask;
 import net.famzangl.minecraft.minebot.ai.task.TaskOperations;
 import net.famzangl.minecraft.minebot.ai.task.error.StringTaskError;
-import net.minecraft.client.gui.GuiEnchantment;
+import net.minecraft.client.gui.screen.EnchantmentScreen;
 import net.minecraft.inventory.ContainerEnchantment;
+
+import java.lang.reflect.Field;
 
 public class SelectEnchantmentTask extends AITask {
 
@@ -33,10 +33,10 @@ public class SelectEnchantmentTask extends AITask {
 
 	@Override
 	public boolean isFinished(AIHelper aiHelper) {
-		if (!(aiHelper.getMinecraft().currentScreen instanceof GuiEnchantment)) {
+		if (!(aiHelper.getMinecraft().currentScreen instanceof EnchantmentScreen)) {
 			return false;
 		} else {
-			final GuiEnchantment screen = (GuiEnchantment) aiHelper.getMinecraft().currentScreen;
+			final EnchantmentScreen screen = (EnchantmentScreen) aiHelper.getMinecraft().currentScreen;
 			return screen.inventorySlots.getSlot(0).getHasStack()
 					&& screen.inventorySlots.getSlot(0).getStack()
 							.isItemEnchanted();
@@ -45,12 +45,12 @@ public class SelectEnchantmentTask extends AITask {
 
 	@Override
 	public void runTick(AIHelper aiHelper, TaskOperations taskOperations) {
-		if (!(aiHelper.getMinecraft().currentScreen instanceof GuiEnchantment)) {
+		if (!(aiHelper.getMinecraft().currentScreen instanceof EnchantmentScreen)) {
 			System.out.println("Screen not opened.");
 			taskOperations.desync(new StringTaskError("Enchantment screen is not open."));
 			return;
 		}
-		final GuiEnchantment screen = (GuiEnchantment) aiHelper.getMinecraft().currentScreen;
+		final EnchantmentScreen screen = (EnchantmentScreen) aiHelper.getMinecraft().currentScreen;
 		if (!screen.inventorySlots.getSlot(0).getHasStack()) {
 			System.out.println("No stack in slot.");
 			taskOperations.desync(new StringTaskError("No stack in enchantment table."));
@@ -62,7 +62,7 @@ public class SelectEnchantmentTask extends AITask {
 		}
 
 		try {
-			final Field field = GuiEnchantment.class
+			final Field field = EnchantmentScreen.class
 					.getDeclaredField("field_147075_G");
 			field.setAccessible(true);
 			final ContainerEnchantment enchantment = (ContainerEnchantment) field

@@ -1,8 +1,25 @@
 package net.famzangl.minecraft.minebot.map;
 
-import java.awt.BorderLayout;
-import java.awt.Frame;
-import java.awt.Graphics;
+import com.google.gson.Gson;
+import com.google.gson.JsonIOException;
+import com.google.gson.JsonSyntaxException;
+import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
+import net.famzangl.minecraft.minebot.ai.AIHelper;
+import net.famzangl.minecraft.minebot.ai.net.ChunkListener;
+import net.famzangl.minecraft.minebot.ai.path.world.WorldData;
+import net.famzangl.minecraft.minebot.ai.path.world.WorldData.ChunkAccessorUnmodified;
+import net.famzangl.minecraft.minebot.ai.utils.PrivateFieldUtils;
+import net.minecraft.client.entity.player.ClientPlayerEntity;
+import net.minecraft.client.multiplayer.ClientChunkProvider;
+import net.minecraft.client.world.ClientWorld;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.ChunkPos;
+import net.minecraft.world.chunk.Chunk;
+import net.minecraft.world.chunk.ChunkSection;
+
+import javax.imageio.ImageIO;
+import javax.swing.*;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
 import java.awt.image.DataBufferByte;
@@ -21,32 +38,6 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
-import javax.imageio.ImageIO;
-import javax.swing.JFrame;
-import javax.swing.JOptionPane;
-import javax.swing.JSeparator;
-import javax.swing.JToolBar;
-
-import com.google.gson.Gson;
-import com.google.gson.JsonIOException;
-import com.google.gson.JsonSyntaxException;
-
-import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
-import net.famzangl.minecraft.minebot.ai.AIHelper;
-import net.famzangl.minecraft.minebot.ai.net.ChunkListener;
-import net.famzangl.minecraft.minebot.ai.path.world.WorldData;
-import net.famzangl.minecraft.minebot.ai.path.world.WorldData.ChunkAccessorUnmodified;
-import net.famzangl.minecraft.minebot.ai.utils.PrivateFieldUtils;
-import net.minecraft.client.entity.EntityPlayerSP;
-import net.minecraft.client.multiplayer.ChunkProviderClient;
-import net.minecraft.client.multiplayer.WorldClient;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.ChunkPos;
-import net.minecraft.world.World;
-import net.minecraft.world.chunk.Chunk;
-import net.minecraft.world.chunk.IChunkProvider;
-import net.minecraft.world.chunk.storage.ExtendedBlockStorage;
-
 /**
  * Reads the map that is sent to the user,
  * 
@@ -62,15 +53,15 @@ public class MapReader implements ChunkListener {
 
 	private final File baseFile;
 
-	private BlockingQueue<Chunk> chunksToProcess = new LinkedBlockingQueue<Chunk>();
-	private BlockingQueue<WriteableImage> imagesToWrite = new LinkedBlockingQueue<WriteableImage>();
+	private final BlockingQueue<Chunk> chunksToProcess = new LinkedBlockingQueue<Chunk>();
+	private final BlockingQueue<WriteableImage> imagesToWrite = new LinkedBlockingQueue<WriteableImage>();
 
-	private MapDisplay mapDisplay = new MapDisplay(this);
+	private final MapDisplay mapDisplay = new MapDisplay(this);
 	MapDisplayDialog mapDialog = new MapDisplayDialog(mapDisplay);
 
-	private WorldChangeManager wcm = new WorldChangeManager(mapDialog);
+	private final WorldChangeManager wcm = new WorldChangeManager(mapDialog);
 
-	private ChunkQueue chunkQueue = new ChunkQueue();
+	private final ChunkQueue chunkQueue = new ChunkQueue();
 
 	final MapReaderTask task = new MapReaderTask();
 	private final MapWriterTask writer = new MapWriterTask();
@@ -181,16 +172,16 @@ public class MapReader implements ChunkListener {
 		}
 
 		public void renderAt(WorldData world, Chunk chunk, int dx, int dz) {
-			int color = mode.getColor(world, chunk, chunk.x * 16 + dx,
-					chunk.z * 16 + dz);
+			int color = mode.getColor(world, chunk, chunk.getPos().x * 16 + dx,
+					chunk.getPos().z * 16 + dz);
 			getPaintingImage().setRGB(
-					-pos.topLeftX + chunk.x * 16 + dx,
-					-pos.topLeftZ + chunk.z * 16 + dz, color);
+					-pos.topLeftX + chunk.getPos().x * 16 + dx,
+					-pos.topLeftZ + chunk.getPos().z * 16 + dz, color);
 		}
 
 		public void renderChunk(WorldData world, Chunk chunk) {
-			int chunkX = chunk.x * 16;
-			int chunkZ = chunk.z * 16;
+			int chunkX = chunk.getPos().x * 16;
+			int chunkZ = chunk.getPos().z * 16;
 
 			byte[] pixels = ((DataBufferByte) getPaintingImage().getRaster()
 					.getDataBuffer()).getData();
@@ -504,7 +495,7 @@ public class MapReader implements ChunkListener {
 	 * @return
 	 */
 	protected static int getChunkHash(Chunk chunk) {
-		ExtendedBlockStorage[] a = chunk.getBlockStorageArray();
+		ChunkSection[] a = chunk.getSections();
 		if (a.length == 0) {
 			return 0;
 		}
@@ -591,19 +582,19 @@ public class MapReader implements ChunkListener {
 			if (!wcm.shouldStillRender()) {
 				return;
 			}
-			ImagePos pos = new ImagePos(chunk.x * 16,
-					chunk.z * 16);
+			ImagePos pos = new ImagePos(chunk.getPos().x * 16,
+					chunk.getPos().z * 16);
 
 			MultiModeImage image = getImage(pos);
 			int hash = getChunkHash(chunk);
-			if (!image.isValidForChunkHash(chunk.x, chunk.z,
+			if (!image.isValidForChunkHash(chunk.getPos().x, chunk.getPos().z,
 					hash)) {
 				System.err.println("Abort rendering: Chunk hash has changed.");
-				if (!wcm.chunkHashChanged(chunk.x, chunk.z)) {
+				if (!wcm.chunkHashChanged(chunk.getPos().x, chunk.getPos().z)) {
 					return;
 				}
 			}
-			image.setChunkHash(chunk.x, chunk.z, hash);
+			image.setChunkHash(chunk.getPos().x, chunk.getPos().z, hash);
 
 			WorldData world = registeredHelper.getWorld();
 			image.renderChunk(world, chunk);
@@ -739,7 +730,7 @@ public class MapReader implements ChunkListener {
 
 		for (ChunkPos d : chunkQueue.tickAndGet()) {
 			Chunk chunkFromChunkCoords = helper.getMinecraft().world
-					.getChunkFromChunkCoords(d.x, d.z);
+					.getChunk(d.x, d.z);
 			if (chunkFromChunkCoords != null) {
 				chunksToProcess.offer(chunkFromChunkCoords);
 			}
@@ -753,7 +744,7 @@ public class MapReader implements ChunkListener {
 		}
 
 		checkIsAlive(helper);
-		EntityPlayerSP playerSP = helper.getMinecraft().player;
+		ClientPlayerEntity playerSP = helper.getMinecraft().player;
 		BlockPos newPlayer = playerSP == null ? null : helper
 				.getPlayerPosition();
 		int newLook = niceDegrees(playerSP == null ? 0
@@ -775,18 +766,13 @@ public class MapReader implements ChunkListener {
 
 	private void loadAllChunks(AIHelper helper) {
 		try {
-			WorldClient theWorld = helper.getMinecraft().world;
+			ClientWorld theWorld = helper.getMinecraft().world;
 			if (theWorld == null) {
 				return;
 			}
-			IChunkProvider provider = PrivateFieldUtils.getFieldValue(theWorld,
-					World.class, IChunkProvider.class);
-			if (!(provider instanceof ChunkProviderClient)) {
-				return;
-			}
-			Long2ObjectMap<Chunk> list;
-			list = PrivateFieldUtils.getFieldValue(
-					(ChunkProviderClient) provider, ChunkProviderClient.class,
+			ClientChunkProvider provider = theWorld.getChunkProvider();
+			Long2ObjectMap<Chunk> list = PrivateFieldUtils.getFieldValue(
+					provider, ClientChunkProvider.class,
 					Long2ObjectMap.class);
 			for (Chunk chunk : list.values()) {
 				chunkQueue.offer(chunk.getPos());

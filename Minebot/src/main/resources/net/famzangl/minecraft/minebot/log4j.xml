@@ -7,7 +7,7 @@
         <Console name="SysOut" target="SYSTEM_OUT">
             <PatternLayout pattern="[%d{HH:mm:ss}] [%t/%level{WARN=W,DEBUG=D,ERROR=E,TRACE=T,INFO=I}]: %msg%n" />
         </Console>
-        <Queue name="ServerGuiConsole">
+        <Queue name="ServerConsoleScreen">
             <PatternLayout pattern="[%d{HH:mm:ss}] [%t/%level{WARN=W,DEBUG=D,ERROR=E,TRACE=T,INFO=I}] [%logger]: %msg%n" />
         </Queue>
         <Console name="MinebotOut" target="SYSTEM_OUT">

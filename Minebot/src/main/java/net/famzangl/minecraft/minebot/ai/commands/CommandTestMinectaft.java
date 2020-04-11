@@ -14,8 +14,8 @@ import net.famzangl.minecraft.minebot.ai.strategy.RunOnceStrategy;
 import net.famzangl.minecraft.minebot.ai.utils.BlockArea;
 import net.famzangl.minecraft.minebot.ai.utils.BlockArea.AreaVisitor;
 import net.famzangl.minecraft.minebot.ai.utils.BlockCuboid;
-import net.minecraft.client.multiplayer.WorldClient;
-import net.minecraft.init.Blocks;
+import net.minecraft.block.Blocks;
+import net.minecraft.client.world.ClientWorld;
 import net.minecraft.util.math.BlockPos;
 
 @AICommand(helpText = "Some performance/... tests.", name = "minebot")
@@ -112,7 +112,7 @@ public class CommandTestMinectaft {
 	}
 
 	private static void accessNativeBlocksAroundPlayer(WorldData world,
-			final WorldClient theWorld) {
+			final ClientWorld theWorld) {
 		BlockArea area = blocksAroundPlayer(world);
 		AreaVisitor visitor = new AreaVisitor() {
 			@Override
@@ -149,7 +149,7 @@ public class CommandTestMinectaft {
 	}
 
 	private static void accessNativeBlocksAroundPlayerLoop(WorldData world,
-			WorldClient theWorld) {
+			ClientWorld theWorld) {
 		BlockCuboid area = blocksAroundPlayer(world);
 		int minX = area.getMin().getX();
 		int minY = area.getMin().getY();
@@ -171,7 +171,7 @@ public class CommandTestMinectaft {
 	}
 
 	private static void accessNativeBlocksAroundPlayerLoopMutableBP(WorldData world,
-			WorldClient theWorld) {
+																	ClientWorld theWorld) {
 		BlockCuboid area = blocksAroundPlayer(world);
 		int minX = area.getMin().getX();
 		int minY = area.getMin().getY();

@@ -2,7 +2,7 @@ package net.famzangl.minecraft.minebot.settings;
 
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSet;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSets;
-import net.minecraft.init.Blocks;
+import net.minecraft.block.Blocks;
 
 public class PathfindingSettings {
 	private static final BlockSet defaultUpwardsBlocks = new BlockSet(
@@ -20,23 +20,23 @@ public class PathfindingSettings {
 	private PathfindingSetting nonDestructiveLumberjack = new PathfindingSetting(
 			BlockSets.SAFE_GROUND, BlockSets.SAFE_GROUND,
 			BlockSets.FEET_CAN_WALK_THROUGH.unionWith(BlockSets.TREE_BLOCKS),
-			BlockSets.HEAD_CAN_WALK_TRHOUGH.unionWith(BlockSets.TREE_BLOCKS),
+			BlockSets.HEAD_CAN_WALK_THROUGH.unionWith(BlockSets.TREE_BLOCKS),
 			defaultUpwardsBlocks);
 	private PathfindingSetting nonDestructive = new PathfindingSetting(
 			BlockSets.SAFE_GROUND, BlockSets.SAFE_GROUND,
-			BlockSets.FEET_CAN_WALK_THROUGH, BlockSets.HEAD_CAN_WALK_TRHOUGH,
+			BlockSets.FEET_CAN_WALK_THROUGH, BlockSets.HEAD_CAN_WALK_THROUGH,
 			defaultUpwardsBlocks);
 	private PathfindingSetting planting = new PathfindingSetting(
 			BlockSets.SAFE_GROUND, BlockSets.SAFE_GROUND,
-			BlockSets.FEET_CAN_WALK_THROUGH, BlockSets.HEAD_CAN_WALK_TRHOUGH,
+			BlockSets.FEET_CAN_WALK_THROUGH, BlockSets.HEAD_CAN_WALK_THROUGH,
 			defaultUpwardsBlocks);
 	private PathfindingSetting construction = new PathfindingSetting(
 			BlockSets.SAFE_GROUND, BlockSets.SAFE_GROUND,
-			BlockSets.FEET_CAN_WALK_THROUGH, BlockSets.HEAD_CAN_WALK_TRHOUGH,
+			BlockSets.FEET_CAN_WALK_THROUGH, BlockSets.HEAD_CAN_WALK_THROUGH,
 			defaultUpwardsBlocks);
 	private PathfindingSetting walking = new PathfindingSetting(
 			BlockSets.SAFE_GROUND, BlockSets.SAFE_GROUND,
-			BlockSets.FEET_CAN_WALK_THROUGH, BlockSets.HEAD_CAN_WALK_TRHOUGH,
+			BlockSets.FEET_CAN_WALK_THROUGH, BlockSets.HEAD_CAN_WALK_THROUGH,
 			defaultUpwardsBlocks);
 
 	public PathfindingSetting getDestructivePathfinder() {

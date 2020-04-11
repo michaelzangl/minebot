@@ -16,8 +16,6 @@
  *******************************************************************************/
 package net.famzangl.minecraft.minebot.ai.strategy;
 
-import java.util.ArrayList;
-
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.enchanting.CloseScreenTask;
 import net.famzangl.minecraft.minebot.ai.scanner.BlockRangeFinder;
@@ -35,11 +33,13 @@ import net.famzangl.minecraft.minebot.ai.task.error.StringTaskError;
 import net.famzangl.minecraft.minebot.ai.task.inventory.ItemWithSubtype;
 import net.famzangl.minecraft.minebot.ai.task.inventory.MoveInInventoryTask;
 import net.famzangl.minecraft.minebot.ai.task.inventory.TakeResultItem;
-import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.client.gui.inventory.GuiFurnace;
+import net.minecraft.client.gui.ScreenScreen;
+import net.minecraft.client.gui.inventory.FurnaceScreen;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
+
+import java.util.ArrayList;
 
 public class FurnaceStrategy extends PathFinderStrategy {
 
@@ -182,11 +182,11 @@ public class FurnaceStrategy extends PathFinderStrategy {
 
 			@Override
 			protected void runOnce(AIHelper aiHelper, TaskOperations taskOperations) {
-				GuiScreen gui = aiHelper.getMinecraft().currentScreen;
-				if (!(gui instanceof GuiFurnace)) {
+				ScreenScreen gui = aiHelper.getMinecraft().currentScreen;
+				if (!(gui instanceof FurnaceScreen)) {
 					taskOperations.desync(new StringTaskError("No furnace open"));
 				} else {
-					f.update((GuiFurnace) gui);
+					f.update((FurnaceScreen) gui);
 				}
 			}
 		}
@@ -195,7 +195,7 @@ public class FurnaceStrategy extends PathFinderStrategy {
 			private final FurnaceData f;
 
 			private TakeFurnaceResult(FurnaceData f) {
-				super(GuiFurnace.class, 2);
+				super(FurnaceScreen.class, 2);
 				this.f = f;
 			}
 
@@ -276,7 +276,7 @@ public class FurnaceStrategy extends PathFinderStrategy {
 				addTask(new UseItemOnBlockAtTask(f.getPos()) {
 					@Override
 					public boolean isFinished(AIHelper aiHelper) {
-						return aiHelper.getMinecraft().currentScreen instanceof GuiFurnace;
+						return aiHelper.getMinecraft().currentScreen instanceof FurnaceScreen;
 					}
 				});
 				addTask(new WaitTask(5));
@@ -302,7 +302,7 @@ public class FurnaceStrategy extends PathFinderStrategy {
 	@Override
 	public void searchTasks(AIHelper helper) {
 		// If gui open, close it.
-		if (helper.getMinecraft().currentScreen instanceof GuiFurnace) {
+		if (helper.getMinecraft().currentScreen instanceof FurnaceScreen) {
 			addTask(new CloseScreenTask());
 		}
 		super.searchTasks(helper);

@@ -16,9 +16,9 @@
  *******************************************************************************/
 package net.famzangl.minecraft.minebot.ai.command;
 
-import java.util.ArrayList;
-
 import net.famzangl.minecraft.minebot.ai.AIHelper;
+
+import java.util.ArrayList;
 
 public abstract class ParameterBuilder {
 

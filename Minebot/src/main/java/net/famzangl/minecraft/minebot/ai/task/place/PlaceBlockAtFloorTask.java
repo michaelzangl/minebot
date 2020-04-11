@@ -24,7 +24,7 @@ import net.famzangl.minecraft.minebot.ai.task.AITask;
 import net.famzangl.minecraft.minebot.ai.task.BlockHalf;
 import net.famzangl.minecraft.minebot.ai.task.TaskOperations;
 import net.famzangl.minecraft.minebot.ai.task.error.SelectTaskError;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 
@@ -57,12 +57,12 @@ public class PlaceBlockAtFloorTask extends AITask {
 	 * @param dir
 	 * @return
 	 */
-	protected boolean isFacing(AIHelper aiHelper, EnumFacing dir) {
+	protected boolean isFacing(AIHelper aiHelper, Direction dir) {
 		BlockPos facingBlock = getPlaceAtPos().offset(dir);
 		return aiHelper.isFacingBlock(facingBlock, dir.getOpposite(), getSide(dir));
 	}
 
-	protected BlockHalf getSide(EnumFacing dir) {
+	protected BlockHalf getSide(Direction dir) {
 		return BlockHalf.ANY;
 	}
 
@@ -104,7 +104,7 @@ public class PlaceBlockAtFloorTask extends AITask {
 
 	private Vec3d getPositionToFace(AIHelper aiHelper) {
 		BlockBounds bounds = aiHelper.getWorld().getBlockBounds(pos.add(0, -1, 0));
-		return bounds.onlySide(EnumFacing.UP).random(pos.add(0, -1, 0), 0.8);
+		return bounds.onlySide(Direction.UP).random(pos.add(0, -1, 0), 0.8);
 	}
 
 	protected void reFace(AIHelper aiHelper) {
@@ -120,12 +120,12 @@ public class PlaceBlockAtFloorTask extends AITask {
 	}
 
 	protected boolean isAtDesiredHeight(AIHelper aiHelper) {
-		return aiHelper.getMinecraft().player.getEntityBoundingBox().minY >= getPlaceAtPos()
+		return aiHelper.getMinecraft().player.getBoundingBox().minY >= getPlaceAtPos()
 				.getY();
 	}
 
 	protected boolean isFacingRightBlock(AIHelper aiHelper) {
-		return isFacing(aiHelper, EnumFacing.DOWN);
+		return isFacing(aiHelper, Direction.DOWN);
 	}
 
 	@Override

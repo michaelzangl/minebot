@@ -1,16 +1,16 @@
 package net.famzangl.minecraft.minebot.ai.strategy;
 
+import net.famzangl.minecraft.minebot.ai.AIHelper;
+import net.famzangl.minecraft.minebot.ai.command.AIChatController;
+import net.famzangl.minecraft.minebot.ai.command.IAIControllable;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.screen.ChatScreen;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.Scanner;
-
-import net.famzangl.minecraft.minebot.ai.AIHelper;
-import net.famzangl.minecraft.minebot.ai.command.AIChatController;
-import net.famzangl.minecraft.minebot.ai.command.IAIControllable;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiChat;
 
 public final class RunFileStrategy extends AIStrategy {
 
@@ -195,11 +195,9 @@ public final class RunFileStrategy extends AIStrategy {
 
 	public static void runCommand(AIHelper helper, String command) {
 		if (helper.getMinecraft().ingameGUI.getChatGUI() != null) {
-			final GuiChat chat = new GuiChat();
-			// helper.getMinecraft().displayGuiScreen(chat);
-			chat.mc = helper.getMinecraft();
-			chat.sendChatMessage(command);
-			// helper.getMinecraft().displayGuiScreen((GuiScreen) null);
+			final ChatScreen chat = new ChatScreen("");
+			chat.init(helper.getMinecraft(), 100, 100);
+			chat.sendMessage(command);
 		}
 	}
 

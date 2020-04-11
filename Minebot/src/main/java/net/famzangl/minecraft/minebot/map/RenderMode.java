@@ -1,41 +1,37 @@
 package net.famzangl.minecraft.minebot.map;
 
-import java.util.Hashtable;
-
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSet;
+import net.famzangl.minecraft.minebot.ai.path.world.BlockSets;
 import net.famzangl.minecraft.minebot.ai.path.world.WorldData;
 import net.famzangl.minecraft.minebot.ai.utils.BlockCounter;
 import net.famzangl.minecraft.minebot.ai.utils.BlockCuboid;
-import net.minecraft.block.material.MapColor;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.init.Blocks;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
+import net.minecraft.block.material.MaterialColor;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.chunk.Chunk;
+import net.minecraft.world.gen.Heightmap;
+
+import java.util.Hashtable;
 
 public enum RenderMode {
 	UNDERGROUND(new UndergroundRenderer(), "-underground"), MAP(
 			new MapRenderer(), ""), BIOME(new BiomeRenderer(), "-biome");
 	private static final BlockSet GLOBAL_COVER_BLACKLIST = new BlockSet(
-			Blocks.WOODEN_SLAB,
 			Blocks.STONE_SLAB,
-			Blocks.STONE_SLAB2,
-			Blocks.AIR);
+			Blocks.AIR)
+			.unionWith(BlockSets.WOODEN_SLAB);
 	private static final BlockSet IGNORED_COVER_BLOCKS = new BlockSet(
-			Blocks.AIR, 
-			Blocks.LEAVES,
-			Blocks.LEAVES2, 
-			Blocks.LOG,
-			Blocks.LOG2, 
+			Blocks.AIR,
 			Blocks.TORCH, 
 			Blocks.WATER, 
-			Blocks.FLOWING_WATER,
-			Blocks.WATERLILY, 
+			Blocks.LILY_PAD,
 			Blocks.LAVA, 
-			Blocks.FLOWING_LAVA,
 			Blocks.SNOW,
-			Blocks.SNOW_LAYER, 
 			Blocks.ICE)
-			.unionWith(GLOBAL_COVER_BLACKLIST);
+			.unionWith(GLOBAL_COVER_BLACKLIST)
+			.unionWith(BlockSets.LEAVES)
+			.unionWith(BlockSets.LOGS);
 	private static final BlockSet UNDERGROUND_BLOCKS = new BlockSet(
 			Blocks.AIR,
 			Blocks.TORCH);
@@ -45,14 +41,14 @@ public enum RenderMode {
 			Blocks.END_STONE,
 			Blocks.BOOKSHELF, 
 			Blocks.PRISMARINE, 
-			Blocks.PLANKS,
-			Blocks.NETHER_BRICK,
-			Blocks.NETHER_WART, 
-			Blocks.TORCH);
+			Blocks.NETHER_BRICKS,
+			Blocks.NETHER_WART,
+			Blocks.TORCH)
+			.unionWith(BlockSets.PLANKS);
 	private static final BlockSet INTERESTING_BLOCKS = new BlockSet(
 			Blocks.CHEST,
 			Blocks.TRAPPED_CHEST,
-			Blocks.MOB_SPAWNER, 
+			Blocks.SPAWNER,
 			Blocks.GOLD_BLOCK);
 
 	private interface IRenderer {
@@ -76,9 +72,9 @@ public enum RenderMode {
 
 		@Override
 		public int getColor(WorldData world, Chunk chunk, int dx, int dz) {
-			int height = chunk.getHeightValue(dx & 0xf, dz & 0xf) + 1;
+			int height = chunk.getTopBlockY(Heightmap.Type.WORLD_SURFACE, dx & 0xf, dz & 0xf) + 1;
 			while (height > 3
-					&& IGNORED_COVER_BLOCKS.contains(chunk.getBlockState(dx, height, dz))) {
+					&& IGNORED_COVER_BLOCKS.contains(chunk.getBlockState(new BlockPos(dx, height, dz)))) {
 				height--;
 			}
 			BlockCuboid area = new BlockCuboid(new BlockPos(dx, 0, dz),
@@ -99,24 +95,24 @@ public enum RenderMode {
 	private static class MapRenderer implements RenderMode.IRenderer {
 		@Override
 		public int getColor(WorldData world, Chunk chunk, int dx, int dz) {
-			int height = chunk.getHeightValue(dx & 0xf, dz & 0xf) + 1;
-			IBlockState state;
+			int height = chunk.getTopBlockY(Heightmap.Type.WORLD_SURFACE, dx & 0xf, dz & 0xf) + 1;
+			BlockState state;
 			do {
 				--height;
 				state = chunk.getBlockState(new BlockPos(dx, height, dz));
 			} while ((GLOBAL_COVER_BLACKLIST.contains(state.getBlock()) || state
-					.getBlock().getMapColor(state, world.getBackingWorld(), new BlockPos(dx, height, dz)) == MapColor.AIR)
+					.getBlock().getMaterialColor(state, world.getBackingWorld(), new BlockPos(dx, height, dz)) == MaterialColor.AIR)
 					&& height > 0);
 
 			if (state.getBlock() == Blocks.SANDSTONE || state.getBlock() == Blocks.SANDSTONE_STAIRS) {
 				return 0xffb4ad8a;
 			}
-			
-			MapColor color = (state.getBlock().getMapColor(state, world.getBackingWorld(), new BlockPos(dx, height, dz)));
+
+			MaterialColor color = (state.getBlock().getMaterialColor(state, world.getBackingWorld(), new BlockPos(dx, height, dz)));
 			return getColor(color);
 		}
 
-		private int getColor(MapColor color) {
+		private int getColor(MaterialColor color) {
 			return 0xff000000 | color.colorValue;
 		}
 	}
@@ -194,7 +190,8 @@ public enum RenderMode {
 		public int getColor(WorldData world, Chunk chunk, int dx, int dz) {
 			int i = dx & 15;
 			int j = dz & 15;
-			int k = chunk.getBiomeArray()[j << 4 | i] & 255;
+			//TODO: This is very slow in the current version
+			int k = chunk.getBiomes().getBiomeIds()[j << 4 | i] & 255;
 			// assume it is already loaded. If not, we ignore it.
 			Integer color = COLORS.get(k);
 			return color != null ? color : DEFAULT_COLOR;

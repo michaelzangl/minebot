@@ -19,7 +19,7 @@ package net.famzangl.minecraft.minebot.ai.task.place;
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.ItemFilter;
 import net.famzangl.minecraft.minebot.ai.task.BlockHalf;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 
 public class JumpingPlaceBlockAtSideTask extends JumpingPlaceAtHalfTask {
@@ -27,7 +27,7 @@ public class JumpingPlaceBlockAtSideTask extends JumpingPlaceAtHalfTask {
 	private final int attempts = 0;
 
 	public JumpingPlaceBlockAtSideTask(BlockPos pos, ItemFilter filter,
-			EnumFacing lookingDirection, BlockHalf side) {
+			Direction lookingDirection, BlockHalf side) {
 		super(pos, filter, side);
 		this.lookingDirection = lookingDirection;
 	}
@@ -37,9 +37,9 @@ public class JumpingPlaceBlockAtSideTask extends JumpingPlaceAtHalfTask {
 	// if (side != BlockSide.UPPER_HALF && attempts % 4 == 3) {
 	// faceBottomBlock(h);
 	// } else if (attempts % 4 == 1) {
-	// faceSideBlock(h, lookingDirection.getRotation(EnumFacing.UP));
+	// faceSideBlock(h, lookingDirection.getRotation(Direction.UP));
 	// } else if (attempts % 4 == 2) {
-	// faceSideBlock(h, lookingDirection.getRotation(EnumFacing.DOWN));
+	// faceSideBlock(h, lookingDirection.getRotation(Direction.DOWN));
 	// } else {
 	// faceSideBlock(h, lookingDirection);
 	// }
@@ -47,12 +47,12 @@ public class JumpingPlaceBlockAtSideTask extends JumpingPlaceAtHalfTask {
 	// }
 
 	@Override
-	protected EnumFacing[] getBuildDirs() {
-		return side != BlockHalf.UPPER_HALF ? new EnumFacing[] {
-				EnumFacing.DOWN,
+	protected Direction[] getBuildDirs() {
+		return side != BlockHalf.UPPER_HALF ? new Direction[] {
+				Direction.DOWN,
 				lookingDirection.rotateY(),
 				lookingDirection.rotateYCCW(),
-				lookingDirection } : new EnumFacing[] {
+				lookingDirection } : new Direction[] {
 				lookingDirection.rotateYCCW(),
 				lookingDirection.rotateY(),
 				lookingDirection };
@@ -69,7 +69,7 @@ public class JumpingPlaceBlockAtSideTask extends JumpingPlaceAtHalfTask {
 					|| isFacing(aiHelper, lookingDirection)
 					|| side != BlockHalf.UPPER_HALF
 					&& isFacing(aiHelper,
-							EnumFacing.DOWN);
+							Direction.DOWN);
 		}
 	}
 }

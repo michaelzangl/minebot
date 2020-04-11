@@ -20,7 +20,7 @@ import net.famzangl.minecraft.minebot.ai.path.world.BlockSet;
 import net.famzangl.minecraft.minebot.build.blockbuild.BuildNormalStairsTask;
 import net.famzangl.minecraft.minebot.build.blockbuild.BuildTask;
 import net.minecraft.block.BlockStairs;
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
 
 public class StairBuildTaskFactory extends AbstractBuildTaskFactory {
@@ -32,7 +32,7 @@ public class StairBuildTaskFactory extends AbstractBuildTaskFactory {
 	}
 
 	@Override
-	protected BuildTask getTaskImpl(BlockPos position, IBlockState block) {
+	protected BuildTask getTaskImpl(BlockPos position, BlockState block) {
 		return new BuildNormalStairsTask(position, block.getBlock(), block.getValue(BlockStairs.FACING), block.getValue(BlockStairs.HALF));
 	}
 

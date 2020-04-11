@@ -17,10 +17,9 @@
 package net.famzangl.minecraft.minebot.ai.selectors;
 
 import com.google.common.base.Predicate;
-
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.passive.EntityAnimal;
+import net.minecraft.entity.passive.AnimalEntity;
 
 public final class FeedableSelector implements Predicate<Entity> {
 	private final AIHelper helper;
@@ -31,9 +30,9 @@ public final class FeedableSelector implements Predicate<Entity> {
 
 	@Override
 	public boolean apply(Entity e) {
-		if (!(e instanceof EntityAnimal)) {
+		if (!(e instanceof AnimalEntity)) {
 			return false;
 		}
-		return helper.canSelectItem(new FilterFeedingItem((EntityAnimal) e));
+		return helper.canSelectItem(new FilterFeedingItem((AnimalEntity) e));
 	}
 }

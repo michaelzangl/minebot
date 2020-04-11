@@ -16,25 +16,25 @@
  *******************************************************************************/
 package net.famzangl.minecraft.minebot.ai.scanner;
 
+import net.famzangl.minecraft.minebot.ai.ItemFilter;
+import net.famzangl.minecraft.minebot.ai.path.world.BlockSet;
+import net.famzangl.minecraft.minebot.ai.path.world.WorldData;
+import net.famzangl.minecraft.minebot.ai.scanner.ChestBlockHandler.ChestData;
+import net.famzangl.minecraft.minebot.ai.utils.PrivateFieldUtils;
+import net.minecraft.block.Blocks;
+import net.minecraft.entity.item.HangingEntity;
+import net.minecraft.entity.item.ItemFrameEntity;
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.Direction;
+import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.util.math.BlockPos;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
-
-import net.famzangl.minecraft.minebot.ai.ItemFilter;
-import net.famzangl.minecraft.minebot.ai.path.world.BlockSet;
-import net.famzangl.minecraft.minebot.ai.path.world.WorldData;
-import net.famzangl.minecraft.minebot.ai.scanner.ChestBlockHandler.ChestData;
-import net.famzangl.minecraft.minebot.ai.utils.PrivateFieldUtils;
-import net.minecraft.entity.EntityHanging;
-import net.minecraft.entity.item.EntityItemFrame;
-import net.minecraft.init.Blocks;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.math.AxisAlignedBB;
-import net.minecraft.util.math.BlockPos;
 
 public class ChestBlockHandler extends RangeBlockHandler<ChestData> {
 	private static final BlockSet CHEST = new BlockSet(Blocks.CHEST,
@@ -183,7 +183,7 @@ public class ChestBlockHandler extends RangeBlockHandler<ChestData> {
 			return id == chestBlockId;
 		}
 
-		public void registerByItemFrame(EntityItemFrame frame) {
+		public void registerByItemFrame(ItemFrameEntity frame) {
 			ItemStack displayed = frame.getDisplayedItem();
 			if (displayed != null && !displayed.isEmpty()) {
 				allowItem(displayed);
@@ -256,17 +256,17 @@ public class ChestBlockHandler extends RangeBlockHandler<ChestData> {
 		BlockPos myPos = new BlockPos(x, y, z);
 		AxisAlignedBB abb = new AxisAlignedBB(x - 1, y, z - 1, x + 2, y + 1,
 				z + 2);
-		List<EntityItemFrame> frames = world.getBackingWorld()
-				.getEntitiesWithinAABB(EntityItemFrame.class, abb);
-		for (EntityItemFrame frame : frames) {
-			EnumFacing direction = getDirection(frame);
+		List<ItemFrameEntity> frames = world.getBackingWorld()
+				.getEntitiesWithinAABB(ItemFrameEntity.class, abb);
+		for (ItemFrameEntity frame : frames) {
+			Direction direction = getDirection(frame);
 			if (direction == null) {
 				continue;
 			}
 			BlockPos pos = PrivateFieldUtils.getFieldValue(frame,
-					EntityHanging.class, BlockPos.class);
-			EnumFacing dir = PrivateFieldUtils.getFieldValue(frame,
-					EntityHanging.class, EnumFacing.class);
+					HangingEntity.class, BlockPos.class);
+			Direction dir = PrivateFieldUtils.getFieldValue(frame,
+					HangingEntity.class, Direction.class);
 			if (pos.offset(dir, -1).equals(myPos)) {
 				// Frame attached to this chest
 				chest.registerByItemFrame(frame);
@@ -276,9 +276,9 @@ public class ChestBlockHandler extends RangeBlockHandler<ChestData> {
 
 	private ChestData getChestAt(BlockPos pos, int id) {
 		ChestData chest = null;
-		for (EnumFacing d : new EnumFacing[] { EnumFacing.UP, EnumFacing.NORTH,
-				EnumFacing.SOUTH, EnumFacing.EAST, EnumFacing.WEST }) {
-			BlockPos blockPos = pos.add(d.getFrontOffsetX(), 0, d.getFrontOffsetZ());
+		for (Direction d : new Direction[] { Direction.UP, Direction.NORTH,
+				Direction.SOUTH, Direction.EAST, Direction.WEST }) {
+			BlockPos blockPos = pos.add(d.getXOffset(), 0, d.getZOffset());
 			ChestData attempted = chests.get(blockPos);
 			if (attempted != null && attempted.isOfType(id)) {
 				chest = attempted;
@@ -300,7 +300,7 @@ public class ChestBlockHandler extends RangeBlockHandler<ChestData> {
 	 * @param itemFrame
 	 * @return
 	 */
-	private EnumFacing getDirection(EntityItemFrame itemFrame) {
+	private Direction getDirection(ItemFrameEntity itemFrame) {
 		return itemFrame.facingDirection;
 	}
 

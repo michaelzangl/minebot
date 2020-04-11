@@ -16,8 +16,6 @@
  *******************************************************************************/
 package net.famzangl.minecraft.minebot.ai.path;
 
-import java.util.LinkedList;
-
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.BlockItemFilter;
 import net.famzangl.minecraft.minebot.ai.PathFinderField;
@@ -35,9 +33,11 @@ import net.famzangl.minecraft.minebot.ai.task.move.WalkTowardsTask;
 import net.famzangl.minecraft.minebot.settings.MinebotSettings;
 import net.famzangl.minecraft.minebot.settings.MinebotSettingsRoot;
 import net.famzangl.minecraft.minebot.settings.PathfindingSetting;
-import net.minecraft.init.Blocks;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.block.Blocks;
+import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
+
+import java.util.LinkedList;
 
 /**
  * A pathfinder that lets you move around a minecraft world.
@@ -110,7 +110,7 @@ public class MovePathFinder extends PathFinderField {
 	protected BlockSet headAllowedBlocks;
 
 	protected BlockSet shortFootBlocks = BlockSets.FEET_CAN_WALK_THROUGH;
-	protected BlockSet shortHeadBlocks = BlockSets.HEAD_CAN_WALK_TRHOUGH;
+	protected BlockSet shortHeadBlocks = BlockSets.HEAD_CAN_WALK_THROUGH;
 
 	protected PathfindingSetting setting;
 
@@ -221,7 +221,7 @@ public class MovePathFinder extends PathFinderField {
 		if (getY(currentNode) > cy) {
 			if (getX(currentNode) != cx || getZ(currentNode) != cz) {
 				return BlockSets.SAFE_CEILING.isAt(world, cx, cy + 3, cz)
-						&& BlockSets.HEAD_CAN_WALK_TRHOUGH.isAt(world, cx,
+						&& BlockSets.HEAD_CAN_WALK_THROUGH.isAt(world, cx,
 								cy + 2, cz);
 			} else if (BlockSets.FALLING.isAt(world, cx, cy + 2, cz)) {
 				// moving down, so ignoring sand, gravel.
@@ -244,7 +244,7 @@ public class MovePathFinder extends PathFinderField {
 				currentPos.getZ()));
 		while (!path.isEmpty()) {
 			BlockPos nextPos = path.removeFirst();
-			EnumFacing moveDirection = direction(currentPos, nextPos);
+			Direction moveDirection = direction(currentPos, nextPos);
 			int stepsAdded = 0;
 			while (path.peekFirst() != null
 					&& isAreaClear(currentPos, path.peekFirst())
@@ -255,7 +255,7 @@ public class MovePathFinder extends PathFinderField {
 			final BlockPos peeked = path.peekFirst();
 			if (stepsAdded > 0) {
 				addHorizontalFastMove(currentPos, nextPos);
-			} else if (moveDirection == EnumFacing.UP && peeked != null
+			} else if (moveDirection == Direction.UP && peeked != null
 					&& nextPos.subtract(peeked).getY() == 0) {
 				addJumpMoveTask(currentPos, peeked);
 				nextPos = peeked;
@@ -311,7 +311,7 @@ public class MovePathFinder extends PathFinderField {
 						|| !BlockSets.SAFE_CEILING.isAt(world, x, y + 2, z)
 						|| !BlockSets.FEET_CAN_WALK_THROUGH
 								.isAt(world, x, y, z)
-						|| !BlockSets.HEAD_CAN_WALK_TRHOUGH.isAt(world, x,
+						|| !BlockSets.HEAD_CAN_WALK_THROUGH.isAt(world, x,
 								y + 1, z)) {
 					return false;
 				}
@@ -320,7 +320,7 @@ public class MovePathFinder extends PathFinderField {
 		return true;
 	}
 
-	private EnumFacing direction(BlockPos currentPos, final BlockPos nextPos) {
+	private Direction direction(BlockPos currentPos, final BlockPos nextPos) {
 		BlockPos delta = nextPos.subtract(currentPos);
 		if (delta.getY() != 0 && (delta.getX() != 0 || delta.getZ() != 0)) {
 			delta = new BlockPos(delta.getX(), 0, delta.getZ());

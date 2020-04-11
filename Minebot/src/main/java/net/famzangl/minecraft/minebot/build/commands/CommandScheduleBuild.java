@@ -36,7 +36,7 @@ import net.famzangl.minecraft.minebot.build.blockbuild.SlabBuildTask;
 import net.famzangl.minecraft.minebot.build.blockbuild.StandingSignBuildTask;
 import net.famzangl.minecraft.minebot.build.blockbuild.StandingSignBuildTask.SignDirection;
 import net.minecraft.block.BlockStairs;
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
 
 @AICommand(helpText = "Schedules a build task.", name = "minebuild")
@@ -94,7 +94,7 @@ public class CommandScheduleBuild {
 			AIHelper helper,
 			@AICommandParameter(type = ParameterType.FIXED, fixedName = "schedule", description = "") String nameArg,
 			@AICommandParameter(type = ParameterType.POSITION, description = "Where to place it (relative is to your current pos)") BlockPos forPosition,
-			@AICommandParameter(type = ParameterType.BLOCK_STATE, description = "The block", blockFilter=StairsBlockFilter.class) IBlockState blockToPlace) {
+			@AICommandParameter(type = ParameterType.BLOCK_STATE, description = "The block", blockFilter=StairsBlockFilter.class) BlockState blockToPlace) {
 		BuildNormalStairsTask task;
 		if (BuildNormalStairsTask.BLOCKS.contains(blockToPlace)) {
 			task = new BuildNormalStairsTask(forPosition, blockToPlace.getBlock(), blockToPlace.getValue(BlockStairs.FACING), blockToPlace.getValue(BlockStairs.HALF));
@@ -124,7 +124,7 @@ public class CommandScheduleBuild {
 	// "The block", blockFilter = RunColoredFilter.class)
 	// BlockWithDataOrDontcare blockToPlace,
 	// @AICommandParameter(type = ParameterType.COLOR, description =
-	// "The color") EnumDyeColor color) {
+	// "The color") DyeColor color) {
 	// if (ColoredCubeBuildTask.BLOCKS.contains(blockToPlace)) {
 	// addTask(helper, new ColoredCubeBuildTask(forPosition, blockToPlace,
 	// color));
@@ -182,7 +182,7 @@ public class CommandScheduleBuild {
 	// @AICommandParameter(type = ParameterType.ENUM, description =
 	// "The type of wood logs") WoodType woodType,
 	// @AICommandParameter(type = ParameterType.ENUM, description =
-	// "The direction the log is facing") EnumFacing direction) {
+	// "The direction the log is facing") Direction direction) {
 	// if (LogBuildTask.BLOCKS.contains(blockToPlace)) {
 	// addTask(helper, new LogBuildTask(forPosition, woodType, direction));
 	// } else {
@@ -205,7 +205,7 @@ public class CommandScheduleBuild {
 //			@AICommandParameter(type = ParameterType.FIXED, fixedName = "schedule", description = "") String nameArg,
 //			@AICommandParameter(type = ParameterType.POSITION, description = "Where to place it (relative is to your current pos)") BlockPos forPosition,
 //			@AICommandParameter(type = ParameterType.BLOCK_NAME, description = "The block", blockFilter = StairsBlockFilter.class) BlockWithDataOrDontcare blockToPlace,
-//			@AICommandParameter(type = ParameterType.ENUM, description = "The direction the stairs face") EnumFacing direction,
+//			@AICommandParameter(type = ParameterType.ENUM, description = "The direction the stairs face") Direction direction,
 //			@AICommandParameter(type = ParameterType.ENUM, description = "Upper for inverted stairs", optional = true) EnumHalf half) {
 //		if (BuildNormalStairsTask.BLOCKS.contains(blockToPlace)) {
 //			addTask(helper,

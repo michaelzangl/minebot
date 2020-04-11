@@ -19,21 +19,21 @@ package net.famzangl.minecraft.minebot.ai.task.place;
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.BlockItemFilter;
 import net.famzangl.minecraft.minebot.ai.task.BlockHalf;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 
 public class SneakAndPlaceAtSideTask extends SneakAndPlaceAtHalfTask {
 
 	public SneakAndPlaceAtSideTask(BlockPos pos, BlockItemFilter filter,
 			BlockPos relativeFrom, double minBuildHeight,
-			EnumFacing lookingDirection, BlockHalf side) {
+			Direction lookingDirection, BlockHalf side) {
 		super(pos, filter, relativeFrom, minBuildHeight, side);
 		this.lookingDirection = lookingDirection;
 	}
 
 	@Override
-	protected EnumFacing[] createBuildDirsUnordered() {
-		return new EnumFacing[] { lookingDirection, lookingDirection.rotateY(),
+	protected Direction[] createBuildDirsUnordered() {
+		return new Direction[] { lookingDirection, lookingDirection.rotateY(),
 				lookingDirection.rotateYCCW() };
 	}
 

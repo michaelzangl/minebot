@@ -16,8 +16,6 @@
  *******************************************************************************/
 package net.famzangl.minecraft.minebot.build;
 
-import java.util.LinkedList;
-
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.BlockItemFilter;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSet;
@@ -26,10 +24,12 @@ import net.famzangl.minecraft.minebot.ai.task.AITask;
 import net.famzangl.minecraft.minebot.ai.task.TaskOperations;
 import net.famzangl.minecraft.minebot.ai.task.error.SelectTaskError;
 import net.famzangl.minecraft.minebot.ai.task.move.HorizontalMoveTask;
-import net.minecraft.init.Blocks;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.block.Blocks;
+import net.minecraft.util.Direction;
 import net.minecraft.util.MovementInput;
 import net.minecraft.util.math.BlockPos;
+
+import java.util.LinkedList;
 
 /**
  * This task lets you walk from one position to an other, adjacent position. In
@@ -91,7 +91,7 @@ public class WalkTowardsTask extends AITask {
 				BlockPos floor = new BlockPos(fromPos.getX(), floorY,
 						fromPos.getZ());
 				aiHelper.faceBlock(floor);
-				if (aiHelper.isFacingBlock(floor, EnumFacing.UP)) {
+				if (aiHelper.isFacingBlock(floor, Direction.UP)) {
 					if (aiHelper.selectCurrentItem(CARPET)) {
 						aiHelper.overrideUseItem();
 						carpets.add(new BlockPos(fromPos.getX(), floorY + 1,

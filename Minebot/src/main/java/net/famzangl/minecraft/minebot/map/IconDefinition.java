@@ -1,12 +1,11 @@
 package net.famzangl.minecraft.minebot.map;
 
+import net.minecraft.util.math.BlockPos;
+
+import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.URL;
-
-import javax.imageio.ImageIO;
-
-import net.minecraft.util.math.BlockPos;
 
 public class IconDefinition {
 	private final BlockPos position;

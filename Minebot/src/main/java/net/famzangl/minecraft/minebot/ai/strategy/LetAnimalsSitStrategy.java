@@ -16,11 +16,7 @@
  *******************************************************************************/
 package net.famzangl.minecraft.minebot.ai.strategy;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.google.common.base.Predicate;
-
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.ItemFilter;
 import net.famzangl.minecraft.minebot.ai.animals.AnimalyType;
@@ -31,11 +27,14 @@ import net.famzangl.minecraft.minebot.ai.selectors.NotSelector;
 import net.famzangl.minecraft.minebot.ai.selectors.OneOfListSelector;
 import net.famzangl.minecraft.minebot.ai.task.FaceAndInteractTask;
 import net.minecraft.entity.Entity;
-import net.minecraft.item.EnumDyeColor;
+import net.minecraft.item.DyeColor;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemDye;
 import net.minecraft.item.ItemFood;
 import net.minecraft.item.ItemStack;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Lets all wolves that are owned by the current player either sit or stand.
@@ -59,7 +58,7 @@ public class LetAnimalsSitStrategy extends TaskStrategy {
 	}
 
 	private static final int DISTANCE = 20;
-	private final EnumDyeColor color;
+	private final DyeColor color;
 	private final boolean shouldSit;
 	private final List<Entity> handled = new ArrayList<Entity>();
 
@@ -74,7 +73,7 @@ public class LetAnimalsSitStrategy extends TaskStrategy {
 	 * @param color
 	 *            A color selector or -1 for no color.
 	 */
-	public LetAnimalsSitStrategy(AnimalyType wolf, boolean shouldSit, EnumDyeColor color) {
+	public LetAnimalsSitStrategy(AnimalyType wolf, boolean shouldSit, DyeColor color) {
 		if (wolf != AnimalyType.WOLF) {
 			throw new IllegalArgumentException();
 		}

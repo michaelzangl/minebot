@@ -17,7 +17,7 @@
 package net.famzangl.minecraft.minebot.ai.task;
 
 import net.famzangl.minecraft.minebot.ai.AIHelper;
-import net.minecraft.client.gui.inventory.GuiChest;
+import net.minecraft.client.gui.screen.inventory.ChestScreen;
 import net.minecraft.util.math.BlockPos;
 
 /**
@@ -48,7 +48,7 @@ public class OpenChestTask extends UseItemTask {
 
 	@Override
 	public boolean isFinished(AIHelper aiHelper) {
-		return aiHelper.getMinecraft().currentScreen instanceof GuiChest;
+		return aiHelper.getMinecraft().currentScreen instanceof ChestScreen;
 	}
 
 	@Override

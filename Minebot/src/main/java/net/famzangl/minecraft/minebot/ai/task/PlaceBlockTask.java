@@ -20,7 +20,7 @@ import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.BlockItemFilter;
 import net.famzangl.minecraft.minebot.ai.task.error.SelectTaskError;
 import net.minecraft.block.Block;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 
 /**
@@ -32,7 +32,7 @@ import net.minecraft.util.math.BlockPos;
  */
 public class PlaceBlockTask extends AITask {
 	private final BlockPos placeOn;
-	private final EnumFacing onSide;
+	private final Direction onSide;
 	private int attemptsLeft = 20;
 	private final Block block;
 
@@ -45,7 +45,7 @@ public class PlaceBlockTask extends AITask {
 	 * @param block
 	 *            The Block to place.
 	 */
-	public PlaceBlockTask(BlockPos placeOn, EnumFacing onSide, Block block) {
+	public PlaceBlockTask(BlockPos placeOn, Direction onSide, Block block) {
 		super();
 		if (placeOn == null || onSide == null || block == null) {
 			throw new NullPointerException();

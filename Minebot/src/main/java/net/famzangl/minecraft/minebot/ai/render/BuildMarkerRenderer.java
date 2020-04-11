@@ -16,16 +16,16 @@
  *******************************************************************************/
 package net.famzangl.minecraft.minebot.ai.render;
 
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.List;
-
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.build.BuildManager;
 import net.famzangl.minecraft.minebot.build.blockbuild.BuildTask;
 import net.minecraft.util.math.BlockPos;
-import net.minecraftforge.fml.common.gameevent.TickEvent.RenderTickEvent;
+import net.minecraftforge.event.TickEvent;
+
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.List;
 
 public class BuildMarkerRenderer extends RenderHelper {
 
@@ -56,7 +56,7 @@ public class BuildMarkerRenderer extends RenderHelper {
 		}
 	}
 
-	public void render(RenderTickEvent event, AIHelper helper) {
+	public void render(TickEvent.RenderTickEvent event, AIHelper helper) {
 		renderStart(event, helper);
 		final BuildManager buildManager = helper.buildManager;
 		final List<BuildTask> scheduled = buildManager.getScheduled();

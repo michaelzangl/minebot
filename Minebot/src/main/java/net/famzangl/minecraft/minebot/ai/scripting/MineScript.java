@@ -16,20 +16,8 @@
  *******************************************************************************/
 package net.famzangl.minecraft.minebot.ai.scripting;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.PrintWriter;
-import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Scanner;
-
-import javax.script.Invocable;
-import javax.script.ScriptEngine;
-import javax.script.ScriptException;
-
+import com.mojang.brigadier.StringReader;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.AIHelper.ToolRaterResult;
 import net.famzangl.minecraft.minebot.ai.command.AIChatController;
@@ -45,18 +33,26 @@ import net.famzangl.minecraft.minebot.ai.strategy.StrategyStack;
 import net.famzangl.minecraft.minebot.ai.strategy.WalkTowardsStrategy;
 import net.famzangl.minecraft.minebot.ai.tools.ToolRater;
 import net.minecraft.command.CommandException;
-import net.minecraft.command.CommandResultStats.Type;
-import net.minecraft.command.EntitySelector;
-import net.minecraft.command.ICommandSender;
+import net.minecraft.command.CommandSource;
+import net.minecraft.command.ICommandSource;
+import net.minecraft.command.arguments.EntitySelectorParser;
 import net.minecraft.entity.Entity;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.JsonToNBT;
-import net.minecraft.nbt.NBTException;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.world.World;
+import net.minecraft.util.math.Vec2f;
+
+import javax.script.Invocable;
+import javax.script.ScriptEngine;
+import javax.script.ScriptException;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Scanner;
 
 /**
  * The minescript object that is exported to js.
@@ -147,86 +143,35 @@ public class MineScript {
 	public Object getEntities(String entityDescr, Object nbtO)
 			throws ScriptException {
 		final AIHelper helper = waitForTick();
-		List<Entity> entities;
+		List<? extends Entity> entities;
 		try {
-			entities = EntitySelector.matchEntities(
-					new ICommandSender() {
-						@Override
-						public void setCommandStat(Type type, int amount) {
-							throw new UnsupportedOperationException();
-						}
-
-						@Override
-						public boolean sendCommandFeedback() {
-							throw new UnsupportedOperationException();
-						}
-
-						@Override
-						public Vec3d getPositionVector() {
-							return helper.getMinecraft().player.getPositionVector();
-						}
-
-						@Override
-						public BlockPos getPosition() {
-							return helper.getMinecraft().player.getPosition();
-						}
-
-						@Override
-						public String getName() {
-							throw new UnsupportedOperationException();
-						}
-
-						@Override
-						public World getEntityWorld() {
-							return helper.getWorld().getBackingWorld();
-						}
-
-						@Override
-						public ITextComponent getDisplayName() {
-							throw new UnsupportedOperationException();
-						}
-
-						@Override
-						public Entity getCommandSenderEntity() {
-							return helper.getMinecraft().player;
-						}
-
-						@Override
-						public void sendMessage(ITextComponent component) {
-							// Only called for errors.
-							throw new RuntimeException(component.toString());
-							
-						}
-
-						@Override
-						public boolean canUseCommand(int permLevel, String commandName) {
-							return true;
-						}
-
-						@Override
-						public MinecraftServer getServer() {
-							// TODO Auto-generated method stub
-							return null;
-						}
-					}, entityDescr, Entity.class);
-		} catch (CommandException e2) {
+			entities = new EntitySelectorParser(new StringReader(entityDescr))
+					.build().select(
+							new CommandSource(ICommandSource.DUMMY,
+									helper.getMinecraft().player.getPositionVector(),
+									Vec2f.ZERO, null,
+									2, helper.getMinecraft().player.getName().getString(),
+									helper.getMinecraft().player.getDisplayName(),
+									helper.getMinecraft().world.getServer(),
+									helper.getMinecraft().player));
+		} catch (CommandException | CommandSyntaxException e2) {
 			throw new ScriptException(e2);
 		}
 
-		NBTTagCompound nbt = null;
+		CompoundNBT nbt = null;
 		if (nbtO != null) {
 			String nbtS = jsonify(nbtO);
 			try {
 				nbt = JsonToNBT.getTagFromJson(nbtS);
-			} catch (NBTException e1) {
+			} catch (CommandSyntaxException e1) {
 				throw new ScriptException(e1);
 			}
 		}
 		ArrayList<FoundEntity> foundEntities = new ArrayList<FoundEntity>();
 		for (Entity e : entities) {
 			if (nbt != null) {
-				NBTTagCompound nbttagcompound1 = new NBTTagCompound();
-				e.writeToNBT(nbttagcompound1);
+				CompoundNBT nbttagcompound1 = new CompoundNBT();
+				e.writeWithoutTypeId(nbttagcompound1);
 
 				// TODO: Where did that go?
 				// if (!CommandTestForBlock.(nbt, nbttagcompound1,
@@ -284,7 +229,7 @@ public class MineScript {
 	}
 
 	public int getCurrentTime() {
-		return (int) (waitForTick().getMinecraft().world.getWorldTime() % 24000l);
+		return (int) (waitForTick().getMinecraft().world.getGameTime() % 24000l);
 	}
 
 	public InventoryDefinition getInventory() {

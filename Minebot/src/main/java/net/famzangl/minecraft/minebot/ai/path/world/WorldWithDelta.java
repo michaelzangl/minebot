@@ -1,18 +1,17 @@
 package net.famzangl.minecraft.minebot.ai.path.world;
 
-import java.util.Arrays;
-import java.util.Hashtable;
-
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
+import net.minecraft.client.world.ClientWorld;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.MarkerManager;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.client.multiplayer.WorldClient;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
+import java.util.Arrays;
+import java.util.Hashtable;
 
 public class WorldWithDelta extends WorldData {
 	private static final Marker MARKER_WORLD_DELTA = MarkerManager
@@ -27,7 +26,7 @@ public class WorldWithDelta extends WorldData {
 	private WorldData currentWorld;
 
 	public static class ChunkWithDelta extends ChunkAccessor {
-		private final WorldClient theWorld;
+		private final ClientWorld theWorld;
 		private final int chunkX;
 		private final int chunkZ;
 
@@ -35,7 +34,7 @@ public class WorldWithDelta extends WorldData {
 
 		private char[][] replacedBlockIds = new char[0][];
 
-		public ChunkWithDelta(WorldClient theWorld, int chunkX, int chunkZ) {
+		public ChunkWithDelta(ClientWorld theWorld, int chunkX, int chunkZ) {
 			super();
 			this.theWorld = theWorld;
 			this.chunkX = chunkX;
@@ -61,8 +60,8 @@ public class WorldWithDelta extends WorldData {
 				LOGGER.trace(MARKER_WORLD_DELTA,
 						"Chunk delta fall through: load block storage for ("
 								+ chunkX + "," + chunkZ + ")");
-				blockStorage = theWorld.getChunkFromChunkCoords(chunkX, chunkZ)
-						.getBlockStorageArray();
+				blockStorage = theWorld.getChunk(chunkX, chunkZ)
+						.getSections();
 			}
 			return super.getBlockIdWithMeta(x, y, z);
 		}
@@ -134,7 +133,7 @@ public class WorldWithDelta extends WorldData {
 		setBlockIdAndMeta(x, y, z, blockId << 4 | meta);
 	}
 
-	public void setBlock(BlockPos pos, IBlockState block) {
+	public void setBlock(BlockPos pos, BlockState block) {
 		setBlockIdAndMeta(pos.getX(), pos.getY(), pos.getZ(), Block.BLOCK_STATE_IDS.get(block));
 	}
 

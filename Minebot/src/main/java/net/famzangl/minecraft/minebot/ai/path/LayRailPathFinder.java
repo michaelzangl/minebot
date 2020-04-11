@@ -24,7 +24,7 @@ import net.famzangl.minecraft.minebot.ai.task.move.UpwardsMoveTask;
 import net.famzangl.minecraft.minebot.ai.task.place.DestroyBlockTask;
 import net.famzangl.minecraft.minebot.ai.task.place.PlaceBlockAtFloorTask;
 import net.minecraft.block.Block;
-import net.minecraft.init.Blocks;
+import net.minecraft.block.Blocks;
 import net.minecraft.util.math.BlockPos;
 
 public class LayRailPathFinder extends AlongTrackPathFinder {
@@ -79,7 +79,7 @@ public class LayRailPathFinder extends AlongTrackPathFinder {
 				addTask(new UpwardsMoveTask(currentPos, new BlockItemFilter(
 						Blocks.REDSTONE_BLOCK)));
 			}
-			placeRail(currentPos, Blocks.GOLDEN_RAIL);
+			placeRail(currentPos, Blocks.POWERED_RAIL);
 		} else {
 			placeRail(currentPos, Blocks.RAIL);
 		}

@@ -17,13 +17,13 @@
 package net.famzangl.minecraft.minebot.ai.selectors;
 
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.passive.EntityWolf;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.passive.WolfEntity;
 
 public final class IsSittingSelector extends OwnTameableSelector {
 	private final boolean sitting;
 
-	public IsSittingSelector(boolean sitting, EntityLivingBase owner) {
+	public IsSittingSelector(boolean sitting, LivingEntity owner) {
 		super(owner);
 		this.sitting = sitting;
 	}
@@ -31,6 +31,6 @@ public final class IsSittingSelector extends OwnTameableSelector {
 	@Override
 	public boolean apply(Entity entity) {
 		return super.apply(entity)
-				&& ((EntityWolf) entity).isSitting() == sitting;
+				&& ((WolfEntity) entity).isSitting() == sitting;
 	}
 }

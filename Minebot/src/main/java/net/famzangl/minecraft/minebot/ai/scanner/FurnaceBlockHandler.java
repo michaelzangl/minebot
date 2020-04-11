@@ -16,10 +16,6 @@
  *******************************************************************************/
 package net.famzangl.minecraft.minebot.ai.scanner;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map.Entry;
-
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSet;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSets;
@@ -27,13 +23,16 @@ import net.famzangl.minecraft.minebot.ai.path.world.WorldData;
 import net.famzangl.minecraft.minebot.ai.scanner.FurnaceBlockHandler.FurnaceData;
 import net.famzangl.minecraft.minebot.ai.task.inventory.ItemWithSubtype;
 import net.famzangl.minecraft.minebot.ai.utils.PrivateFieldUtils;
-import net.minecraft.client.gui.inventory.GuiFurnace;
+import net.minecraft.client.gui.screen.inventory.FurnaceScreen;
 import net.minecraft.inventory.IInventory;
-import net.minecraft.inventory.SlotFurnaceFuel;
+import net.minecraft.inventory.container.FurnaceFuelSlot;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.FurnaceRecipes;
-import net.minecraft.tileentity.TileEntityFurnace;
+import net.minecraft.tileentity.FurnaceTileEntity;
 import net.minecraft.util.math.BlockPos;
+
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map.Entry;
 
 public class FurnaceBlockHandler extends RangeBlockHandler<FurnaceData> {
 
@@ -63,8 +62,8 @@ public class FurnaceBlockHandler extends RangeBlockHandler<FurnaceData> {
 
 		private static boolean isFuel(ItemWithSubtype item) {
 			ItemStack stack = item.getFakeMCStack(1);
-			return TileEntityFurnace.isItemFuel(stack)
-					|| SlotFurnaceFuel.isBucket(stack);
+			return FurnaceTileEntity.isFuel(stack)
+					|| FurnaceFuelSlot.isBucket(stack);
 		}
 
 		public boolean couldPut(ItemWithSubtype item) {
@@ -81,12 +80,12 @@ public class FurnaceBlockHandler extends RangeBlockHandler<FurnaceData> {
 			return setResultItem != null || !resultStackKnown;
 		}
 
-		public void update(GuiFurnace screen) {
+		public void update(FurnaceScreen screen) {
 			if (screen == null) {
 				return;
 			}
 			IInventory inv = PrivateFieldUtils.getFieldValue(screen,
-					GuiFurnace.class, IInventory.class);
+					FurnaceScreen.class, IInventory.class);
 			ItemStack burn = inv.getStackInSlot(0);
 			ItemStack fuel = inv.getStackInSlot(1);
 			ItemStack result = inv.getStackInSlot(2);
@@ -106,7 +105,7 @@ public class FurnaceBlockHandler extends RangeBlockHandler<FurnaceData> {
 		}
 
 		public void update(AIHelper aiHelper) {
-			update((GuiFurnace) aiHelper.getMinecraft().currentScreen);
+			update((FurnaceScreen) aiHelper.getMinecraft().currentScreen);
 		}
 
 	}

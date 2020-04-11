@@ -53,7 +53,7 @@ public class DoNotSuffocateStrategy extends AIStrategy {
 	}
 
 	private boolean safeHead(AIHelper helper, BlockPos p) {
-		return BlockSets.HEAD_CAN_WALK_TRHOUGH.isAt(helper.getWorld(), p.add(0, 1, 0));
+		return BlockSets.HEAD_CAN_WALK_THROUGH.isAt(helper.getWorld(), p.add(0, 1, 0));
 	}
 
 	private boolean safeFeet(AIHelper helper, BlockPos p) {

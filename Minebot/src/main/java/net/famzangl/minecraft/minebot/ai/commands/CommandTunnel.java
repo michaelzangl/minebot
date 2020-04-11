@@ -26,7 +26,7 @@ import net.famzangl.minecraft.minebot.ai.path.TunnelPathFinder;
 import net.famzangl.minecraft.minebot.ai.path.TunnelPathFinder.TorchSide;
 import net.famzangl.minecraft.minebot.ai.strategy.AIStrategy;
 import net.famzangl.minecraft.minebot.ai.strategy.PathFinderStrategy;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 
 @AICommand(helpText = "Build a tunnel with the given profile", name = "minebot")
@@ -35,7 +35,7 @@ public class CommandTunnel {
 	public static AIStrategy run(
 			AIHelper helper,
 			@AICommandParameter(type = ParameterType.FIXED, fixedName = "tunnel", description = "") String nameArg,
-			@AICommandParameter(type = ParameterType.ENUM, description = "direction", optional = true) EnumFacing inDirection,
+			@AICommandParameter(type = ParameterType.ENUM, description = "direction", optional = true) Direction inDirection,
 			@AICommandParameter(type = ParameterType.FIXED, fixedName = "branches", description = "add sideward branches", optional = true) String sidewardBranches,
 			@AICommandParameter(type = ParameterType.ENUM, description = "torch side", optional = true) TorchSide torches,
 			@AICommandParameter(type = ParameterType.NUMBER, description = "max length", optional = true) Integer length) {
@@ -47,7 +47,7 @@ public class CommandTunnel {
 	public static AIStrategy run(
 			AIHelper helper,
 			@AICommandParameter(type = ParameterType.FIXED, fixedName = "tunnel", description = "") String nameArg,
-			@AICommandParameter(type = ParameterType.ENUM, description = "direction", optional = true) EnumFacing inDirection,
+			@AICommandParameter(type = ParameterType.ENUM, description = "direction", optional = true) Direction inDirection,
 			@AICommandParameter(type = ParameterType.NUMBER, description = "add to side") int addToSide,
 			@AICommandParameter(type = ParameterType.NUMBER, description = "add to top") int addToTop,
 			@AICommandParameter(type = ParameterType.ENUM, description = "torch side", optional = true) TorchSide torches,
@@ -66,7 +66,7 @@ public class CommandTunnel {
 
 		final BlockPos pos = helper.getPlayerPosition();
 		final TunnelPathFinder tunnel = new TunnelPathFinder(
-				inDirection.getFrontOffsetX(), inDirection.getFrontOffsetZ(),
+				inDirection.getXOffset(), inDirection.getFrontOffsetZ(),
 				pos.getX(), pos.getY(), pos.getZ(), addToSide, addToTop,
 				torches, length);
 		return new PathFinderStrategy(tunnel, null) {

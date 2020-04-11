@@ -16,17 +16,7 @@
  *******************************************************************************/
 package net.famzangl.minecraft.minebot.ai;
 
-import java.io.File;
-import java.util.HashMap;
-import java.util.List;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.Marker;
-import org.apache.logging.log4j.MarkerManager;
-
 import com.google.common.base.Predicate;
-
 import net.famzangl.minecraft.minebot.ai.command.AIChatController;
 import net.famzangl.minecraft.minebot.ai.input.KeyboardInputController;
 import net.famzangl.minecraft.minebot.ai.input.KeyboardInputController.KeyType;
@@ -44,22 +34,32 @@ import net.famzangl.minecraft.minebot.settings.MinebotSettings;
 import net.famzangl.minecraft.minebot.settings.SaferuleSettings;
 import net.famzangl.minecraft.minebot.stats.StatsManager;
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockFence;
-import net.minecraft.block.BlockFenceGate;
-import net.minecraft.block.BlockSlab;
-import net.minecraft.block.BlockWall;
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.FenceBlock;
+import net.minecraft.block.FenceGateBlock;
+import net.minecraft.block.SlabBlock;
+import net.minecraft.block.WallBannerBlock;
+import net.minecraft.block.WallBlock;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraft.util.MovementInput;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.chunk.Chunk;
-import net.minecraft.world.chunk.storage.ExtendedBlockStorage;
+import net.minecraft.world.chunk.ChunkSection;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.Marker;
+import org.apache.logging.log4j.MarkerManager;
+
+import java.io.File;
+import java.util.HashMap;
+import java.util.List;
 
 /**
  * Lots and lots of helpful methods to control the current player. This contains
@@ -69,7 +69,7 @@ import net.minecraft.world.chunk.storage.ExtendedBlockStorage;
  * player ({@link #face(double, double, double)}, {@link #overrideUseItem()}),
  * some methods to get the player state ({@link #isAlive()},
  * {@link #getPlayerPosition()}) and some to simplify block handling (
- * {@link #getSignDirection(IBlockState)})
+ * {@link #getSignDirection(BlockState)})
  * 
  * @author michael
  * 
@@ -92,7 +92,7 @@ public abstract class AIHelper {
 		ALLOW_TOP_OF_WORLD_HIT = settings.isAllowTopOfWorldHit();
 	}
 	
-	private static Minecraft mc = Minecraft.getMinecraft();
+	private static Minecraft mc = Minecraft.getInstance();
 	/**
 	 * A world that never gets a delta applied to it.
 	 */
@@ -218,7 +218,7 @@ public abstract class AIHelper {
 	public RayTraceResult getObjectMouseOver() {
 		if (objectMouseOverInvalidated) {
 			objectMouseOverInvalidated = false;
-			getMinecraft().entityRenderer.getMouseOver(1.0F);
+			getMinecraft().gameRenderer.getMouseOver(1.0F);
 		}
 		return getMinecraft().objectMouseOver;
 	}
@@ -259,9 +259,9 @@ public abstract class AIHelper {
 	 * @return
 	 */
 	public double getRequiredAngularChangeTo(double x, double y, double z) {
-		final double d0 = x - getMinecraft().player.posX;
-		final double d1 = z - getMinecraft().player.posZ;
-		final double d2 = y - getMinecraft().player.posY - getMinecraft().player.getEyeHeight();
+		final double d0 = x - getMinecraft().player.getPosX();
+		final double d1 = z - getMinecraft().player.getPosZ();
+		final double d2 = y - getMinecraft().player.getPosY() - getMinecraft().player.getEyeHeight();
 		final double d3 = d0 * d0 + d2 * d2 + d1 * d1;
 
 		if (d3 < 2.500000277905201E-7D) {
@@ -300,9 +300,9 @@ public abstract class AIHelper {
 
 		LOGGER.trace(MARKER_FACING, "facing " + x + "," + y + "," + z
 				+ " using influence: " + yawInfluence + ";" + pitchInfluence);
-		final double d0 = x - getMinecraft().player.posX;
-		final double d1 = z - getMinecraft().player.posZ;
-		final double d2 = y - getMinecraft().player.posY - getMinecraft().player.getEyeHeight();
+		final double d0 = x - getMinecraft().player.getPosX();
+		final double d1 = z - getMinecraft().player.getPosZ();
+		final double d2 = y - getMinecraft().player.getPosY() - getMinecraft().player.getEyeHeight();
 		final double d3 = d0 * d0 + d2 * d2 + d1 * d1;
 
 		if (d3 >= 2.500000277905201E-7D) {
@@ -329,9 +329,9 @@ public abstract class AIHelper {
 			// TODO: Make this linear?
 
 			getMinecraft().player.setPositionAndRotation(
-					getMinecraft().player.posX,
-					getMinecraft().player.posY,
-					getMinecraft().player.posZ,
+					getMinecraft().player.getPosX(),
+					getMinecraft().player.getPosY(),
+					getMinecraft().player.getPosZ(),
 					rotationYaw + yawChange * yawInfluence,
 					rotationPitch + pitchChange * pitchInfluence);
 			invalidateObjectMouseOver();
@@ -371,16 +371,16 @@ public abstract class AIHelper {
 	public boolean isFacingBlock(int x, int y, int z) {
 		final RayTraceResult position = getObjectMouseOver();
 		return position != null
-				&& position.typeOfHit == RayTraceResult.Type.BLOCK
-				&& new BlockPos(x, y, z).equals(position.getBlockPos())
-				&& (y < 255 || allowTopOfWorldHit() || position.sideHit != EnumFacing.UP);
+				&& position.getType() == RayTraceResult.Type.BLOCK
+				&& new BlockPos(x, y, z).equals(((BlockRayTraceResult)position).getPos())
+				&& (y < 255 || allowTopOfWorldHit() || ((BlockRayTraceResult)position).getFace() != Direction.UP);
 	}
 
 	private boolean allowTopOfWorldHit() {
 		return ALLOW_TOP_OF_WORLD_HIT;
 	}
 
-	public boolean isFacingBlock(BlockPos pos, EnumFacing blockSide,
+	public boolean isFacingBlock(BlockPos pos, Direction blockSide,
 			BlockHalf half) {
 		return isFacingBlock(pos.getX(), pos.getY(), pos.getZ(), blockSide,
 				half);
@@ -399,7 +399,7 @@ public abstract class AIHelper {
 	 *            (not useful for top/bottom)
 	 * @return <code>true</code> if the player faces the block.
 	 */
-	public boolean isFacingBlock(int x, int y, int z, EnumFacing blockSide,
+	public boolean isFacingBlock(int x, int y, int z, Direction blockSide,
 			BlockHalf half) {
 		if (!isFacingBlock(x, y, z, blockSide)) {
 			return false;
@@ -410,7 +410,7 @@ public abstract class AIHelper {
 		}
 	}
 
-	public boolean isFacingBlock(BlockPos pos, EnumFacing side) {
+	public boolean isFacingBlock(BlockPos pos, Direction side) {
 		return isFacingBlock(pos.getX(), pos.getY(), pos.getZ(), side);
 	}
 
@@ -420,13 +420,13 @@ public abstract class AIHelper {
 	 * @param x
 	 * @param y
 	 * @param z
-	 * @param blockSide
+	 * @param side
 	 *            The side of the block as game integer.
 	 * @return <code>true</code> if the player faces the block.
 	 */
-	public boolean isFacingBlock(int x, int y, int z, EnumFacing side) {
+	public boolean isFacingBlock(int x, int y, int z, Direction side) {
 		final RayTraceResult position = getObjectMouseOver();
-		return isFacingBlock(x, y, z) && position.sideHit == side;
+		return isFacingBlock(x, y, z) && ((BlockRayTraceResult)position).getFace() == side;
 	}
 
 	public boolean isStandingOn(BlockPos pos) {
@@ -444,9 +444,9 @@ public abstract class AIHelper {
 	public boolean isStandingOn(int x, int y, int z) {
 		// boolean isFence = blockIsOneOf(getBlock(x, y - 1, z),
 		// FenceBuildTask.BLOCKS);
-		return Math.abs(x + 0.5 - getMinecraft().player.posX) < 0.2
-				&& Math.abs(z + 0.5 - getMinecraft().player.posZ) < 0.2
-				&& Math.abs(getMinecraft().player.getEntityBoundingBox().minY - y) < 0.52;
+		return Math.abs(x + 0.5 - getMinecraft().player.getPosX()) < 0.2
+				&& Math.abs(z + 0.5 - getMinecraft().player.getPosZ()) < 0.2
+				&& Math.abs(getMinecraft().player.getBoundingBox().minY - y) < 0.52;
 	}
 
 	public double realBlockTopY(BlockPos pos) {
@@ -466,10 +466,10 @@ public abstract class AIHelper {
 		final Block block = getBlock(x, y - 1, z);
 		// Fence bounds are not exposed...
 		double maxY;
-		if (block instanceof BlockFence || block instanceof BlockFenceGate
-				|| block instanceof BlockWall) {
+		if (block instanceof FenceBlock || block instanceof FenceGateBlock
+				|| block instanceof WallBlock) {
 			maxY = 1.5;
-		} else if (block instanceof BlockSlab) {
+		} else if (block instanceof SlabBlock) {
 			final int blockMetadata = getWorld().getBlockIdWithMeta(x, y, z) & 0xf;
 			maxY = (blockMetadata & 0x8) == 0 ? 0.5 : 1;
 		} else {
@@ -605,7 +605,7 @@ public abstract class AIHelper {
 	 * Selects a good tool for mining the given Block.
 	 * 
 	 * @param pos
-	 * @param ToolRater
+	 * @param rater
 	 *            the tool rater that rates the tool.
 	 */
 	public ToolRaterResult selectToolFor(final BlockPos pos, ToolRater rater) {
@@ -656,7 +656,7 @@ public abstract class AIHelper {
 		faceAndDestroy(pos);
 		if (!isFacingBlock(pos)) {
 			// Check if there is a block hanging here.
-			for (EnumFacing d : EnumFacing.values()) {
+			for (Direction d : Direction.values()) {
 				BlockPos offseted = pos.offset(d);
 				if (isFacingBlock(offseted)) {
 					BlockPos hanging = getWorld().getHangingOnBlock(offseted);
@@ -685,7 +685,7 @@ public abstract class AIHelper {
 	 * @param sideToFace
 	 * @return
 	 */
-	public boolean faceSideOf(BlockPos pos, EnumFacing sideToFace) {
+	public boolean faceSideOf(BlockPos pos, Direction sideToFace) {
 		BlockBounds bounds = getWorld().getBlockBounds(pos);
 		return face(bounds.onlySide(sideToFace).random(pos, 0.8));
 	}
@@ -693,9 +693,7 @@ public abstract class AIHelper {
 	/**
 	 * Advanced version to face a specific side of a block.
 	 * 
-	 * @param x
-	 * @param y
-	 * @param z
+	 * @param pos
 	 * @param sideToFace
 	 *            To restrict facing on a given side. Can be <code>null</code>
 	 *            to disable.
@@ -708,8 +706,8 @@ public abstract class AIHelper {
 	 * @param xzdir
 	 *            The direction the xz restriction affects.
 	 */
-	public void faceSideOf(BlockPos pos, EnumFacing sideToFace, double minY,
-			double maxY, double centerX, double centerZ, EnumFacing xzdir) {
+	public void faceSideOf(BlockPos pos, Direction sideToFace, double minY,
+			double maxY, double centerX, double centerZ, Direction xzdir) {
 		// System.out.println("x = " + x + " y=" + y + " z=" + z + " dir="
 		// + sideToFace);
 		BlockBounds bounds = getWorld().getBlockBounds(pos);
@@ -722,19 +720,19 @@ public abstract class AIHelper {
 		// double faceY = randBetweenNice(minY, maxY);
 		// double faceX, faceZ;
 		//
-		// if (xzdir == EnumFacing.EAST) {
+		// if (xzdir == Direction.EAST) {
 		// faceX = randBetween(Math.max(block.getBlockBoundsMinX(), centerX),
 		// block.getBlockBoundsMaxX());
 		// faceZ = centerZ;
-		// } else if (xzdir == EnumFacing.WEST) {
+		// } else if (xzdir == Direction.WEST) {
 		// faceX = randBetween(block.getBlockBoundsMinX(),
 		// Math.min(block.getBlockBoundsMaxX(), centerX));
 		// faceZ = centerZ;
-		// } else if (xzdir == EnumFacing.SOUTH) {
+		// } else if (xzdir == Direction.SOUTH) {
 		// faceZ = randBetween(Math.max(block.getBlockBoundsMinZ(), centerZ),
 		// block.getBlockBoundsMaxZ());
 		// faceX = centerX;
-		// } else if (xzdir == EnumFacing.NORTH) {
+		// } else if (xzdir == Direction.NORTH) {
 		// faceZ = randBetween(block.getBlockBoundsMinZ(),
 		// Math.min(block.getBlockBoundsMaxZ(), centerZ));
 		// faceX = centerX;
@@ -875,7 +873,7 @@ public abstract class AIHelper {
 	public List<Entity> getEntities(int dist, Predicate<Entity> selector) {
 		return getMinecraft().world.getEntitiesInAABBexcluding(
 				getMinecraft().getRenderViewEntity(),
-				getMinecraft().getRenderViewEntity().getEntityBoundingBox()
+				getMinecraft().getRenderViewEntity().getBoundingBox()
 						.expand(-dist, -dist, -dist)
 						.expand(dist, dist, dist)
 						.grow(1), selector);
@@ -914,7 +912,7 @@ public abstract class AIHelper {
 	 *            The side to sneak at.
 	 * @return <code>true</code> on arrival.
 	 */
-	public boolean sneakFrom(BlockPos pos, EnumFacing inDirection) {
+	public boolean sneakFrom(BlockPos pos, Direction inDirection) {
 		return sneakFrom(pos, inDirection, true);
 	}
 
@@ -929,7 +927,7 @@ public abstract class AIHelper {
 	 *            Should we face that position?
 	 * @return <code>true</code> on arrival.
 	 */
-	public boolean sneakFrom(BlockPos pos, EnumFacing inDirection, boolean face) {
+	public boolean sneakFrom(BlockPos pos, Direction inDirection, boolean face) {
 		BlockBounds bounds = getWorld().getBlockBounds(pos);
 		double destX = pos.getX() + .5;
 		double destZ = pos.getZ() + .5;
@@ -966,8 +964,8 @@ public abstract class AIHelper {
 	}
 
 	public boolean walkTowards(double x, double z, boolean jump, boolean face) {
-		final double dx = x - getMinecraft().player.posX;
-		final double dz = z - getMinecraft().player.posZ;
+		final double dx = x - getMinecraft().player.getPosX();
+		final double dz = z - getMinecraft().player.getPosZ();
 		final double distTo = Math.sqrt(dx * dx + dz * dz);
 		boolean arrived = distTo > MIN_DISTANCE_ERROR;
 		if (arrived) {
@@ -989,7 +987,7 @@ public abstract class AIHelper {
 					+ "; d = " + dx + "," + dz + "; walk: " + same + ","
 					+ strafe);
 			final MovementInput movement = new MovementInput();
-			movement.field_192832_b = (float) (speed * same);
+			movement.moveForward = (float) (speed * same);
 			movement.moveStrafe = (float) (speed * strafe);
 			movement.jump = jump;
 			overrideMovement(movement);
@@ -1005,8 +1003,8 @@ public abstract class AIHelper {
 	}
 
 	public boolean arrivedAt(double x, double z) {
-		final double dx = x - getMinecraft().player.posX;
-		final double dz = z - getMinecraft().player.posZ;
+		final double dx = x - getMinecraft().player.getPosX();
+		final double dz = z - getMinecraft().player.getPosZ();
 		final double distTo = Math.sqrt(dx * dx + dz * dz);
 		return distTo <= MIN_DISTANCE_ERROR;
 	}
@@ -1020,17 +1018,17 @@ public abstract class AIHelper {
 	 * 
 	 * @return
 	 */
-	public EnumFacing getLookDirection() {
+	public Direction getLookDirection() {
 		switch (MathHelper
 				.floor(getMinecraft().player.rotationYaw / 360 * 4 + .5) & 3) {
 		case 1:
-			return EnumFacing.WEST;
+			return Direction.WEST;
 		case 2:
-			return EnumFacing.NORTH;
+			return Direction.NORTH;
 		case 3:
-			return EnumFacing.EAST;
+			return Direction.EAST;
 		default:
-			return EnumFacing.SOUTH;
+			return Direction.SOUTH;
 		}
 	}
 
@@ -1058,10 +1056,10 @@ public abstract class AIHelper {
 	 * @param z
 	 * @return
 	 */
-	public static EnumFacing getDirectionForXZ(int x, int z) {
+	public static Direction getDirectionForXZ(int x, int z) {
 		if (x != 0 || z != 0) {
-			for (final EnumFacing d : EnumFacing.values()) {
-				if (d.getFrontOffsetX() == x && d.getFrontOffsetZ() == z) {
+			for (final Direction d : Direction.values()) {
+				if (d.getXOffset() == x && d.getFrontOffsetZ() == z) {
 					return d;
 				}
 			}
@@ -1070,8 +1068,8 @@ public abstract class AIHelper {
 				+ " " + z);
 	}
 
-	public static EnumFacing getDirectionFor(BlockPos delta) {
-		for (final EnumFacing d : EnumFacing.values()) {
+	public static Direction getDirectionFor(BlockPos delta) {
+		for (final Direction d : Direction.values()) {
 			if (Pos.fromDir(d).equals(delta)) {
 				return d;
 			}
@@ -1082,15 +1080,15 @@ public abstract class AIHelper {
 
 	// TODO: Move this to WorldData
 	public int getLightAt(BlockPos pos) {
-		final Chunk chunk = getMinecraft().world.getChunkFromChunkCoords(
+		final Chunk chunk = getMinecraft().world.getChunk(
 				pos.getX() >> 4, pos.getZ() >> 4);
-		final ExtendedBlockStorage storage = chunk.getBlockStorageArray()[pos
+		final ChunkSection storage = chunk.getSections()[pos
 				.getY() >> 4];
 		if (storage == null) {
 			return 0;
 		} else {
-			return storage.getBlockLight(pos.getX() & 15,
-					pos.getY() & 15, pos.getZ() & 15);
+			return storage.getBlockState(pos.getX() & 15,
+					pos.getY() & 15, pos.getZ() & 15).getLightValue();
 		}
 	}
 

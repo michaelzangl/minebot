@@ -1,16 +1,16 @@
 package net.famzangl.minecraft.minebot.ai.scanner;
 
-import java.util.List;
-
 import net.famzangl.minecraft.minebot.ai.ItemFilter;
 import net.famzangl.minecraft.minebot.ai.blockmap.BlockCubeCounter;
 import net.famzangl.minecraft.minebot.ai.blockmap.ChunkCubeHashMap;
 import net.famzangl.minecraft.minebot.ai.blockmap.ChunkCubeProvider;
-import net.minecraft.client.multiplayer.WorldClient;
-import net.minecraft.entity.item.EntityItem;
+import net.minecraft.client.world.ClientWorld;
+import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
+
+import java.util.List;
 
 /**
  * This class counts the items that lay around. You can simply use 
@@ -18,11 +18,11 @@ import net.minecraft.util.math.BlockPos;
  *
  */
 public class LayingItemCounts implements ChunkCubeProvider<BlockCubeCounter> {
-	private WorldClient itemWorld;
+	private ClientWorld itemWorld;
 	private ChunkCubeHashMap<BlockCubeCounter> chunks = new ChunkCubeHashMap<BlockCubeCounter>(this);
 	private ItemFilter filter;
 
-	public LayingItemCounts(WorldClient itemWorld, ItemFilter filter) {
+	public LayingItemCounts(ClientWorld itemWorld, ItemFilter filter) {
 		this.itemWorld = itemWorld;
 		this.filter = filter;
 	}
@@ -31,11 +31,11 @@ public class LayingItemCounts implements ChunkCubeProvider<BlockCubeCounter> {
 	public BlockCubeCounter getForChunk(int chunkStartX, int chunkStartY,
 			int chunkStartZ) {
 		BlockCubeCounter counter = new BlockCubeCounter();
-		List<EntityItem> items = itemWorld.getEntitiesWithinAABB(
-				EntityItem.class, new AxisAlignedBB(chunkStartX, chunkStartY,
+		List<ItemEntity> items = itemWorld.getEntitiesWithinAABB(
+				ItemEntity.class, new AxisAlignedBB(chunkStartX, chunkStartY,
 						chunkStartZ, chunkStartX + 16, chunkStartY + 16,
 						chunkStartZ + 16));
-		for (EntityItem i : items) {
+		for (ItemEntity i : items) {
 			ItemStack item = i.getItem();
 			if (item == null) {
 				continue;

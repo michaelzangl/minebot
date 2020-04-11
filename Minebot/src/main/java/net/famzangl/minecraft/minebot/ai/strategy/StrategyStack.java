@@ -16,12 +16,12 @@
  *******************************************************************************/
 package net.famzangl.minecraft.minebot.ai.strategy;
 
+import net.famzangl.minecraft.minebot.ai.AIHelper;
+import net.famzangl.minecraft.minebot.ai.strategy.AIStrategy.TickResult;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
-import net.famzangl.minecraft.minebot.ai.AIHelper;
-import net.famzangl.minecraft.minebot.ai.strategy.AIStrategy.TickResult;
 
 /**
  * This is a stack of strategies, ordered by priority. The strategy with the

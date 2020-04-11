@@ -1,25 +1,25 @@
 package net.famzangl.minecraft.minebot.ai.path.world;
 
-import java.lang.reflect.Field;
-import java.util.stream.Stream;
-
 import net.famzangl.minecraft.minebot.ai.command.BlockWithData;
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockTorch;
-import net.minecraft.block.BlockWallSign;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.client.entity.EntityPlayerSP;
-import net.minecraft.client.multiplayer.WorldClient;
-import net.minecraft.init.Blocks;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
+import net.minecraft.block.TorchBlock;
+import net.minecraft.block.WallSignBlock;
+import net.minecraft.client.entity.player.ClientPlayerEntity;
+import net.minecraft.client.world.ClientWorld;
 import net.minecraft.util.BitArray;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.chunk.BlockStateContainer;
+import net.minecraft.util.math.shapes.VoxelShape;
+import net.minecraft.util.palette.PalettedContainer;
 import net.minecraft.world.chunk.Chunk;
-import net.minecraft.world.chunk.storage.ExtendedBlockStorage;
+import net.minecraft.world.chunk.ChunkSection;
+
+import java.lang.reflect.Field;
+import java.util.stream.Stream;
 
 /**
  * This is a world that has some deltas attached to it. This may represent a
@@ -28,7 +28,7 @@ import net.minecraft.world.chunk.storage.ExtendedBlockStorage;
  * @author Michael Zangl
  */
 public class WorldData {
-	private static final int BARRIER_ID = Block.getIdFromBlock(Blocks.BARRIER) << 4;
+	private static final int BARRIER_ID = Block.BLOCK_STATE_IDS.get(Blocks.BARRIER.getDefaultState()) << 4;
 	private static final int AIR_ID = 0;
 	private static final int CACHE_ENTRIES = 10;
 	/**
@@ -36,22 +36,22 @@ public class WorldData {
 	 */
 	private static final int CACHE_INVALID = 0x10000000;
 	private static final double FLOOR_HEIGHT = .55;
-	
+
 	private static class FastBlockStorageAccess {
 		private static final int FORCED_SIZE = MathHelper.log2DeBruijn(Block.BLOCK_STATE_IDS.size());
-		private final BlockStateContainer data;
+		private final PalettedContainer<BlockState> data;
 		
 		private static final Field BITS_FIELD;
 		private static final Field STORAGE_FIELD;
 		private BitArray array;
 		static {
-			BITS_FIELD = Stream.of(BlockStateContainer.class.getDeclaredFields()).filter(f -> f.getType() == Integer.TYPE).findFirst().get();
+			BITS_FIELD = Stream.of(PalettedContainer.class.getDeclaredFields()).filter(f -> f.getType() == Integer.TYPE).findFirst().get();
 			BITS_FIELD.setAccessible(true);
-			STORAGE_FIELD = Stream.of(BlockStateContainer.class.getDeclaredFields()).filter(f -> f.getType() == BitArray.class).findFirst().get();
+			STORAGE_FIELD = Stream.of(PalettedContainer.class.getDeclaredFields()).filter(f -> f.getType() == BitArray.class).findFirst().get();
 			STORAGE_FIELD.setAccessible(true);
 		}
 
-		public FastBlockStorageAccess(ExtendedBlockStorage extendedBlockStorage) {
+		public FastBlockStorageAccess(ChunkSection extendedBlockStorage) {
 			data = extendedBlockStorage.getData();
 			try {
 				int bits = BITS_FIELD.getInt(data);
@@ -74,7 +74,7 @@ public class WorldData {
 	}
 
 	public static abstract class ChunkAccessor {
-		protected ExtendedBlockStorage[] blockStorage;
+		protected ChunkSection[] blockStorage;
 		private FastBlockStorageAccess[] access;
 
 		public int getBlockIdWithMeta(int x, int y, int z) {
@@ -107,16 +107,16 @@ public class WorldData {
 		}
 	}
 
-	private long[] cachedPos = new long[CACHE_ENTRIES];
-	private ChunkAccessor[] cached = new ChunkAccessor[CACHE_ENTRIES];
+	private final long[] cachedPos = new long[CACHE_ENTRIES];
+	private final ChunkAccessor[] cached = new ChunkAccessor[CACHE_ENTRIES];
 
 	private int chunkCacheReplaceCounter = 0;
 
-	protected final WorldClient theWorld;
-	private EntityPlayerSP thePlayerToGetPositionFrom;
+	protected final ClientWorld theWorld;
+	private final ClientPlayerEntity thePlayerToGetPositionFrom;
 
-	public WorldData(WorldClient theWorld,
-			EntityPlayerSP thePlayerToGetPositionFrom) {
+	public WorldData(ClientWorld theWorld,
+					 ClientPlayerEntity thePlayerToGetPositionFrom) {
 		this.theWorld = theWorld;
 		this.thePlayerToGetPositionFrom = thePlayerToGetPositionFrom;
 	}
@@ -169,7 +169,7 @@ public class WorldData {
 	}
 
 	protected ChunkAccessor generateChunkAccessor(int chunkX, int chunkZ) {
-		return new ChunkAccessorUnmodified(theWorld.getChunkFromChunkCoords(
+		return new ChunkAccessorUnmodified(theWorld.getChunk(
 				chunkX, chunkZ));
 	}
 
@@ -191,7 +191,7 @@ public class WorldData {
 		}
 	}
 
-	public WorldClient getBackingWorld() {
+	public ClientWorld getBackingWorld() {
 		return theWorld;
 	}
 
@@ -207,8 +207,8 @@ public class WorldData {
 		return getBlockIdWithMeta(pos.getX(), pos.getY(), pos.getZ());
 	}
 
-	public IBlockState getBlockState(BlockPos pos) {
-		IBlockState iblockstate = (IBlockState) Block.BLOCK_STATE_IDS
+	public BlockState getBlockState(BlockPos pos) {
+		BlockState iblockstate = (BlockState) Block.BLOCK_STATE_IDS
 				.getByValue(getBlockIdWithMeta(pos));
 		return iblockstate != null ? iblockstate : Blocks.AIR.getDefaultState();
 	}
@@ -217,19 +217,19 @@ public class WorldData {
 		int id = getBlockIdWithMeta(pos);
 		// TODO: Convert this to a block set.
 		return BlockSets.TORCH.containsWithMeta(id)
-				&& getBlockState(pos).getValue(BlockTorch.FACING) != EnumFacing.UP;
+				&& getBlockState(pos).get(TorchBlock.FACING) != Direction.UP;
 	}
 
 	public BlockPos getHangingOnBlock(BlockPos pos) {
-		IBlockState meta = getBlockState(pos);
-		EnumFacing facing = null;
+		BlockState meta = getBlockState(pos);
+		Direction facing = null;
 		if (BlockSets.TORCH.contains(meta.getBlock())) {
 			facing = getTorchDirection(meta);
-		} else if (meta.getBlock().equals(Blocks.WALL_SIGN)) {
+		} else if (BlockSets.WALL_SIGN.contains(meta.getBlock())) {
 			facing = getSignDirection(meta);
 			// TODO Ladder and other hanging blocks.
 		} else if (BlockSets.FEET_CAN_WALK_THROUGH.contains(meta)) {
-			facing = EnumFacing.UP;
+			facing = Direction.UP;
 		}
 		return facing == null ? null : pos.offset(facing, -1);
 	}
@@ -240,8 +240,8 @@ public class WorldData {
 	 * @param meta
 	 * @return
 	 */
-	private EnumFacing getSignDirection(IBlockState metaValue) {
-		return (EnumFacing) metaValue.getValue(BlockWallSign.FACING);
+	private Direction getSignDirection(BlockState metaValue) {
+		return (Direction) metaValue.get(WallSignBlock.FACING);
 	}
 
 	// TODO: Move somewhere else.
@@ -251,8 +251,8 @@ public class WorldData {
 	 * @param metaValue
 	 * @return
 	 */
-	public EnumFacing getTorchDirection(IBlockState metaValue) {
-		return (EnumFacing) metaValue.getValue(BlockTorch.FACING);
+	public Direction getTorchDirection(BlockState metaValue) {
+		return (Direction) metaValue.get(BlockTorch.FACING);
 	}
 
 	/**
@@ -266,10 +266,10 @@ public class WorldData {
 	 * @return
 	 */
 	public BlockPos getPlayerPosition() {
-		final int x = (int) Math.floor(thePlayerToGetPositionFrom.posX);
+		final int x = (int) Math.floor(thePlayerToGetPositionFrom.getPosX());
 		final int y = (int) Math.floor(thePlayerToGetPositionFrom
-				.getEntityBoundingBox().minY + FLOOR_HEIGHT);
-		final int z = (int) Math.floor(thePlayerToGetPositionFrom.posZ);
+				.getBoundingBox().minY + FLOOR_HEIGHT);
+		final int z = (int) Math.floor(thePlayerToGetPositionFrom.getPosZ());
 		return new BlockPos(x, y, z);
 	}
 
@@ -277,9 +277,9 @@ public class WorldData {
 	 * @return Feet of the player
 	 */
 	public Vec3d getExactPlayerPosition() {
-		return new Vec3d(thePlayerToGetPositionFrom.posX,
-				thePlayerToGetPositionFrom.getEntityBoundingBox().minY,
-				thePlayerToGetPositionFrom.posZ);
+		return new Vec3d(thePlayerToGetPositionFrom.getPosX(),
+				thePlayerToGetPositionFrom.getBoundingBox().minY,
+				thePlayerToGetPositionFrom.getPosZ());
 	}
 
 	public BlockBounds getBlockBounds(BlockPos pos) {
@@ -291,10 +291,10 @@ public class WorldData {
 				z));
 		if (res == BlockBounds.UNKNOWN_BLOCK) {
 			// TODO: Replace this.
-			WorldClient world = getBackingWorld();
+			ClientWorld world = getBackingWorld();
 			BlockPos pos = new BlockPos(x, y, z);
-			IBlockState state = world.getBlockState(pos);
-			AxisAlignedBB bounds = state.getBoundingBox(world, pos);
+			BlockState state = world.getBlockState(pos);
+			VoxelShape bounds = state.getShape(world, pos);
 
 			return new BlockBounds(bounds);
 		}

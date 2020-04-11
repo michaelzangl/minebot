@@ -16,11 +16,11 @@
  *******************************************************************************/
 package net.famzangl.minecraft.minebot.ai.task;
 
-import java.util.List;
-
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSets;
 import net.minecraft.util.math.BlockPos;
+
+import java.util.List;
 
 /**
  * An interface that is implemented by all {@link AITask}s that do destroy

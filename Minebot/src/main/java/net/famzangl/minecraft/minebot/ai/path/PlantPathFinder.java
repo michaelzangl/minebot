@@ -33,14 +33,14 @@ import net.famzangl.minecraft.minebot.ai.task.place.DestroyBlockTask;
 import net.famzangl.minecraft.minebot.ai.task.place.PlaceBlockAtFloorTask;
 import net.famzangl.minecraft.minebot.settings.MinebotSettingsRoot;
 import net.famzangl.minecraft.minebot.settings.PathfindingSetting;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.init.Blocks;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemHoe;
 import net.minecraft.item.ItemSeeds;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 
@@ -73,7 +73,7 @@ public class PlantPathFinder extends MovePathFinder {
 		@Override
 		public boolean applyToDelta(WorldWithDelta world) {
 			Item anyPlaceItem = seedFilter.type.items[0];
-			IBlockState block = ((ItemSeeds)anyPlaceItem).getPlant(null, null);
+			BlockState block = ((ItemSeeds)anyPlaceItem).getPlant(null, null);
 			world.setBlock(pos, block);
 			return true;
 		}
@@ -181,7 +181,7 @@ public class PlantPathFinder extends MovePathFinder {
 		@Override
 		protected void notFacingBlock(AIHelper aiHelper) {
 			BlockBounds bounds = aiHelper.getWorld().getBlockBounds(getPos());
-			facingPosition = bounds.onlySide(EnumFacing.UP).random(getPos(), 0.7);
+			facingPosition = bounds.onlySide(Direction.UP).random(getPos(), 0.7);
 			reFace(aiHelper);
 		}
 	}

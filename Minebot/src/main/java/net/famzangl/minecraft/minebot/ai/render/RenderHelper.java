@@ -16,17 +16,17 @@
  *******************************************************************************/
 package net.famzangl.minecraft.minebot.ai.render;
 
-import org.lwjgl.opengl.GL11;
-
+import com.google.common.collect.ImmutableList;
+import com.mojang.blaze3d.platform.GlStateManager;
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.minecraft.client.renderer.BufferBuilder;
-import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.vertex.VertexFormat;
 import net.minecraft.client.renderer.vertex.VertexFormatElement;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.BlockPos;
-import net.minecraftforge.fml.common.gameevent.TickEvent.RenderTickEvent;
+import net.minecraftforge.event.TickEvent;
+import org.lwjgl.opengl.GL11;
 
 /**
  * Helps rendering markers.
@@ -39,20 +39,22 @@ public class RenderHelper {
 	private static final double MAX = 1.05;
 	private static final double MIN = -0.05;
 
-    public static final VertexFormat VF = new VertexFormat();
-    static {
-        VF.addElement(new VertexFormatElement(0, VertexFormatElement.EnumType.FLOAT, VertexFormatElement.EnumUsage.POSITION, 3));
-        VF.addElement(new VertexFormatElement(0, VertexFormatElement.EnumType.UBYTE, VertexFormatElement.EnumUsage.COLOR, 4));
-    }
+    public static final VertexFormat VF = new VertexFormat(ImmutableList.of(
+    				new VertexFormatElement(0, VertexFormatElement.Type.FLOAT, VertexFormatElement.Usage.POSITION, 3),
+        	new VertexFormatElement(0, VertexFormatElement.Type.UBYTE, VertexFormatElement.Usage.COLOR, 4)
+	));
 
-	public void renderStart(RenderTickEvent event, AIHelper helper) {
+	public void renderStart(TickEvent.RenderTickEvent event, AIHelper helper) {
 		final Entity player = helper.getMinecraft().getRenderViewEntity();
+		if (player == null) {
+			return;
+		}
 		final double x = player.lastTickPosX
-				+ (player.posX - player.lastTickPosX) * event.renderTickTime;
+				+ (player.getPosX() - player.lastTickPosX) * event.renderTickTime;
 		final double y = player.lastTickPosY
-				+ (player.posY - player.lastTickPosY) * event.renderTickTime;
+				+ (player.getPosY() - player.lastTickPosY) * event.renderTickTime;
 		final double z = player.lastTickPosZ
-				+ (player.posZ - player.lastTickPosZ) * event.renderTickTime;
+				+ (player.getPosZ() - player.lastTickPosZ) * event.renderTickTime;
 
 		preRender();
         Tessellator tessellator = Tessellator.getInstance();

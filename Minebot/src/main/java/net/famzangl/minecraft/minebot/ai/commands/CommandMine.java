@@ -31,7 +31,7 @@ import net.famzangl.minecraft.minebot.ai.path.OrebfuscatedMinePathFinder;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSet;
 import net.famzangl.minecraft.minebot.ai.strategy.AIStrategy;
 import net.famzangl.minecraft.minebot.ai.strategy.PathFinderStrategy;
-import net.minecraft.init.Blocks;
+import net.minecraft.block.Blocks;
 
 @AICommand(helpText = "Mines for ores.\n"
 		+ "Uses the minebot.properties file to find ores."

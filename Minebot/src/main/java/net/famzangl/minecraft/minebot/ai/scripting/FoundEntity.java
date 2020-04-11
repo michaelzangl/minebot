@@ -17,26 +17,27 @@
 package net.famzangl.minecraft.minebot.ai.scripting;
 
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLiving;
-import net.minecraft.entity.item.EntityMinecart;
-import net.minecraft.entity.passive.EntitySheep;
-import net.minecraft.entity.passive.EntityWolf;
-import net.minecraft.item.EnumDyeColor;
+import net.minecraft.entity.passive.SheepEntity;
+import net.minecraft.entity.passive.WolfEntity;
+import net.minecraft.item.DyeColor;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.ITextComponent;
+
+import java.util.Optional;
 
 public class FoundEntity extends EntityPos {
 	private final Entity entity;
 	private final BlockPos pos;
-	private EnumDyeColor color = null;
+	private DyeColor color = null;
 	
 	public FoundEntity(Entity entity) {
 		super(entity);
 		this.entity = entity;
-		pos = new BlockPos((int) Math.floor(entity.posX), (int) Math.floor(entity.posY), (int) Math.floor(entity.posZ));
-		if (entity instanceof EntitySheep) {
-			color = ((EntitySheep) entity).getFleeceColor();
-		} else if (entity instanceof EntityWolf) {
-			color = ((EntityWolf) entity).getCollarColor();
+		pos = new BlockPos((int) Math.floor(entity.getPosX()), (int) Math.floor(entity.getPosY()), (int) Math.floor(entity.getPosZ()));
+		if (entity instanceof SheepEntity) {
+			color = ((SheepEntity) entity).getFleeceColor();
+		} else if (entity instanceof WolfEntity) {
+			color = ((WolfEntity) entity).getCollarColor();
 		}
 	}
 
@@ -57,17 +58,11 @@ public class FoundEntity extends EntityPos {
 	}
 	
 	public String getName() {
-		return entity.getCommandSenderEntity().getName();
+		return entity.getCommandSource().getName();
 	}
 	
 	public String getCustomName() {
-		if (entity instanceof EntityLiving) {
-			return ((EntityLiving) entity).hasCustomName() ? ((EntityLiving) entity).getCustomNameTag() : null;
-		} else if (entity instanceof EntityMinecart) {
-			return ((EntityMinecart) entity).hasCustomName() ? entity.getCommandSenderEntity().getName() : null;
-		} else {
-			return null;
-		}
+		return Optional.ofNullable(entity.getCustomName()).map(ITextComponent::getUnformattedComponentText).orElse(null);
 	}
 
 	@Override

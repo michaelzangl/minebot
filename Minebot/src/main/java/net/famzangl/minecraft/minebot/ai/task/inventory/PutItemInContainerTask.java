@@ -20,7 +20,7 @@ import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.task.AITask;
 import net.famzangl.minecraft.minebot.ai.task.TaskOperations;
 import net.famzangl.minecraft.minebot.ai.task.error.StringTaskError;
-import net.minecraft.client.gui.inventory.GuiContainer;
+import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.inventory.ClickType;
 import net.minecraft.inventory.Slot;
 
@@ -38,7 +38,7 @@ public abstract class PutItemInContainerTask extends AITask {
 
 	@Override
 	public boolean isFinished(AIHelper aiHelper) {
-		final GuiContainer screen = (GuiContainer) aiHelper.getMinecraft().currentScreen;
+		final Screen screen = aiHelper.getMinecraft().currentScreen;
 		return screen != null
 				&& placed
 				&& (slotToPlace < 0 || isFull || !screen.inventorySlots
@@ -47,7 +47,7 @@ public abstract class PutItemInContainerTask extends AITask {
 
 	@Override
 	public void runTick(AIHelper aiHelper, TaskOperations taskOperations) {
-		final GuiContainer screen = (GuiContainer) aiHelper.getMinecraft().currentScreen;
+		final Screen screen = aiHelper.getMinecraft().currentScreen;
 		if (screen == null) {
 			taskOperations.desync(new StringTaskError("Expected container to be open"));
 			return;

@@ -19,7 +19,6 @@ package net.famzangl.minecraft.minebot.ai.enchanting;
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.task.AITask;
 import net.famzangl.minecraft.minebot.ai.task.TaskOperations;
-import net.minecraft.client.gui.GuiScreen;
 
 public class CloseScreenTask extends AITask {
 
@@ -30,7 +29,7 @@ public class CloseScreenTask extends AITask {
 
 	@Override
 	public void runTick(AIHelper aiHelper, TaskOperations taskOperations) {
-		aiHelper.getMinecraft().displayGuiScreen((GuiScreen) null);
+		aiHelper.getMinecraft().displayGuiScreen(null);
 		// TODO: check if it helps: aiHelper.getMinecraft().setIngameFocus();
 	}
 

@@ -1,10 +1,5 @@
 package net.famzangl.minecraft.minebot.ai.strategy;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.Marker;
-import org.apache.logging.log4j.MarkerManager;
-
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.BlockItemFilter;
 import net.famzangl.minecraft.minebot.ai.command.AIChatController;
@@ -23,8 +18,12 @@ import net.famzangl.minecraft.minebot.ai.utils.BlockArea.AreaVisitor;
 import net.famzangl.minecraft.minebot.ai.utils.BlockCuboid;
 import net.famzangl.minecraft.minebot.ai.utils.BlockFilteredArea;
 import net.famzangl.minecraft.minebot.ai.utils.ReverseAcceptingArea;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.Marker;
+import org.apache.logging.log4j.MarkerManager;
 
 /**
  * Build a bridge through the air.
@@ -59,10 +58,10 @@ public class AirbridgeStrategy extends TaskStrategy {
 	 */
 	private static class SneakToSideTask extends AITask {
 		private BlockPos pos;
-		private EnumFacing inDirection;
+		private Direction inDirection;
 		private boolean arrived;
 
-		public SneakToSideTask(BlockPos pos, EnumFacing inDirection) {
+		public SneakToSideTask(BlockPos pos, Direction inDirection) {
 			super();
 			this.pos = pos;
 			this.inDirection = inDirection;
@@ -134,12 +133,12 @@ public class AirbridgeStrategy extends TaskStrategy {
 	}
 
 	private final BlockPos start;
-	private final EnumFacing direction;
+	private final Direction direction;
 	private final int length;
 	private final int toLeft;
 	private final int toRight;
 
-	public AirbridgeStrategy(BlockPos start, EnumFacing direction, int length,
+	public AirbridgeStrategy(BlockPos start, Direction direction, int length,
 			int toLeft, int toRight) {
 		super();
 		this.start = start;

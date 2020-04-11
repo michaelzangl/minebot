@@ -16,10 +16,7 @@
  *******************************************************************************/
 package net.famzangl.minecraft.minebot.ai.strategy;
 
-import java.util.HashSet;
-
 import com.google.common.base.Predicate;
-
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.ItemFilter;
 import net.famzangl.minecraft.minebot.ai.animals.AnimalyType;
@@ -31,10 +28,12 @@ import net.famzangl.minecraft.minebot.ai.selectors.OrSelector;
 import net.famzangl.minecraft.minebot.ai.selectors.OwnTameableSelector;
 import net.famzangl.minecraft.minebot.ai.selectors.XPOrbSelector;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.passive.EntityAnimal;
-import net.minecraft.item.EnumDyeColor;
+import net.minecraft.entity.passive.AnimalEntity;
+import net.minecraft.item.DyeColor;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemSword;
+
+import java.util.HashSet;
 
 /**
  * Kills all animals in range by mving towards them and hitting them.
@@ -51,15 +50,15 @@ public class KillAnimalsStrategy extends FaceInteractStrategy {
 				return false;
 			}
 
-			return ((EntityAnimal) entity).getGrowingAge() >= 0
-					&& ((EntityAnimal) entity).getHealth() > 0;
+			return ((AnimalEntity) entity).getGrowingAge() >= 0
+					&& ((AnimalEntity) entity).getHealth() > 0;
 		}
 	}
 
 	private final int maxKills;
 	private final AnimalyType type;
 	private final HashSet<Entity> hitEntities = new HashSet<Entity>();
-	private final EnumDyeColor color;
+	private final DyeColor color;
 	private int cooldown;
 	private int lastKills;
 
@@ -67,7 +66,7 @@ public class KillAnimalsStrategy extends FaceInteractStrategy {
 		this(-1, AnimalyType.ANY, null);
 	}
 
-	public KillAnimalsStrategy(int maxKills, AnimalyType type, EnumDyeColor color) {
+	public KillAnimalsStrategy(int maxKills, AnimalyType type, DyeColor color) {
 		this.maxKills = maxKills;
 		this.type = type;
 		this.color = color;
@@ -137,8 +136,8 @@ public class KillAnimalsStrategy extends FaceInteractStrategy {
 	private int countKills() {
 		int kills = 0;
 		for (Entity e : hitEntities) {
-			if (e instanceof EntityAnimal
-					&& ((EntityAnimal) e).getHealth() <= 0) {
+			if (e instanceof AnimalEntity
+					&& ((AnimalEntity) e).getHealth() <= 0) {
 				kills++;
 			}
 		}

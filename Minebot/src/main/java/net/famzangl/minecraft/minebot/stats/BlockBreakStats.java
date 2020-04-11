@@ -16,14 +16,14 @@
  *******************************************************************************/
 package net.famzangl.minecraft.minebot.stats;
 
+import net.famzangl.minecraft.minebot.ai.command.BlockWithData;
+import net.famzangl.minecraft.minebot.ai.path.world.WorldData;
+import net.minecraft.util.math.BlockPos;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
-
-import net.famzangl.minecraft.minebot.ai.command.BlockWithData;
-import net.famzangl.minecraft.minebot.ai.path.world.WorldData;
-import net.minecraft.util.math.BlockPos;
 
 /**
  * A recorder of the block breaks.

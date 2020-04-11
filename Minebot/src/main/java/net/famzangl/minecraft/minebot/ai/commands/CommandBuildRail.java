@@ -24,7 +24,7 @@ import net.famzangl.minecraft.minebot.ai.command.SafeStrategyRule;
 import net.famzangl.minecraft.minebot.ai.path.LayRailPathFinder;
 import net.famzangl.minecraft.minebot.ai.strategy.AIStrategy;
 import net.famzangl.minecraft.minebot.ai.strategy.PathFinderStrategy;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 
 public class CommandBuildRail {
@@ -32,7 +32,7 @@ public class CommandBuildRail {
 	public static AIStrategy run(
 			AIHelper helper,
 			@AICommandParameter(type = ParameterType.FIXED, fixedName = "rails", description = "") String nameArg) {
-		final EnumFacing horizontalLook = helper.getLookDirection();
+		final Direction horizontalLook = helper.getLookDirection();
 		return run(helper, nameArg, horizontalLook);
 	}
 	
@@ -40,11 +40,11 @@ public class CommandBuildRail {
 	public static AIStrategy run(
 			AIHelper helper,
 			@AICommandParameter(type = ParameterType.FIXED, fixedName = "rails", description = "") String nameArg,
-			@AICommandParameter(type = ParameterType.ENUM, description = "direction") EnumFacing inDirection) {
+			@AICommandParameter(type = ParameterType.ENUM, description = "direction") Direction inDirection) {
 
 		final BlockPos playerPosition = helper.getPlayerPosition();
 		return new PathFinderStrategy(
-				new LayRailPathFinder(inDirection.getFrontOffsetX(),
+				new LayRailPathFinder(inDirection.getXOffset(),
 						inDirection.getFrontOffsetZ(), playerPosition.getX(), playerPosition.getY(), playerPosition.getZ()),
 				"Building a railway");
 	}

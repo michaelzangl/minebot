@@ -1,10 +1,5 @@
 package net.famzangl.minecraft.minebot.ai.command;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-
-import org.apache.commons.lang3.ArrayUtils;
-
 import net.famzangl.minecraft.minebot.ai.ColoredBlockItemFilter;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockMetaSet;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSet;
@@ -12,9 +7,13 @@ import net.famzangl.minecraft.minebot.ai.task.inventory.ItemWithSubtype;
 import net.famzangl.minecraft.minebot.build.block.WoodType;
 import net.famzangl.minecraft.minebot.build.block.WoodType.LogDirection;
 import net.minecraft.block.Block;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.init.Blocks;
-import net.minecraft.item.EnumDyeColor;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
+import net.minecraft.item.DyeColor;
+import org.apache.commons.lang3.ArrayUtils;
+
+import java.util.ArrayList;
+import java.util.Arrays;
 
 /**
  * This is the object wrapper for a block (id) and meta value pair. You can use
@@ -56,8 +55,8 @@ public class BlockWithData extends BlockWithDataOrDontcare {
 
 	static {
 		String[] colors = new String[16];
-		for (EnumDyeColor color : EnumDyeColor.values()) {
-			colors[color.getMetadata()] = color.getName();
+		for (DyeColor color : DyeColor.values()) {
+			colors[color.getColorValue()] = color.getName();
 		}
 		nicerMeta.add(new NicerMetaValue(
 				ColoredBlockItemFilter.COLORABLE_BLOCKS, colors));
@@ -105,7 +104,7 @@ public class BlockWithData extends BlockWithDataOrDontcare {
 		this(toBlockWithMeta(blockId, meta));
 	}
 
-	public BlockWithData(IBlockState block) {
+	public BlockWithData(BlockState block) {
 		this(Block.BLOCK_STATE_IDS.get(block));
 	}
 
@@ -154,7 +153,7 @@ public class BlockWithData extends BlockWithDataOrDontcare {
 		return new ItemWithSubtype(getBlockId(), getMetaValue());
 	}
 
-	public IBlockState getBlockState() {
-		return (IBlockState) Block.BLOCK_STATE_IDS.getByValue(blockIdWithMeta);
+	public BlockState getBlockState() {
+		return (BlockState) Block.BLOCK_STATE_IDS.getByValue(blockIdWithMeta);
 	}
 }

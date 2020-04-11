@@ -17,12 +17,12 @@
 package net.famzangl.minecraft.minebot.ai.task;
 
 import com.google.common.base.Predicate;
-
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.item.EntityItem;
-import net.minecraft.entity.item.EntityXPOrb;
+import net.minecraft.entity.item.ExperienceOrbEntity;
+import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.util.MovementInput;
+import net.minecraft.util.math.EntityRayTraceResult;
 import net.minecraft.util.math.RayTraceResult;
 
 /**
@@ -69,29 +69,28 @@ public class FaceAndInteractTask extends AITask {
 
 	@Override
 	public boolean isFinished(AIHelper aiHelper) {
-		final boolean collect = preferedAnimal instanceof EntityItem
-				|| preferedAnimal instanceof EntityXPOrb;
-		return collect ? preferedAnimal.getEntityBoundingBox().intersects(
-				aiHelper.getMinecraft().player.getEntityBoundingBox()) : interacted;
+		final boolean collect = preferedAnimal instanceof ItemEntity
+				|| preferedAnimal instanceof ExperienceOrbEntity;
+		return collect ? preferedAnimal.getBoundingBox().intersects(
+				aiHelper.getMinecraft().player.getBoundingBox()) : interacted;
 	}
 
 	@Override
 	public void runTick(AIHelper aiHelper, TaskOperations taskOperations) {
 		final RayTraceResult position = aiHelper.getObjectMouseOver();
 		if (ticksRun > 2 && position != null
-				&& position.typeOfHit == RayTraceResult.Type.ENTITY
-				&& alsoAcceptedAnimal.apply(position.entityHit)) {
+				&& position.getType() == RayTraceResult.Type.ENTITY
+				&& alsoAcceptedAnimal.apply(((EntityRayTraceResult)position).getEntity())) {
 			doInteractWithCurrent(aiHelper);
 		} else {
-			final double speed = aiHelper.getMinecraft().player.motionX
-					* aiHelper.getMinecraft().player.motionX
-					+ aiHelper.getMinecraft().player.motionZ
-					* aiHelper.getMinecraft().player.motionZ;
-			aiHelper.face(preferedAnimal.posX, preferedAnimal.posY,
-					preferedAnimal.posZ);
+			double x = aiHelper.getMinecraft().player.getMotion().x;
+			double z = aiHelper.getMinecraft().player.getMotion().z;
+			final double speed = x * x + z * z;
+			aiHelper.face(preferedAnimal.getPosX(), preferedAnimal.getPosY(),
+					preferedAnimal.getPosZ());
 			final MovementInput movement = new MovementInput();
 			movement.jump = speed < 0.01 && ticksRun > 8;
-			movement.field_192832_b = 1;
+			movement.moveForward = 1;
 			aiHelper.overrideMovement(movement);
 		}
 		ticksRun++;

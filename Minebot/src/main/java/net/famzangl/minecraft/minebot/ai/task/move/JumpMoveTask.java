@@ -16,14 +16,14 @@
  *******************************************************************************/
 package net.famzangl.minecraft.minebot.ai.task.move;
 
-import java.util.List;
-
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSets;
 import net.famzangl.minecraft.minebot.ai.path.world.WorldWithDelta;
 import net.famzangl.minecraft.minebot.ai.task.TaskOperations;
-import net.minecraft.init.Blocks;
+import net.minecraft.block.Blocks;
 import net.minecraft.util.math.BlockPos;
+
+import java.util.List;
 
 /**
  * Digs one block up and one to the side. Then jumps there.
@@ -50,7 +50,7 @@ public class JumpMoveTask extends HorizontalMoveTask {
 
 	@Override
 	public void runTick(AIHelper aiHelper, TaskOperations taskOperations) {
-		if (!BlockSets.HEAD_CAN_WALK_TRHOUGH.isAt(aiHelper.getWorld(), oldX, pos.getY() + 1, oldZ)) {
+		if (!BlockSets.HEAD_CAN_WALK_THROUGH.isAt(aiHelper.getWorld(), oldX, pos.getY() + 1, oldZ)) {
 			aiHelper.faceAndDestroy(toDestroyForJump());
 		} else {
 			super.runTick(aiHelper, taskOperations);

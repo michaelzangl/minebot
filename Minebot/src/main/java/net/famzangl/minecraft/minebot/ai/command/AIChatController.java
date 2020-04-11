@@ -16,10 +16,7 @@
  *******************************************************************************/
 package net.famzangl.minecraft.minebot.ai.command;
 
-import java.util.List;
-
 import com.google.common.base.Function;
-
 import net.famzangl.minecraft.minebot.ai.commands.CommandAirbridge;
 import net.famzangl.minecraft.minebot.ai.commands.CommandBuildWay;
 import net.famzangl.minecraft.minebot.ai.commands.CommandCraft;
@@ -72,7 +69,9 @@ import net.famzangl.minecraft.minebot.build.commands.CommandStepNext;
 import net.famzangl.minecraft.minebot.build.commands.CommandStepPlace;
 import net.famzangl.minecraft.minebot.build.commands.CommandStepWalk;
 import net.minecraft.client.Minecraft;
-import net.minecraft.util.text.TextComponentString;
+import net.minecraft.util.text.StringTextComponent;
+
+import java.util.List;
 
 /**
  * Controlls the AI from a chat line.
@@ -160,14 +159,14 @@ public class AIChatController {
 	}
 
 	private static void addToChat(String string) {
-		Minecraft.getMinecraft().player
-				.sendMessage(new TextComponentString(string));
+		Minecraft.getInstance().player
+				.sendMessage(new StringTextComponent(string));
 	}
 
 	public static <T> void addToChatPaged(String title, int page, List<T> data,
 			Function<T, String> convert) {
 
-		int totalPages = (int) Math.ceil(data.size() / PER_PAGE);
+		int totalPages = (int) Math.ceil(1.0f + data.size() / PER_PAGE);
 		AIChatController.addChatLine(title + " " + page + " / " + totalPages);
 
 		int start = Math.max(0, page - 1) * PER_PAGE;

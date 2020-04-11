@@ -1,9 +1,9 @@
 package net.famzangl.minecraft.minebot.ai.net;
 
-import java.util.List;
-
 import net.famzangl.minecraft.minebot.ai.net.MinebotNetHandler.PersistentChat;
 import net.minecraft.entity.Entity;
+
+import java.util.List;
 
 public interface NetworkHelper {
 

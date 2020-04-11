@@ -16,9 +16,6 @@
  *******************************************************************************/
 package net.famzangl.minecraft.minebot.ai.strategy;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.enchanting.CloseScreenTask;
 import net.famzangl.minecraft.minebot.ai.scanner.BlockRangeFinder;
@@ -31,11 +28,14 @@ import net.famzangl.minecraft.minebot.ai.task.AITask;
 import net.famzangl.minecraft.minebot.ai.task.OpenChestTask;
 import net.famzangl.minecraft.minebot.ai.task.WaitTask;
 import net.famzangl.minecraft.minebot.ai.task.inventory.MoveInInventoryTask;
-import net.minecraft.client.gui.inventory.GuiChest;
+import net.minecraft.client.gui.screen.inventory.ChestScreen;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class UnstoreStrategy extends PathFinderStrategy {
 
@@ -103,7 +103,7 @@ public class UnstoreStrategy extends PathFinderStrategy {
 
 				@Override
 				protected int getToStack(AIHelper aiHelper) {
-					GuiChest screen = (GuiChest) aiHelper.getMinecraft().currentScreen;
+					ChestScreen screen = (ChestScreen) aiHelper.getMinecraft().currentScreen;
 					int slots = screen.inventorySlots.inventorySlots.size();
 					int iSlot;
 					if (inventorySlot < 9) {
@@ -117,7 +117,7 @@ public class UnstoreStrategy extends PathFinderStrategy {
 				@Override
 				protected int getFromStack(AIHelper aiHelper) {
 					fromStack = -1;
-					GuiChest screen = (GuiChest) aiHelper.getMinecraft().currentScreen;
+					ChestScreen screen = (ChestScreen) aiHelper.getMinecraft().currentScreen;
 					SameItemFilter filter = new SameItemFilter(
 							slot.getFakeMcStack());
 					List<Slot> inventorySlots = screen.inventorySlots.inventorySlots;
@@ -225,7 +225,7 @@ public class UnstoreStrategy extends PathFinderStrategy {
 	@Override
 	public void searchTasks(AIHelper helper) {
 		// If chest open, close it.
-		if (helper.getMinecraft().currentScreen instanceof GuiChest) {
+		if (helper.getMinecraft().currentScreen instanceof ChestScreen) {
 			addTask(new CloseScreenTask());
 		}
 		super.searchTasks(helper);

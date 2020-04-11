@@ -24,8 +24,8 @@ import net.famzangl.minecraft.minebot.ai.task.place.JumpingPlaceBlockAtSideTask;
 import net.famzangl.minecraft.minebot.ai.task.place.SneakAndPlaceAtSideTask;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockStairs.EnumHalf;
-import net.minecraft.init.Blocks;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.block.Blocks;
+import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 
 public class BuildNormalStairsTask extends AbstractBuildTask {
@@ -43,7 +43,7 @@ public class BuildNormalStairsTask extends AbstractBuildTask {
 			Blocks.STONE_BRICK_STAIRS, 
 			Blocks.STONE_STAIRS,
 			Blocks.QUARTZ_STAIRS);
-	private final EnumFacing upwardsDirection;
+	private final Direction upwardsDirection;
 	private final EnumHalf half;
 	private final Block stairs;
 
@@ -52,15 +52,15 @@ public class BuildNormalStairsTask extends AbstractBuildTask {
 	}
 
 	public BuildNormalStairsTask(BlockPos forPosition, Block stairs,
-			EnumFacing upwardsDirection, EnumHalf half) {
+			Direction upwardsDirection, EnumHalf half) {
 		super(forPosition);
 		this.stairs = stairs;
 		this.upwardsDirection = upwardsDirection;
 		this.half = half;
-		if (upwardsDirection != EnumFacing.EAST
-				&& upwardsDirection != EnumFacing.WEST
-				&& upwardsDirection != EnumFacing.NORTH
-				&& upwardsDirection != EnumFacing.SOUTH) {
+		if (upwardsDirection != Direction.EAST
+				&& upwardsDirection != Direction.WEST
+				&& upwardsDirection != Direction.NORTH
+				&& upwardsDirection != Direction.SOUTH) {
 			throw new IllegalArgumentException();
 		}
 	}
@@ -96,22 +96,22 @@ public class BuildNormalStairsTask extends AbstractBuildTask {
 	@Override
 	public BuildTask withPositionAndRotation(BlockPos add, int rotateSteps,
 			MirrorDirection mirror) {
-		EnumFacing dir = upwardsDirection;
+		Direction dir = upwardsDirection;
 		for (int i = 0; i < rotateSteps; i++) {
 			dir = dir.rotateY();
 		}
 
-		if (mirror == MirrorDirection.EAST_WEST && dir == EnumFacing.EAST) {
-			dir = EnumFacing.WEST;
+		if (mirror == MirrorDirection.EAST_WEST && dir == Direction.EAST) {
+			dir = Direction.WEST;
 		} else if (mirror == MirrorDirection.EAST_WEST
-				&& dir == EnumFacing.WEST) {
-			dir = EnumFacing.EAST;
+				&& dir == Direction.WEST) {
+			dir = Direction.EAST;
 		} else if (mirror == MirrorDirection.NORTH_SOUTH
-				&& dir == EnumFacing.NORTH) {
-			dir = EnumFacing.SOUTH;
+				&& dir == Direction.NORTH) {
+			dir = Direction.SOUTH;
 		} else if (mirror == MirrorDirection.NORTH_SOUTH
-				&& dir == EnumFacing.SOUTH) {
-			dir = EnumFacing.NORTH;
+				&& dir == Direction.SOUTH) {
+			dir = Direction.NORTH;
 		}
 
 		return new BuildNormalStairsTask(add, stairs, dir,

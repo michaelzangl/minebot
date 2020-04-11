@@ -16,13 +16,10 @@
  *******************************************************************************/
 package net.famzangl.minecraft.minebot.stats;
 
-import java.awt.GridLayout;
-
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.SwingUtilities;
-
 import net.famzangl.minecraft.minebot.stats.BlockBreakStats.BlockBreakStatsChangeListener;
+
+import javax.swing.*;
+import java.awt.*;
 
 public class StatsTable extends JPanel implements BlockBreakStatsChangeListener {
 	private final JLabel all = new JLabel("");

@@ -1,9 +1,9 @@
 package net.famzangl.minecraft.minebot.ai.path.world;
 
-import java.util.Arrays;
-
 import net.famzangl.minecraft.minebot.ai.command.BlockWithData;
 import net.minecraft.block.Block;
+
+import java.util.Arrays;
 
 /**
  * This is a Block-ID + Meta -> Float map.

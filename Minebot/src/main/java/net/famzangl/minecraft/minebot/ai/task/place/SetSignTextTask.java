@@ -19,9 +19,9 @@ package net.famzangl.minecraft.minebot.ai.task.place;
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.task.AITask;
 import net.famzangl.minecraft.minebot.ai.task.TaskOperations;
-import net.minecraft.client.gui.inventory.GuiEditSign;
+import net.minecraft.client.gui.inventory.EditScreenSign;
 import net.minecraft.tileentity.TileEntitySign;
-import net.minecraft.util.ChatAllowedCharacters;
+import net.minecraft.util.SharedConstants;
 import net.minecraft.util.math.BlockPos;
 
 /**
@@ -52,7 +52,7 @@ public class SetSignTextTask extends AITask {
 		StringBuffer res = new StringBuffer();
 		for (int i = 0; i < string.length() && res.length() < 15; i++) {
 			char c = string.charAt(i);
-			if (ChatAllowedCharacters.isAllowedCharacter(c)) {
+			if (SharedConstants.isAllowedCharacter(c)) {
 				res.append(c);
 			} else if (c == '§') {
 				res.append(' ');
@@ -70,16 +70,16 @@ public class SetSignTextTask extends AITask {
 	public void runTick(AIHelper aiHelper, TaskOperations taskOperations) {
 		if (!guiOpened) {
 			// wait
-			guiOpened = aiHelper.getMinecraft().currentScreen instanceof GuiEditSign;
+			guiOpened = aiHelper.getMinecraft().currentScreen instanceof EditScreenSign;
 		} else {
 			if (timer == 0) {
 				TileEntitySign sign = (TileEntitySign) aiHelper.getMinecraft().world
 						.getTileEntity(pos);
 				// sign.signText = text;
 			} else if (timer == 5) {
-				// GuiEditSign edit = (GuiEditSign)
+				// EditScreenSign edit = (EditScreenSign)
 				// h.getMinecraft().currentScreen;
-				aiHelper.getMinecraft().displayGuiScreen(null);
+				aiHelper.getMinecraft().displayScreenScreen(null);
 			}
 			timer++;
 		}

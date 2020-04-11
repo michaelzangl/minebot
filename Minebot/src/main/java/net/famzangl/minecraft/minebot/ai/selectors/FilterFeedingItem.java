@@ -17,14 +17,14 @@
 package net.famzangl.minecraft.minebot.ai.selectors;
 
 import net.famzangl.minecraft.minebot.ai.ItemFilter;
-import net.minecraft.entity.passive.EntityAnimal;
-import net.minecraft.entity.passive.EntityWolf;
+import net.minecraft.entity.passive.AnimalEntity;
+import net.minecraft.entity.passive.WolfEntity;
 import net.minecraft.item.ItemStack;
 
 public final class FilterFeedingItem implements ItemFilter {
-	private final EntityAnimal animal;
+	private final AnimalEntity animal;
 
-	public FilterFeedingItem(EntityAnimal animal) {
+	public FilterFeedingItem(AnimalEntity animal) {
 		this.animal = animal;
 	}
 
@@ -33,7 +33,7 @@ public final class FilterFeedingItem implements ItemFilter {
 		return isFeedingItem(animal, itemStack);
 	}
 
-	private boolean isFeedingItem(final EntityAnimal animal,
+	private boolean isFeedingItem(final AnimalEntity animal,
 			ItemStack currentItem) {
 		return currentItem != null && currentItem.getItem() != null
 				&& animal.isBreedingItem(currentItem) && !animal.isInLove()
@@ -41,8 +41,8 @@ public final class FilterFeedingItem implements ItemFilter {
 				&& animal.getHealth() > 0;
 	}
 
-	private boolean isHungryWolf(EntityAnimal animal) {
-		return animal instanceof EntityWolf
+	private boolean isHungryWolf(AnimalEntity animal) {
+		return animal instanceof WolfEntity
 				&& animal.getHealth() < animal.getMaxHealth();
 	}
 }

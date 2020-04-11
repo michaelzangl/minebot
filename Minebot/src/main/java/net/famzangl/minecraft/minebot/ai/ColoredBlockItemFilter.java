@@ -19,8 +19,8 @@ package net.famzangl.minecraft.minebot.ai;
 import net.famzangl.minecraft.minebot.ai.command.BlockWithData;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSet;
 import net.minecraft.block.Block;
-import net.minecraft.init.Blocks;
-import net.minecraft.item.EnumDyeColor;
+import net.minecraft.block.Blocks;
+import net.minecraft.item.DyeColor;
 
 /**
  * Colored is ItemCloth
@@ -47,16 +47,16 @@ public class ColoredBlockItemFilter extends BlockItemFilter {
 		this(matched, colorFromString(color));
 	}
 
-	public static EnumDyeColor colorFromString(String color) {
-		EnumDyeColor res = colorFromStringNull(color);
+	public static DyeColor colorFromString(String color) {
+		DyeColor res = colorFromStringNull(color);
 		if (res == null) {
 			throw new IllegalArgumentException("Unknown color: " + color);
 		}
 		return res;
 	}
 
-	public static EnumDyeColor colorFromStringNull(String color) {
-		for (EnumDyeColor v : EnumDyeColor.values()) {
+	public static DyeColor colorFromStringNull(String color) {
+		for (DyeColor v : DyeColor.values()) {
 			if (v.getName().equalsIgnoreCase(color)) {
 				return v;
 			}
@@ -65,7 +65,7 @@ public class ColoredBlockItemFilter extends BlockItemFilter {
 		return null;
 	}
 
-	public ColoredBlockItemFilter(Block matched, EnumDyeColor color) {
+	public ColoredBlockItemFilter(Block matched, DyeColor color) {
 		super(new BlockWithData(matched, color.getMetadata()));
 		if (COLORABLE_BLOCKS.contains(matched)) {
 			throw new IllegalArgumentException();

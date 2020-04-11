@@ -1,10 +1,10 @@
 package net.famzangl.minecraft.minebot.ai.path;
 
-import java.util.BitSet;
-
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSets;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
+
+import java.util.BitSet;
 
 /**
  * Mine some visible ores that are close to us.
@@ -26,7 +26,7 @@ public class MineNerbyPathFinder extends MineBySettingsPathFinder {
 	private final BitSet alreadyScanned = new BitSet();
 	private BlockPos activationPosition;
 
-	public MineNerbyPathFinder(EnumFacing preferedDirection) {
+	public MineNerbyPathFinder(Direction preferedDirection) {
 		super(preferedDirection, 0);
 	}
 
@@ -59,7 +59,7 @@ public class MineNerbyPathFinder extends MineBySettingsPathFinder {
 		// TODO: Use some sort of visible block list.
 		// We need to use the current server state now.
 		if (BlockSets.FEET_CAN_WALK_THROUGH.isAt(world.getCurrentState(), add)) {
-			for (EnumFacing d : EnumFacing.values()) {
+			for (Direction d : Direction.values()) {
 				findPossiblePositionsAround(add.offset(d));
 			}
 		}

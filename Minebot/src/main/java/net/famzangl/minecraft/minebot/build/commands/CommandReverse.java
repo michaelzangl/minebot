@@ -16,11 +16,6 @@
  *******************************************************************************/
 package net.famzangl.minecraft.minebot.build.commands;
 
-import java.io.File;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.command.AICommand;
 import net.famzangl.minecraft.minebot.ai.command.AICommandInvocation;
@@ -29,6 +24,11 @@ import net.famzangl.minecraft.minebot.ai.command.ParameterType;
 import net.famzangl.minecraft.minebot.ai.strategy.AIStrategy;
 import net.famzangl.minecraft.minebot.build.reverse.RunReverseBuildStrategy;
 import net.famzangl.minecraft.minebot.settings.MinebotSettings;
+
+import java.io.File;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 
 @AICommand(helpText = "Get a build script for the selected area.\n"
 		+ "out-file is the file to write to."

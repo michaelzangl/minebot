@@ -24,7 +24,7 @@ import net.famzangl.minecraft.minebot.ai.command.ParameterType;
 import net.famzangl.minecraft.minebot.ai.command.SafeStrategyRule;
 import net.famzangl.minecraft.minebot.ai.strategy.AIStrategy;
 import net.famzangl.minecraft.minebot.ai.strategy.ShearStrategy;
-import net.minecraft.item.EnumDyeColor;
+import net.minecraft.item.DyeColor;
 
 @AICommand(helpText = "Shear sheep.", name = "minebot")
 public class CommandShear {
@@ -33,7 +33,7 @@ public class CommandShear {
 	public static AIStrategy run(
 			AIHelper helper,
 			@AICommandParameter(type = ParameterType.FIXED, fixedName = "shear", description = "") String nameArg,
-			@AICommandParameter(type = ParameterType.COLOR, description = "The color to get", optional = true) EnumDyeColor color) {
+			@AICommandParameter(type = ParameterType.COLOR, description = "The color to get", optional = true) DyeColor color) {
 		return new ShearStrategy(color);
 	}
 

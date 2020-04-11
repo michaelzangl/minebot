@@ -16,16 +16,6 @@
  *******************************************************************************/
 package net.famzangl.minecraft.minebot.ai;
 
-import java.util.Hashtable;
-import java.util.Map.Entry;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.Marker;
-import org.apache.logging.log4j.MarkerManager;
-import org.lwjgl.input.Keyboard;
-import org.lwjgl.opengl.Display;
-
 import net.famzangl.minecraft.minebot.ai.command.AIChatController;
 import net.famzangl.minecraft.minebot.ai.command.IAIControllable;
 import net.famzangl.minecraft.minebot.ai.net.MinebotNetHandler;
@@ -36,15 +26,24 @@ import net.famzangl.minecraft.minebot.ai.render.PosMarkerRenderer;
 import net.famzangl.minecraft.minebot.ai.strategy.AIStrategy;
 import net.famzangl.minecraft.minebot.ai.strategy.AIStrategy.TickResult;
 import net.famzangl.minecraft.minebot.ai.strategy.RunOnceStrategy;
-import net.minecraft.client.entity.EntityPlayerSP;
+import net.java.games.input.Keyboard;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.MouseHelper;
+import net.minecraft.client.entity.ClientPlayerEntity;
+import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.entity.Entity;
 import net.minecraft.init.Items;
+import net.minecraft.item.Items;
 import net.minecraft.util.EnumHand;
+import net.minecraft.util.Hand;
 import net.minecraft.util.MouseHelper;
 import net.minecraft.util.math.BlockPos;
+import net.minecraftforge.event.TickEvent;
+import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.entity.player.UseHoeEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -54,6 +53,15 @@ import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent.Phase;
 import net.minecraftforge.fml.common.gameevent.TickEvent.RenderTickEvent;
 import net.minecraftforge.fml.common.network.FMLNetworkEvent.ClientConnectedToServerEvent;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.Marker;
+import org.apache.logging.log4j.MarkerManager;
+import org.lwjgl.input.Keyboard;
+import org.lwjgl.opengl.Display;
+
+import java.util.Hashtable;
+import java.util.Map.Entry;
 
 /**
  * The main class that handles the bot.
@@ -63,16 +71,16 @@ import net.minecraftforge.fml.common.network.FMLNetworkEvent.ClientConnectedToSe
  */
 public class AIController extends AIHelper implements IAIControllable {
 	private final class UngrabMouseHelper extends MouseHelper {
-		@Override
-		public void mouseXYChange() {
+		public UngrabMouseHelper(Minecraft minecraftIn) {
+			super(minecraftIn);
 		}
 
 		@Override
-		public void grabMouseCursor() {
+		public void grabMouse() {
 		}
 
 		@Override
-		public void ungrabMouseCursor() {
+		public void ungrabMouse() {
 		}
 	}
 
@@ -134,7 +142,7 @@ public class AIController extends AIHelper implements IAIControllable {
 	private BuildMarkerRenderer buildMarkerRenderer;
 	private NetworkHelper networkHelper;
 	private InterceptingProfiler profilerHelper;
-	private RenderTickEvent activeDrawEvent;
+	private TickEvent.RenderTickEvent activeDrawEvent;
 	private boolean displayWasActiveSinceUngrab;
 
 	public AIController() {
@@ -148,7 +156,7 @@ public class AIController extends AIHelper implements IAIControllable {
 		// Hook into
 		// net.minecraft.client.renderer.RenderGlobal.drawBlockDamageTexture(Tessellator,
 		// WorldRenderer, Entity, float)
-		profilerHelper.addLisener("destroyProgress", new Runnable() {
+		profilerHelper.addListener("destroyProgress", new Runnable() {
 			@Override
 			public void run() {
 				drawMakers();
@@ -162,8 +170,8 @@ public class AIController extends AIHelper implements IAIControllable {
 	 * @param evt
 	 */
 	@SubscribeEvent
-	public void onPlayerTick(ClientTickEvent evt) {
-		if (evt.phase != ClientTickEvent.Phase.START) {
+	public void onPlayerTick(TickEvent.ClientTickEvent evt) {
+		if (evt.phase != TickEvent.ClientTickEvent.Phase.START) {
 			return;
 		} else if (getMinecraft().player == null
 				|| getMinecraft().world == null) {
@@ -173,7 +181,7 @@ public class AIController extends AIHelper implements IAIControllable {
 		}
 
 		LOGGER.debug(MARKER_STRATEGY, "Strategy game tick. World time: "
-				+ getMinecraft().world.getTotalWorldTime());
+				+ getMinecraft().world.getGameTime());
 		testUngrabMode();
 		invalidateObjectMouseOver();
 		resetAllInputs();
@@ -237,13 +245,14 @@ public class AIController extends AIHelper implements IAIControllable {
 		}
 
 	}
+
 	@SubscribeEvent
 	public void onUseHoe(UseHoeEvent evt) {
-		LOGGER.debug(MARKER_EVENT, "Hoe used at " + evt.getPos());
+		LOGGER.debug(MARKER_EVENT, "Hoe used at " + evt.getContext().getPos());
 	}
 
 	private boolean isStopPressed() {
-		return stop.isPressed() || stop.isKeyDown() || Keyboard.isKeyDown(stop.getKeyCode());
+		return stop.isPressed() || stop.isKeyDown() ||  keyboard.isKeyDown(stop.getKey().getKeyCode());
 	}
 
 	private void deactivateCurrentStrategy() {
@@ -256,8 +265,8 @@ public class AIController extends AIHelper implements IAIControllable {
 	}
 
 	@SubscribeEvent
-	public void drawHUD(RenderTickEvent event) {
-		if (event.phase != Phase.END) {
+	public void drawHUD(TickEvent.RenderTickEvent event) {
+		if (event.phase != TickEvent.Phase.END) {
 			return;
 		}
 		if (doUngrab) {
@@ -265,13 +274,11 @@ public class AIController extends AIHelper implements IAIControllable {
 			// TODO: Reset this on grab
 			getMinecraft().gameSettings.pauseOnLostFocus = false;
 			// getMinecraft().mouseHelper.ungrabMouseCursor();
-			if (getMinecraft().inGameHasFocus) {
+			if (getMinecraft().isGameFocused()) {
 				startUngrabMode();
 			}
 			doUngrab = false;
 		}
-
-		ScaledResolution res = new ScaledResolution(getMinecraft());
 
 		String[] str;
 		synchronized (strategyDescrMutex) {
@@ -281,7 +288,7 @@ public class AIController extends AIHelper implements IAIControllable {
 		for (String s : str) {
 			getMinecraft().fontRenderer.drawStringWithShadow(
 					s,
-					res.getScaledWidth()
+					getMinecraft().getMainWindow().getScaledWidth()
 							- getMinecraft().fontRenderer.getStringWidth(s)
 							- 10, y, 16777215);
 			y += 15;
@@ -292,12 +299,12 @@ public class AIController extends AIHelper implements IAIControllable {
 	private synchronized void startUngrabMode() {
 		LOGGER.trace(MARKER_MOUSE, "Starting mouse ungrab");
 		getMinecraft().mouseHelper.ungrabMouseCursor();
-		getMinecraft().inGameHasFocus = true;
+		getMinecraft().setGameFocused(true);
 		if (!(getMinecraft().mouseHelper instanceof UngrabMouseHelper)) {
 			LOGGER.trace(MARKER_MOUSE, "Storing old mouse helper.");
 			oldMouseHelper = getMinecraft().mouseHelper;
 		}
-		getMinecraft().mouseHelper = new UngrabMouseHelper();
+		getMinecraft().mouseHelper = new UngrabMouseHelper(getMinecraft());
 		displayWasActiveSinceUngrab = true;
 	}
 
@@ -308,15 +315,14 @@ public class AIController extends AIHelper implements IAIControllable {
 				LOGGER.debug(MARKER_MOUSE, "Preparing to re-grab the mouse.");
 				// Tell minecraft what really happened.
 				getMinecraft().mouseHelper = oldMouseHelper;
-				getMinecraft().inGameHasFocus = false;
-				getMinecraft().setIngameFocus();
+				getMinecraft().setGameFocused(false);
 				oldMouseHelper = null;
 			}
 		}
 	}
 
 	@SubscribeEvent
-	public void resetOnGameEnd(PlayerChangedDimensionEvent unload) {
+	public void resetOnGameEnd(PlayerEvent.PlayerChangedDimensionEvent unload) {
 		LOGGER.trace(MARKER_EVENT, "Unloading world.");
 		dead = true;
 		buildManager.reset();
@@ -324,7 +330,7 @@ public class AIController extends AIHelper implements IAIControllable {
 	}
 
 	@SubscribeEvent
-	public void resetOnGameEnd2(PlayerRespawnEvent unload) {
+	public void resetOnGameEnd2(PlayerEvent.PlayerRespawnEvent unload) {
 		resetOnGameEnd(null);
 	}
 
@@ -334,8 +340,8 @@ public class AIController extends AIHelper implements IAIControllable {
 	 * @param event
 	 */
 	@SubscribeEvent
-	public void beforeDrawMarkers(RenderTickEvent event) {
-		if (event.phase != Phase.START) {
+	public void beforeDrawMarkers(TickEvent.RenderTickEvent event) {
+		if (event.phase != TickEvent.Phase.START) {
 			return;
 		}
 		activeDrawEvent = event;
@@ -343,18 +349,18 @@ public class AIController extends AIHelper implements IAIControllable {
 
 	public void drawMakers() {
 		final Entity view = getMinecraft().getRenderViewEntity();
-		if (!(view instanceof EntityPlayerSP)) {
+		if (!(view instanceof ClientPlayerEntity)) {
 			return;
 		}
-		EntityPlayerSP player = (EntityPlayerSP) view;
-		if (player.getHeldItem(EnumHand.MAIN_HAND) != null
-				&& player.getHeldItem(EnumHand.MAIN_HAND).getItem() == Items.WOODEN_AXE) {
+		ClientPlayerEntity player = (ClientPlayerEntity) view;
+		if (player.getHeldItem(Hand.MAIN_HAND).getItem() != Items.AIR
+				&& player.getHeldItem(Hand.MAIN_HAND).getItem() == Items.WOODEN_AXE) {
 			if (markerRenderer == null) {
 				markerRenderer = new PosMarkerRenderer(1, 0, 0);
 			}
 			markerRenderer.render(activeDrawEvent, this, pos1, pos2);
-		} else if (player.getHeldItem(EnumHand.MAIN_HAND) != null
-				&& player.getHeldItem(EnumHand.MAIN_HAND).getItem() == Items.STICK) {
+		} else if (player.getHeldItem(Hand.MAIN_HAND).getItem() != Items.AIR
+				&& player.getHeldItem(Hand.MAIN_HAND).getItem() == Items.STICK) {
 			if (buildMarkerRenderer == null) {
 				buildMarkerRenderer = new BuildMarkerRenderer();
 			}

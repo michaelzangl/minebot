@@ -16,16 +16,15 @@
  *******************************************************************************/
 package net.famzangl.minecraft.minebot.ai.strategy;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
-
 import net.famzangl.minecraft.minebot.ai.task.inventory.ItemWithSubtype;
-import net.minecraft.entity.player.InventoryPlayer;
+import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+
+import java.util.ArrayList;
+import java.util.Arrays;
 
 /**
  * This is a definition of what the (current) inventory of the player contains.
@@ -74,7 +73,7 @@ public class InventoryDefinition {
 
 	}
 
-	public InventoryDefinition(InventoryPlayer player) {
+	public InventoryDefinition(PlayerInventory player) {
 		for (int i = 0; i < 36; i++) {
 			ItemStack stack = player.mainInventory.get(i);
 			if (stack == null || stack.getItem() == null) {

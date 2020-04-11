@@ -16,8 +16,6 @@
  *******************************************************************************/
 package net.famzangl.minecraft.minebot.ai.task.place;
 
-import java.util.Arrays;
-
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.BlockItemFilter;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockBounds;
@@ -26,9 +24,11 @@ import net.famzangl.minecraft.minebot.ai.path.world.WorldData;
 import net.famzangl.minecraft.minebot.ai.task.BlockHalf;
 import net.famzangl.minecraft.minebot.ai.task.TaskOperations;
 import net.famzangl.minecraft.minebot.ai.task.error.StringTaskError;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
+
+import java.util.Arrays;
 
 public class SneakAndPlaceAtHalfTask extends SneakAndPlaceTask {
 
@@ -36,11 +36,11 @@ public class SneakAndPlaceAtHalfTask extends SneakAndPlaceTask {
 			Comparable<PlacingDirection> {
 
 		private final BlockPos pos;
-		private final EnumFacing direction;
+		private final Direction direction;
 		private final BlockHalf blockHalf;
 		private final WorldData world;
 
-		public PlacingDirection(BlockPos pos, EnumFacing direction,
+		public PlacingDirection(BlockPos pos, Direction direction,
 				BlockHalf half, WorldData world) {
 			this.pos = pos;
 			this.direction = direction;
@@ -88,12 +88,12 @@ public class SneakAndPlaceAtHalfTask extends SneakAndPlaceTask {
 		}
 	}
 
-	protected final EnumFacing[] DIRS = new EnumFacing[] { EnumFacing.EAST,
-			EnumFacing.NORTH, EnumFacing.WEST, EnumFacing.SOUTH };
+	protected final Direction[] DIRS = new Direction[] { Direction.EAST,
+			Direction.NORTH, Direction.WEST, Direction.SOUTH };
 
 	protected final BlockHalf blockHalf;
 
-	protected EnumFacing lookingDirection = null;
+	protected Direction lookingDirection = null;
 
 	private int attempts;
 
@@ -108,10 +108,10 @@ public class SneakAndPlaceAtHalfTask extends SneakAndPlaceTask {
 	protected PlacingDirection[] getBuildDirs(AIHelper aiHelper) {
 		// we sort them by distance. This order is kept afterwards.
 		if (dirs == null) {
-			EnumFacing[] orders = createBuildDirsUnordered();
+			Direction[] orders = createBuildDirsUnordered();
 			dirs = new PlacingDirection[orders.length];
 			for (int i = 0; i < orders.length; i++) {
-				EnumFacing f = orders[i];
+				Direction f = orders[i];
 				dirs[i] = new PlacingDirection(positionToPlace, f, blockHalf,
 						aiHelper.getWorld());
 			}
@@ -120,7 +120,7 @@ public class SneakAndPlaceAtHalfTask extends SneakAndPlaceTask {
 		return dirs;
 	}
 
-	protected EnumFacing[] createBuildDirsUnordered() {
+	protected Direction[] createBuildDirsUnordered() {
 		return DIRS;
 	}
 

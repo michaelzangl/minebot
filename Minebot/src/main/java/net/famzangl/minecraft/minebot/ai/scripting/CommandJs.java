@@ -16,19 +16,6 @@
  *******************************************************************************/
 package net.famzangl.minecraft.minebot.ai.scripting;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-
-import javax.script.ScriptEngine;
-import javax.script.ScriptEngineManager;
-import javax.script.ScriptException;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.Marker;
-import org.apache.logging.log4j.MarkerManager;
-
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.command.AIChatController;
 import net.famzangl.minecraft.minebot.ai.command.AICommand;
@@ -39,8 +26,17 @@ import net.famzangl.minecraft.minebot.ai.strategy.AIStrategy;
 import net.famzangl.minecraft.minebot.ai.strategy.AIStrategy.TickResult;
 import net.famzangl.minecraft.minebot.ai.task.error.StringTaskError;
 import net.famzangl.minecraft.minebot.ai.task.error.TaskError;
-import net.famzangl.minecraft.minebot.ai.utils.PrivateFieldUtils;
-import net.minecraft.launchwrapper.LaunchClassLoader;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.Marker;
+import org.apache.logging.log4j.MarkerManager;
+
+import javax.script.ScriptEngine;
+import javax.script.ScriptEngineManager;
+import javax.script.ScriptException;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 
 @AICommand(name = "minebot", helpText = "Execute a javascript file.")
 public class CommandJs {
@@ -211,12 +207,12 @@ public class CommandJs {
 			ClassLoader cl = getClass().getClassLoader();
 			while (cl != null) {
 				LOGGER.trace(MARKER_ENGINE, "  - " + cl);
-				if (cl instanceof LaunchClassLoader) {
+				/* TODO was required in older Forge: if (cl instanceof LaunchClassLoader) {
 					cl = PrivateFieldUtils.getFieldValue(cl,
 							LaunchClassLoader.class, ClassLoader.class);
-				} else {
+				} else {*/
 					cl = cl.getParent();
-				}
+				//}
 			}
 
 			ScriptEngine nashorn = manager.getEngineByName("nashorn");
@@ -240,12 +236,12 @@ public class CommandJs {
 		 * This is a fix that allows minecraft and nashorn classes to interoperate.
 		 */
 		private void fixLaunchClassLoader() {
-			if (getClass().getClassLoader() instanceof LaunchClassLoader) {
+			/*TODO: Still needed? if (getClass().getClassLoader() instanceof LaunchClassLoader) {
 				LaunchClassLoader loader = (LaunchClassLoader) getClass()
 						.getClassLoader();
 				// allows you to extend Minebot classes.
 				loader.addClassLoaderExclusion("jdk.nashorn.");
-			}
+			}*/
 		}
 
 		public boolean isFinished() {

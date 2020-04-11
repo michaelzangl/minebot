@@ -2,7 +2,7 @@ package net.famzangl.minecraft.minebot.ai.utils;
 
 import net.famzangl.minecraft.minebot.ai.path.world.Pos;
 import net.famzangl.minecraft.minebot.ai.path.world.WorldData;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3i;
 
@@ -79,7 +79,7 @@ public class BlockCuboid<WorldT extends WorldData> extends BlockArea<WorldT> {
 				extend));
 	}
 
-	public BlockCuboid<WorldT> extend(int amount, EnumFacing direction) {
+	public BlockCuboid<WorldT> extend(int amount, Direction direction) {
 		return boundsWith(move(amount, direction));
 	}
 
@@ -87,7 +87,7 @@ public class BlockCuboid<WorldT extends WorldData> extends BlockArea<WorldT> {
 		return new BlockCuboid<>(Pos.minPos(min, other.min), Pos.maxPos(max, other.max));
 	}
 
-	public BlockCuboid<WorldT> move(int amount, EnumFacing direction) {
+	public BlockCuboid<WorldT> move(int amount, Direction direction) {
 		return move(Pos.ZERO.offset(direction, amount));
 	}
 

@@ -16,21 +16,6 @@
  *******************************************************************************/
 package net.famzangl.minecraft.minebot.ai.strategy;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Hashtable;
-import java.util.List;
-import java.util.Map.Entry;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.Marker;
-import org.apache.logging.log4j.MarkerManager;
-
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.command.BlockWithDataOrDontcare;
 import net.famzangl.minecraft.minebot.ai.enchanting.CloseScreenTask;
@@ -46,17 +31,29 @@ import net.famzangl.minecraft.minebot.ai.task.inventory.ItemCountList;
 import net.famzangl.minecraft.minebot.ai.task.inventory.ItemWithSubtype;
 import net.famzangl.minecraft.minebot.ai.task.inventory.PutOnCraftingTableTask;
 import net.famzangl.minecraft.minebot.ai.task.inventory.TakeResultItem;
-import net.famzangl.minecraft.minebot.ai.utils.PrivateFieldUtils;
-import net.minecraft.client.gui.inventory.GuiContainer;
-import net.minecraft.client.gui.inventory.GuiCrafting;
-import net.minecraft.init.Blocks;
+import net.minecraft.block.Blocks;
+import net.minecraft.client.gui.inventory.ContainerScreen;
+import net.minecraft.client.gui.screen.inventory.CraftingScreen;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.CraftingManager;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.item.crafting.Ingredient;
-import net.minecraft.item.crafting.ShapedRecipes;
+import net.minecraft.item.crafting.ShapedRecipe;
 import net.minecraft.util.math.BlockPos;
-import net.minecraftforge.oredict.ShapedOreRecipe;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.Marker;
+import org.apache.logging.log4j.MarkerManager;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Hashtable;
+import java.util.List;
+import java.util.Map.Entry;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Use the crafting table.
@@ -77,19 +74,19 @@ public class CraftStrategy extends PathFinderStrategy {
 
 		public CraftingPossibility(IRecipe recipe) {
 			LOGGER.trace(MARKER_RECIPE, "Parsing recipe: " + recipe);
-			if (recipe instanceof ShapedRecipes) {
-				ShapedRecipes shapedRecipes = (ShapedRecipes) recipe;
-				LOGGER.trace(MARKER_RECIPE, "Interpreting ShapedRecipes: "
+			if (recipe instanceof ShapedRecipe) {
+				ShapedRecipe shapedRecipes = (ShapedRecipe) recipe;
+				LOGGER.trace(MARKER_RECIPE, "Interpreting ShapedRecipe: "
 						+ shapedRecipes.getRecipeOutput().getItem()
-								.getUnlocalizedName());
-				int width = shapedRecipes.recipeWidth;
-				int height = shapedRecipes.recipeHeight;
+								.getRegistryName());
+				int width = shapedRecipes.getRecipeWidth();
+				int height = shapedRecipes.getRecipeHeight();
 
 				LOGGER.trace(MARKER_RECIPE, "Found items of size " + width
-						+ "x" + height + ": " + shapedRecipes.recipeItems);
+						+ "x" + height + ": " + shapedRecipes.getIngredients());
 				for (int x = 0; x < width; x++) {
 					for (int y = 0; y < height; y++) {
-						Ingredient itemStack = shapedRecipes.recipeItems.get(x + y * width);
+						Ingredient itemStack = shapedRecipes.getIngredients().get(x + y * width);
 						if (itemStack != null && itemStack.getMatchingStacks().length > 0) {
 							this.slots[x][y] = Stream.of(itemStack.getMatchingStacks())
 									.map(ItemWithSubtype::new)
@@ -98,7 +95,7 @@ public class CraftStrategy extends PathFinderStrategy {
 					}
 				}
 				LOGGER.trace(MARKER_RECIPE, "Slots " + Arrays.toString(slots));
-			} else if (recipe instanceof ShapedOreRecipe) {
+			}/* TODO: Still needed? else if (recipe instanceof ShapedOreRecipe) {
 				ShapedOreRecipe shapedRecipes = (ShapedOreRecipe) recipe;
 				try {
 					// Width is the first integer field.
@@ -128,7 +125,7 @@ public class CraftStrategy extends PathFinderStrategy {
 				} catch (IllegalAccessException e) {
 					throw new IllegalArgumentException("Cannot access " + recipe);
 				}
-			} else {
+			} */ else {
 				LOGGER.error(MARKER_RECIPE,
 						"An item recipe has been found but the item cannot be crafted. The class "
 								+ recipe.getClass().getCanonicalName()
@@ -327,12 +324,12 @@ public class CraftStrategy extends PathFinderStrategy {
 				@Override
 				public boolean isFinished(AIHelper aiHelper) {
 					return super.isFinished(aiHelper)
-							&& aiHelper.getMinecraft().currentScreen instanceof GuiCrafting;
+							&& aiHelper.getMinecraft().currentScreen instanceof CraftingScreen;
 				}
 			});
 			addCraftTaks(grid);
 			addTask(new WaitTask(5));
-			addTask(new TakeResultItem(GuiCrafting.class, 0));
+			addTask(new TakeResultItem(CraftingScreen.class, 0));
 			addTask(new WaitTask(5));
 			addTask(new CloseScreenTask());
 		}
@@ -453,7 +450,7 @@ public class CraftStrategy extends PathFinderStrategy {
 	@Override
 	public void searchTasks(AIHelper helper) {
 		// If chest open, close it.
-		if (helper.getMinecraft().currentScreen instanceof GuiContainer) {
+		if (helper.getMinecraft().currentScreen instanceof ContainerScreen) {
 			addTask(new CloseScreenTask());
 		}
 		super.searchTasks(helper);

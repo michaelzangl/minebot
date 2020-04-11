@@ -18,7 +18,7 @@ package net.famzangl.minecraft.minebot.ai.enchanting;
 
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.strategy.TaskStrategy;
-import net.minecraft.client.gui.GuiEnchantment;
+import net.minecraft.client.gui.screen.EnchantmentScreen;
 
 /**
  * Strategy: kill mobs, until we have enough levels.
@@ -61,7 +61,7 @@ public class XPFarmStrategy extends TaskStrategy {
 	}
 
 	private boolean enchantmentTableOpened(AIHelper helper) {
-		return helper.getMinecraft().currentScreen instanceof GuiEnchantment;
+		return helper.getMinecraft().currentScreen instanceof EnchantmentScreen;
 	}
 
 	@Override

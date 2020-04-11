@@ -16,10 +16,10 @@
  *******************************************************************************/
 package net.famzangl.minecraft.minebot.ai.strategy;
 
-import java.util.HashSet;
-
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.minecraftforge.fml.common.gameevent.TickEvent.RenderTickEvent;
+
+import java.util.HashSet;
 
 /**
  * Run a whole stack of strategies.

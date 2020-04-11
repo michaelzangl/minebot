@@ -9,17 +9,17 @@ import net.famzangl.minecraft.minebot.ai.command.ParameterType;
 import net.famzangl.minecraft.minebot.ai.path.world.Pos;
 import net.famzangl.minecraft.minebot.ai.strategy.AIStrategy;
 import net.famzangl.minecraft.minebot.ai.strategy.RunOnceStrategy;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3i;
 
 @AICommand(helpText = "Expand the selected region.", name = "minebuild")
 public class CommandExpand {
 	private static final class ExpandStrategy extends RunOnceStrategy {
-		private final EnumFacing direction;
+		private final Direction direction;
 		private final int amount;
 
-		public ExpandStrategy(int amount, EnumFacing direction) {
+		public ExpandStrategy(int amount, Direction direction) {
 			this.amount = amount;
 			this.direction = direction;
 		}
@@ -66,7 +66,7 @@ public class CommandExpand {
 			AIHelper helper,
 			@AICommandParameter(type = ParameterType.FIXED, fixedName = "expand", description = "") String nameArg,
 			@AICommandParameter(type = ParameterType.NUMBER, description = "How much", optional = true) Integer amount,
-			@AICommandParameter(type = ParameterType.ENUM, description = "Direction", optional = true) EnumFacing direction) {
+			@AICommandParameter(type = ParameterType.ENUM, description = "Direction", optional = true) Direction direction) {
 		if (direction == null) {
 			System.out.println("Pitch: "
 					+ helper.getMinecraft().player.rotationPitch);

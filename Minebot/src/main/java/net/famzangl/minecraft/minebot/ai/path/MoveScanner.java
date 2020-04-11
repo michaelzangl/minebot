@@ -16,6 +16,22 @@
  *******************************************************************************/
 package net.famzangl.minecraft.minebot.ai.path;
 
+import net.famzangl.minecraft.minebot.ai.AIHelper;
+import net.famzangl.minecraft.minebot.ai.PathFinderField;
+import net.famzangl.minecraft.minebot.ai.path.world.BlockSet;
+import net.famzangl.minecraft.minebot.ai.path.world.BlockSets;
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.monster.EntityCreeper;
+import net.minecraft.entity.monster.EntitySkeleton;
+import net.minecraft.entity.monster.EntitySpider;
+import net.minecraft.entity.monster.EntityZombie;
+import net.minecraft.util.ClassInheritanceMultiMap;
+import net.minecraft.world.chunk.Chunk;
+import net.minecraft.world.chunk.PalettedContainer;
+import net.minecraft.world.chunk.storage.ExtendedBlockStorage;
+
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -26,22 +42,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
-
-import net.famzangl.minecraft.minebot.ai.AIHelper;
-import net.famzangl.minecraft.minebot.ai.PathFinderField;
-import net.famzangl.minecraft.minebot.ai.path.world.BlockSet;
-import net.famzangl.minecraft.minebot.ai.path.world.BlockSets;
-import net.minecraft.block.Block;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.monster.EntityCreeper;
-import net.minecraft.entity.monster.EntitySkeleton;
-import net.minecraft.entity.monster.EntitySpider;
-import net.minecraft.entity.monster.EntityZombie;
-import net.minecraft.util.ClassInheritanceMultiMap;
-import net.minecraft.world.chunk.BlockStateContainer;
-import net.minecraft.world.chunk.Chunk;
-import net.minecraft.world.chunk.storage.ExtendedBlockStorage;
 
 /**
  * Scanns the area around a given position for blocks. The scanner is
@@ -124,7 +124,7 @@ public class MoveScanner {
 		public void scanBlocks(Chunk chunk, int chunkY, ScannerPolicy policy) {
 			ExtendedBlockStorage storage = chunk.getBlockStorageArray()[chunkY];
 			
-			BlockStateContainer data = storage.getData();
+			PalettedContainer data = storage.getData();
 //			char[] array = storage.getData();
 			for (int y = 0; y < 16; y++) {
 				for (int z = 0; z < 16; z++) {
@@ -162,7 +162,7 @@ public class MoveScanner {
 		 * 
 		 * @param fromDirection
 		 */
-		// public void propagateBlockChanges(EnumFacing fromDirection,
+		// public void propagateBlockChanges(Direction fromDirection,
 		// short flagsToMerge, short flagToRevoke) {
 		// for (int y = 0; y < 16; y++) {
 		// if (local(0, y + fromDirection.offsetY, 0) < 0
@@ -578,7 +578,7 @@ public class MoveScanner {
 	public class ScannerPolicy {
 
 		private final BlockSet safeCeiling = BlockSets.SAFE_CEILING;
-		private final BlockSet safeHead = BlockSets.HEAD_CAN_WALK_TRHOUGH;
+		private final BlockSet safeHead = BlockSets.HEAD_CAN_WALK_THROUGH;
 		private final BlockSet safeFoot = BlockSets.FEET_CAN_WALK_THROUGH;
 		private final BlockSet safeFloor = BlockSets.SAFE_GROUND;
 		private final BlockSet safeSide = BlockSets.SAFE_SIDE;
@@ -609,7 +609,7 @@ public class MoveScanner {
 			return flag;
 		}
 
-		public int getPositionFlags(IBlockState iBlockState) {
+		public int getPositionFlags(BlockState iBlockState) {
 			return Block.BLOCK_STATE_IDS.get(iBlockState);
 		}
 
@@ -702,7 +702,7 @@ public class MoveScanner {
 								+ (chunkZ % CHUNK_SIZE_X_Z) * STRIDE_Z * 16
 								+ (chunkX % CHUNK_SIZE_X_Z) * STRIDE_X * 16);
 				Chunk mcChunk = helper.getMinecraft().world
-						.getChunkFromChunkCoords(chunkX, chunkZ);
+						.getChunk(chunkX, chunkZ);
 				scheduler
 						.addTask(new ScanChunkTask(chunks[i], policy, mcChunk));
 				scheduler.addTask(new PropagateSidesOfChunkTask(chunks[i]));

@@ -16,9 +16,6 @@
  *******************************************************************************/
 package net.famzangl.minecraft.minebot.ai.task.move;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSet;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSets;
@@ -27,8 +24,11 @@ import net.famzangl.minecraft.minebot.ai.path.world.WorldWithDelta;
 import net.famzangl.minecraft.minebot.ai.task.AITask;
 import net.famzangl.minecraft.minebot.ai.task.CanPrefaceAndDestroy;
 import net.famzangl.minecraft.minebot.ai.task.TaskOperations;
-import net.minecraft.init.Blocks;
+import net.minecraft.block.Blocks;
 import net.minecraft.util.math.BlockPos;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Digs/walks horizontaly one block wide.
@@ -108,7 +108,7 @@ public class HorizontalMoveTask extends AITask implements CanPrefaceAndDestroy {
 	}
 
 	private boolean needDestroyHead(WorldData world) {
-		return !BlockSets.HEAD_CAN_WALK_TRHOUGH.isAt(world, pos.add(0, 1, 0));
+		return !BlockSets.HEAD_CAN_WALK_THROUGH.isAt(world, pos.add(0, 1, 0));
 	}
 
 	@Override

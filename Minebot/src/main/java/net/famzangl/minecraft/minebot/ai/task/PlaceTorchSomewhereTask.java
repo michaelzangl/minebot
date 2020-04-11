@@ -16,17 +16,17 @@
  *******************************************************************************/
 package net.famzangl.minecraft.minebot.ai.task;
 
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
-
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.BlockItemFilter;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSets;
 import net.famzangl.minecraft.minebot.ai.task.error.SelectTaskError;
-import net.minecraft.init.Blocks;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.block.Blocks;
+import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
+
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Place a torch on one of the given positions. Attempts to place it somewhere
@@ -41,17 +41,17 @@ import net.minecraft.util.math.BlockPos;
 public class PlaceTorchSomewhereTask extends AITask {
 	private LinkedList<PosAndDir> attemptOnPositions;
 	private final List<BlockPos> places;
-	private final EnumFacing[] preferedDirection;
+	private final Direction[] preferedDirection;
 	private BlockPos lastAttempt;
 
 	private int delayAfter;
 
 	private static class PosAndDir {
 		public final BlockPos place;
-		public final EnumFacing dir;
+		public final Direction dir;
 		public int attemptsLeft = 10;
 
-		public PosAndDir(BlockPos place, EnumFacing dir) {
+		public PosAndDir(BlockPos place, Direction dir) {
 			super();
 			this.place = place;
 			this.dir = dir;
@@ -77,7 +77,7 @@ public class PlaceTorchSomewhereTask extends AITask {
 	 *            direction in which the stick of the torch should be mounted.
 	 */
 	public PlaceTorchSomewhereTask(List<BlockPos> positions,
-			EnumFacing... preferedDirection) {
+			Direction... preferedDirection) {
 		super();
 		this.places = positions;
 		this.preferedDirection = preferedDirection;
@@ -107,7 +107,7 @@ public class PlaceTorchSomewhereTask extends AITask {
 		if (attemptOnPositions == null) {
 			attemptOnPositions = new LinkedList<PlaceTorchSomewhereTask.PosAndDir>();
 			for (final BlockPos place : places) {
-				for (final EnumFacing direction : preferedDirection) {
+				for (final Direction direction : preferedDirection) {
 					final PosAndDir current = new PosAndDir(place, direction);
 					final BlockPos placeOn = current.getPlaceOn();
 					if (!BlockSets.AIR.isAt(aiHelper.getWorld(), placeOn)) {

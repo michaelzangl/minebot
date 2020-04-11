@@ -16,8 +16,7 @@
  *******************************************************************************/
 package net.famzangl.minecraft.minebot.stats;
 
-import javax.swing.BoxLayout;
-import javax.swing.JFrame;
+import javax.swing.*;
 
 /**
  * Warning: Dirty, temporary hack.

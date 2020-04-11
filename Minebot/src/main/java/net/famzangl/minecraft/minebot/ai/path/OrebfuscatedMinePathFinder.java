@@ -17,12 +17,12 @@
 package net.famzangl.minecraft.minebot.ai.path;
 
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSet;
-import net.minecraft.init.Blocks;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.block.Blocks;
+import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 
 public class OrebfuscatedMinePathFinder extends MineBySettingsPathFinder {
-	public OrebfuscatedMinePathFinder(EnumFacing preferedDirection,
+	public OrebfuscatedMinePathFinder(Direction preferedDirection,
 			int preferedLayer) {
 		super(preferedDirection, preferedLayer);
 	}
@@ -48,7 +48,7 @@ public class OrebfuscatedMinePathFinder extends MineBySettingsPathFinder {
 	protected float rateDestination(int distance, int x, int y, int z) {
 		if (y == preferedLayer && isGoodForOrebufscator(x, y, z)) {
 			int d = ignoredAbs(x - searchCenter.getX(),
-					preferedDirection.getFrontOffsetX())
+					preferedDirection.getXOffset())
 					+ ignoredAbs(z - searchCenter.getZ(),
 							preferedDirection.getFrontOffsetZ());
 			return distance + maxDistancePoints + 10 + d * 5;

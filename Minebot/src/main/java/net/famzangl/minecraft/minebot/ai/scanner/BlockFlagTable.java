@@ -16,10 +16,10 @@
  *******************************************************************************/
 package net.famzangl.minecraft.minebot.ai.scanner;
 
-import java.util.BitSet;
-
 import net.famzangl.minecraft.minebot.ai.path.world.Pos;
 import net.minecraft.util.math.BlockPos;
+
+import java.util.BitSet;
 
 /**
  * A simple 3-dimensional Bitset.

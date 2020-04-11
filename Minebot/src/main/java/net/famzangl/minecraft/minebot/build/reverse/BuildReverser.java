@@ -16,25 +16,24 @@
  *******************************************************************************/
 package net.famzangl.minecraft.minebot.build.reverse;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.PrintStream;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.Marker;
-import org.apache.logging.log4j.MarkerManager;
-
 import net.famzangl.minecraft.minebot.MinebotMod;
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.command.AIChatController;
 import net.famzangl.minecraft.minebot.ai.path.world.Pos;
 import net.famzangl.minecraft.minebot.build.reverse.factories.BuildTaskFactories;
 import net.minecraft.block.Block;
-import net.minecraft.init.Blocks;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.block.Blocks;
+import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.Marker;
+import org.apache.logging.log4j.MarkerManager;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.PrintStream;
 
 /**
  * This does the reverse of building: it creates a build script from a given
@@ -94,8 +93,8 @@ public class BuildReverser {
 				for (int x = minPos.getX(); x <= maxPos.getX(); x++) {
 					final boolean row2 = (x - minPos.getX() & 1) == 1;
 					addRow(new BlockPos(x, y, row2 ? maxPos.getZ()
-							: minPos.getZ()), row2 ? EnumFacing.NORTH
-							: EnumFacing.SOUTH, maxPos.getZ() - minPos.getZ()
+							: minPos.getZ()), row2 ? Direction.NORTH
+							: Direction.SOUTH, maxPos.getZ() - minPos.getZ()
 							+ 1);
 				}
 				out.println("");
@@ -121,7 +120,7 @@ public class BuildReverser {
 		}
 	}
 
-	public void addRow(BlockPos start, EnumFacing direction, int length) {
+	public void addRow(BlockPos start, Direction direction, int length) {
 		for (int i = 0; i < length; i++) {
 			addBuildPlace(start.offset(direction, i));
 		}

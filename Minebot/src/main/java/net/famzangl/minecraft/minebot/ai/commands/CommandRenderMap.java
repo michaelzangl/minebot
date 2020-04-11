@@ -1,7 +1,5 @@
 package net.famzangl.minecraft.minebot.ai.commands;
 
-import java.io.File;
-
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.command.AICommand;
 import net.famzangl.minecraft.minebot.ai.command.AICommandInvocation;
@@ -14,6 +12,8 @@ import net.famzangl.minecraft.minebot.map.IconDefinition;
 import net.famzangl.minecraft.minebot.map.IconType;
 import net.famzangl.minecraft.minebot.map.MapReader;
 import net.famzangl.minecraft.minebot.settings.MinebotSettings;
+
+import java.io.File;
 
 @AICommand(helpText = "Store a map of this world to a png file.", name = "minebot")
 public class CommandRenderMap {

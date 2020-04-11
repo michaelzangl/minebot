@@ -16,12 +16,12 @@
  *******************************************************************************/
 package net.famzangl.minecraft.minebot.ai.command;
 
-import java.util.ArrayList;
-import java.util.Collection;
-
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.ColoredBlockItemFilter;
-import net.minecraft.item.EnumDyeColor;
+import net.minecraft.item.DyeColor;
+
+import java.util.ArrayList;
+import java.util.Collection;
 
 public class ColorNameBuilder extends ParameterBuilder {
 
@@ -39,7 +39,7 @@ public class ColorNameBuilder extends ParameterBuilder {
 		@Override
 		public void getTabCompleteOptions(String currentStart,
 				Collection<String> addTo) {
-			for (final EnumDyeColor color : EnumDyeColor.values()) {
+			for (final DyeColor color : DyeColor.values()) {
 				if (color.getName().toLowerCase().startsWith(currentStart.toLowerCase())) {
 					addTo.add(color.getName());
 				}
@@ -63,7 +63,7 @@ public class ColorNameBuilder extends ParameterBuilder {
 	
 	@Override
 	protected Class<?> getRequiredParameterClass() {
-		return EnumDyeColor.class;
+		return DyeColor.class;
 	}
 
 }

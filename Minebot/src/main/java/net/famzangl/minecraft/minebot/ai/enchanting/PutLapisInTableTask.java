@@ -3,9 +3,9 @@ package net.famzangl.minecraft.minebot.ai.enchanting;
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.strategy.TintStrategy;
 import net.famzangl.minecraft.minebot.ai.task.inventory.PutItemInContainerTask;
-import net.minecraft.client.gui.GuiEnchantment;
+import net.minecraft.client.gui.screen.EnchantmentScreen;
 import net.minecraft.inventory.Slot;
-import net.minecraft.item.EnumDyeColor;
+import net.minecraft.item.DyeColor;
 import net.minecraft.item.ItemStack;
 
 /**
@@ -20,14 +20,14 @@ public class PutLapisInTableTask extends PutItemInContainerTask {
 
 	@Override
 	protected int getStackToPut(AIHelper aiHelper) {
-		final GuiEnchantment screen = (GuiEnchantment) aiHelper.getMinecraft().currentScreen;
+		final EnchantmentScreen screen = (EnchantmentScreen) aiHelper.getMinecraft().currentScreen;
 		for (int i = TABLE_INV_OFFSET; i < 9 * 4 + TABLE_INV_OFFSET; i++) {
 			final Slot slot = screen.inventorySlots.getSlot(i);
 			if (slot == null || !slot.canTakeStack(aiHelper.getMinecraft().player)) {
 				continue;
 			}
 			final ItemStack stack = slot.getStack();
-			if (new TintStrategy.DyeItemFilter(EnumDyeColor.BLUE)
+			if (new TintStrategy.DyeItemFilter(DyeColor.BLUE)
 					.matches(stack)) {
 				return i;
 			}

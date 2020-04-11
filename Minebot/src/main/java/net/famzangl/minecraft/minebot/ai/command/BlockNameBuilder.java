@@ -16,19 +16,19 @@
  *******************************************************************************/
 package net.famzangl.minecraft.minebot.ai.command;
 
-import java.util.ArrayList;
-import java.util.Collection;
-
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.command.AICommandParameter.AnyBlockFilter;
 import net.famzangl.minecraft.minebot.ai.command.AICommandParameter.BlockFilter;
 import net.famzangl.minecraft.minebot.ai.command.BlockWithDataOrDontcare.IllegalBlockNameException;
 import net.minecraft.util.ResourceLocation;
 
+import java.util.ArrayList;
+import java.util.Collection;
+
 public class BlockNameBuilder extends ParameterBuilder {
 
 	public static String toString(ResourceLocation l) {
-		return l.getResourceDomain() + ":" + l.getResourcePath();
+		return l.getNamespace() + ":" + l.getResourcePath();
 	}
 
 	private final static class BlockArgumentDefinition extends
@@ -80,7 +80,7 @@ public class BlockNameBuilder extends ParameterBuilder {
 //			for (final ResourceLocation k : keys) {
 //				final Object block = Block.REGISTRY.getObject(k);
 //				if (blockFilter.matches((Block) block)) {
-//					if (k.getResourceDomain().equals(MINECRAFT_PREFIX)) {
+//					if (k.getNamespace().equals(MINECRAFT_PREFIX)) {
 //						final String subKey = k.getResourcePath();
 //						addKey(currentStart, addTo, subKey);
 //					} else {

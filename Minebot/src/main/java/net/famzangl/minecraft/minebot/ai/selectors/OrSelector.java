@@ -17,7 +17,6 @@
 package net.famzangl.minecraft.minebot.ai.selectors;
 
 import com.google.common.base.Predicate;
-
 import net.minecraft.entity.Entity;
 
 public class OrSelector implements Predicate<Entity> {

@@ -25,7 +25,7 @@ import net.famzangl.minecraft.minebot.ai.command.SafeStrategyRule;
 import net.famzangl.minecraft.minebot.ai.strategy.AIStrategy;
 import net.famzangl.minecraft.minebot.ai.strategy.TintStrategy;
 import net.famzangl.minecraft.minebot.ai.strategy.TintStrategy.TintType;
-import net.minecraft.item.EnumDyeColor;
+import net.minecraft.item.DyeColor;
 
 @AICommand(helpText = "Tints wolves and sheep with the given color", name = "minebot")
 public class CommandTint {
@@ -41,7 +41,7 @@ public class CommandTint {
 	public static AIStrategy run(
 			AIHelper helper,
 			@AICommandParameter(type = ParameterType.FIXED, fixedName = "tint", description = "") String nameArg,
-			@AICommandParameter(type = ParameterType.COLOR, description = "The color to use") EnumDyeColor color,
+			@AICommandParameter(type = ParameterType.COLOR, description = "The color to use") DyeColor color,
 			@AICommandParameter(type = ParameterType.ENUM, description = "Animals to apply the tint to", optional = true) TintType type) {
 		return run(helper, nameArg, color, type, null);
 	}
@@ -50,9 +50,9 @@ public class CommandTint {
 	public static AIStrategy run(
 			AIHelper helper,
 			@AICommandParameter(type = ParameterType.FIXED, fixedName = "tint", description = "") String nameArg,
-			@AICommandParameter(type = ParameterType.COLOR, description = "The color to use") EnumDyeColor color,
+			@AICommandParameter(type = ParameterType.COLOR, description = "The color to use") DyeColor color,
 			@AICommandParameter(type = ParameterType.ENUM, description = "Animals to apply the tint to") TintType type,
-			@AICommandParameter(type = ParameterType.COLOR, description = "The color the wolf should currently have") EnumDyeColor current) {
+			@AICommandParameter(type = ParameterType.COLOR, description = "The color the wolf should currently have") DyeColor current) {
 		return new TintStrategy(color, type, current);
 	}
 }

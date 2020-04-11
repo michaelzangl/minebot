@@ -19,13 +19,13 @@ package net.famzangl.minecraft.minebot.ai.path;
 import net.famzangl.minecraft.minebot.ai.command.BlockWithData;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockFloatMap;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSet;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 
 public class MineSinglePathFinder extends MinePathfinder {
 
 	private final BlockSet blocks;
 
-	public MineSinglePathFinder(BlockSet blocks, EnumFacing preferedDirection,
+	public MineSinglePathFinder(BlockSet blocks, Direction preferedDirection,
 			int preferedLayer) {
 		super(preferedDirection, preferedLayer);
 		this.blocks = blocks;

@@ -16,11 +16,7 @@
  *******************************************************************************/
 package net.famzangl.minecraft.minebot.ai.enchanting;
 
-import java.util.List;
-import java.util.Random;
-
 import com.google.common.base.Predicate;
-
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.task.AITask;
 import net.famzangl.minecraft.minebot.ai.task.TaskOperations;
@@ -28,6 +24,9 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.util.math.AxisAlignedBB;
+
+import java.util.List;
+import java.util.Random;
 
 public class FaceAnyMobTask extends AITask {
 	private final class LivingSelector implements Predicate<Entity> {
@@ -60,7 +59,7 @@ public class FaceAnyMobTask extends AITask {
 			System.out.println("Face next entity in range");
 			final int n = new Random().nextInt(entsInBBList.size());
 			final Entity e = entsInBBList.get(n);
-			final AxisAlignedBB ebb = e.getEntityBoundingBox();
+			final AxisAlignedBB ebb = e.getBoundingBox();
 			aiHelper.face((ebb.maxX + ebb.minX) / 2, ebb.minY + 0.2,
 					(ebb.maxZ + ebb.minZ) / 2);
 		}

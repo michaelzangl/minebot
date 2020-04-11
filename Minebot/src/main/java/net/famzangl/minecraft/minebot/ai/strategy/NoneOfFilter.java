@@ -16,10 +16,10 @@
  *******************************************************************************/
 package net.famzangl.minecraft.minebot.ai.strategy;
 
-import java.util.Arrays;
-
 import net.famzangl.minecraft.minebot.ai.ItemFilter;
 import net.minecraft.item.ItemStack;
+
+import java.util.Arrays;
 
 /**
  * An inverted {@link ItemFilter}.

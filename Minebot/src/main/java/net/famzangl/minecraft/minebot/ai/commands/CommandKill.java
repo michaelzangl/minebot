@@ -25,7 +25,7 @@ import net.famzangl.minecraft.minebot.ai.command.ParameterType;
 import net.famzangl.minecraft.minebot.ai.command.SafeStrategyRule;
 import net.famzangl.minecraft.minebot.ai.strategy.AIStrategy;
 import net.famzangl.minecraft.minebot.ai.strategy.KillAnimalsStrategy;
-import net.minecraft.item.EnumDyeColor;
+import net.minecraft.item.DyeColor;
 
 @AICommand(helpText = "Starts hitting animals.\nA filter can be given.\nAvoids animals of your team.", name = "minebot")
 public class CommandKill {
@@ -35,7 +35,7 @@ public class CommandKill {
 			AIHelper helper,
 			@AICommandParameter(type = ParameterType.FIXED, fixedName = "kill", description = "") String nameArg,
 			@AICommandParameter(type = ParameterType.ENUM, description = "Animal type", optional = true) AnimalyType type,
-			@AICommandParameter(type = ParameterType.COLOR, description = "Color", optional = true) EnumDyeColor color,
+			@AICommandParameter(type = ParameterType.COLOR, description = "Color", optional = true) DyeColor color,
 			@AICommandParameter(type = ParameterType.NUMBER, description = "How many", optional = true) Integer count) {
 		return new KillAnimalsStrategy(count == null ? -1 : count,
 				type == null ? AnimalyType.ANY : type, color);

@@ -17,7 +17,7 @@
 package net.famzangl.minecraft.minebot.ai.task.inventory;
 
 import net.famzangl.minecraft.minebot.ai.AIHelper;
-import net.minecraft.client.gui.inventory.GuiChest;
+import net.minecraft.client.gui.inventory.ChestScreen;
 
 /**
  * Put one inventory slot in the chest that is currently open.
@@ -40,7 +40,7 @@ public class PutInChestTask extends PutItemInContainerTask {
 
 	@Override
 	protected int getStackToPut(AIHelper aiHelper) {
-		GuiChest screen = (GuiChest) aiHelper.getMinecraft().currentScreen;
+		ChestScreen screen = (ChestScreen) aiHelper.getMinecraft().currentScreen;
 		int slots = screen.inventorySlots.inventorySlots.size();
 		int iSlot;
 		if (inventorySlot < 9) {

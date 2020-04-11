@@ -1,9 +1,9 @@
 package net.famzangl.minecraft.minebot.ai.scripting;
 
+import net.famzangl.minecraft.minebot.ai.net.MinebotNetHandler.PersistentChat;
+
 import javax.script.ScriptEngine;
 import javax.script.ScriptException;
-
-import net.famzangl.minecraft.minebot.ai.net.MinebotNetHandler.PersistentChat;
 
 public class ChatMessage {
 
@@ -15,7 +15,7 @@ public class ChatMessage {
 	public ChatMessage(PersistentChat m, ScriptEngine engine)
 			throws ScriptException {
 		time = engine.eval("new Date(" + m.getTime() + ")");
-		text = m.getMessage().getUnformattedText();
+		text = m.getMessage().getUnformattedComponentText();
 		textFormatted = m.getMessage().getFormattedText();
 		isChat = m.isChat();
 	}

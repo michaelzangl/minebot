@@ -1,10 +1,11 @@
 package net.famzangl.minecraft.minebot.ai.path.world;
 
 import net.famzangl.minecraft.minebot.ai.utils.RandUtils;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.shapes.VoxelShape;
 
 public class BlockBounds {
 	private final double minX;
@@ -27,7 +28,11 @@ public class BlockBounds {
 		this.minZ = minZ;
 		this.maxZ = maxZ;
 	}
-	
+
+	public BlockBounds(VoxelShape vs) {
+		this(vs.getBoundingBox());
+	}
+
 	public BlockBounds(AxisAlignedBB axisAlignedBB) {
 		this.minX = axisAlignedBB.minX;
 		this.maxX = axisAlignedBB.maxX;
@@ -72,13 +77,13 @@ public class BlockBounds {
 		// block.getBlockBoundsMaxZ());
 	}
 
-	public BlockBounds onlySide(EnumFacing side) {
-		return new BlockBounds(side == EnumFacing.EAST ? maxX : minX,
-				side == EnumFacing.WEST ? minX : maxX,
-				side == EnumFacing.UP ? maxY : minY,
-				side == EnumFacing.DOWN ? minY : maxY,
-				side == EnumFacing.SOUTH ? maxZ : minZ,
-				side == EnumFacing.NORTH ? minZ : maxZ);
+	public BlockBounds onlySide(Direction side) {
+		return new BlockBounds(side == Direction.EAST ? maxX : minX,
+				side == Direction.WEST ? minX : maxX,
+				side == Direction.UP ? maxY : minY,
+				side == Direction.DOWN ? minY : maxY,
+				side == Direction.SOUTH ? maxZ : minZ,
+				side == Direction.NORTH ? minZ : maxZ);
 	}
 
 	public Vec3d random(BlockPos pos, double centered) {

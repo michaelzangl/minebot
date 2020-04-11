@@ -1,14 +1,10 @@
 package net.famzangl.minecraft.minebot.map;
 
+import net.minecraft.util.math.BlockPos;
+
+import javax.swing.*;
 import java.util.Hashtable;
 import java.util.Map.Entry;
-
-import javax.swing.JLabel;
-import javax.swing.JMenuItem;
-import javax.swing.JPopupMenu;
-import javax.swing.JSeparator;
-
-import net.minecraft.util.math.BlockPos;
 
 public class MapContextMenu extends JPopupMenu {
 	private final BlockPos pos;

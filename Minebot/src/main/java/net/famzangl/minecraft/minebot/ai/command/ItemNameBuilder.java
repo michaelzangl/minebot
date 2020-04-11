@@ -16,14 +16,12 @@
  *******************************************************************************/
 package net.famzangl.minecraft.minebot.ai.command;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Set;
-
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.task.inventory.ItemWithSubtype;
 import net.minecraft.item.Item;
-import net.minecraft.util.ResourceLocation;
+
+import java.util.ArrayList;
+import java.util.Collection;
 
 /**
  * Builds the name for an item.
@@ -59,17 +57,14 @@ public class ItemNameBuilder extends ParameterBuilder {
 		public void getTabCompleteOptions(String currentStart,
 				Collection<String> addTo) {
 			super.getTabCompleteOptions(currentStart, addTo);
-			@SuppressWarnings("unchecked")
-			final Set<ResourceLocation> keys = Item.REGISTRY.getKeys();
-			for (final ResourceLocation k : keys) {
-				final Object block = Item.REGISTRY.getObject(k);
-				if (k.getResourceDomain().equals(MINECRAFT_PREFIX)) {
-					final String subKey = k.getResourcePath();
+			Item.BLOCK_TO_ITEM.forEach((block, item) -> {
+				if (item.getRegistryName().getNamespace().equals(MINECRAFT_PREFIX)) {
+					final String subKey = item.getRegistryName().getPath();
 					addKey(currentStart, addTo, subKey);
 				} else {
-					addKey(currentStart, addTo, BlockNameBuilder.toString(k));
+					addKey(currentStart, addTo, BlockNameBuilder.toString(item.getRegistryName()));
 				}
-			}
+			});
 		}
 
 		private void addKey(String currentStart, Collection<String> addTo,

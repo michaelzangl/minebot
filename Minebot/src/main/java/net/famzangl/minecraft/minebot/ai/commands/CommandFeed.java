@@ -24,7 +24,7 @@ import net.famzangl.minecraft.minebot.ai.command.ParameterType;
 import net.famzangl.minecraft.minebot.ai.command.SafeStrategyRule;
 import net.famzangl.minecraft.minebot.ai.strategy.AIStrategy;
 import net.famzangl.minecraft.minebot.ai.strategy.FeedAnimalsStrategy;
-import net.minecraft.item.EnumDyeColor;
+import net.minecraft.item.DyeColor;
 
 @AICommand(helpText = "Feeds animals in range\n"
 		+ "The animals can be restricted by color.", name = "minebot")
@@ -41,7 +41,7 @@ public class CommandFeed {
 	public static AIStrategy run(
 			AIHelper helper,
 			@AICommandParameter(type = ParameterType.FIXED, fixedName = "feed", description = "") String nameArg,
-			@AICommandParameter(type = ParameterType.COLOR, description = "The color of wolfes to feed.") EnumDyeColor color) {
+			@AICommandParameter(type = ParameterType.COLOR, description = "The color of wolfes to feed.") DyeColor color) {
 		return new FeedAnimalsStrategy(color);
 	}
 }

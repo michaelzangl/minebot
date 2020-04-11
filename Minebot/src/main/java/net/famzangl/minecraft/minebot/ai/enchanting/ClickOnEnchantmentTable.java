@@ -19,8 +19,8 @@ package net.famzangl.minecraft.minebot.ai.enchanting;
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSet;
 import net.famzangl.minecraft.minebot.ai.task.UseItemOnBlockTask;
-import net.minecraft.client.gui.GuiEnchantment;
-import net.minecraft.init.Blocks;
+import net.minecraft.block.Blocks;
+import net.minecraft.client.gui.screen.EnchantmentScreen;
 
 public class ClickOnEnchantmentTable extends UseItemOnBlockTask {
 
@@ -30,7 +30,7 @@ public class ClickOnEnchantmentTable extends UseItemOnBlockTask {
 
 	@Override
 	public boolean isFinished(AIHelper aiHelper) {
-		return aiHelper.getMinecraft().currentScreen instanceof GuiEnchantment;
+		return aiHelper.getMinecraft().currentScreen instanceof EnchantmentScreen;
 	}
 
 }

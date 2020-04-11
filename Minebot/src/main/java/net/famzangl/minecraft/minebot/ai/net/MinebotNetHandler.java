@@ -16,24 +16,12 @@
  *******************************************************************************/
 package net.famzangl.minecraft.minebot.ai.net;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.CopyOnWriteArrayList;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.Marker;
-import org.apache.logging.log4j.MarkerManager;
-
 import com.mojang.authlib.GameProfile;
-
 import net.famzangl.minecraft.minebot.ai.AIController;
 import net.famzangl.minecraft.minebot.ai.command.AIChatController;
 import net.famzangl.minecraft.minebot.ai.utils.PrivateFieldUtils;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.client.gui.ScreenScreen;
 import net.minecraft.client.network.NetHandlerPlayClient;
 import net.minecraft.entity.Entity;
 import net.minecraft.network.NetworkManager;
@@ -56,6 +44,17 @@ import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.Marker;
+import org.apache.logging.log4j.MarkerManager;
+import sun.awt.X11.Screen;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class MinebotNetHandler extends NetHandlerPlayClient implements
 		NetworkHelper {
@@ -113,7 +112,7 @@ public class MinebotNetHandler extends NetHandlerPlayClient implements
 	private final ArrayList<PersistentChat> chatMessages = new ArrayList<PersistentChat>();
 	private Minecraft mcIn;
 
-	public MinebotNetHandler(Minecraft mcIn, GuiScreen p_i46300_2_,
+	public MinebotNetHandler(Minecraft mcIn, Screen p_i46300_2_,
 			NetworkManager p_i46300_3_, GameProfile p_i46300_4_) {
 		super(mcIn, p_i46300_2_, p_i46300_3_, p_i46300_4_);
 		this.mcIn = mcIn;
@@ -162,8 +161,8 @@ public class MinebotNetHandler extends NetHandlerPlayClient implements
 		if (netHandler != null && netHandler instanceof NetHandlerPlayClient) {
 
 			if (!(netHandler instanceof MinebotNetHandler)) {
-				GuiScreen screen = PrivateFieldUtils.getFieldValue(netHandler,
-						NetHandlerPlayClient.class, GuiScreen.class);
+				Screen screen = PrivateFieldUtils.getFieldValue(netHandler,
+						NetHandlerPlayClient.class, ScreenScreen.class);
 				MinebotNetHandler handler = new MinebotNetHandler(
 						aiController.getMinecraft(), screen,
 						netHandler.getNetworkManager(),

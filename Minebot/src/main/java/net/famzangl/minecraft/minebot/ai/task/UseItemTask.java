@@ -19,6 +19,7 @@ package net.famzangl.minecraft.minebot.ai.task;
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.ItemFilter;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.RayTraceResult;
 
 /**
@@ -59,12 +60,12 @@ public abstract class UseItemTask extends AITask {
 
 			final RayTraceResult position = aiHelper.getObjectMouseOver();
 			if (position == null
-					|| position.typeOfHit != RayTraceResult.Type.BLOCK) {
+					|| position.getType() != RayTraceResult.Type.BLOCK) {
 				notFacingBlock(aiHelper);
 				return;
 			}
 			// Check is facing to make sure top facing check passed.
-			if (!isBlockAllowed(aiHelper, position.getBlockPos())) {
+			if (!(position instanceof BlockRayTraceResult) || !isBlockAllowed(aiHelper, ((BlockRayTraceResult)position).getPos())) {
 				notFacingBlock(aiHelper);
 				return;
 			}

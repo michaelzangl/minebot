@@ -16,22 +16,9 @@
  *******************************************************************************/
 package net.famzangl.minecraft.minebot.settings;
 
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.Date;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.Marker;
-import org.apache.logging.log4j.MarkerManager;
-
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonParseException;
-
 import net.famzangl.minecraft.minebot.ai.path.world.BlockFloatMap;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSet;
 import net.famzangl.minecraft.minebot.ai.tools.ToolRater;
@@ -39,6 +26,17 @@ import net.famzangl.minecraft.minebot.settings.serialize.BlockFloatAdapter;
 import net.famzangl.minecraft.minebot.settings.serialize.BlockSetAdapter;
 import net.famzangl.minecraft.minebot.settings.serialize.ToolRaterAdapter;
 import net.minecraft.client.Minecraft;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.Marker;
+import org.apache.logging.log4j.MarkerManager;
+
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.Date;
 
 /**
  * This wraps a minebot setting file and provides convenient access to the
@@ -134,7 +132,7 @@ public class MinebotSettings {
 	}
 
 	public static File getDataDir() {
-		File dir = new File(Minecraft.getMinecraft().mcDataDir, "minebot");
+		File dir = new File(Minecraft.getInstance().mcDataDir, "minebot");
 		LOGGER.trace(MARKER_SETTINGS, "Data directory: " + dir);
 		if (!dir.isDirectory()) {
 			try {

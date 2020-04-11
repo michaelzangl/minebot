@@ -16,17 +16,17 @@
  *******************************************************************************/
 package net.famzangl.minecraft.minebot.ai.path;
 
-import java.util.Random;
-import java.util.Set;
-
 import net.famzangl.minecraft.minebot.ai.path.world.BlockFloatMap;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSet;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSets;
 import net.famzangl.minecraft.minebot.ai.task.DestroyInRangeTask;
 import net.minecraft.block.Block;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
+
+import java.util.Random;
+import java.util.Set;
 
 public abstract class MinePathfinder extends MovePathFinder {
 	protected static final float MIN_FACTOR = 0.1f;
@@ -39,7 +39,7 @@ public abstract class MinePathfinder extends MovePathFinder {
 	/**
 	 * A horizontal direction that is prefered
 	 */
-	protected final EnumFacing preferedDirection;
+	protected final Direction preferedDirection;
 	/**
 	 * 0.0 - 1.0.
 	 */
@@ -83,7 +83,7 @@ public abstract class MinePathfinder extends MovePathFinder {
 //	}
 
 	@SuppressWarnings("unchecked")
-	public MinePathfinder(EnumFacing preferedDirection, int preferedLayer) {
+	public MinePathfinder(Direction preferedDirection, int preferedLayer) {
 		this.preferedDirection = preferedDirection;
 		this.preferedLayer = preferedLayer;
 	}
@@ -146,9 +146,9 @@ public abstract class MinePathfinder extends MovePathFinder {
 			float badDirectionMalus = 0;
 			final BlockPos current = world.getPlayerPosition();
 			if (preferedDirection != null
-					&& preferedDirection.getFrontOffsetX() != 0) {
+					&& preferedDirection.getXOffset() != 0) {
 				final int dx = x - current.getX();
-				if (Math.signum(dx) != preferedDirection.getFrontOffsetX()) {
+				if (Math.signum(dx) != preferedDirection.getXOffset()) {
 					badDirectionMalus = dx * preferedDirectionInfluence;
 				}
 			} else if (preferedDirection != null

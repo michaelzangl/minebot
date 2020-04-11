@@ -21,10 +21,8 @@ import net.famzangl.minecraft.minebot.ai.command.BlockWithDataOrDontcare;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockMetaSet;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSet;
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockLog;
-import net.minecraft.block.BlockLog.EnumAxis;
-import net.minecraft.block.BlockPlanks.EnumType;
-import net.minecraft.init.Blocks;
+import net.minecraft.block.Blocks;
+import net.minecraft.util.Direction;
 
 /**
  * A type of wood used in the game.
@@ -35,20 +33,23 @@ import net.minecraft.init.Blocks;
  *
  */
 public enum WoodType {
-	OAK(Blocks.LOG, 0, EnumType.OAK), SPRUCE(Blocks.LOG, 1, EnumType.SPRUCE), BIRCH(
-			Blocks.LOG, 2, EnumType.BIRCH), JUNGLE(Blocks.LOG, 3,
-			EnumType.JUNGLE), ACACIA(Blocks.LOG2, 0, EnumType.ACACIA), DARK_OAK(
-			Blocks.LOG2, 1, EnumType.DARK_OAK);
+	OAK(Blocks.OAK_LOG, 0, net.minecraft.block.WoodType.OAK),
+	SPRUCE(Blocks.SPRUCE_LOG, 1, net.minecraft.block.WoodType.SPRUCE),
+	BIRCH(Blocks.BIRCH_LOG, 2, net.minecraft.block.WoodType.BIRCH),
+	JUNGLE(Blocks.JUNGLE_LOG, 3, net.minecraft.block.WoodType.JUNGLE),
+	ACACIA(Blocks.ACACIA_LOG, 0, net.minecraft.block.WoodType.ACACIA),
+	DARK_OAK(Blocks.DARK_OAK_LOG, 1, net.minecraft.block.WoodType.DARK_OAK);
 
 	public enum LogDirection {
-		X(BlockLog.EnumAxis.X, 1 << 2), Y(BlockLog.EnumAxis.Y, 0), Z(
-				BlockLog.EnumAxis.Z, 2 << 2);
+		X(Direction.Axis.X, 1 << 2),
+		Y(Direction.Axis.Y, 0),
+		Z(Direction.Axis.Z, 2 << 2);
 
 		public final int higherBits;
-		public final EnumAxis axis;
+		public final Direction.Axis axis;
 		public final BlockSet blocks;
 
-		private LogDirection(EnumAxis axis, int higherBits) {
+		private LogDirection(Direction.Axis axis, int higherBits) {
 			this.axis = axis;
 			this.higherBits = higherBits;
 			BlockMetaSet set = new BlockMetaSet();
@@ -81,9 +82,9 @@ public enum WoodType {
 
 	public final Block block;
 	public final int lowerBits;
-	public final EnumType plankType;
+	public final net.minecraft.block.WoodType plankType;
 
-	private WoodType(Block block, int lowerBits, EnumType plankType) {
+	private WoodType(Block block, int lowerBits, net.minecraft.block.WoodType plankType) {
 		this.block = block;
 		this.lowerBits = lowerBits;
 		this.plankType = plankType;

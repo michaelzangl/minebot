@@ -17,7 +17,7 @@
 package net.famzangl.minecraft.minebot.ai.path;
 
 import net.famzangl.minecraft.minebot.ai.path.world.BlockFloatMap;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 
 public class MineBySettingsPathFinder extends MinePathfinder {
 //
@@ -46,7 +46,7 @@ public class MineBySettingsPathFinder extends MinePathfinder {
 //
 //	}
 
-	public MineBySettingsPathFinder(EnumFacing preferedDirection,
+	public MineBySettingsPathFinder(Direction preferedDirection,
 			int preferedLayer) {
 		super(preferedDirection, preferedLayer);
 		maxDistancePoints = settings.getMining().getPointsMap().getMax();

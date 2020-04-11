@@ -16,9 +16,6 @@
  *******************************************************************************/
 package net.famzangl.minecraft.minebot.ai.path;
 
-import java.util.Comparator;
-import java.util.stream.Stream;
-
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSet;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSets;
@@ -36,8 +33,11 @@ import net.famzangl.minecraft.minebot.ai.task.place.PlantSaplingTask;
 import net.famzangl.minecraft.minebot.ai.utils.BlockCounter;
 import net.famzangl.minecraft.minebot.ai.utils.BlockCuboid;
 import net.famzangl.minecraft.minebot.build.block.WoodType;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
+
+import java.util.Comparator;
+import java.util.stream.Stream;
 
 /**
  * This searches for trees (vertical rows of logs), walks to the bottom most and
@@ -438,10 +438,10 @@ public class TreePathFinder extends MovePathFinder {
 		if (addTasksForLargeTree(helper)) {
 			return true;
 		}
-		if (BlockSets.AIR.isAt(world, playerPosition.offset(EnumFacing.DOWN))
-				&& allowedGroundBlocks.isAt(world, playerPosition.offset(EnumFacing.DOWN, 2))) {
+		if (BlockSets.AIR.isAt(world, playerPosition.offset(Direction.DOWN))
+				&& allowedGroundBlocks.isAt(world, playerPosition.offset(Direction.DOWN, 2))) {
 			// Bug: Desync during jump. TODO: Port this to all other pathfinders, find a common way to handle it safely.
-			playerPosition = playerPosition.offset(EnumFacing.DOWN);
+			playerPosition = playerPosition.offset(Direction.DOWN);
 		}
 		return super.runSearch(playerPosition);
 	}

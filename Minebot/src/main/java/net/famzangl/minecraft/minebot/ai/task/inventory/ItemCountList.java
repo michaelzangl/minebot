@@ -16,11 +16,11 @@
  *******************************************************************************/
 package net.famzangl.minecraft.minebot.ai.task.inventory;
 
-import java.util.Hashtable;
-import java.util.Map.Entry;
-
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.item.ItemStack;
+
+import java.util.Hashtable;
+import java.util.Map.Entry;
 
 /**
  * A simple list of item counts (how often do we have item x)

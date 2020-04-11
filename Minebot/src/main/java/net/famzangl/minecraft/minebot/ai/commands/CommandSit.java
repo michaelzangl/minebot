@@ -25,7 +25,7 @@ import net.famzangl.minecraft.minebot.ai.command.ParameterType;
 import net.famzangl.minecraft.minebot.ai.command.SafeStrategyRule;
 import net.famzangl.minecraft.minebot.ai.strategy.AIStrategy;
 import net.famzangl.minecraft.minebot.ai.strategy.LetAnimalsSitStrategy;
-import net.minecraft.item.EnumDyeColor;
+import net.minecraft.item.DyeColor;
 
 @AICommand(helpText = "Lets all dogs either sit or stand.", name = "minebot")
 public class CommandSit {
@@ -34,7 +34,7 @@ public class CommandSit {
 	public static AIStrategy runSit(
 			AIHelper helper,
 			@AICommandParameter(type = ParameterType.FIXED, fixedName = "sit", description = "") String nameArg,
-			@AICommandParameter(type = ParameterType.COLOR, description = "The color of wolfes to feed.", optional = true) EnumDyeColor color) {
+			@AICommandParameter(type = ParameterType.COLOR, description = "The color of wolfes to feed.", optional = true) DyeColor color) {
 		return new LetAnimalsSitStrategy(AnimalyType.WOLF, true, color);
 	}
 
@@ -42,7 +42,7 @@ public class CommandSit {
 	public static AIStrategy runUnSit(
 			AIHelper helper,
 			@AICommandParameter(type = ParameterType.FIXED, fixedName = "unsit", description = "") String nameArg,
-			@AICommandParameter(type = ParameterType.COLOR, description = "The color of wolfes to feed.", optional = true) EnumDyeColor color) {
+			@AICommandParameter(type = ParameterType.COLOR, description = "The color of wolfes to feed.", optional = true) DyeColor color) {
 		return new LetAnimalsSitStrategy(AnimalyType.WOLF, false, color);
 	}
 }

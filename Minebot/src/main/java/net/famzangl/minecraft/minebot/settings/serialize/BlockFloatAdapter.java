@@ -1,8 +1,5 @@
 package net.famzangl.minecraft.minebot.settings.serialize;
 
-import java.lang.reflect.Type;
-import java.util.Map.Entry;
-
 import com.google.gson.JsonArray;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
@@ -12,10 +9,12 @@ import com.google.gson.JsonParseException;
 import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
-
 import net.famzangl.minecraft.minebot.ai.path.world.BlockFloatMap;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSet;
 import net.minecraft.block.Block;
+
+import java.lang.reflect.Type;
+import java.util.Map.Entry;
 
 public class BlockFloatAdapter implements JsonSerializer<BlockFloatMap>,
 		JsonDeserializer<BlockFloatMap> {

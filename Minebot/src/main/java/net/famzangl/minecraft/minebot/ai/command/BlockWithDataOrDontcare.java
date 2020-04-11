@@ -1,17 +1,17 @@
 package net.famzangl.minecraft.minebot.ai.command;
 
+import net.famzangl.minecraft.minebot.ai.path.world.BlockSet;
+import net.famzangl.minecraft.minebot.ai.task.inventory.ItemWithSubtype;
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
+import net.minecraft.util.ResourceLocation;
+
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import net.famzangl.minecraft.minebot.ai.path.world.BlockSet;
-import net.famzangl.minecraft.minebot.ai.task.inventory.ItemWithSubtype;
-import net.minecraft.block.Block;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.init.Blocks;
-import net.minecraft.util.ResourceLocation;
 
 public abstract class BlockWithDataOrDontcare {
 
@@ -100,10 +100,10 @@ public abstract class BlockWithDataOrDontcare {
 			strings.add(key.toString());
 
 			Block block = (Block) Block.REGISTRY.getObject(key);
-			HashSet<IBlockState> states = new HashSet<IBlockState>();
+			HashSet<BlockState> states = new HashSet<BlockState>();
 			for (int i = 0; i < 16; i++) {
 				try {
-				IBlockState state = block.getStateFromMeta(i);
+				BlockState state = block.getStateFromMeta(i);
 				if (!states.contains(state)) {
 					states.add(state);
 				}
@@ -112,7 +112,7 @@ public abstract class BlockWithDataOrDontcare {
 				}
 			}
 			if (states.size() > 1) {
-				for (IBlockState state : states) {
+				for (BlockState state : states) {
 					BlockWithData withData = new BlockWithData(block,
 							block.getMetaFromState(state));
 					strings.add(key + ":" + withData.getMetaString());
@@ -141,8 +141,8 @@ public abstract class BlockWithDataOrDontcare {
 		Block block = getBlock();
 		final ResourceLocation name = ((ResourceLocation) Block.REGISTRY
 				.getNameForObject(block));
-		String domain = name.getResourceDomain().equals("minecraft") ? ""
-				: name.getResourceDomain() + ":";
+		String domain = name.getNamespace().equals("minecraft") ? ""
+				: name.getNamespace() + ":";
 		String blockName = domain + name.getResourcePath();
 		return blockName;
 	}

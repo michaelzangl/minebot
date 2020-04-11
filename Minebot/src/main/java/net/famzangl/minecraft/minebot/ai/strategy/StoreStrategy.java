@@ -16,8 +16,6 @@
  *******************************************************************************/
 package net.famzangl.minecraft.minebot.ai.strategy;
 
-import java.util.ArrayList;
-
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.enchanting.CloseScreenTask;
 import net.famzangl.minecraft.minebot.ai.scanner.BlockRangeFinder;
@@ -27,10 +25,12 @@ import net.famzangl.minecraft.minebot.ai.scanner.ChestBlockHandler.ChestData;
 import net.famzangl.minecraft.minebot.ai.task.OpenChestTask;
 import net.famzangl.minecraft.minebot.ai.task.WaitTask;
 import net.famzangl.minecraft.minebot.ai.task.inventory.PutInChestTask;
-import net.minecraft.client.gui.inventory.GuiChest;
+import net.minecraft.client.gui.inventory.ChestScreen;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
+
+import java.util.ArrayList;
 
 /**
  * Store whatever you are holding in a chest.
@@ -127,7 +127,7 @@ public class StoreStrategy extends PathFinderStrategy {
 	@Override
 	public void searchTasks(AIHelper helper) {
 		// If chest open, close it.
-		if (helper.getMinecraft().currentScreen instanceof GuiChest) {
+		if (helper.getMinecraft().currentScreen instanceof ChestScreen) {
 			addTask(new CloseScreenTask());
 		}
 		super.searchTasks(helper);

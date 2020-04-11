@@ -17,7 +17,7 @@
 package net.famzangl.minecraft.minebot.build.block;
 
 import net.famzangl.minecraft.minebot.ai.BlockItemFilter;
-import net.minecraft.init.Blocks;
+import net.minecraft.block.Blocks;
 import net.minecraft.item.ItemStack;
 
 /**

@@ -24,7 +24,7 @@ import net.famzangl.minecraft.minebot.ai.path.world.WorldWithDelta;
 import net.famzangl.minecraft.minebot.ai.task.TaskOperations;
 import net.famzangl.minecraft.minebot.ai.task.error.PositionTaskError;
 import net.famzangl.minecraft.minebot.ai.task.place.JumpingPlaceBlockAtFloorTask;
-import net.minecraft.init.Blocks;
+import net.minecraft.block.Blocks;
 import net.minecraft.util.math.BlockPos;
 
 /**
@@ -51,7 +51,7 @@ public class UpwardsMoveTask extends JumpingPlaceBlockAtFloorTask {
 
 	@Override
 	public void runTick(AIHelper aiHelper, TaskOperations taskOperations) {
-		if (!BlockSets.HEAD_CAN_WALK_TRHOUGH.isAt(aiHelper.getWorld(), pos.add(0, 1, 0))) {
+		if (!BlockSets.HEAD_CAN_WALK_THROUGH.isAt(aiHelper.getWorld(), pos.add(0, 1, 0))) {
 			if (!aiHelper.isStandingOn(pos.add(0, -1, 0))) {
 				taskOperations.desync(new PositionTaskError(pos.add(0, -1, 0)));
 			}

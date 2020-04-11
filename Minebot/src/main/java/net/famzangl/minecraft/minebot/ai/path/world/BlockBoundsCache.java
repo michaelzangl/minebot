@@ -1,22 +1,21 @@
 package net.famzangl.minecraft.minebot.ai.path.world;
 
-import java.util.HashMap;
-
+import net.famzangl.minecraft.minebot.ai.command.BlockWithData;
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
+import net.minecraft.init.Biomes;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.Direction;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.IBlockAccess;
+import net.minecraft.world.WorldType;
+import net.minecraft.world.biome.Biome;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.MarkerManager;
 
-import net.famzangl.minecraft.minebot.ai.command.BlockWithData;
-import net.minecraft.block.Block;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.init.Biomes;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IBlockAccess;
-import net.minecraft.world.WorldType;
-import net.minecraft.world.biome.Biome;
+import java.util.HashMap;
 
 public class BlockBoundsCache {
 	private static final Marker MARKER_BOUNDS_PROBLEM = MarkerManager
@@ -59,7 +58,7 @@ public class BlockBoundsCache {
 	private static BlockBounds attemptLoad(int blockWithMeta) {
 		BlockWithData blockData = new BlockWithData(blockWithMeta);
 		Block block = blockData.getBlock();
-		final IBlockState state = blockData.getBlockState();
+		final BlockState state = blockData.getBlockState();
 		IBlockAccess world = new IBlockAccess() {
 			@Override
 			public boolean isAirBlock(BlockPos pos) {
@@ -77,7 +76,7 @@ public class BlockBoundsCache {
 			}
 
 			@Override
-			public int getStrongPower(BlockPos pos, EnumFacing direction) {
+			public int getStrongPower(BlockPos pos, Direction direction) {
 				throw new UnsupportedOperationException();
 			}
 
@@ -87,7 +86,7 @@ public class BlockBoundsCache {
 			}
 
 			@Override
-			public IBlockState getBlockState(BlockPos pos) {
+			public BlockState getBlockState(BlockPos pos) {
 				if (Pos.ZERO.equals(pos)) {
 					return state;
 				}
@@ -95,7 +94,7 @@ public class BlockBoundsCache {
 			}
 
 			@Override
-			public boolean isSideSolid(BlockPos pos, EnumFacing side,
+			public boolean isSideSolid(BlockPos pos, Direction side,
 					boolean _default) {
 				throw new UnsupportedOperationException();
 			}

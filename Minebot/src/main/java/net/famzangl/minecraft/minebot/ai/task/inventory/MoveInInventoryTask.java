@@ -16,18 +16,17 @@
  *******************************************************************************/
 package net.famzangl.minecraft.minebot.ai.task.inventory;
 
-import java.util.LinkedList;
-
-import org.apache.logging.log4j.Marker;
-import org.apache.logging.log4j.MarkerManager;
-
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.task.AITask;
 import net.famzangl.minecraft.minebot.ai.task.TaskOperations;
 import net.famzangl.minecraft.minebot.ai.task.error.StringTaskError;
-import net.minecraft.client.gui.inventory.GuiContainer;
+import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.inventory.ClickType;
 import net.minecraft.inventory.Slot;
+import org.apache.logging.log4j.Marker;
+import org.apache.logging.log4j.MarkerManager;
+
+import java.util.LinkedList;
 
 /**
  * Move a given amount from one slot to an other, empty slot in the current open
@@ -82,7 +81,7 @@ public abstract class MoveInInventoryTask extends AITask {
 
 	@Override
 	public void runTick(AIHelper aiHelper, TaskOperations taskOperations) {
-		final GuiContainer screen = (GuiContainer) aiHelper.getMinecraft().currentScreen;
+		final Screen screen = aiHelper.getMinecraft().currentScreen;
 		if (screen == null) {
 			taskOperations.desync(new StringTaskError("Expected container to be open"));
 			return;
@@ -206,7 +205,7 @@ public abstract class MoveInInventoryTask extends AITask {
 			int clickKey = getClickKey();
 			ClickType clickType = getClickType();
 			LOGGER.trace(MARKER_MOVE, "Click on " + slotNumber + " using " + clickKey + "," + clickType);
-			final GuiContainer screen = (GuiContainer) aiHelper.getMinecraft().currentScreen;
+			final ContainerScreen screen = (ContainerScreen) aiHelper.getMinecraft().currentScreen;
 			aiHelper.getMinecraft().playerController.windowClick(
 					screen.inventorySlots.windowId, slotNumber, clickKey, clickType,
 					aiHelper.getMinecraft().player);

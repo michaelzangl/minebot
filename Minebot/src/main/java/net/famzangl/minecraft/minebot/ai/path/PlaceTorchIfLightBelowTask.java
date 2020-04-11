@@ -16,17 +16,17 @@
  *******************************************************************************/
 package net.famzangl.minecraft.minebot.ai.path;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.BlockItemFilter;
 import net.famzangl.minecraft.minebot.ai.task.PlaceTorchSomewhereTask;
 import net.famzangl.minecraft.minebot.ai.task.SkipWhenSearchingPrefetch;
 import net.famzangl.minecraft.minebot.ai.task.TaskOperations;
-import net.minecraft.init.Blocks;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.block.Blocks;
+import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
+
+import java.util.ArrayList;
+import java.util.Arrays;
 
 @SkipWhenSearchingPrefetch
 public class PlaceTorchIfLightBelowTask extends PlaceTorchSomewhereTask {
@@ -37,21 +37,21 @@ public class PlaceTorchIfLightBelowTask extends PlaceTorchSomewhereTask {
 	private boolean attempted;
 
 	public PlaceTorchIfLightBelowTask(BlockPos currentPos,
-			EnumFacing doNotPlaceAt, float torchLightLevel) {
+			Direction doNotPlaceAt, float torchLightLevel) {
 		super(Arrays.asList(currentPos, currentPos.add(0, 1, 0)),
 				getDirections(doNotPlaceAt));
 		this.currentPos = currentPos;
 		this.torchLightLevel = torchLightLevel;
 	}
 
-	private static EnumFacing[] getDirections(EnumFacing except) {
-		final ArrayList<EnumFacing> allowed = new ArrayList<EnumFacing>();
-		for (final EnumFacing d : EnumFacing.values()) {
-			if (d != except && d != EnumFacing.UP) {
+	private static Direction[] getDirections(Direction except) {
+		final ArrayList<Direction> allowed = new ArrayList<Direction>();
+		for (final Direction d : Direction.values()) {
+			if (d != except && d != Direction.UP) {
 				allowed.add(d);
 			}
 		}
-		return allowed.toArray(new EnumFacing[allowed.size()]);
+		return allowed.toArray(new Direction[allowed.size()]);
 	}
 
 	@Override
