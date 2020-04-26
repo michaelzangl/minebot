@@ -9,25 +9,25 @@ import net.famzangl.minecraft.minebot.ai.path.world.WorldData;
  * @author Michael Zangl
  *
  */
-public class BlockFilteredArea extends BlockArea {
-	private BlockArea base;
-	private BlockSet containedBlocks;
+public class BlockFilteredArea<W extends WorldData> extends BlockArea<W> {
+	private final BlockArea<W> base;
+	private final BlockSet containedBlocks;
 
-	private static class FitleredVisitor implements AreaVisitor {
+	private static class FilteredVisitor<W extends WorldData> implements AreaVisitor<W> {
 
-		private AreaVisitor visitor;
-		private WorldData world;
-		private BlockSet containedBlocks;
+		private final AreaVisitor<? super W> visitor;
+		private final WorldData world;
+		private final BlockSet containedBlocks;
 
-		public FitleredVisitor(AreaVisitor visitor, WorldData world,
-				BlockSet containedBlocks) {
+		public FilteredVisitor(AreaVisitor<? super W> visitor, WorldData world,
+							   BlockSet containedBlocks) {
 			this.visitor = visitor;
 			this.world = world;
 			this.containedBlocks = containedBlocks;
 		}
 
 		@Override
-		public void visit(WorldData world, int x, int y, int z) {
+		public void visit(W world, int x, int y, int z) {
 			if (containedBlocks.isAt(world, x, y, z)) {
 				visitor.visit(world, x, y, z);
 			}
@@ -35,19 +35,19 @@ public class BlockFilteredArea extends BlockArea {
 
 	}
 
-	public BlockFilteredArea(BlockArea base,
+	public BlockFilteredArea(BlockArea<W> base,
 			BlockSet containedBlocks) {
 		this.base = base;
 		this.containedBlocks = containedBlocks;
 	}
 
 	@Override
-	public void accept(AreaVisitor visitor, WorldData world) {
-		base.accept(new FitleredVisitor(visitor, world, containedBlocks), world);
+	public <WorldT2 extends W> void accept(AreaVisitor<? super WorldT2> visitor, WorldT2 world) {
+		base.accept(new FilteredVisitor<WorldT2>(visitor, world, containedBlocks), world);
 	}
 
 	@Override
-	public boolean contains(WorldData world, int x, int y, int z) {
+	public boolean contains(W world, int x, int y, int z) {
 		return containedBlocks.isAt(world, x, y, z) && base.contains(world, x, y, z);
 	}
 }

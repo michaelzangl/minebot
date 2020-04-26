@@ -22,7 +22,7 @@ import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.AIHelper.ToolRaterResult;
 import net.famzangl.minecraft.minebot.ai.command.AIChatController;
 import net.famzangl.minecraft.minebot.ai.command.UnknownCommandException;
-import net.famzangl.minecraft.minebot.ai.net.MinebotNetHandler.PersistentChat;
+import net.famzangl.minecraft.minebot.ai.net.PersistentChat;
 import net.famzangl.minecraft.minebot.ai.scripting.CommandJs.ScriptStrategy;
 import net.famzangl.minecraft.minebot.ai.scripting.CommandJs.TickProvider;
 import net.famzangl.minecraft.minebot.ai.strategy.AIStrategy;

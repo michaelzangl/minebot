@@ -1,6 +1,6 @@
 package net.famzangl.minecraft.minebot.ai.scripting;
 
-import net.famzangl.minecraft.minebot.ai.net.MinebotNetHandler.PersistentChat;
+import net.famzangl.minecraft.minebot.ai.net.PersistentChat;
 
 import javax.script.ScriptEngine;
 import javax.script.ScriptException;

@@ -2,6 +2,7 @@ package net.famzangl.minecraft.minebot.ai.profiler;
 
 import net.famzangl.minecraft.minebot.ai.utils.PrivateFieldUtils;
 import net.minecraft.client.Minecraft;
+import net.minecraft.profiler.DebugProfiler;
 import net.minecraft.profiler.Profiler;
 import net.minecraft.util.Util;
 
@@ -15,12 +16,12 @@ import java.util.function.IntSupplier;
  * @author michael
  *
  */
-public class InterceptingProfiler extends Profiler {
+public class InterceptingProfiler extends DebugProfiler {
 
 	private ConcurrentHashMap<String, Runnable> runOnSection = new ConcurrentHashMap<String, Runnable>();
 
-	public InterceptingProfiler(long p_i225707_1_, IntSupplier p_i225707_3_, boolean p_i225707_4_) {
-		super(p_i225707_1_, p_i225707_3_, p_i225707_4_);
+	public InterceptingProfiler(IntSupplier tickCounter) {
+		super(tickCounter);
 	}
 
 	@Override
@@ -37,11 +38,11 @@ public class InterceptingProfiler extends Profiler {
 	}
 
 	public static InterceptingProfiler inject(Minecraft minecraft) {
-		Profiler old = PrivateFieldUtils.getFieldValue(minecraft, Minecraft.class, Profiler.class);
-		IntSupplier ticks = PrivateFieldUtils.getFieldValue(old, Profiler.class, IntSupplier.class);
-		InterceptingProfiler profiler = new InterceptingProfiler(Util.nanoTime(), ticks, true);
-		// set minecraft.mcProfiler
-		PrivateFieldUtils.setFieldValue(minecraft, Minecraft.class, Profiler.class, profiler);
+		DebugProfiler old = PrivateFieldUtils.getFieldValue(minecraft, Minecraft.class, DebugProfiler.class);
+		IntSupplier ticks = PrivateFieldUtils.getFieldValue(old, DebugProfiler.class, IntSupplier.class); // < the field is in the parent class
+		InterceptingProfiler profiler = new InterceptingProfiler(ticks);
+		// set minecraft.debugProfiler
+		PrivateFieldUtils.setFieldValue(minecraft, Minecraft.class, DebugProfiler.class, profiler);
 		return profiler;
 	}
 }

@@ -25,11 +25,6 @@ public class BlockFloatMap {
 		if (Float.isNaN(defaultValue)) {
 			throw new IllegalArgumentException("Default is NaN.");
 		}
-		for (int i = 0; i < floats.length; i++) {
-			if (Float.isNaN(floats[i])) {
-				floats[i] = defaultValue;
-			}
-		}
 		this.defaultValue = defaultValue;
 	}
 
@@ -46,7 +41,12 @@ public class BlockFloatMap {
 	}
 
 	public float get(int blockAndMeta) {
-		return floats[blockAndMeta];
+		if (blockAndMeta < floats.length) {
+			float value = floats[blockAndMeta];
+			return Float.isNaN(value) ? getDefaultValue() : value;
+		} else {
+			return getDefaultValue();
+		}
 	}
 
 	public float getMax() {

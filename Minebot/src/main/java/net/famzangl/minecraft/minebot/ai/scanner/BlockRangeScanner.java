@@ -63,15 +63,12 @@ public class BlockRangeScanner {
 	}
 
 	public void scanArea(WorldData world) {
-		BlockCuboid area = new BlockCuboid(center.add(-HORIZONTAL_SCAN,  -VERTICAL_SCAN, -HORIZONTAL_SCAN), center.add(HORIZONTAL_SCAN,  VERTICAL_SCAN, HORIZONTAL_SCAN));
-		area.accept(new AreaVisitor() {
-			@Override
-			public void visit(WorldData world, int x, int y, int z) {
-				int id = world.getBlockId(x, y, z);					
-				BlockHandler handler = handlersCache[id];
-				if (handler != null) {
-					handler.scanBlock(world, id, x, y, z);
-				}
+		BlockCuboid<WorldData> area = new BlockCuboid<>(center.add(-HORIZONTAL_SCAN,  -VERTICAL_SCAN, -HORIZONTAL_SCAN), center.add(HORIZONTAL_SCAN,  VERTICAL_SCAN, HORIZONTAL_SCAN));
+		area.accept((world1, x, y, z) -> {
+			int id = world1.getBlockStateId(x, y, z);
+			BlockHandler handler = handlersCache[id];
+			if (handler != null) {
+				handler.scanBlock(world1, id, x, y, z);
 			}
 		}, world);
 		for (BlockHandler handler : handlers) {

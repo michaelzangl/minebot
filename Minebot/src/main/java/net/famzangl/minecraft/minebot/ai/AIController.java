@@ -38,9 +38,13 @@ import net.minecraft.entity.Entity;
 import net.minecraft.item.Items;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
+import net.minecraftforge.client.event.ClientPlayerNetworkEvent;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.entity.player.UseHoeEvent;
+import net.minecraftforge.event.world.WorldEvent;
+import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
@@ -84,9 +88,9 @@ public class AIController extends AIHelper implements IAIControllable {
 	private final static Hashtable<KeyBinding, AIStrategyFactory> uses = new Hashtable<KeyBinding, AIStrategyFactory>();
 
 	protected static final KeyBinding stop = new KeyBinding("Stop",
-			InputMappings.getInputByName("N").getKeyCode(), "Command Mod");
+			InputMappings.getInputByName("key.keyboard.n").getKeyCode(), "Command Mod");
 	protected static final KeyBinding ungrab = new KeyBinding("Ungrab",
-			InputMappings.getInputByName("U").getKeyCode(), "Command Mod");
+			InputMappings.getInputByName("key.keyboard.u").getKeyCode(), "Command Mod");
 
 	static {
 		// final KeyBinding mine = new KeyBinding("Farm ores",
@@ -139,8 +143,8 @@ public class AIController extends AIHelper implements IAIControllable {
 		AIChatController.getRegistry().setControlled(this);
 	}
 
-	public void connect(NetworkEvent.LoginPayloadEvent e) {
-		networkHelper = MinebotNetHandler.inject(this, getMinecraft().getConnection());
+	public void connect(ClientPlayerNetworkEvent.LoggedInEvent e) {
+		networkHelper = MinebotNetHandler.inject(getMinecraft().getConnection());
 		profilerHelper = InterceptingProfiler.inject(getMinecraft());
 		// Hook into
 		// net.minecraft.client.renderer.RenderGlobal.drawBlockDamageTexture(Tessellator,
@@ -251,6 +255,7 @@ public class AIController extends AIHelper implements IAIControllable {
 		currentStrategy = null;
 	}
 
+	// TODO: Use RenderWorldLastEvent?
 	public void drawHUD(TickEvent.RenderTickEvent event) {
 		if (event.phase != TickEvent.Phase.END) {
 			return;
@@ -410,15 +415,14 @@ public class AIController extends AIHelper implements IAIControllable {
 	// }
 	// }
 
-	public void initialize() {
-		FMLJavaModLoadingContext.get().getModEventBus().addListener(this::connect);
-		FMLJavaModLoadingContext.get().getModEventBus().addListener(this::onPlayerTick);
-		FMLJavaModLoadingContext.get().getModEventBus().addListener(this::onUseHoe);
-		FMLJavaModLoadingContext.get().getModEventBus().addListener(this::drawHUD);
-		FMLJavaModLoadingContext.get().getModEventBus().addListener(this::resetOnGameEnd);
-		FMLJavaModLoadingContext.get().getModEventBus().addListener(this::resetOnGameEnd2);
-		FMLJavaModLoadingContext.get().getModEventBus().addListener(this::beforeDrawMarkers);
-
+	public void initialize(IEventBus bus) {
+		bus.addListener(this::connect);
+		bus.addListener(this::onPlayerTick);
+		bus.addListener(this::onUseHoe);
+		bus.addListener(this::drawHUD);
+		bus.addListener(this::resetOnGameEnd);
+		bus.addListener(this::resetOnGameEnd2);
+		bus.addListener(this::beforeDrawMarkers);
 		// registerAxe();
 	}
 

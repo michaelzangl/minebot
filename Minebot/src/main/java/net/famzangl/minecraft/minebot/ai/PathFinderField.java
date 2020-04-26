@@ -201,6 +201,10 @@ public class PathFinderField implements Comparator<Integer> {
 			return Float.compare(destDistanceRating, o.destDistanceRating);
 		}
 
+		@Override
+		public String toString() {
+			return "Dest{" + "destNode=" + destNode + ", destDistanceRating=" + destDistanceRating + '}';
+		}
 	}
 
 	protected boolean searchSomethingAround(int cx, int cy, int cz) {
@@ -283,7 +287,10 @@ public class PathFinderField implements Comparator<Integer> {
 			setVisited(currentNode);
 		}
 		if (pqEmpty()) {
-			LOGGER.debug(MARKER_PATH, "Path found to " + currentDest);
+			if (LOGGER.isDebugEnabled(MARKER_PATH)) {
+				LOGGER.debug(MARKER_PATH, "Path found to node " + currentDest + ". Planing path from " +
+				cx + "," + cy + "," + cz + " to " + getX(currentDest.destNode) + "," + getY(currentDest.destNode) + "," + getZ(currentDest.destNode));
+			}
 			if (currentDest != null) {
 				planPathTo(currentDest.destNode, cx, cy, cz);
 				terminated();

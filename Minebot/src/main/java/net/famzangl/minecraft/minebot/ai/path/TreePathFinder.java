@@ -63,7 +63,11 @@ public class TreePathFinder extends MovePathFinder {
 		@Override
 		public void runTick(AIHelper aiHelper, TaskOperations taskOperations) {
 		}
-		
+
+		@Override
+		public String toString() {
+			return "PrefaceBarrier{}";
+		}
 	}
 
 	private class LargeTreeState {
@@ -79,6 +83,11 @@ public class TreePathFinder extends MovePathFinder {
 				topReached = true;
 			}
 
+
+			@Override
+			public String toString() {
+				return "TopReachedTask{" + topReached + "}";
+			}
 		}
 
 		/**
@@ -313,6 +322,11 @@ public class TreePathFinder extends MovePathFinder {
 			} else {
 				largeTree = state;
 			}
+		}
+
+		@Override
+		public String toString() {
+			return "SwitchToLargeTreeTask{" + "state=" + state + '}';
 		}
 	}
 

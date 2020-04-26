@@ -34,7 +34,12 @@ public class BlockBoundsCache {
 	}
 
 	public static BlockBounds getBounds(int blockStateId) {
-		return bounds[blockStateId];
+        BlockBounds bound = bounds[blockStateId];
+        if (bound == null) {
+            LOGGER.warn("Block bounds is not in the cache: " + blockStateId);
+            return BlockBounds.FULL_BLOCK;
+        }
+        return bound;
 	}
 
 	public static void initialize() {
@@ -43,9 +48,10 @@ public class BlockBoundsCache {
 		usedBounds.put(BlockBounds.FULL_BLOCK, BlockBounds.FULL_BLOCK);
 		usedBounds.put(BlockBounds.LOWER_HALF_BLOCK, BlockBounds.LOWER_HALF_BLOCK);
 		usedBounds.put(BlockBounds.UPPER_HALF_BLOCK, BlockBounds.UPPER_HALF_BLOCK);
-		for (int i = 0; i < bounds.length; i++) {
+		Block.BLOCK_STATE_IDS.forEach(state -> {
+		    int i = Block.getStateId(state);
 			try {
-				BlockBounds bound = attemptLoad(i);
+				BlockBounds bound = attemptLoad(state);
 				usedBounds.computeIfAbsent(bound, __ -> bound);
 				// Reduces instances we keep in memory
 				bounds[i] = usedBounds.get(bound);
@@ -54,11 +60,10 @@ public class BlockBoundsCache {
 						"Could not create bounds for " + Block.getStateById(i));
 				bounds[i] = BlockBounds.FULL_BLOCK;
 			}
-		}
+		});
 	}
 
-	private static BlockBounds attemptLoad(int blockStateId) {
-		BlockState state = Block.getStateById(blockStateId);
+	private static BlockBounds attemptLoad(BlockState state) {
 		IBlockReader world = new FakeBlockReader(state);
 
 		return new BlockBounds(state.getCollisionShape(world, new BlockPos(0, 100, 0)));

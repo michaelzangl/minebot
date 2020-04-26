@@ -63,14 +63,10 @@ public class CommandRegistry {
 	private IAIControllable controlled;
 
 	public void register(Class<?> commandClass) {
-		LOGGER.info(MARKER_REGISTER, "Registering: " + commandClass.getCanonicalName());
+		LOGGER.info(MARKER_REGISTER, "Scanning commands from: " + commandClass.getCanonicalName());
 		checkCommandClass(commandClass);
 		final String name = commandClass.getAnnotation(AICommand.class).name();
-		List<CommandDefinition> list = commandTable.get(name);
-		if (list == null) {
-			list = new ArrayList<CommandDefinition>();
-			commandTable.put(name, list);
-		}
+		List<CommandDefinition> list = commandTable.computeIfAbsent(name, k -> new ArrayList<>());
 		getCommandsForClass(commandClass, list);
 	}
 
@@ -91,11 +87,15 @@ public class CommandRegistry {
 			if (e.getEvaluateable().size() > 0) {
 				AIChatController
 						.addChatLine("ERROR: More than 1 command matches your command line.");
-				LOGGER.error(MARKER_EVALUATE, "Multiple commands matched: " + StringUtils.join(e.getEvaluateable(), ","), e);
+				LOGGER.error(MARKER_EVALUATE, "Multiple commands found for: " + String.join(" ", args), e);
+				e.getEvaluateable().forEach(matched ->
+						LOGGER.error(MARKER_EVALUATE, "Command that matched: "
+								+ matched.getArguments().stream().map(ArgumentDefinition::getDescriptionType)
+								.collect(Collectors.joining(" "))));
 			} else {
 				AIChatController.addChatLine("ERROR: No command:"
 						+ combine(args) + ".");
-				LOGGER.error(MARKER_EVALUATE, "No command found for: " + args, e);
+				LOGGER.error(MARKER_EVALUATE, "No command found for: " + String.join(" ", args), e);
 			}
 		} catch (final CommandEvaluationException e) {
 			AIChatController.addChatLine("ERROR while evaluating: "
@@ -105,7 +105,7 @@ public class CommandRegistry {
 		} catch (final Throwable e) {
 			e.printStackTrace();
 			AIChatController
-					.addChatLine("ERROR: Could not evaluate. Please report.");
+					.addChatLine("ERROR: Could not evaluate. Please report and send your minecraft log to https://github.com/michaelzangl/minebot/issues.");
 			LOGGER.error(MARKER_EVALUATE, "Command evaluation failed because of unknown error.", e);
 		}
 	}
@@ -304,7 +304,7 @@ public class CommandRegistry {
 		for (final Method m : commandClass.getMethods()) {
 			if (Modifier.isStatic(m.getModifiers())
 					&& m.isAnnotationPresent(AICommandInvocation.class)) {
-				LOGGER.debug(MARKER_REGISTER, "Registering method: %s#%s()",  commandClass.getCanonicalName(), m.getName());
+				LOGGER.debug(MARKER_REGISTER, "Registering method: " + commandClass.getSimpleName() + "#" + m.getName());
 				commands.addAll(getCommandsForMethod(m));
 			}
 		}

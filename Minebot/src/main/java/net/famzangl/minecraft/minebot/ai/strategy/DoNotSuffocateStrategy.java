@@ -17,8 +17,13 @@
 package net.famzangl.minecraft.minebot.ai.strategy;
 
 import net.famzangl.minecraft.minebot.ai.AIHelper;
+import net.famzangl.minecraft.minebot.ai.commands.CommandSettings;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSets;
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * Prevents a suffocation in walls because of server lags.
@@ -27,6 +32,7 @@ import net.minecraft.util.math.BlockPos;
  * 
  */
 public class DoNotSuffocateStrategy extends AIStrategy {
+	private static final Logger LOGGER = LogManager.getLogger(DoNotSuffocateStrategy.class);
 
 	@Override
 	public boolean takesOverAnyTime() {
@@ -42,14 +48,25 @@ public class DoNotSuffocateStrategy extends AIStrategy {
 	@Override
 	protected TickResult onGameTick(AIHelper helper) {
 		BlockPos playerPosition = helper.getPlayerPosition();
-		if (!safeFeet(helper, playerPosition)) {
-			helper.faceAndDestroy(playerPosition);
+		if (!safeHead(helper, playerPosition)) {
+			// Do head first => being stuck inside head is worse.
+			destroyBlockWeAreIn(helper, playerPosition.add(0, 1, 0));
 			return TickResult.TICK_HANDLED;
-		} else if (!safeHead(helper, playerPosition)) {
-			helper.faceAndDestroy(playerPosition.add(0, 1, 0));
+		} else if (!safeFeet(helper, playerPosition)) {
+			destroyBlockWeAreIn(helper, playerPosition);
 			return TickResult.TICK_HANDLED;
+		} else {
+			return TickResult.NO_MORE_WORK;
 		}
-		return TickResult.NO_MORE_WORK;
+	}
+
+	private void destroyBlockWeAreIn(AIHelper helper, BlockPos toDestroy) {
+		if (LOGGER.isDebugEnabled()) {
+			BlockState blockState = helper.getWorld().getBlockState(toDestroy);
+			LOGGER.debug("Detected that we are inside unsafe block: " + blockState
+					+ " (id=" + Block.getStateId(blockState) + "). Attempting to destroy it.");
+		}
+		helper.faceAndDestroy(toDestroy);
 	}
 
 	private boolean safeHead(AIHelper helper, BlockPos p) {

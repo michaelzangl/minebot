@@ -32,9 +32,13 @@ import net.famzangl.minecraft.minebot.ai.task.place.DestroyBlockTask;
 import net.famzangl.minecraft.minebot.ai.task.place.PlaceBlockAtFloorTask;
 import net.famzangl.minecraft.minebot.settings.MinebotSettingsRoot;
 import net.famzangl.minecraft.minebot.settings.PathfindingSetting;
+import net.minecraft.block.BeetrootBlock;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
+import net.minecraft.block.CarrotBlock;
+import net.minecraft.block.CropsBlock;
 import net.minecraft.block.NetherWartBlock;
+import net.minecraft.block.PotatoBlock;
 import net.minecraft.item.HoeItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -49,13 +53,13 @@ public class PlantPathFinder extends MovePathFinder {
 	private static final BlockSet GROWN_CROPS =
 			BlockSet.builder().add(
 					Blocks.NETHER_WART.getDefaultState().with(NetherWartBlock.AGE, 3),
-					Blocks.WHEAT.getDefaultState().with(NetherWartBlock.AGE, 7),
-					Blocks.CARROTS.getDefaultState().with(NetherWartBlock.AGE, 7),
-					Blocks.POTATOES.getDefaultState().with(NetherWartBlock.AGE, 7),
-					Blocks.BEETROOTS.getDefaultState().with(NetherWartBlock.AGE, 3)
+					Blocks.WHEAT.getDefaultState().with(CropsBlock.AGE, 7),
+					Blocks.CARROTS.getDefaultState().with(CarrotBlock.AGE, 7),
+					Blocks.POTATOES.getDefaultState().with(PotatoBlock.AGE, 7),
+					Blocks.BEETROOTS.getDefaultState().with(BeetrootBlock.BEETROOT_AGE, 3)
 					).build();
 	private static final BlockSet FARMLAND = BlockSet.builder().add(Blocks.FARMLAND).build();
-	private static final BlockSet NETHERWART_FARMLAND =BlockSet.builder().add(
+	private static final BlockSet NETHERWART_FARMLAND = BlockSet.builder().add(
 			Blocks.SOUL_SAND).build();
 
 	private static final BlockSet FARMLANDABLE = BlockSet.builder().add(Blocks.DIRT,

@@ -24,6 +24,7 @@ import net.famzangl.minecraft.minebot.ai.render.PosMarkerRenderer;
 import net.famzangl.minecraft.minebot.ai.utils.BlockArea;
 import net.famzangl.minecraft.minebot.ai.utils.BlockArea.AreaVisitor;
 import net.famzangl.minecraft.minebot.ai.utils.BlockCuboid;
+import net.minecraft.block.Blocks;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.RayTraceResult;
@@ -72,16 +73,16 @@ public class DestroyInRangeTask extends AITask implements CanPrefaceAndDestroy {
 		@Override
 		public void visit(WorldWithDelta world, int x, int y, int z) {
 			if (isSafeToDestroy(world, x, y, z)) {
-				// FIXME: Use generics instead of cast.
-				world.setBlock(x, y, z, 0, 0);
+				world.setBlock(new BlockPos(x, y, z), Blocks.AIR);
 				y++;
+				// Blocks that fall down are destroyed as well
 				while (isSafeFallingBlock(world, x, y, z)) {
-					world.setBlock(x, y, z, 0, 0);
+					world.setBlock(new BlockPos(x, y, z), Blocks.AIR);
 					y++;
 				}
 			} else {
-				LOGGER.error(MARKER_DESTROY_IN_RANGE, "Cannot destroy for " + x + "," + y + ","
-						+ z + ", block is: " + world.getBlockId(x, y, z));
+				LOGGER.error(MARKER_DESTROY_IN_RANGE, "Cannot simulate the destroy for " + x + "," + y + ","
+						+ z + ", block state at that position is: " + world.getBlockStateId(x, y, z));
 			}
 		}
 

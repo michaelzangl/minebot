@@ -28,8 +28,8 @@ import java.util.stream.Stream;
  * @author Michael Zangl
  */
 public class WorldData {
-	private static final int BARRIER_ID = Block.BLOCK_STATE_IDS.get(Blocks.BARRIER.getDefaultState()) << 4;
-	private static final int AIR_ID = 0;
+	private static final int BARRIER_ID = Block.getStateId(Blocks.BARRIER.getDefaultState());
+	private static final int AIR_ID = Block.getStateId(Blocks.AIR.getDefaultState());
 	private static final int CACHE_ENTRIES = 10;
 	/**
 	 * A cache pos that may never occur naturally.
@@ -139,8 +139,6 @@ public class WorldData {
 		}
 		ChunkAccessor a = getChunkAccessor(x, z);
 
-		// chunk.getBlock(x & 15, y, z & 15);
-
 		return a == null ? BARRIER_ID : a.getBlockIdWithMeta(x, y, z);
 	}
 
@@ -193,14 +191,6 @@ public class WorldData {
 
 	public ClientWorld getBackingWorld() {
 		return theWorld;
-	}
-
-	public int getBlockId(BlockPos pos) {
-		return getBlockId(pos.getX(), pos.getY(), pos.getZ());
-	}
-
-	public int getBlockId(int x, int y, int z) {
-		return getBlockStateId(x, y, z) >> 4;
 	}
 
 	public int getBlockStateId(BlockPos pos) {

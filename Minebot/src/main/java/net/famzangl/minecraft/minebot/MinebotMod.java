@@ -18,7 +18,11 @@ package net.famzangl.minecraft.minebot;
 
 import net.famzangl.minecraft.minebot.ai.AIController;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockBoundsCache;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.ModContainer;
+import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
@@ -28,20 +32,27 @@ import org.apache.logging.log4j.core.LoggerContext;
 import org.apache.logging.log4j.core.config.Configuration;
 
 import java.net.URISyntaxException;
+import java.util.Optional;
 
-@Mod("minebot-mod")
+@Mod(MinebotMod.MOD_ID)
 public class MinebotMod {
+	public static final String MOD_ID = "minebot-mod";
 	public static MinebotMod instance;
 
 	public MinebotMod() {
 		instance = this;
-		FMLJavaModLoadingContext.get().getModEventBus().addListener(this::init);
+		IEventBus modBus = FMLJavaModLoadingContext.get().getModEventBus();
+		IEventBus mcBus = MinecraftForge.EVENT_BUS;
+
+		modBus.addListener(this::init);
+		mcBus.addListener(new PlayerUpdateHandler()::onPlayerTick);
+		new AIController().initialize(mcBus);
 	}
 	
 	static {
 		// logging
-		String doLogging = System.getProperty("MINEBOT_LOG", "0");
-		if (doLogging.equals("1")) {
+		String doLogging = System.getenv("MINEBOT_LOG");
+		if ("1".equals(doLogging)) {
 			LoggerContext context = (LoggerContext) LogManager.getContext(false);
 			Configuration config = context.getConfiguration();
 			try {
@@ -56,14 +67,11 @@ public class MinebotMod {
 
 	public void init(FMLCommonSetupEvent event) {
 		BlockBoundsCache.initialize();
-		FMLJavaModLoadingContext.get().getModEventBus().addListener(new PlayerUpdateHandler()::onPlayerTick);
-		final AIController controller = new AIController();
-		controller.initialize();
 	}
 
 	public static String getVersion() {
-		// TODO: Get version
-		return "TODO";
-		//return MinebotMod.class.getAnnotation(Mod.class).version();
+		return ModList.get().getModContainerById(MOD_ID).map(
+				id -> id.getModInfo().getVersion().toString()
+		).orElse("NONE");
 	}
 }

@@ -13,6 +13,8 @@ import net.famzangl.minecraft.minebot.ai.strategy.RunOnceStrategy;
 import net.famzangl.minecraft.minebot.ai.utils.BlockArea;
 import net.famzangl.minecraft.minebot.ai.utils.BlockArea.AreaVisitor;
 import net.famzangl.minecraft.minebot.ai.utils.BlockCuboid;
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.SandBlock;
 import net.minecraft.client.world.ClientWorld;
@@ -75,9 +77,34 @@ public class CommandTestMinectaft {
 		};
 	}
 
-	public static BlockCuboid blocksAroundPlayer(WorldData world) {
+	@AICommandInvocation()
+	public static AIStrategy runIntegrity(
+			AIHelper helper,
+			@AICommandParameter(type = ParameterType.FIXED, fixedName = "test", description = "") String nameArg,
+			@AICommandParameter(type = ParameterType.FIXED, fixedName = "integrity", description = "") String nameArg2) {
+		return new RunOnceStrategy() {
+
+			@Override
+			protected void singleRun(AIHelper helper) {
+				// Test that simulated world is equal to what we see in Minecraft
+				BlockCuboid<WorldData> toTest = blocksAroundPlayer(helper.getWorld());
+
+				toTest.accept(((world, x, y, z) -> {
+					BlockPos pos = new BlockPos(x, y, z);
+					BlockState simulated = Block.getStateById(world.getBlockStateId(x, y, z));
+					BlockState real = world.getBackingWorld().getBlockState(pos);
+					if (simulated != real) {
+						System.out.println("Block mismatch at " + pos + ", simulated=" + simulated + ", real=" + real);
+					}
+				}), helper.getWorld());
+
+			}
+		};
+	}
+
+	public static BlockCuboid<WorldData> blocksAroundPlayer(WorldData world) {
 		BlockPos pos = world.getPlayerPosition();
-		return new BlockCuboid(
+		return new BlockCuboid<>(
 				new BlockPos(pos.getX() - 32, 0, pos.getZ() - 32),
 				new BlockPos(pos.getX() + 32, 100, pos.getZ() + 32));
 	}

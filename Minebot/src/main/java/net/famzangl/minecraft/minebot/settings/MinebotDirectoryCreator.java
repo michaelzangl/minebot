@@ -48,9 +48,10 @@ public class MinebotDirectoryCreator {
 	private static final String BASE = "net/famzangl/minecraft/minebot/settings/minebot/";
 
 	public File createDirectory(File dir) throws IOException {
+		// TODO: Use Java 8 Paths / Resources
 		CodeSource src = MinebotDirectoryCreator.class.getProtectionDomain()
 				.getCodeSource();
-		if (src != null) {
+		if (src != null && src.getLocation() != null) {
 			URL jar = src.getLocation();
 			if (jar.getFile().endsWith("class") && !jar.getFile().contains(".jar!")) {
 				System.out.println("WARNING: Using the dev directory for settings.");
