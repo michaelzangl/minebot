@@ -204,6 +204,23 @@ public class BlockSets {
 			Blocks.ACACIA_FENCE,
 			Blocks.NETHER_BRICK_FENCE).build();
 
+	public static final BlockSet WALL = BlockSet.builder().add(
+			Blocks.ANDESITE_WALL,
+			Blocks.BRICK_WALL,
+			Blocks.COBBLESTONE_WALL,
+			Blocks.DIORITE_WALL,
+			Blocks.END_STONE_BRICK_WALL,
+			Blocks.GRANITE_WALL,
+			Blocks.MOSSY_COBBLESTONE_WALL,
+			Blocks.MOSSY_STONE_BRICK_WALL,
+			Blocks.NETHER_BRICK_WALL,
+			Blocks.PRISMARINE_WALL,
+			Blocks.RED_NETHER_BRICK_WALL,
+			Blocks.RED_SANDSTONE_WALL,
+			Blocks.SANDSTONE_WALL,
+			Blocks.STONE_BRICK_WALL
+	).build();
+
 	public static final BlockSet WOODEN_DOR = BlockSet.builder().add(
 			Blocks.OAK_DOOR,
 			Blocks.SPRUCE_DOOR,
@@ -422,8 +439,7 @@ public class BlockSets {
 	public static final BlockSet FEET_CAN_WALK_THROUGH = BlockSet.builder().add(explicitFootWalkableBlocks).add(HEAD_CAN_WALK_THROUGH).build();
 
 	private static final BlockSet explicitSafeSideBlocks = BlockSet.builder().add(
-			Blocks.ANVIL, 
-			Blocks.COBBLESTONE_WALL, 
+			Blocks.ANVIL,
 			Blocks.CACTUS, 
 			Blocks.SUGAR_CANE,
 			Blocks.COBWEB,
@@ -439,13 +455,14 @@ public class BlockSets {
 			Blocks.STONE_PRESSURE_PLATE,
 			Blocks.STONE_BUTTON,
 			Blocks.DRAGON_EGG,
-			Blocks.TURTLE_EGG).add(FENCE).add(FENCE_GATE).add(BED).add(WOODEN_PRESSURE_PLATE).add(WOODEN_BUTTON).build();
+			Blocks.TURTLE_EGG).add(WALL).add(FENCE).add(FENCE_GATE).add(BED).add(WOODEN_PRESSURE_PLATE).add(WOODEN_BUTTON).build();
 
 	/**
 	 * Blocks we can just walk over/next to without problems.
 	 */
 	public static final BlockSet SIMPLE_CUBE = BlockSet.builder().add(
 			Blocks.BEDROCK,
+			Blocks.END_STONE,
 			Blocks.END_STONE_BRICKS,
 			Blocks.BOOKSHELF,
 			Blocks.BRICKS,
