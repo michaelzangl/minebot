@@ -1,6 +1,6 @@
 package net.famzangl.minecraft.minebot.ai.net;
 
-import net.famzangl.minecraft.minebot.ai.net.Intercepts.EInterceptResult;
+import net.famzangl.minecraft.minebot.ai.net.Intercepts.InterceptResult;
 import net.minecraft.client.network.play.IClientPlayNetHandler;
 import net.minecraft.network.INetHandler;
 import net.minecraft.network.IPacket;
@@ -8,7 +8,6 @@ import net.minecraft.network.play.IServerPlayNetHandler;
 
 import java.util.HashMap;
 import java.util.function.Function;
-import java.util.function.Predicate;
 
 public class MinebotPacketInterceptors {
     private final Interceptors<IClientPlayNetHandler> incoming = new Interceptors<>();
@@ -21,13 +20,13 @@ public class MinebotPacketInterceptors {
      * @param <T> The type
      */
     public <T extends IPacket<IClientPlayNetHandler>> void addIncomingInterceptor(
-            Class<T> type, Function<T, EInterceptResult> handler
+            Class<T> type, Function<T, InterceptResult<T>> handler
     ) {
         incoming.add(type, handler);
     }
 
     public <T extends IPacket<IServerPlayNetHandler>> void addOutgoingInterceptor(
-            Class<T> type, Function<T, EInterceptResult> handler) {
+            Class<T> type, Function<T, InterceptResult<T>> handler) {
         outgoing.add(type, handler);
     }
 
@@ -40,23 +39,27 @@ public class MinebotPacketInterceptors {
     }
 
     private static class Interceptors<N extends INetHandler> implements Intercepts<IPacket<N>> {
-        private final HashMap<Class<? extends IPacket<N>>, Function<? extends IPacket<N>, EInterceptResult>> handlers = new HashMap<>();
+        private final HashMap<Class<? extends IPacket<N>>, InterceptorFunction<? extends IPacket<N>>> handlers = new HashMap<>();
 
-        <T extends IPacket<N>> void add(Class<T> type, Function<T, EInterceptResult> handler) {
-            handlers.compute(type, (__, oldHandler) -> oldHandler == null ? handler :
-                    t -> applyHandler(t, oldHandler) == EInterceptResult.DROP ? EInterceptResult.DROP : applyHandler(t, handler));
+        <T extends IPacket<N>> void add(Class<T> type, Function<T, InterceptResult<T>> handler) {
+            InterceptorFunction<T> typesafeHandler = handler::apply;
+            handlers.compute(type, (__, oldHandler) -> oldHandler == null ? typesafeHandler :
+                    packet -> applyHandler(packet, oldHandler).then(newPacket -> applyHandler(newPacket, typesafeHandler)));
         }
 
         @Override
-        public EInterceptResult intercept(IPacket<N> packet) {
-            Function<? extends IPacket<N>, EInterceptResult> handler = handlers.get(packet.getClass());
-            return handler == null ? EInterceptResult.PASS : applyHandler(packet, handler);
+        public <U extends IPacket<N>> InterceptResult<U> intercept(U packet) {
+            InterceptorFunction<? extends IPacket<N>> handler = handlers.get(packet.getClass());
+            return handler == null ? InterceptResult.pass() : applyHandler(packet, handler);
         }
 
-        private <T extends IPacket<N>> EInterceptResult applyHandler(IPacket<N> packet,
-                                                                     Function<? extends IPacket<N>, EInterceptResult> handler) {
-            return ((Function<T, EInterceptResult>)handler).apply((T)packet);
+
+        private <T extends IPacket<N>> InterceptResult<T> applyHandler(IPacket<N> packet,
+                                                                       InterceptorFunction<? extends IPacket<N>> handler) {
+            return ((InterceptorFunction<T>)handler).apply((T)packet);
         }
     }
+
+    interface InterceptorFunction<T> extends Function<T, InterceptResult<T>> {}
 
 }

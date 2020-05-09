@@ -18,22 +18,22 @@ public enum RenderMode {
 	UNDERGROUND(new UndergroundRenderer(), "-underground"), MAP(
 			new MapRenderer(), ""), BIOME(new BiomeRenderer(), "-biome");
 	private static final BlockSet GLOBAL_COVER_BLACKLIST = BlockSet.builder().add(
-			Blocks.STONE_SLAB,
-			Blocks.AIR)
+			Blocks.STONE_SLAB)
+			.add(BlockSets.AIR)
 			.add(BlockSets.WOODEN_SLAB).build();
 	private static final BlockSet IGNORED_COVER_BLOCKS = BlockSet.builder().add(
-			Blocks.AIR,
 			Blocks.TORCH, 
 			Blocks.WATER, 
 			Blocks.LILY_PAD,
 			Blocks.LAVA, 
 			Blocks.SNOW,
 			Blocks.ICE)
+			.add(BlockSets.AIR)
 			.add(GLOBAL_COVER_BLACKLIST)
 			.add(BlockSets.LEAVES)
 			.add(BlockSets.LOGS).build();
 	private static final BlockSet UNDERGROUND_BLOCKS = BlockSet.builder().add(
-			Blocks.AIR)
+			BlockSets.AIR)
 			.add(BlockSets.TORCH)
 			.build();
 	private static final BlockSet STRUCTURE_BLOCKS = BlockSet.builder().add(

@@ -16,31 +16,66 @@
  *******************************************************************************/
 package net.famzangl.minecraft.minebot.ai.commands;
 
-import net.famzangl.minecraft.minebot.ai.AIHelper;
+import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+import com.mojang.brigadier.context.CommandContext;
 import net.famzangl.minecraft.minebot.ai.command.AICommand;
-import net.famzangl.minecraft.minebot.ai.command.AICommandInvocation;
-import net.famzangl.minecraft.minebot.ai.command.AICommandParameter;
-import net.famzangl.minecraft.minebot.ai.command.ParameterType;
+import net.famzangl.minecraft.minebot.ai.command.CommandEvaluationException;
+import net.famzangl.minecraft.minebot.ai.command.IAIControllable;
 import net.famzangl.minecraft.minebot.ai.command.SafeStrategyRule;
 import net.famzangl.minecraft.minebot.ai.path.FillAreaPathfinder;
-import net.famzangl.minecraft.minebot.ai.strategy.AIStrategy;
+import net.famzangl.minecraft.minebot.ai.path.world.WorldData;
 import net.famzangl.minecraft.minebot.ai.strategy.PathFinderStrategy;
 import net.famzangl.minecraft.minebot.ai.utils.BlockCuboid;
 import net.famzangl.minecraft.minebot.build.commands.CommandClearArea;
 import net.minecraft.block.BlockState;
+import net.minecraft.command.arguments.BlockPosArgument;
+import net.minecraft.command.arguments.BlockStateArgument;
+import net.minecraft.command.arguments.BlockStateInput;
 
 @AICommand(name = "minebuild", helpText = "Fill an area with a given block.")
 public class CommandFillArea {
-	@AICommandInvocation(safeRule = SafeStrategyRule.DEFEND)
-	public static AIStrategy run(
-			AIHelper helper,
-			@AICommandParameter(type = ParameterType.FIXED, fixedName = "fill", description = "") String nameArg,
-			@AICommandParameter(type = ParameterType.BLOCK_STATE, blockFilter=FillAreaPathfinder.FillBlocks.class, description = "The block to place") BlockState block) {
-		BlockCuboid area = CommandClearArea.getArea(helper);
-		if (area != null)  {
-			return new PathFinderStrategy(new FillAreaPathfinder(area, block), "Filling with " + block.toString());
-		} else {
-			return null;
-		}
-	}
+    public static void register(LiteralArgumentBuilder<IAIControllable> dispatcher, LiteralArgumentBuilder<IAIControllable> minebuild) {
+        // /minebuild fill uses the area set by minebuild
+        minebuild.then(
+                Commands.literal("fill")
+                        .then(
+                                Commands.argument("block", BlockStateArgument.blockState())
+                                        .executes(
+                                                context -> {
+                                                    BlockCuboid<WorldData> area = CommandClearArea.getArea(context.getSource().getAiHelper());
+                                                    if (area != null) {
+                                                        return requestUseStrategy(context, area);
+                                                    } else {
+                                                        throw new CommandEvaluationException("No area has been set yet. Set an area to fill using /minebot posN");
+                                                    }
+                                                }
+                                        )
+                        )
+        );
+
+        dispatcher.then(
+                Commands.literal("fill")
+                        // Minecraft syntax: /minebot [from] [to] [block]
+                        .then(
+                                Commands.argument("from", BlockPosArgument.blockPos()).then(
+                                        Commands.argument("to", BlockPosArgument.blockPos()).then(
+                                                Commands.argument("block", BlockStateArgument.blockState()).executes(
+                                                        context -> requestUseStrategy(context, new BlockCuboid<>(
+                                                                Commands.getBlockPos(context, "from"),
+                                                                Commands.getBlockPos(context, "to")
+                                                        ))
+                                                )))
+
+                        )
+        );
+    }
+
+    private static int requestUseStrategy(CommandContext<IAIControllable> context, BlockCuboid<WorldData> area) {
+        BlockState block = context.getArgument("block", BlockStateInput.class).getState();
+        return context.getSource().requestUseStrategy(
+                new PathFinderStrategy(
+                        new FillAreaPathfinder(area, block),
+                        "Filling with " + block.toString()),
+                SafeStrategyRule.DEFEND);
+    }
 }

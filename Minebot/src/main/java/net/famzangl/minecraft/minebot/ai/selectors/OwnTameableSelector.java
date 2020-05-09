@@ -16,12 +16,12 @@
  *******************************************************************************/
 package net.famzangl.minecraft.minebot.ai.selectors;
 
-import com.google.common.base.Predicate;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.passive.TameableEntity;
 
 import java.lang.reflect.Method;
+import java.util.function.Predicate;
 
 public class OwnTameableSelector implements Predicate<Entity> {
 	private final LivingEntity owner;
@@ -32,7 +32,7 @@ public class OwnTameableSelector implements Predicate<Entity> {
 	}
 
 	@Override
-	public boolean apply(Entity entity) {
+	public boolean test(Entity entity) {
 		return entity instanceof TameableEntity && isMine((TameableEntity) entity);
 	}
 

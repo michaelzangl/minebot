@@ -31,6 +31,7 @@ public class CommandNameBuilder extends ParameterBuilder {
 
 		@Override
 		public boolean couldEvaluateAgainst(String string) {
+			/*
 			for (final CommandDefinition command : AIChatController
 					.getRegistry().getAllCommands()) {
 				final ArrayList<ArgumentDefinition> args = command
@@ -39,18 +40,21 @@ public class CommandNameBuilder extends ParameterBuilder {
 					return true;
 				}
 			}
+			 */
 			return false;
 		}
 
 		@Override
 		public void getTabCompleteOptions(String currentStart,
 				Collection<String> addTo) {
+			/*
 			for (final CommandDefinition command : AIChatController
 					.getRegistry().getAllCommands()) {
 				final ArrayList<ArgumentDefinition> args = command
 						.getArguments();
 				args.get(0).getTabCompleteOptions(currentStart, addTo);
 			}
+			 */
 		}
 	}
 

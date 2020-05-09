@@ -28,8 +28,8 @@ import java.util.stream.Stream;
  * @author Michael Zangl
  */
 public class WorldData {
-	private static final int BARRIER_ID = Block.getStateId(Blocks.BARRIER.getDefaultState());
-	private static final int AIR_ID = Block.getStateId(Blocks.AIR.getDefaultState());
+	private static final int BARRIER_ID = BlockSet.getStateId(Blocks.BARRIER.getDefaultState());
+	private static final int AIR_ID = BlockSet.getStateId(Blocks.AIR.getDefaultState());
 	private static final int CACHE_ENTRIES = 10;
 	/**
 	 * A cache pos that may never occur naturally.
@@ -198,7 +198,7 @@ public class WorldData {
 	}
 
 	public BlockState getBlockState(BlockPos pos) {
-		return Block.getStateById(getBlockStateId(pos));
+		return BlockSet.getStateById(getBlockStateId(pos));
 	}
 
 	public boolean isSideTorch(BlockPos pos) {
@@ -272,6 +272,12 @@ public class WorldData {
 		return new Vec3d(thePlayerToGetPositionFrom.getPosX(),
 				thePlayerToGetPositionFrom.getBoundingBox().minY,
 				thePlayerToGetPositionFrom.getPosZ());
+	}
+
+
+	public BlockBounds getFacingBounds(BlockPos pos) {
+		BlockBounds bounds = getBlockBounds(pos);
+		return bounds.clampY(0, 1);
 	}
 
 	public BlockBounds getBlockBounds(BlockPos pos) {

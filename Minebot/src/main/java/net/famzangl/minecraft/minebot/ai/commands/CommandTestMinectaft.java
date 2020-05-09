@@ -91,7 +91,7 @@ public class CommandTestMinectaft {
 
 				toTest.accept(((world, x, y, z) -> {
 					BlockPos pos = new BlockPos(x, y, z);
-					BlockState simulated = Block.getStateById(world.getBlockStateId(x, y, z));
+					BlockState simulated = BlockSet.getStateById(world.getBlockStateId(x, y, z));
 					BlockState real = world.getBackingWorld().getBlockState(pos);
 					if (simulated != real) {
 						System.out.println("Block mismatch at " + pos + ", simulated=" + simulated + ", real=" + real);

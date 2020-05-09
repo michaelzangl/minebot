@@ -16,28 +16,19 @@
  *******************************************************************************/
 package net.famzangl.minecraft.minebot.ai.net;
 
-import com.mojang.brigadier.suggestion.Suggestions;
+import com.mojang.brigadier.tree.RootCommandNode;
 import mcp.MethodsReturnNonnullByDefault;
 import net.famzangl.minecraft.minebot.ai.command.AIChatController;
-import net.famzangl.minecraft.minebot.ai.net.Intercepts.EInterceptResult;
+import net.famzangl.minecraft.minebot.ai.net.Intercepts.InterceptResult;
 import net.famzangl.minecraft.minebot.ai.utils.PrivateFieldUtils;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.network.play.ClientPlayNetHandler;
+import net.minecraft.command.ISuggestionProvider;
 import net.minecraft.entity.Entity;
 import net.minecraft.network.INetHandler;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.play.client.CChatMessagePacket;
-import net.minecraft.network.play.client.CTabCompletePacket;
-import net.minecraft.network.play.server.SBlockActionPacket;
-import net.minecraft.network.play.server.SChangeBlockPacket;
-import net.minecraft.network.play.server.SChatPacket;
-import net.minecraft.network.play.server.SChunkDataPacket;
-import net.minecraft.network.play.server.SMultiBlockChangePacket;
-import net.minecraft.network.play.server.SPlaySoundEffectPacket;
-import net.minecraft.network.play.server.SPlaySoundEventPacket;
-import net.minecraft.network.play.server.SPlayerPositionLookPacket;
-import net.minecraft.network.play.server.SSpawnParticlePacket;
-import net.minecraft.network.play.server.STabCompletePacket;
-import net.minecraft.particles.ParticleTypes;
+import net.minecraft.network.play.server.*;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import org.apache.logging.log4j.LogManager;
@@ -48,6 +39,7 @@ import org.apache.logging.log4j.MarkerManager;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -73,16 +65,16 @@ public class MinebotNetHandler implements NetworkHelper {
 
 	private final CopyOnWriteArrayList<ChunkListener> listeners = new CopyOnWriteArrayList<>();
 
-	private String lastSendTabComplete;
+	private LinkedHashMap<Integer, String> lastSendTabComplete = new LinkedHashMap<>();
 
 	private final ArrayList<PersistentChat> chatMessages = new ArrayList<PersistentChat>();
 
 	public MinebotNetHandler() {
 		interceptors.addOutgoingInterceptor(CChatMessagePacket.class, this::sendPacketChatMessage);
-		interceptors.addOutgoingInterceptor(CTabCompletePacket.class, this::sendPacketTabComplete);
+		//interceptors.addOutgoingInterceptor(CTabCompletePacket.class, this::sendPacketTabComplete);
 
-		interceptors.addIncomingInterceptor(STabCompletePacket.class, this::handleTabComplete);
-		interceptors.addIncomingInterceptor(SSpawnParticlePacket.class, this::handleParticles);
+		//interceptors.addIncomingInterceptor(STabCompletePacket.class, this::handleTabComplete);
+		interceptors.addIncomingInterceptor(SCommandListPacket.class, this::addMinebotCommands);
 		// unused interceptors.addIncomingInterceptor(SPlaySoundEventPacket.class, this::handleEffect);
 		interceptors.addIncomingInterceptor(SPlaySoundEffectPacket.class, this::handleSoundEffect);
 		interceptors.addIncomingInterceptor(SChunkDataPacket.class, this::handleChunkData);
@@ -93,74 +85,62 @@ public class MinebotNetHandler implements NetworkHelper {
 		interceptors.addIncomingInterceptor(SPlayerPositionLookPacket.class, this::handlePlayerPosLook);
 	}
 
-	public EInterceptResult sendPacketChatMessage(CChatMessagePacket chatMessage) {
+	public InterceptResult<CChatMessagePacket> sendPacketChatMessage(CChatMessagePacket chatMessage) {
 		// Intercept chat message.
 		String message = chatMessage.getMessage();
 		if (message.startsWith("/") && AIChatController.getRegistry().interceptCommand(message)) {
 			// Do not send the command
-			return EInterceptResult.DROP;
+			return InterceptResult.drop();
 		}
-		return EInterceptResult.PASS;
+		return InterceptResult.pass();
 	}
 
-	protected EInterceptResult sendPacketTabComplete(CTabCompletePacket complete) {
+	public InterceptResult<SCommandListPacket> addMinebotCommands(SCommandListPacket packet) {
+		RootCommandNode<ISuggestionProvider> root = packet.getRoot();
+
+		AIChatController.getRegistry().addCommandsTo(root);
+
+		return InterceptResult.replaceBy(new SCommandListPacket(root));
+	}
+
+	/*
+	protected InterceptResult sendPacketTabComplete(CTabCompletePacket complete) {
 		String message = complete.getCommand();
 		if (message.startsWith("/") && message.contains(" ")) {
 			if (AIChatController.getRegistry().interceptTab(complete, this)) {
 				// Do not send the tab complete => We don't need to let the server know
-				return EInterceptResult.DROP;
+				return InterceptResult.drop();
 			}
 		}
-		lastSendTabComplete = message;
-		return EInterceptResult.PASS;
+		lastSendTabComplete.put(complete.getTransactionId(), complete.getCommand());
+		while (lastSendTabComplete.size() > 10) {
+			lastSendTabComplete.remove(lastSendTabComplete.keySet().iterator().next());
+		}
+		return InterceptResult.pass();
 	}
 
-	public EInterceptResult handleTabComplete(STabCompletePacket packetIn) {
-		if (lastSendTabComplete != null && lastSendTabComplete.startsWith("/")
-				&& !lastSendTabComplete.contains(" ")) {
-			Suggestions newStrings = AIChatController.getRegistry().fillTabComplete(this, packetIn.getSuggestions(), lastSendTabComplete);
+	public InterceptResult handleTabComplete(STabCompletePacket packetIn) {
+		String requestForPacket = lastSendTabComplete.remove(packetIn.getTransactionId());
+		if (requestForPacket != null && requestForPacket.startsWith("/")
+				&& !requestForPacket.contains(" ")) {
+			Suggestions newStrings = AIChatController.getRegistry().fillTabComplete(this, packetIn.getSuggestions(), requestForPacket);
 			packetIn = new STabCompletePacket(packetIn.getTransactionId(), newStrings);
-			lastSendTabComplete = null;
+			return InterceptResult.replaceBy(packetIn);
 		}
-		return EInterceptResult.PASS;
+		return InterceptResult.pass();
 	}
+	 */
 
-	public EInterceptResult handleParticles(SSpawnParticlePacket packetIn) {
-		// For detecting fishing rod events.
-		// TODO: Check particle type
-		if (packetIn.getParticle().getType() == ParticleTypes.DRIPPING_WATER) {
-			if (packetIn.getParticleCount() > 0) {
-				double x = packetIn.getXCoordinate();
-				double y = packetIn.getYCoordinate();
-				double z = packetIn.getZCoordinate();
-				LOGGER.trace(MARKER_FISH, "fish particle (?) at " + new BlockPos(x, y, z));
-				// foundFishPositions.add(new BlockPos(x, y, z));
-				// System.out.println("NetHandler: fish at " + new BlockPos(x,
-				// y, z) + ", packet: " +
-				// Arrays.toString(packetIn.getParticleArgs()) + "; " +
-				// packetIn.getParticleCount()+ "; " + packetIn.getXOffset()+
-				// "; " + packetIn.getYOffset()+ "; " + packetIn.getZOffset());
-			}
-		}
-		return EInterceptResult.PASS;
-	}
-
-	public EInterceptResult handleEffect(SPlaySoundEventPacket packetIn) {
-		return EInterceptResult.PASS;
-	}
-
-	public EInterceptResult handleSoundEffect(SPlaySoundEffectPacket packetIn) {
+	public InterceptResult handleSoundEffect(SPlaySoundEffectPacket packetIn) {
 		ResourceLocation name = packetIn.getSound().getName();
-		//TODO: Check this name
-		// System.out.println(name.getPath());
-		if ("entity.bobber.splash".equals(name.getPath())) {
+		if ("entity.fishing_bobber.splash".equals(name.getPath())) {
 			double x = packetIn.getX();
 			double y = packetIn.getY();
 			double z = packetIn.getZ();
 			foundFishPositions.add(new BlockPos(x, y, z));
 			LOGGER.trace(MARKER_FISH, "fish at " + new BlockPos(x, y, z));
 		}
-		return EInterceptResult.PASS;
+		return InterceptResult.pass();
 	}
 
 	@Override
@@ -186,28 +166,28 @@ public class MinebotNetHandler implements NetworkHelper {
 		foundFishPositions.clear();
 	}
 
-	public EInterceptResult handleChunkData(SChunkDataPacket packetIn) {
+	public InterceptResult handleChunkData(SChunkDataPacket packetIn) {
 		int x = packetIn.getChunkX();
 		int z = packetIn.getChunkZ();
 		fireChunkChange(x, z);
-		return EInterceptResult.PASS;
+		return InterceptResult.pass();
 	}
 
-	public EInterceptResult handleBlockChange(SChangeBlockPacket packetIn) {
+	public InterceptResult handleBlockChange(SChangeBlockPacket packetIn) {
 		blockChange(packetIn.getPos());
-		return EInterceptResult.PASS;
+		return InterceptResult.pass();
 	}
 
-	public EInterceptResult handleBlockAction(SBlockActionPacket packetIn) {
+	public InterceptResult handleBlockAction(SBlockActionPacket packetIn) {
 		blockChange(packetIn.getBlockPosition());
-		return EInterceptResult.PASS;
+		return InterceptResult.pass();
 	}
 
-	public EInterceptResult handleMultiBlockChange(SMultiBlockChangePacket packetIn) {
+	public InterceptResult handleMultiBlockChange(SMultiBlockChangePacket packetIn) {
 		for (SMultiBlockChangePacket.UpdateData b : packetIn.getChangedBlocks()) {
 			blockChange(b.getPos());
 		}
-		return EInterceptResult.PASS;
+		return InterceptResult.pass();
 	}
 
 	private void blockChange(BlockPos pos) {
@@ -232,15 +212,15 @@ public class MinebotNetHandler implements NetworkHelper {
 		listeners.remove(l);
 	}
 
-	public EInterceptResult handleChat(SChatPacket packetIn) {
+	public InterceptResult handleChat(SChatPacket packetIn) {
 		LOGGER.trace(MARKER_CHAT, "Received chat package: " + packetIn.hashCode() + ": " + packetIn.getChatComponent());
 		chatMessages.add(new PersistentChat(packetIn));
-		return EInterceptResult.PASS;
+		return InterceptResult.pass();
 	}
 
-	public EInterceptResult handlePlayerPosLook(SPlayerPositionLookPacket packetIn) {
+	public InterceptResult handlePlayerPosLook(SPlayerPositionLookPacket packetIn) {
 		LOGGER.trace(MARKER_POS, "Forced move to: " + packetIn.getX() + "," + packetIn.getZ());
-		return EInterceptResult.PASS;
+		return InterceptResult.pass();
 	}
 
 	public List<PersistentChat> getChatMessages() {
@@ -251,13 +231,22 @@ public class MinebotNetHandler implements NetworkHelper {
 		// Intercepts incoming packages
 		NetworkManager originalManager = oldHandler.getNetworkManager();
 		// Set the field packetListener
+		MinebotClientPlayNetHandler playNetHandler = new MinebotClientPlayNetHandler(oldHandler, interceptors.getIncoming());
 		PrivateFieldUtils.setFieldValue(originalManager, NetworkManager.class, INetHandler.class,
-				new MinebotClientNetHandler(oldHandler, interceptors.getIncoming()));
+				playNetHandler);
 
 		// Intercept outgoing packages
 		MinebotNetworkManager mnm = new MinebotNetworkManager(originalManager, interceptors.getOutgoing());
 		// Set it to the client only => the client packages is what we want to intercept. The rest of MC will only see the original handler
 		PrivateFieldUtils.setFieldValue(oldHandler, ClientPlayNetHandler.class, NetworkManager.class, mnm);
+
+		// Problem is that commands package is most likely in the queue. So get it from old handler and pass it thorough the new handler again
+		// It is important to use enqueue here so that this statemnt is executed after the commands received from the server left the queue
+		Minecraft.getInstance().enqueue(() -> {
+			if (playNetHandler.getNetworkManager().isChannelOpen()) {
+				new SCommandListPacket(oldHandler.getCommandDispatcher().getRoot()).processPacket(playNetHandler);
+			}
+		});
 	}
 
 	public static NetworkHelper inject(ClientPlayNetHandler into) {

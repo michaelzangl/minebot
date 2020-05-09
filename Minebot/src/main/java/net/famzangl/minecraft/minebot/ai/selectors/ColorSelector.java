@@ -16,11 +16,12 @@
  *******************************************************************************/
 package net.famzangl.minecraft.minebot.ai.selectors;
 
-import com.google.common.base.Predicate;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.passive.SheepEntity;
 import net.minecraft.entity.passive.WolfEntity;
 import net.minecraft.item.DyeColor;
+
+import java.util.function.Predicate;
 
 public final class ColorSelector implements Predicate<Entity> {
 	private final DyeColor color;
@@ -31,7 +32,7 @@ public final class ColorSelector implements Predicate<Entity> {
 	}
 
 	@Override
-	public boolean apply(Entity var1) {
+	public boolean test(Entity var1) {
 		if (var1 instanceof WolfEntity) {
 			return ((WolfEntity) var1).getCollarColor() == color;
 		} else if (var1 instanceof SheepEntity) {

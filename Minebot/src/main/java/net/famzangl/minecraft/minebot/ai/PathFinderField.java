@@ -37,11 +37,14 @@ public class PathFinderField implements Comparator<Integer> {
 	private static final Marker MARKER_PATH = MarkerManager.getMarker("path");
 	private static final Logger LOGGER = LogManager.getLogger(AIHelper.class);
 
-	private static final long MAX_RUN_TIME = 200;
+	private static final long MAX_RUN_TIME = 100;
 	// Power of 2!
 	private static final int Y_LEVEL = 32;
-	private static int SIZE_X_Z = 256;
-	private static int FIELD_SIZE = (1 << 16) * Y_LEVEL;
+	private static final int SIZE_X_Z = 256;
+	private static final int FIELD_SIZE = (1 << 16) * Y_LEVEL;
+	protected static final int HORIZONTAL_SEARCH_DISTANCE = SIZE_X_Z / 2;
+	protected static final int VERTICAL_SEARCH_DISTANCE = Y_LEVEL / 2;
+
 	// Needs to be more than normal distance spread. Power of 2.
 	private static int FAST_DISTANCE_ACCESS = 64;
 
@@ -238,7 +241,7 @@ public class PathFinderField implements Comparator<Integer> {
 		startTime = System.currentTimeMillis();
 		long iteration = 0;
 		while (!pqEmpty()
-				&& ((iteration++ & 0xff) == 0 || hasTimeLeft(startTime))) {
+				&& ((iteration++ & 0xff) != 0 || hasTimeLeft(startTime))) {
 			final int currentNode = pqPoll();
 			final int currentDistance = getDistance(currentNode);
 			if (currentDest != null
@@ -265,7 +268,7 @@ public class PathFinderField implements Comparator<Integer> {
 					if (distance < getDistance(n)) {
 						LOGGER.error(
 								MARKER_PATH,
-								"A shorter path was found. THis should not happen. Node: %d.",
+								"A shorter path was found. This should not happen. Node: {}.",
 								n);
 					}
 					continue;
@@ -287,14 +290,15 @@ public class PathFinderField implements Comparator<Integer> {
 			setVisited(currentNode);
 		}
 		if (pqEmpty()) {
-			if (LOGGER.isDebugEnabled(MARKER_PATH)) {
-				LOGGER.debug(MARKER_PATH, "Path found to node " + currentDest + ". Planing path from " +
-				cx + "," + cy + "," + cz + " to " + getX(currentDest.destNode) + "," + getY(currentDest.destNode) + "," + getZ(currentDest.destNode));
-			}
 			if (currentDest != null) {
+				if (LOGGER.isDebugEnabled(MARKER_PATH)) {
+					LOGGER.debug(MARKER_PATH, "Path found to node " + currentDest + ". Planing path from " +
+							cx + "," + cy + "," + cz + " to " + getX(currentDest.destNode) + "," + getY(currentDest.destNode) + "," + getZ(currentDest.destNode));
+				}
 				planPathTo(currentDest.destNode, cx, cy, cz);
 				terminated();
 			} else {
+				LOGGER.debug(MARKER_PATH, "Could not find any destination");
 				terminated();
 				noPathFound();
 			}
@@ -410,10 +414,10 @@ public class PathFinderField implements Comparator<Integer> {
 	}
 
 	protected int getNeighbour(int currentNode, int cx, int cy, int cz) {
-		return cy > 1 && cy < 256 && cx > data.offsetX
-				&& cx < data.offsetX + 256 && cy > data.offsetY
+		return cy >= 1 && cy < 256 && cx > data.offsetX
+				&& cx < data.offsetX + SIZE_X_Z && cy > data.offsetY
 				&& cy < data.offsetY + Y_LEVEL && cz > data.offsetZ
-				&& cz < data.offsetZ + 256 ? getIndexForBlock(cx, cy, cz) : -1;
+				&& cz < data.offsetZ + SIZE_X_Z ? getIndexForBlock(cx, cy, cz) : -1;
 	}
 
 	private void debug(int nodeId) {

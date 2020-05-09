@@ -44,7 +44,7 @@ public class ItemPlaceOnGroundTask extends BuildFlatOnGroundTask {
 			Blocks.GLASS, 
 			Blocks.GOLD_BLOCK,
 			Blocks.GOLD_ORE,
-			Blocks.GRASS, 
+			Blocks.GRASS_BLOCK,
 			Blocks.GRAVEL, 
 			Blocks.HAY_BLOCK, 
 			Blocks.IRON_BLOCK,

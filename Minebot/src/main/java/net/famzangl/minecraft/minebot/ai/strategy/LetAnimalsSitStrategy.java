@@ -16,14 +16,11 @@
  *******************************************************************************/
 package net.famzangl.minecraft.minebot.ai.strategy;
 
-import com.google.common.base.Predicate;
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.ItemFilter;
 import net.famzangl.minecraft.minebot.ai.animals.AnimalyType;
-import net.famzangl.minecraft.minebot.ai.selectors.AndSelector;
 import net.famzangl.minecraft.minebot.ai.selectors.ColorSelector;
 import net.famzangl.minecraft.minebot.ai.selectors.IsSittingSelector;
-import net.famzangl.minecraft.minebot.ai.selectors.NotSelector;
 import net.famzangl.minecraft.minebot.ai.selectors.OneOfListSelector;
 import net.famzangl.minecraft.minebot.ai.task.FaceAndInteractTask;
 import net.minecraft.entity.Entity;
@@ -34,6 +31,7 @@ import net.minecraft.item.ItemStack;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Predicate;
 
 /**
  * Lets all wolves that are owned by the current player either sit or stand.
@@ -86,11 +84,11 @@ public class LetAnimalsSitStrategy extends TaskStrategy {
 			return;
 		}
 
-		Predicate<Entity> selector = new AndSelector(new IsSittingSelector(
-				!shouldSit, helper.getMinecraft().player), new NotSelector(
-				new OneOfListSelector(handled)));
+		Predicate<Entity> selector = new IsSittingSelector(
+				!shouldSit, helper.getMinecraft().player).and(
+				new OneOfListSelector(handled).negate());
 		if (color != null) {
-			selector = new AndSelector(selector, new ColorSelector(color));
+			selector = selector.and(new ColorSelector(color));
 		}
 
 		final Entity found = helper.getClosestEntity(DISTANCE, selector);

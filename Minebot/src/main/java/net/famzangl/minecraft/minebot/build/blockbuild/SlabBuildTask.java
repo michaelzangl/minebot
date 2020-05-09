@@ -51,7 +51,7 @@ public class SlabBuildTask extends BlockBuildTask {
 	@Override
 	public AITask getPlaceBlockTask(BlockPos relativeFromPos) {
 		if (!isStandablePlace(relativeFromPos)) {
-			throw new IllegalArgumentException("Cannot build standing there: "
+			throw new IllegalArgumentException("Cannot build a slab at " + forPosition + " standing at relative position: "
 					+ relativeFromPos);
 		} else if (relativeFromPos.equals(FROM_GROUND)) {
 			return new JumpingPlaceAtHalfTask(forPosition.add(0, 1, 0),

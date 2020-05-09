@@ -1,6 +1,5 @@
 package net.famzangl.minecraft.minebot.ai.net;
 
-import net.famzangl.minecraft.minebot.MinebotMod;
 import net.minecraft.client.network.play.IClientPlayNetHandler;
 import net.minecraft.network.IPacket;
 import net.minecraft.network.NetworkManager;
@@ -99,513 +98,464 @@ import net.minecraft.util.text.ITextComponent;
 import javax.annotation.ParametersAreNonnullByDefault;
 
 @ParametersAreNonnullByDefault
-public class MinebotClientNetHandler implements IClientPlayNetHandler {
+public class MinebotClientPlayNetHandler implements IClientPlayNetHandler {
 
     private IClientPlayNetHandler parentHandler;
     private Intercepts<IPacket<IClientPlayNetHandler>> handlers;
 
-    public MinebotClientNetHandler(IClientPlayNetHandler parentHandler, Intercepts<IPacket<IClientPlayNetHandler>> handlers) {
+    public MinebotClientPlayNetHandler(IClientPlayNetHandler parentHandler, Intercepts<IPacket<IClientPlayNetHandler>> handlers) {
         this.parentHandler = parentHandler;
         this.handlers = handlers;
     }
 
     @Override
     public void handleSpawnObject(SSpawnObjectPacket packetIn) {
-        if (handlers.intercept(packetIn) != Intercepts.EInterceptResult.DROP) parentHandler.handleSpawnObject(packetIn);
+        handlers.withInterceptors(packetIn, parentHandler::handleSpawnObject);
     }
 
     @Override
     public void handleSpawnExperienceOrb(SSpawnExperienceOrbPacket packetIn) {
-        if (handlers.intercept(packetIn) != Intercepts.EInterceptResult.DROP)
-            parentHandler.handleSpawnExperienceOrb(packetIn);
+        handlers.withInterceptors(packetIn, parentHandler::handleSpawnExperienceOrb);
     }
 
     @Override
     public void handleSpawnGlobalEntity(SSpawnGlobalEntityPacket packetIn) {
-        if (handlers.intercept(packetIn) != Intercepts.EInterceptResult.DROP)
-            parentHandler.handleSpawnGlobalEntity(packetIn);
+        handlers.withInterceptors(packetIn, parentHandler::handleSpawnGlobalEntity);
     }
 
     @Override
     public void handleSpawnMob(SSpawnMobPacket packetIn) {
-        if (handlers.intercept(packetIn) != Intercepts.EInterceptResult.DROP) parentHandler.handleSpawnMob(packetIn);
+        handlers.withInterceptors(packetIn, parentHandler::handleSpawnMob);
     }
 
     @Override
     public void handleScoreboardObjective(SScoreboardObjectivePacket packetIn) {
-        if (handlers.intercept(packetIn) != Intercepts.EInterceptResult.DROP)
-            parentHandler.handleScoreboardObjective(packetIn);
+        handlers.withInterceptors(packetIn, parentHandler::handleScoreboardObjective);
     }
 
     @Override
     public void handleSpawnPainting(SSpawnPaintingPacket packetIn) {
-        if (handlers.intercept(packetIn) != Intercepts.EInterceptResult.DROP)
-            parentHandler.handleSpawnPainting(packetIn);
+        handlers.withInterceptors(packetIn, parentHandler::handleSpawnPainting);
     }
 
     @Override
     public void handleSpawnPlayer(SSpawnPlayerPacket packetIn) {
-        if (handlers.intercept(packetIn) != Intercepts.EInterceptResult.DROP) parentHandler.handleSpawnPlayer(packetIn);
+        handlers.withInterceptors(packetIn, parentHandler::handleSpawnPlayer);
     }
 
     @Override
     public void handleAnimation(SAnimateHandPacket packetIn) {
-        if (handlers.intercept(packetIn) != Intercepts.EInterceptResult.DROP) parentHandler.handleAnimation(packetIn);
+        handlers.withInterceptors(packetIn, parentHandler::handleAnimation);
     }
 
     @Override
     public void handleStatistics(SStatisticsPacket packetIn) {
-        if (handlers.intercept(packetIn) != Intercepts.EInterceptResult.DROP) parentHandler.handleStatistics(packetIn);
+        handlers.withInterceptors(packetIn, parentHandler::handleStatistics);
     }
 
     @Override
     public void handleRecipeBook(SRecipeBookPacket packetIn) {
-        if (handlers.intercept(packetIn) != Intercepts.EInterceptResult.DROP) parentHandler.handleRecipeBook(packetIn);
+        handlers.withInterceptors(packetIn, parentHandler::handleRecipeBook);
     }
 
     @Override
     public void handleBlockBreakAnim(SAnimateBlockBreakPacket packetIn) {
-        if (handlers.intercept(packetIn) != Intercepts.EInterceptResult.DROP)
-            parentHandler.handleBlockBreakAnim(packetIn);
+        handlers.withInterceptors(packetIn, parentHandler::handleBlockBreakAnim);
     }
 
     @Override
     public void handleSignEditorOpen(SOpenSignMenuPacket packetIn) {
-        if (handlers.intercept(packetIn) != Intercepts.EInterceptResult.DROP)
-            parentHandler.handleSignEditorOpen(packetIn);
+        handlers.withInterceptors(packetIn, parentHandler::handleSignEditorOpen);
     }
 
     @Override
     public void handleUpdateTileEntity(SUpdateTileEntityPacket packetIn) {
-        if (handlers.intercept(packetIn) != Intercepts.EInterceptResult.DROP)
-            parentHandler.handleUpdateTileEntity(packetIn);
+        handlers.withInterceptors(packetIn, parentHandler::handleUpdateTileEntity);
     }
 
     @Override
     public void handleBlockAction(SBlockActionPacket packetIn) {
-        if (handlers.intercept(packetIn) != Intercepts.EInterceptResult.DROP) parentHandler.handleBlockAction(packetIn);
+        handlers.withInterceptors(packetIn, parentHandler::handleBlockAction);
     }
 
     @Override
     public void handleBlockChange(SChangeBlockPacket packetIn) {
-        if (handlers.intercept(packetIn) != Intercepts.EInterceptResult.DROP) parentHandler.handleBlockChange(packetIn);
+        handlers.withInterceptors(packetIn, parentHandler::handleBlockChange);
     }
 
     @Override
     public void handleChat(SChatPacket packetIn) {
-        if (handlers.intercept(packetIn) != Intercepts.EInterceptResult.DROP) parentHandler.handleChat(packetIn);
+        handlers.withInterceptors(packetIn, parentHandler::handleChat);
     }
 
     @Override
     public void handleMultiBlockChange(SMultiBlockChangePacket packetIn) {
-        if (handlers.intercept(packetIn) != Intercepts.EInterceptResult.DROP)
-            parentHandler.handleMultiBlockChange(packetIn);
+        handlers.withInterceptors(packetIn, parentHandler::handleMultiBlockChange);
     }
 
     @Override
     public void handleMaps(SMapDataPacket packetIn) {
-        if (handlers.intercept(packetIn) != Intercepts.EInterceptResult.DROP) parentHandler.handleMaps(packetIn);
+        handlers.withInterceptors(packetIn, parentHandler::handleMaps);
     }
 
     @Override
     public void handleConfirmTransaction(SConfirmTransactionPacket packetIn) {
-        if (handlers.intercept(packetIn) != Intercepts.EInterceptResult.DROP)
-            parentHandler.handleConfirmTransaction(packetIn);
+        handlers.withInterceptors(packetIn, parentHandler::handleConfirmTransaction);
     }
 
     @Override
     public void handleCloseWindow(SCloseWindowPacket packetIn) {
-        if (handlers.intercept(packetIn) != Intercepts.EInterceptResult.DROP) parentHandler.handleCloseWindow(packetIn);
+        handlers.withInterceptors(packetIn, parentHandler::handleCloseWindow);
     }
 
     @Override
     public void handleWindowItems(SWindowItemsPacket packetIn) {
-        if (handlers.intercept(packetIn) != Intercepts.EInterceptResult.DROP) parentHandler.handleWindowItems(packetIn);
+        handlers.withInterceptors(packetIn, parentHandler::handleWindowItems);
     }
 
     @Override
     public void handleOpenHorseWindow(SOpenHorseWindowPacket packetIn) {
-        if (handlers.intercept(packetIn) != Intercepts.EInterceptResult.DROP)
-            parentHandler.handleOpenHorseWindow(packetIn);
+        handlers.withInterceptors(packetIn, parentHandler::handleOpenHorseWindow);
     }
 
     @Override
     public void handleWindowProperty(SWindowPropertyPacket packetIn) {
-        if (handlers.intercept(packetIn) != Intercepts.EInterceptResult.DROP)
-            parentHandler.handleWindowProperty(packetIn);
+        handlers.withInterceptors(packetIn, parentHandler::handleWindowProperty);
     }
 
     @Override
     public void handleSetSlot(SSetSlotPacket packetIn) {
-        if (handlers.intercept(packetIn) != Intercepts.EInterceptResult.DROP) parentHandler.handleSetSlot(packetIn);
+        handlers.withInterceptors(packetIn, parentHandler::handleSetSlot);
     }
 
     @Override
     public void handleCustomPayload(SCustomPayloadPlayPacket packetIn) {
-        if (handlers.intercept(packetIn) != Intercepts.EInterceptResult.DROP)
-            parentHandler.handleCustomPayload(packetIn);
+        handlers.withInterceptors(packetIn, parentHandler::handleCustomPayload);
     }
 
     @Override
     public void handleDisconnect(SDisconnectPacket packetIn) {
-        if (handlers.intercept(packetIn) != Intercepts.EInterceptResult.DROP) parentHandler.handleDisconnect(packetIn);
+        handlers.withInterceptors(packetIn, parentHandler::handleDisconnect);
     }
 
     @Override
     public void handleEntityStatus(SEntityStatusPacket packetIn) {
-        if (handlers.intercept(packetIn) != Intercepts.EInterceptResult.DROP)
-            parentHandler.handleEntityStatus(packetIn);
+        handlers.withInterceptors(packetIn, parentHandler::handleEntityStatus);
     }
 
     @Override
     public void handleEntityAttach(SMountEntityPacket packetIn) {
-        if (handlers.intercept(packetIn) != Intercepts.EInterceptResult.DROP)
-            parentHandler.handleEntityAttach(packetIn);
+        handlers.withInterceptors(packetIn, parentHandler::handleEntityAttach);
     }
 
     @Override
     public void handleSetPassengers(SSetPassengersPacket packetIn) {
-        if (handlers.intercept(packetIn) != Intercepts.EInterceptResult.DROP)
-            parentHandler.handleSetPassengers(packetIn);
+        handlers.withInterceptors(packetIn, parentHandler::handleSetPassengers);
     }
 
     @Override
     public void handleExplosion(SExplosionPacket packetIn) {
-        if (handlers.intercept(packetIn) != Intercepts.EInterceptResult.DROP) parentHandler.handleExplosion(packetIn);
+        handlers.withInterceptors(packetIn, parentHandler::handleExplosion);
     }
 
     @Override
     public void handleChangeGameState(SChangeGameStatePacket packetIn) {
-        if (handlers.intercept(packetIn) != Intercepts.EInterceptResult.DROP)
-            parentHandler.handleChangeGameState(packetIn);
+        handlers.withInterceptors(packetIn, parentHandler::handleChangeGameState);
     }
 
     @Override
     public void handleKeepAlive(SKeepAlivePacket packetIn) {
-        if (handlers.intercept(packetIn) != Intercepts.EInterceptResult.DROP) parentHandler.handleKeepAlive(packetIn);
+        handlers.withInterceptors(packetIn, parentHandler::handleKeepAlive);
     }
 
     @Override
     public void handleChunkData(SChunkDataPacket packetIn) {
-        if (handlers.intercept(packetIn) != Intercepts.EInterceptResult.DROP) parentHandler.handleChunkData(packetIn);
+        handlers.withInterceptors(packetIn, parentHandler::handleChunkData);
     }
 
     @Override
     public void processChunkUnload(SUnloadChunkPacket packetIn) {
-        if (handlers.intercept(packetIn) != Intercepts.EInterceptResult.DROP)
-            parentHandler.processChunkUnload(packetIn);
+        handlers.withInterceptors(packetIn, parentHandler::processChunkUnload);
     }
 
     @Override
     public void handleEffect(SPlaySoundEventPacket packetIn) {
-        if (handlers.intercept(packetIn) != Intercepts.EInterceptResult.DROP) parentHandler.handleEffect(packetIn);
+        handlers.withInterceptors(packetIn, parentHandler::handleEffect);
     }
 
     @Override
     public void handleJoinGame(SJoinGamePacket packetIn) {
-        if (handlers.intercept(packetIn) != Intercepts.EInterceptResult.DROP) parentHandler.handleJoinGame(packetIn);
+        handlers.withInterceptors(packetIn, parentHandler::handleJoinGame);
     }
 
     @Override
     public void handleEntityMovement(SEntityPacket packetIn) {
-        if (handlers.intercept(packetIn) != Intercepts.EInterceptResult.DROP)
-            parentHandler.handleEntityMovement(packetIn);
+        handlers.withInterceptors(packetIn, parentHandler::handleEntityMovement);
     }
 
     @Override
     public void handlePlayerPosLook(SPlayerPositionLookPacket packetIn) {
-        if (handlers.intercept(packetIn) != Intercepts.EInterceptResult.DROP)
-            parentHandler.handlePlayerPosLook(packetIn);
+        handlers.withInterceptors(packetIn, parentHandler::handlePlayerPosLook);
     }
 
     @Override
     public void handleParticles(SSpawnParticlePacket packetIn) {
-        if (handlers.intercept(packetIn) != Intercepts.EInterceptResult.DROP) parentHandler.handleParticles(packetIn);
+        handlers.withInterceptors(packetIn, parentHandler::handleParticles);
     }
 
     @Override
     public void handlePlayerAbilities(SPlayerAbilitiesPacket packetIn) {
-        if (handlers.intercept(packetIn) != Intercepts.EInterceptResult.DROP)
-            parentHandler.handlePlayerAbilities(packetIn);
+        handlers.withInterceptors(packetIn, parentHandler::handlePlayerAbilities);
     }
 
     @Override
     public void handlePlayerListItem(SPlayerListItemPacket packetIn) {
-        if (handlers.intercept(packetIn) != Intercepts.EInterceptResult.DROP)
-            parentHandler.handlePlayerListItem(packetIn);
+        handlers.withInterceptors(packetIn, parentHandler::handlePlayerListItem);
     }
 
     @Override
     public void handleDestroyEntities(SDestroyEntitiesPacket packetIn) {
-        if (handlers.intercept(packetIn) != Intercepts.EInterceptResult.DROP)
-            parentHandler.handleDestroyEntities(packetIn);
+        handlers.withInterceptors(packetIn, parentHandler::handleDestroyEntities);
     }
 
     @Override
     public void handleRemoveEntityEffect(SRemoveEntityEffectPacket packetIn) {
-        if (handlers.intercept(packetIn) != Intercepts.EInterceptResult.DROP)
-            parentHandler.handleRemoveEntityEffect(packetIn);
+        handlers.withInterceptors(packetIn, parentHandler::handleRemoveEntityEffect);
     }
 
     @Override
     public void handleRespawn(SRespawnPacket packetIn) {
-        if (handlers.intercept(packetIn) != Intercepts.EInterceptResult.DROP) parentHandler.handleRespawn(packetIn);
+        handlers.withInterceptors(packetIn, parentHandler::handleRespawn);
     }
 
     @Override
     public void handleEntityHeadLook(SEntityHeadLookPacket packetIn) {
-        if (handlers.intercept(packetIn) != Intercepts.EInterceptResult.DROP)
-            parentHandler.handleEntityHeadLook(packetIn);
+        handlers.withInterceptors(packetIn, parentHandler::handleEntityHeadLook);
     }
 
     @Override
     public void handleHeldItemChange(SHeldItemChangePacket packetIn) {
-        if (handlers.intercept(packetIn) != Intercepts.EInterceptResult.DROP)
-            parentHandler.handleHeldItemChange(packetIn);
+        handlers.withInterceptors(packetIn, parentHandler::handleHeldItemChange);
     }
 
     @Override
     public void handleDisplayObjective(SDisplayObjectivePacket packetIn) {
-        if (handlers.intercept(packetIn) != Intercepts.EInterceptResult.DROP)
-            parentHandler.handleDisplayObjective(packetIn);
+        handlers.withInterceptors(packetIn, parentHandler::handleDisplayObjective);
     }
 
     @Override
     public void handleEntityMetadata(SEntityMetadataPacket packetIn) {
-        if (handlers.intercept(packetIn) != Intercepts.EInterceptResult.DROP)
-            parentHandler.handleEntityMetadata(packetIn);
+        handlers.withInterceptors(packetIn, parentHandler::handleEntityMetadata);
     }
 
     @Override
     public void handleEntityVelocity(SEntityVelocityPacket packetIn) {
-        if (handlers.intercept(packetIn) != Intercepts.EInterceptResult.DROP)
-            parentHandler.handleEntityVelocity(packetIn);
+        handlers.withInterceptors(packetIn, parentHandler::handleEntityVelocity);
     }
 
     @Override
     public void handleEntityEquipment(SEntityEquipmentPacket packetIn) {
-        if (handlers.intercept(packetIn) != Intercepts.EInterceptResult.DROP)
-            parentHandler.handleEntityEquipment(packetIn);
+        handlers.withInterceptors(packetIn, parentHandler::handleEntityEquipment);
     }
 
     @Override
     public void handleSetExperience(SSetExperiencePacket packetIn) {
-        if (handlers.intercept(packetIn) != Intercepts.EInterceptResult.DROP)
-            parentHandler.handleSetExperience(packetIn);
+        handlers.withInterceptors(packetIn, parentHandler::handleSetExperience);
     }
 
     @Override
     public void handleUpdateHealth(SUpdateHealthPacket packetIn) {
-        if (handlers.intercept(packetIn) != Intercepts.EInterceptResult.DROP)
-            parentHandler.handleUpdateHealth(packetIn);
+        handlers.withInterceptors(packetIn, parentHandler::handleUpdateHealth);
     }
 
     @Override
     public void handleTeams(STeamsPacket packetIn) {
-        if (handlers.intercept(packetIn) != Intercepts.EInterceptResult.DROP) parentHandler.handleTeams(packetIn);
+        handlers.withInterceptors(packetIn, parentHandler::handleTeams);
     }
 
     @Override
     public void handleUpdateScore(SUpdateScorePacket packetIn) {
-        if (handlers.intercept(packetIn) != Intercepts.EInterceptResult.DROP) parentHandler.handleUpdateScore(packetIn);
+        handlers.withInterceptors(packetIn, parentHandler::handleUpdateScore);
     }
 
     @Override
     public void handleSpawnPosition(SSpawnPositionPacket packetIn) {
-        if (handlers.intercept(packetIn) != Intercepts.EInterceptResult.DROP)
-            parentHandler.handleSpawnPosition(packetIn);
+        handlers.withInterceptors(packetIn, parentHandler::handleSpawnPosition);
     }
 
     @Override
     public void handleTimeUpdate(SUpdateTimePacket packetIn) {
-        if (handlers.intercept(packetIn) != Intercepts.EInterceptResult.DROP) parentHandler.handleTimeUpdate(packetIn);
+        handlers.withInterceptors(packetIn, parentHandler::handleTimeUpdate);
     }
 
     @Override
     public void handleSoundEffect(SPlaySoundEffectPacket packetIn) {
-        if (handlers.intercept(packetIn) != Intercepts.EInterceptResult.DROP) parentHandler.handleSoundEffect(packetIn);
+        handlers.withInterceptors(packetIn, parentHandler::handleSoundEffect);
     }
 
     @Override
     public void func_217266_a(SSpawnMovingSoundEffectPacket packetIn) {
-        if (handlers.intercept(packetIn) != Intercepts.EInterceptResult.DROP) parentHandler.func_217266_a(packetIn);
+        handlers.withInterceptors(packetIn, parentHandler::func_217266_a);
     }
 
     @Override
     public void handleCustomSound(SPlaySoundPacket packetIn) {
-        if (handlers.intercept(packetIn) != Intercepts.EInterceptResult.DROP) parentHandler.handleCustomSound(packetIn);
+        handlers.withInterceptors(packetIn, parentHandler::handleCustomSound);
     }
 
     @Override
     public void handleCollectItem(SCollectItemPacket packetIn) {
-        if (handlers.intercept(packetIn) != Intercepts.EInterceptResult.DROP) parentHandler.handleCollectItem(packetIn);
+        handlers.withInterceptors(packetIn, parentHandler::handleCollectItem);
     }
 
     @Override
     public void handleEntityTeleport(SEntityTeleportPacket packetIn) {
-        if (handlers.intercept(packetIn) != Intercepts.EInterceptResult.DROP)
-            parentHandler.handleEntityTeleport(packetIn);
+        handlers.withInterceptors(packetIn, parentHandler::handleEntityTeleport);
     }
 
     @Override
     public void handleEntityProperties(SEntityPropertiesPacket packetIn) {
-        if (handlers.intercept(packetIn) != Intercepts.EInterceptResult.DROP)
-            parentHandler.handleEntityProperties(packetIn);
+        handlers.withInterceptors(packetIn, parentHandler::handleEntityProperties);
     }
 
     @Override
     public void handleEntityEffect(SPlayEntityEffectPacket packetIn) {
-        if (handlers.intercept(packetIn) != Intercepts.EInterceptResult.DROP)
-            parentHandler.handleEntityEffect(packetIn);
+        handlers.withInterceptors(packetIn, parentHandler::handleEntityEffect);
     }
 
     @Override
     public void handleTags(STagsListPacket packetIn) {
-        if (handlers.intercept(packetIn) != Intercepts.EInterceptResult.DROP) parentHandler.handleTags(packetIn);
+        handlers.withInterceptors(packetIn, parentHandler::handleTags);
     }
 
     @Override
     public void handleCombatEvent(SCombatPacket packetIn) {
-        if (handlers.intercept(packetIn) != Intercepts.EInterceptResult.DROP) parentHandler.handleCombatEvent(packetIn);
+        handlers.withInterceptors(packetIn, parentHandler::handleCombatEvent);
     }
 
     @Override
     public void handleServerDifficulty(SServerDifficultyPacket packetIn) {
-        if (handlers.intercept(packetIn) != Intercepts.EInterceptResult.DROP)
-            parentHandler.handleServerDifficulty(packetIn);
+        handlers.withInterceptors(packetIn, parentHandler::handleServerDifficulty);
     }
 
     @Override
     public void handleCamera(SCameraPacket packetIn) {
-        if (handlers.intercept(packetIn) != Intercepts.EInterceptResult.DROP) parentHandler.handleCamera(packetIn);
+        handlers.withInterceptors(packetIn, parentHandler::handleCamera);
     }
 
     @Override
     public void handleWorldBorder(SWorldBorderPacket packetIn) {
-        if (handlers.intercept(packetIn) != Intercepts.EInterceptResult.DROP) parentHandler.handleWorldBorder(packetIn);
+        handlers.withInterceptors(packetIn, parentHandler::handleWorldBorder);
     }
 
     @Override
     public void handleTitle(STitlePacket packetIn) {
-        if (handlers.intercept(packetIn) != Intercepts.EInterceptResult.DROP) parentHandler.handleTitle(packetIn);
+        handlers.withInterceptors(packetIn, parentHandler::handleTitle);
     }
 
     @Override
     public void handlePlayerListHeaderFooter(SPlayerListHeaderFooterPacket packetIn) {
-        if (handlers.intercept(packetIn) != Intercepts.EInterceptResult.DROP)
-            parentHandler.handlePlayerListHeaderFooter(packetIn);
+        handlers.withInterceptors(packetIn, parentHandler::handlePlayerListHeaderFooter);
     }
 
     @Override
     public void handleResourcePack(SSendResourcePackPacket packetIn) {
-        if (handlers.intercept(packetIn) != Intercepts.EInterceptResult.DROP)
-            parentHandler.handleResourcePack(packetIn);
+        handlers.withInterceptors(packetIn, parentHandler::handleResourcePack);
     }
 
     @Override
     public void handleUpdateBossInfo(SUpdateBossInfoPacket packetIn) {
-        if (handlers.intercept(packetIn) != Intercepts.EInterceptResult.DROP)
-            parentHandler.handleUpdateBossInfo(packetIn);
+        handlers.withInterceptors(packetIn, parentHandler::handleUpdateBossInfo);
     }
 
     @Override
     public void handleCooldown(SCooldownPacket packetIn) {
-        if (handlers.intercept(packetIn) != Intercepts.EInterceptResult.DROP) parentHandler.handleCooldown(packetIn);
+        handlers.withInterceptors(packetIn, parentHandler::handleCooldown);
     }
 
     @Override
     public void handleMoveVehicle(SMoveVehiclePacket packetIn) {
-        if (handlers.intercept(packetIn) != Intercepts.EInterceptResult.DROP) parentHandler.handleMoveVehicle(packetIn);
+        handlers.withInterceptors(packetIn, parentHandler::handleMoveVehicle);
     }
 
     @Override
     public void handleAdvancementInfo(SAdvancementInfoPacket packetIn) {
-        if (handlers.intercept(packetIn) != Intercepts.EInterceptResult.DROP)
-            parentHandler.handleAdvancementInfo(packetIn);
+        handlers.withInterceptors(packetIn, parentHandler::handleAdvancementInfo);
     }
 
     @Override
     public void handleSelectAdvancementsTab(SSelectAdvancementsTabPacket packetIn) {
-        if (handlers.intercept(packetIn) != Intercepts.EInterceptResult.DROP)
-            parentHandler.handleSelectAdvancementsTab(packetIn);
+        handlers.withInterceptors(packetIn, parentHandler::handleSelectAdvancementsTab);
     }
 
     @Override
     public void handlePlaceGhostRecipe(SPlaceGhostRecipePacket packetIn) {
-        if (handlers.intercept(packetIn) != Intercepts.EInterceptResult.DROP)
-            parentHandler.handlePlaceGhostRecipe(packetIn);
+        handlers.withInterceptors(packetIn, parentHandler::handlePlaceGhostRecipe);
     }
 
     @Override
     public void handleCommandList(SCommandListPacket packetIn) {
-        if (handlers.intercept(packetIn) != Intercepts.EInterceptResult.DROP) parentHandler.handleCommandList(packetIn);
+        handlers.withInterceptors(packetIn, parentHandler::handleCommandList);
     }
 
     @Override
     public void handleStopSound(SStopSoundPacket packetIn) {
-        if (handlers.intercept(packetIn) != Intercepts.EInterceptResult.DROP) parentHandler.handleStopSound(packetIn);
+        handlers.withInterceptors(packetIn, parentHandler::handleStopSound);
     }
 
     @Override
     public void handleTabComplete(STabCompletePacket packetIn) {
-        if (handlers.intercept(packetIn) != Intercepts.EInterceptResult.DROP) parentHandler.handleTabComplete(packetIn);
+        handlers.withInterceptors(packetIn, parentHandler::handleTabComplete);
     }
 
     @Override
     public void handleUpdateRecipes(SUpdateRecipesPacket packetIn) {
-        if (handlers.intercept(packetIn) != Intercepts.EInterceptResult.DROP)
-            parentHandler.handleUpdateRecipes(packetIn);
+        handlers.withInterceptors(packetIn, parentHandler::handleUpdateRecipes);
     }
 
     @Override
     public void handlePlayerLook(SPlayerLookPacket packetIn) {
-        if (handlers.intercept(packetIn) != Intercepts.EInterceptResult.DROP) parentHandler.handlePlayerLook(packetIn);
+        handlers.withInterceptors(packetIn, parentHandler::handlePlayerLook);
     }
 
     @Override
     public void handleNBTQueryResponse(SQueryNBTResponsePacket packetIn) {
-        if (handlers.intercept(packetIn) != Intercepts.EInterceptResult.DROP)
-            parentHandler.handleNBTQueryResponse(packetIn);
+        handlers.withInterceptors(packetIn, parentHandler::handleNBTQueryResponse);
     }
 
     @Override
     public void handleUpdateLight(SUpdateLightPacket packetIn) {
-        if (handlers.intercept(packetIn) != Intercepts.EInterceptResult.DROP) parentHandler.handleUpdateLight(packetIn);
+        handlers.withInterceptors(packetIn, parentHandler::handleUpdateLight);
     }
 
     @Override
     public void handleOpenBookPacket(SOpenBookWindowPacket packetIn) {
-        if (handlers.intercept(packetIn) != Intercepts.EInterceptResult.DROP)
-            parentHandler.handleOpenBookPacket(packetIn);
+        handlers.withInterceptors(packetIn, parentHandler::handleOpenBookPacket);
     }
 
     @Override
     public void handleOpenWindowPacket(SOpenWindowPacket packetIn) {
-        if (handlers.intercept(packetIn) != Intercepts.EInterceptResult.DROP)
-            parentHandler.handleOpenWindowPacket(packetIn);
+        handlers.withInterceptors(packetIn, parentHandler::handleOpenWindowPacket);
     }
 
     @Override
     public void handleMerchantOffers(SMerchantOffersPacket packetIn) {
-        if (handlers.intercept(packetIn) != Intercepts.EInterceptResult.DROP)
-            parentHandler.handleMerchantOffers(packetIn);
+        handlers.withInterceptors(packetIn, parentHandler::handleMerchantOffers);
     }
 
     @Override
     public void handleUpdateViewDistancePacket(SUpdateViewDistancePacket packetIn) {
-        if (handlers.intercept(packetIn) != Intercepts.EInterceptResult.DROP)
-            parentHandler.handleUpdateViewDistancePacket(packetIn);
+        handlers.withInterceptors(packetIn, parentHandler::handleUpdateViewDistancePacket);
     }
 
     @Override
     public void handleChunkPositionPacket(SUpdateChunkPositionPacket packetIn) {
-        if (handlers.intercept(packetIn) != Intercepts.EInterceptResult.DROP)
-            parentHandler.handleChunkPositionPacket(packetIn);
+        handlers.withInterceptors(packetIn, parentHandler::handleChunkPositionPacket);
     }
 
     @Override
     public void func_225312_a(SPlayerDiggingPacket packetIn) {
-        if (handlers.intercept(packetIn) != Intercepts.EInterceptResult.DROP) parentHandler.func_225312_a(packetIn);
+        handlers.withInterceptors(packetIn, parentHandler::func_225312_a);
     }
 
     @Override

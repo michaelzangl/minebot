@@ -1,6 +1,7 @@
 package net.famzangl.minecraft.minebot.ai.tools.rate;
 
 import net.famzangl.minecraft.minebot.ai.path.world.BlockFloatMap;
+import net.famzangl.minecraft.minebot.ai.path.world.BlockSet;
 import net.minecraft.block.Block;
 import net.minecraft.item.ItemStack;
 
@@ -15,7 +16,7 @@ public class MatchesRater extends Rater {
 				&& forBlockAndMeta >= 0
 				&& item.getItem() != null
 				&& item.getItem().canHarvestBlock(item,
-					Block.getStateById(forBlockAndMeta));
+					BlockSet.getStateById(forBlockAndMeta));
 	}
 
 	@Override

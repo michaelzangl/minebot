@@ -28,16 +28,8 @@ public class BlockFloatMap {
 		this.defaultValue = defaultValue;
 	}
 
-	private void set(int blockWithMeta, float value) {
-		floats[blockWithMeta] = value;
-	}
-
-	public void set(BlockState block, float value) {
-		set(Block.getStateId(block), value);
-	}
-
 	public float get(BlockState blockAndMeta) {
-		return get(Block.getStateId(blockAndMeta));
+		return get(BlockSet.getStateId(blockAndMeta));
 	}
 
 	public float get(int blockAndMeta) {
@@ -60,11 +52,11 @@ public class BlockFloatMap {
 	}
 
 	public void setBlock(Block block, float value) {
-		block.getStateContainer().getValidStates().forEach(state -> setBlockState(state, value));
+		block.getStateContainer().getValidStates().forEach(state -> set(state, value));
 	}
 
-	public void setBlockState(BlockState blockState, float value) {
-		int stateId = Block.getStateId(blockState);
+	public void set(BlockState blockState, float value) {
+		int stateId = BlockSet.getStateId(blockState);
 		if (floats.length <= stateId) {
 			float[] newFloats = Arrays.copyOf(floats, Math.max(stateId + 1, floats.length * 2));
 			Arrays.fill(newFloats, floats.length, newFloats.length, Float.NaN);

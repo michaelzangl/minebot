@@ -16,17 +16,10 @@
  *******************************************************************************/
 package net.famzangl.minecraft.minebot.ai.strategy;
 
-import com.google.common.base.Predicate;
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.ItemFilter;
 import net.famzangl.minecraft.minebot.ai.animals.AnimalyType;
-import net.famzangl.minecraft.minebot.ai.selectors.AndSelector;
-import net.famzangl.minecraft.minebot.ai.selectors.ColorSelector;
-import net.famzangl.minecraft.minebot.ai.selectors.ItemSelector;
-import net.famzangl.minecraft.minebot.ai.selectors.NotSelector;
-import net.famzangl.minecraft.minebot.ai.selectors.OrSelector;
-import net.famzangl.minecraft.minebot.ai.selectors.OwnTameableSelector;
-import net.famzangl.minecraft.minebot.ai.selectors.XPOrbSelector;
+import net.famzangl.minecraft.minebot.ai.selectors.*;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.passive.AnimalEntity;
 import net.minecraft.item.DyeColor;
@@ -34,6 +27,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.SwordItem;
 
 import java.util.HashSet;
+import java.util.function.Predicate;
 
 /**
  * Kills all animals in range by mving towards them and hitting them.
@@ -45,7 +39,7 @@ public class KillAnimalsStrategy extends FaceInteractStrategy {
 
 	private final class KillableSelector implements Predicate<Entity> {
 		@Override
-		public boolean apply(Entity entity) {
+		public boolean test(Entity entity) {
 			if (!type.hasAnimalClass(entity)) {
 				return false;
 			}
@@ -75,26 +69,20 @@ public class KillAnimalsStrategy extends FaceInteractStrategy {
 	@Override
 	protected Predicate<Entity> entitiesToInteract(AIHelper helper) {
 		if (maxKillsReached()) {
-			return new Predicate<Entity>() {
-				@Override
-				public boolean apply(Entity var1) {
-					return false;
-				}
-			};
+			return __ -> false;
 		} else {
 			Predicate<Entity> selector = new KillableSelector();
 			if (color != null) {
-				selector = new AndSelector(new ColorSelector(color), selector);
+				selector = new ColorSelector(color).and(selector);
 			}
-			return new AndSelector(selector, new NotSelector(new OwnTameableSelector(
-					helper.getMinecraft().player)));
+			return selector.and(new OwnTameableSelector(
+					helper.getMinecraft().player).negate());
 		}
 	}
 
 	@Override
 	protected Predicate<Entity> entitiesToFace(AIHelper helper) {
-		return new OrSelector(super.entitiesToFace(helper), new ItemSelector(),
-				new XPOrbSelector());
+		return super.entitiesToFace(helper).or(new ItemSelector()).or(new XPOrbSelector());
 	}
 
 	@Override

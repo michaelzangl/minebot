@@ -36,7 +36,7 @@ public class CommandCraft {
 	 * Blocks that can not be crafted.
 	 */
 	private static final BlockSet simpleBlocks = BlockSet.builder().add(
-			Blocks.AIR, Blocks.BREWING_STAND, Blocks.NETHER_WART,
+			Blocks.BREWING_STAND, Blocks.NETHER_WART,
 			Blocks.CAULDRON, Blocks.FLOWER_POT, Blocks.WHEAT, Blocks.SUGAR_CANE,
 			Blocks.CAKE, Blocks.SKELETON_SKULL, Blocks.SKELETON_WALL_SKULL, Blocks.WITHER_SKELETON_SKULL,
 			Blocks.WITHER_SKELETON_WALL_SKULL, Blocks.PISTON_HEAD,
@@ -46,6 +46,7 @@ public class CommandCraft {
 			Blocks.MELON_STEM,
 			Blocks.REDSTONE_WIRE,
 			Blocks.IRON_DOOR)
+			.add(BlockSets.AIR)
 			.add(BlockSets.WALL_SIGN)
 			.add(BlockSets.WOOL)
 			.add(BlockSets.BED)

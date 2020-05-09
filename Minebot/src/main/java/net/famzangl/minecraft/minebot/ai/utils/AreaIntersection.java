@@ -2,7 +2,11 @@ package net.famzangl.minecraft.minebot.ai.utils;
 
 import net.famzangl.minecraft.minebot.ai.path.world.WorldData;
 
-public class BlockIntersection<WorldT extends WorldData> extends BlockArea<WorldT> {
+/**
+ * Intersection of two block areas
+ * @param <WorldT> The world type
+ */
+public class AreaIntersection<WorldT extends WorldData> extends BlockArea<WorldT> {
 	private static class FilteredAreaVisitor<WorldT extends WorldData> implements AreaVisitor<WorldT> {
 		private AreaVisitor<? super WorldT> visitor;
 		private final BlockArea<? super WorldT> b;
@@ -25,7 +29,7 @@ public class BlockIntersection<WorldT extends WorldData> extends BlockArea<World
 	private final BlockArea<? super WorldT> a;
 	private final BlockArea<? super WorldT> b;
 
-	public BlockIntersection(BlockArea<? super WorldT> a, BlockArea<? super WorldT> b) {
+	public AreaIntersection(BlockArea<? super WorldT> a, BlockArea<? super WorldT> b) {
 		this.a = a;
 		this.b = b;
 	}

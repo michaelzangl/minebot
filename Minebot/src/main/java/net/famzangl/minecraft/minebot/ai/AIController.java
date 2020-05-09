@@ -16,19 +16,18 @@
  *******************************************************************************/
 package net.famzangl.minecraft.minebot.ai;
 
-import net.famzangl.minecraft.minebot.PlayerUpdateHandler;
 import net.famzangl.minecraft.minebot.ai.command.AIChatController;
 import net.famzangl.minecraft.minebot.ai.command.IAIControllable;
+import net.famzangl.minecraft.minebot.ai.command.SafeStrategyRule;
 import net.famzangl.minecraft.minebot.ai.net.MinebotNetHandler;
 import net.famzangl.minecraft.minebot.ai.net.NetworkHelper;
+import net.famzangl.minecraft.minebot.ai.path.world.BlockBoundsCache;
 import net.famzangl.minecraft.minebot.ai.profiler.InterceptingProfiler;
 import net.famzangl.minecraft.minebot.ai.render.BuildMarkerRenderer;
 import net.famzangl.minecraft.minebot.ai.render.PosMarkerRenderer;
-import net.famzangl.minecraft.minebot.ai.strategy.AIStrategy;
+import net.famzangl.minecraft.minebot.ai.strategy.*;
 import net.famzangl.minecraft.minebot.ai.strategy.AIStrategy.TickResult;
-import net.famzangl.minecraft.minebot.ai.strategy.RunOnceStrategy;
 import net.famzangl.minecraft.minebot.ai.utils.PrivateFieldUtils;
-import net.java.games.input.Keyboard;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.MouseHelper;
 import net.minecraft.client.entity.player.ClientPlayerEntity;
@@ -39,16 +38,11 @@ import net.minecraft.item.Items;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.client.event.ClientPlayerNetworkEvent;
-import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.entity.player.UseHoeEvent;
-import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import net.minecraftforge.fml.network.NetworkEvent;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.Marker;
@@ -140,10 +134,13 @@ public class AIController extends AIHelper implements IAIControllable {
 	private boolean displayWasActiveSinceUngrab;
 
 	public AIController() {
-		AIChatController.getRegistry().setControlled(this);
 	}
 
 	public void connect(ClientPlayerNetworkEvent.LoggedInEvent e) {
+		AIChatController.getRegistry().setControlled(this);
+
+		BlockBoundsCache.initialize();
+
 		networkHelper = MinebotNetHandler.inject(getMinecraft().getConnection());
 		profilerHelper = InterceptingProfiler.inject(getMinecraft());
 		// Hook into
@@ -397,9 +394,37 @@ public class AIController extends AIHelper implements IAIControllable {
 	}
 
 	@Override
-	public void requestUseStrategy(AIStrategy strategy) {
-		LOGGER.trace(MARKER_STRATEGY, "Request to use strategy " + strategy);
-		requestedStrategy = strategy;
+	public int requestUseStrategy(AIStrategy strategy) {
+		return requestUseStrategy(strategy, SafeStrategyRule.NONE);
+	}
+
+	@Override
+	public int requestUseStrategy(AIStrategy strategy, SafeStrategyRule rule) {
+		LOGGER.trace(MARKER_STRATEGY, "Request to use strategy " + strategy + " using saferule " + rule);
+
+		requestedStrategy = makeSafe(strategy, rule);
+
+		return 1;
+	}
+	private AIStrategy makeSafe(AIStrategy strategy, SafeStrategyRule safeRule) {
+		if (safeRule == SafeStrategyRule.NONE) {
+			return strategy;
+		} else {
+			final StrategyStack stack = new StrategyStack();
+			stack.addStrategy(new AbortOnDeathStrategy());
+			if (safeRule == SafeStrategyRule.DEFEND_MINING) {
+				stack.addStrategy(new DoNotSuffocateStrategy());
+			}
+			stack.addStrategy(new DamageTakenStrategy());
+			stack.addStrategy(new PlayerComesActionStrategy());
+			stack.addStrategy(new CreeperComesActionStrategy());
+			stack.addStrategy(new EatStrategy());
+			if (safeRule == SafeStrategyRule.DEFEND_MINING) {
+				stack.addStrategy(new PlaceTorchStrategy());
+			}
+			stack.addStrategy(strategy);
+			return new StackStrategy(stack);
+		}
 	}
 
 	// @SubscribeEvent

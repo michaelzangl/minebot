@@ -20,11 +20,12 @@ import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.BlockItemFilter;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSet;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSets;
-import net.famzangl.minecraft.minebot.ai.task.AITask;
-import net.famzangl.minecraft.minebot.ai.task.DestroyInRangeTask;
-import net.famzangl.minecraft.minebot.ai.task.PlaceBlockTask;
-import net.famzangl.minecraft.minebot.ai.task.PlaceTorchSomewhereTask;
+import net.famzangl.minecraft.minebot.ai.path.world.WorldData;
+import net.famzangl.minecraft.minebot.ai.task.*;
 import net.famzangl.minecraft.minebot.ai.task.inventory.GetOnHotBarTask;
+import net.famzangl.minecraft.minebot.ai.utils.AbstractFilteredArea;
+import net.famzangl.minecraft.minebot.ai.utils.BlockCuboid;
+import net.famzangl.minecraft.minebot.ai.utils.BlockFilteredArea;
 import net.famzangl.minecraft.minebot.build.WalkTowardsTask;
 import net.famzangl.minecraft.minebot.build.blockbuild.AbstractBuildTask;
 import net.famzangl.minecraft.minebot.build.blockbuild.BlockBuildTask;
@@ -32,6 +33,8 @@ import net.famzangl.minecraft.minebot.build.blockbuild.SlabBuildTask;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
+import net.minecraft.block.SlabBlock;
+import net.minecraft.state.properties.SlabType;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import org.apache.logging.log4j.LogManager;
@@ -42,7 +45,7 @@ import java.util.Arrays;
 import java.util.Collections;
 
 /**
- * Build a way. it is covered with cobblestone slabs. Bridge profile:
+ * Build a way. it is covered with cobblestone slabs (CSS). Bridge profile:
  * 
  * <pre>
  * (torch)            (torch) 
@@ -58,7 +61,7 @@ import java.util.Collections;
  * Something         Something &lt;- Layer 0
  * Something CSS CSS Something
  * 
- * The lower left CSS is always the root way.
+ * The lower left CSS is always where the player needs to stand to start building the way.
  * 
  * 
  * @author michael
@@ -67,20 +70,57 @@ import java.util.Collections;
 public class BuildWayPathfinder extends AlongTrackPathFinder {
 	private static final Logger LOGGER = LogManager.getLogger(BuildWayPathfinder.class);
 
-	private static final BlockState FLOOR = Blocks.COBBLESTONE_SLAB.getDefaultState();
-	public static final BlockSet FLOOR_BLOCKS = BlockSet.builder().add(FLOOR).build();
+	/**
+	 * The things to place on the floor
+	 */
+	private static final BlockState FLOOR = Blocks.COBBLESTONE_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.BOTTOM);
+	private static final BlockSet FLOOR_BLOCKS = BlockSet.builder().add(FLOOR).build();
 
+	/**
+	 * What to place on the side on a bride
+	 */
 	private static final Block BRIDGE_SIDE = Blocks.COBBLESTONE;
+	/**
+	 * Wall so that people do not fall of the bridge
+	 */
 	private static final Block BRIDGE_WALL = Blocks.COBBLESTONE_WALL;
-	private final int width = 2;
 
-	private BuildWayPathfinder(int dx, int dz, int cx, int cy, int cz) {
-		super(dx, dz, cx, cy, cz, -1);
+	/**
+	 * Width of the way to build. Not changeable at the moment, but could easily be.
+	 */
+	public static final int DEFAULT_WIDTH = 2;
+	private final int width = DEFAULT_WIDTH;
+
+	private BuildWayPathfinder(Direction dir, BlockPos pos) {
+		super(dir.getXOffset(), dir.getZOffset(), pos.getX(), pos
+				.getY(), pos.getZ(), -1);
 	}
 
-	public BuildWayPathfinder(Direction dir, BlockPos pos) {
-		this(dir.getXOffset(), dir.getZOffset(), pos.getX(), pos
-				.getY() + 1, pos.getZ());
+	/**
+	 * Automatically detect the best position to start the path finding at
+	 * @param inDirection Direction. This is fixed
+	 * @param world The world we are in
+	 * @return The pathfinder.
+	 */
+	public static BuildWayPathfinder findContinue(Direction inDirection, WorldData world) {
+		int cx = world.getPlayerPosition().getX();
+		int cy = world.getPlayerPosition().getY();
+		int cz = world.getPlayerPosition().getZ();
+		for (int dy = 0; dy > -2; dy--) {
+			for (int dSide = 0; dSide < DEFAULT_WIDTH; dSide++) {
+				BlockPos near = new BlockPos(cx + inDirection.getZOffset() * (-dSide), cy + dy, cz - inDirection.getXOffset() * (-dSide));
+				BlockPos far = new BlockPos(cx + inDirection.getZOffset() * (-dSide + DEFAULT_WIDTH - 1), cy + dy, cz - inDirection.getXOffset() * (-dSide + DEFAULT_WIDTH - 1));
+				LOGGER.debug("Checking if we can continue way with slabs at {}, {}", near, far);
+				if (new BlockFilteredArea<>(new BlockCuboid<>(near, far), FLOOR_BLOCKS).getVolume(world) == DEFAULT_WIDTH) {
+					// We found the slabs => start building there
+					LOGGER.debug("Found a way to continue at {}, {} in direction {}", near, far, inDirection);
+					return new BuildWayPathfinder(inDirection, near.add(0, 1, 0));
+				}
+			}
+		}
+		// Just start with the player position.
+		LOGGER.debug("Starting new way with player standing at {}, going to {}", world.getPlayerPosition(), inDirection);
+		return new BuildWayPathfinder(inDirection, world.getPlayerPosition().add(0, 1, 0));
 	}
 
 	/**
@@ -101,6 +141,12 @@ public class BuildWayPathfinder extends AlongTrackPathFinder {
 			this.stepIndex = stepIndex;
 		}
 
+		/**
+		 * get a position for the current way build step
+		 * @param u Sideways
+		 * @param dy Upwards
+		 * @return The block pos
+		 */
 		protected BlockPos getPos(int u, int dy) {
 			return new BlockPos(cx + dx * stepIndex + dz * u, cy + dy, cz + dz
 					* stepIndex - dx * u);
@@ -113,32 +159,42 @@ public class BuildWayPathfinder extends AlongTrackPathFinder {
 		/**
 		 * Add construction tasks while standing on the base halfslab
 		 * 
-		 * @param currentPos
+		 * @param currentPos left side of the road.
 		 */
 		public void addConstructionTasks(BlockPos currentPos) {
-			addTask(new GetOnHotBarTask(new BlockItemFilter(FLOOR)));
+			// Open the menu, get the items we need on the hotbar
+			addTask(new GetOnHotBarTask(new BlockItemFilter(FLOOR_BLOCKS)));
 			if (placeTorch) {
+				// TODO: Do not drop the floor blocks here
 				addTask(new GetOnHotBarTask(new BlockItemFilter(Blocks.TORCH)));
 			}
 
+			// This is the first floor block. Place a slab there.
+			// There are 3 places we can be:
+			// * At the side of that slab (=> from previous task)
+			// * At the bottom of that slab (=> from pathfiner)
 			final BlockPos first = getPos(0, -1);
 			final AITask placeTask = new SlabBuildTask(first, FLOOR).getPlaceBlockTask(currentPos
 					.subtract(first));
 			addTask(placeTask);
 
-			final DestroyInRangeTask clearTask = getClearAreaTask();
-			//FIXME: clearTask.blacklist(first);
-			addTask(clearTask);
+			// Now we are standing on the first slab. Clear everything else
+			addTask(getClearAreaTask());
 
+			// The tasks to build the floor slabs
 			for (int i = 1; i < width; i++) {
 				final BlockPos current = getPos(i, -1);
 				addTask(new SlabBuildTask(current, FLOOR)
 						.getPlaceBlockTask(getPos(i - 1, 0).subtract(current)));
 			}
 
+			// Tasks for building the wall on the far side, if needed
 			addFarSideBuildTasks();
 
+			// Walk back to the starting side
 			addTask(new WalkTowardsTask(getPos(width - 1, 0), getPos(0, 0)));
+
+			// Tasks for building the wall on this side
 			addNearSideBuildTasks();
 
 			done = true;
@@ -153,23 +209,37 @@ public class BuildWayPathfinder extends AlongTrackPathFinder {
 		}
 
 		protected DestroyInRangeTask getClearAreaTask() {
-			return new DestroyInRangeTask(getPos(0, -1), getPos(width - 1, 2));
+			BlockCuboid<WorldData> areaToClear = new BlockCuboid<>(getPos(0, -1), getPos(width - 1, 1));
+			return getClearAreaTask(areaToClear);
+		}
+
+		protected DestroyInRangeTask getClearAreaTask(BlockCuboid<WorldData> areaToClear) {
+			AbstractFilteredArea<WorldData> allExceptCorrectFloor = new AreaWithoutFloor(areaToClear);
+			return new DestroyInRangeTask(allExceptCorrectFloor) {
+				@Override
+				public void runTick(AIHelper aiHelper, TaskOperations taskOperations) {
+					if (allExceptCorrectFloor.contains(aiHelper.getWorld(), getPos(0, -1))) {
+						throw new IllegalStateException("Not standing on a half slab to clear the area.");
+					}
+					super.runTick(aiHelper, taskOperations);
+				}
+			};
 		}
 
 		public void addConstructionTasksFromInner() {
-			addTask(new DestroyInRangeTask(getPos(0, -1), getPos(0, 1)));
+			BlockPos playerStartPosition = getPos(0, -1);
+			LOGGER.debug("Scheduling construction standing on the previous way position at {}", playerStartPosition);
+			// Clear the place we need to start at - if it will not be a slab.
+			addTask(new DestroyInRangeTask(playerStartPosition, getPos(0, 1)));
 
-			addConstructionTasks(getPos(0, -1));
+			addConstructionTasks(playerStartPosition);
 		}
 
-		public void addConstructionTasksFromPrevoius(BlockPos current) {
+		public void addConstructionTasksFromPrevious(BlockPos current) {
+			LOGGER.debug("Scheduling construction standing on the previous way position at {}", current);
 			final BlockPos floorPos = getPos(0, -1);
-			final Block floor = helper.getBlock(floorPos);
+
 			addTask(new DestroyInRangeTask(floorPos, getPos(0, 1)));
-			// helper.addTask(new SneakAndPlaceAtHalfTask(floorPos.x,
-			// floorPos.y,
-			// floorPos.z, FLOOR, current, floorPos.y + .5,
-			// BlockSide.LOWER_HALF));
 
 			addConstructionTasks(current);
 		}
@@ -185,6 +255,22 @@ public class BuildWayPathfinder extends AlongTrackPathFinder {
 					BRIDGE_SIDE.getDefaultState());
 			addTask(task
 					.getPlaceBlockTask(getPos(-1, 1).subtract(getPos(0, 0))));
+		}
+
+		private class AreaWithoutFloor extends AbstractFilteredArea<WorldData> {
+			public AreaWithoutFloor(BlockCuboid<WorldData> areaToClear) {
+				super(areaToClear);
+			}
+
+			@Override
+			protected boolean test(WorldData world, int x, int y, int z) {
+				return y >= cy || !FLOOR_BLOCKS.isAt(world, x, y, z);
+			}
+
+			@Override
+			public String toString() {
+				return "AreaWithoutFloor{base = " + base + "}";
+			}
 		}
 	}
 
@@ -264,7 +350,7 @@ public class BuildWayPathfinder extends AlongTrackPathFinder {
 
 		@Override
 		protected DestroyInRangeTask getClearAreaTask() {
-			return new DestroyInRangeTask(getPos(-1, -1), getPos(width, 2));
+			return getClearAreaTask(new BlockCuboid<>(getPos(-1, -1), getPos(width, 2)));
 		}
 	}
 
@@ -314,7 +400,7 @@ public class BuildWayPathfinder extends AlongTrackPathFinder {
 		@Override
 		protected DestroyInRangeTask getClearAreaTask() {
 			if (placeTorch) {
-				return new DestroyInRangeTask(getPos(-1, -1), getPos(width, 2));
+				return getClearAreaTask(new BlockCuboid<>(getPos(-1, -1), getPos(width, 2)));
 			} else {
 				return super.getClearAreaTask();
 			}
@@ -370,18 +456,19 @@ public class BuildWayPathfinder extends AlongTrackPathFinder {
 	}
 
 	private void computeNextWayType() {
-		final int size = wayTypes.size();
-		final NormalWayType base = new NormalWayType(size);
+		final int offset = wayTypes.size();
+		final NormalWayType base = new NormalWayType(offset);
 		WayPiece type = base;
 		if (base.needsBridge()) {
-			type = new BridgeWayType(size);
+			type = new BridgeWayType(offset);
 		} else if (base.needsTunnel()) {
-			type = new TunnelWayType(size);
+			type = new TunnelWayType(offset);
 		} else {
-			type = new FlatlandWayType(size);
+			type = new FlatlandWayType(offset);
 		}
 
-		type.placeTorch = size % 8 == 0;
+		// This will create a global pattern => resume will preserve the spacing of torches
+		type.placeTorch = ((cx * dx + cz * dz) + offset) % 8 == 0;
 		wayTypes.add(type);
 	}
 
@@ -396,19 +483,23 @@ public class BuildWayPathfinder extends AlongTrackPathFinder {
 	}
 
 	public boolean addContinuingTask(BlockPos playerPosition) {
-		LOGGER.debug("Seatch at " + playerPosition + ", on track: "
+		BlockPos floorPosition = playerPosition.down();
+		LOGGER.debug("Search way at player=" + playerPosition + ", floor=" + floorPosition + ", on track: "
 				+ isOnTrack(playerPosition.getX(), playerPosition.getZ())
-				+ ", cy= " + (cy - 1) + " right block: "
-				+ FLOOR_BLOCKS.isAt(world, playerPosition));
+				+ ", cy= " + cy + ", standing at right block: "
+				+ FLOOR_BLOCKS.isAt(world, floorPosition));
 		if (isOnTrack(playerPosition.getX(), playerPosition.getZ())
-				&& playerPosition.getY() == cy - 1
-				&& FLOOR_BLOCKS.isAt(world, playerPosition)) {
+				&& playerPosition.getY() == cy
+				&& FLOOR_BLOCKS.isAt(world, floorPosition)) {
 			final int currentStep = getStepNumber(playerPosition.getX(),
 					playerPosition.getZ());
 			final WayPiece next = getSuggestedWayType(currentStep + 1);
 			if (!next.isDone()) {
-				next.addConstructionTasksFromPrevoius(playerPosition.add(0, 1,
-						0));
+				next.addConstructionTasksFromPrevious(playerPosition);
+				return true;
+			} else {
+				// Next bridge is done => walk one step on the bridge (we don't want pathfinding to destroy our bridge
+				addTask(new WalkTowardsTask(playerPosition, playerPosition.add(getForwardDirection().getDirectionVec())));
 				return true;
 			}
 		}

@@ -57,16 +57,12 @@ public class MinebotNetworkManager extends NetworkManager {
 
     @Override
     public void sendPacket(IPacket<?> packetIn) {
-        if (intercept.intercept((IPacket<IServerPlayNetHandler>) packetIn) != Intercepts.EInterceptResult.DROP) {
-            parentManager.sendPacket(packetIn);
-        }
+        intercept.withInterceptors((IPacket<IServerPlayNetHandler>) packetIn, parentManager::sendPacket);
     }
 
     @Override
     public void sendPacket(IPacket<?> packetIn, @Nullable GenericFutureListener<? extends Future<? super Void>> p_201058_2_) {
-        if (intercept.intercept((IPacket<IServerPlayNetHandler>) packetIn) != Intercepts.EInterceptResult.DROP) {
-            parentManager.sendPacket(packetIn, p_201058_2_);
-        }
+        intercept.withInterceptors((IPacket<IServerPlayNetHandler>) packetIn, p -> parentManager.sendPacket(p, p_201058_2_));
     }
 
     @Override

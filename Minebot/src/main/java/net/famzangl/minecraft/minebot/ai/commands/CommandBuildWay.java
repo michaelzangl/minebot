@@ -16,28 +16,29 @@
  *******************************************************************************/
 package net.famzangl.minecraft.minebot.ai.commands;
 
-import net.famzangl.minecraft.minebot.ai.AIHelper;
+import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import net.famzangl.minecraft.minebot.ai.command.AICommand;
-import net.famzangl.minecraft.minebot.ai.command.AICommandInvocation;
-import net.famzangl.minecraft.minebot.ai.command.AICommandParameter;
-import net.famzangl.minecraft.minebot.ai.command.ParameterType;
+import net.famzangl.minecraft.minebot.ai.command.IAIControllable;
 import net.famzangl.minecraft.minebot.ai.command.SafeStrategyRule;
 import net.famzangl.minecraft.minebot.ai.path.BuildWayPathfinder;
-import net.famzangl.minecraft.minebot.ai.strategy.AIStrategy;
 import net.famzangl.minecraft.minebot.ai.strategy.BuildWayStrategy;
 import net.minecraft.util.Direction;
-import net.minecraft.util.math.BlockPos;
 
 @AICommand(helpText = "Build a nice way", name = "minebot")
 public class CommandBuildWay {
 
-	@AICommandInvocation(safeRule = SafeStrategyRule.DEFEND)
-	public static AIStrategy run(
-			AIHelper helper,
-			@AICommandParameter(type = ParameterType.FIXED, fixedName = "way", description = "") String nameArg) {
-		final Direction dir = helper.getLookDirection();
-		final BlockPos pos = helper.getPlayerPosition();
-
-		return new BuildWayStrategy(new BuildWayPathfinder(dir, pos));
+	public static void register(LiteralArgumentBuilder<IAIControllable> dispatcher) {
+		dispatcher.then(
+				Commands.optionalHorizontalDirection(
+						Commands.literal("buildroad"),
+						(builder2, direction) -> builder2.executes(context -> {
+							Direction inDirection = direction.get(context);
+							return context.getSource().requestUseStrategy(
+									new BuildWayStrategy(BuildWayPathfinder.findContinue(inDirection, context.getSource().getAiHelper().getWorld())),
+									SafeStrategyRule.DEFEND
+							);
+						})
+				)
+		);
 	}
 }

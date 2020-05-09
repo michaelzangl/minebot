@@ -61,7 +61,7 @@ public class PathFinderStrategy extends TaskStrategy {
 
 		pathFindingWorld = helper.getWorld();
 		if (isInAir(helper)) {
-			addTask(new WaitTask(1));
+			addTask(new WaitTask(3)); // < 3 ticks should be enough for the game to keep up
 		} else if (!searchTasksWithPathfinder(helper)) {
 			// Path finding needs more time
 			if (!(noPathFound && inShouldTakeOver)) {

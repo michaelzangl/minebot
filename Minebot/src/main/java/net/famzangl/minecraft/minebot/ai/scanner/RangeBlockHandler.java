@@ -17,6 +17,7 @@
 package net.famzangl.minecraft.minebot.ai.scanner;
 
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSet;
+import net.famzangl.minecraft.minebot.ai.path.world.BlockSets;
 import net.famzangl.minecraft.minebot.ai.path.world.WorldData;
 import net.famzangl.minecraft.minebot.ai.scanner.BlockRangeScanner.BlockHandler;
 import net.minecraft.block.Blocks;
@@ -30,7 +31,7 @@ import java.util.Map.Entry;
 
 public abstract class RangeBlockHandler<ReachData> implements BlockHandler {
 	private static final BlockSet THROUGH_REACHABLE = BlockSet.builder().add(
-			Blocks.AIR, Blocks.TORCH).build();
+			Blocks.TORCH).add(BlockSets.AIR).build();
 	private final Hashtable<BlockPos, ArrayList<ReachData>> reachable = new Hashtable<BlockPos, ArrayList<ReachData>>();
 
 	@Override

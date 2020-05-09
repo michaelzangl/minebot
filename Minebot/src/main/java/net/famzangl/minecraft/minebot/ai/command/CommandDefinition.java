@@ -16,8 +16,10 @@
  *******************************************************************************/
 package net.famzangl.minecraft.minebot.ai.command;
 
+import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.strategy.AIStrategy;
+import net.minecraft.command.Commands;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
@@ -36,23 +38,6 @@ public class CommandDefinition {
 	private final ArrayList<Integer> parameterStarts;
 	private final Method method;
 	private final ArrayList<ParameterBuilder> builders;
-
-	// public CommandDefinition(Method m) {
-	// // this.method = m;
-	// // final Class<?>[] types = m.getParameterTypes();
-	// // final Annotation[][] parameterAnnotations =
-	// // m.getParameterAnnotations();
-	// // builders = new ParameterBuilder[types.length];
-	// // parameterStarts = new int[types.length + 1];
-	// // for (int parameter = 0; parameter < types.length; parameter++) {
-	// // ParameterBuilder b = getParameter(types, parameterAnnotations,
-	// // parameter);
-	// // parameterStarts[parameter] = arguments.size();
-	// // b.addArguments(arguments);
-	// // builders[parameter] = b;
-	// // }
-	// // parameterStarts[types.length] = arguments.size();
-	// }
 
 	private CommandDefinition(Method method, ArrayList<ParameterBuilder> builders,
 			ArrayList<ArgumentDefinition> arguments,
@@ -217,32 +202,6 @@ public class CommandDefinition {
 		return true;
 	}
 
-	public AIStrategy evaluate(AIHelper helper, String[] args) {
-		final Object[] params = new Object[builders.size()];
-		for (int parameter = 0; parameter < builders.size(); parameter++) {
-			final String[] argsPart = Arrays.copyOfRange(args,
-					parameterStarts.get(parameter), parameterStarts.get(parameter + 1));
-			params[parameter] = builders.get(parameter).getParameter(helper,
-					argsPart);
-		}
-		Object result = null;
-		try {
-			result = method.invoke(null, params);
-			if (result instanceof AIStrategy) {
-				return (AIStrategy) result;
-			}
-		} catch (final IllegalAccessException e) {
-			doThrow(e);
-		} catch (final IllegalArgumentException e) {
-			dumIAE(e, params);
-			doThrow(e);
-		} catch (final InvocationTargetException e) {
-			final Throwable exception = e.getTargetException();
-			doThrow(exception);
-		}
-		throw new CommandEvaluationException("No AI strategy was created.  Result was: " + result);
-	}
-
 	private void dumIAE(IllegalArgumentException e, Object[] params) {
 		System.err.println("There was an argument mismatch. This is what I attempted to use:");
 		for (Object p : params) {
@@ -277,4 +236,5 @@ public class CommandDefinition {
 	public SafeStrategyRule getSafeStrategyRule() {
 		return method.getAnnotation(AICommandInvocation.class).safeRule();
 	}
+
 }

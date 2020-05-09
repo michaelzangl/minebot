@@ -23,8 +23,9 @@ public final class RunFileStrategy extends AIStrategy {
 		}
 
 		@Override
-		public void requestUseStrategy(AIStrategy strategy) {
+		public int requestUseStrategy(AIStrategy strategy) {
 			receivedStrategy = strategy;
+			return 0;
 		}
 
 		@Override

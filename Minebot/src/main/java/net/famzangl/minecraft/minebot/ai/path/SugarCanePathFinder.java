@@ -10,7 +10,7 @@ import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 
 public class SugarCanePathFinder extends WalkingPathfinder {
-	private static final BlockSet SUGAR_CANE_GROUND = BlockSet.builder().add(Blocks.SAND, Blocks.GRASS, Blocks.DIRT).build();
+	private static final BlockSet SUGAR_CANE_GROUND = BlockSet.builder().add(Blocks.SAND, Blocks.GRASS_BLOCK, Blocks.DIRT).build();
 	private static final BlockSet SUGAR_CANE = BlockSet.builder().add(Blocks.SUGAR_CANE).build();
 
 	@Override

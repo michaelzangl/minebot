@@ -105,7 +105,7 @@ public abstract class TaskStrategy extends AIStrategy implements
 					break;
 				}
 			} else {
-				LOGGER.trace(MARKER_PREFACING, "Prefetching showstopper: " + task);
+				LOGGER.trace(MARKER_PREFACING, "Task is prefetching barrier: " + task);
 				break;
 			}
 		}

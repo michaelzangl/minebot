@@ -13,8 +13,8 @@ public class PathfindingSettings {
 	private static final BlockSet destructableBlocks =
 			BlockSet.builder().add(BlockSets.SAFE_AFTER_DESTRUCTION)
 			.add(BlockSets.SAFE_CEILING).add(BlockSets.FALLING)
+			.intersectWith(BlockSets.INDESTRUCTABLE.invert())
 			.build();
-			// TODO:	.intersectWith(BlockSets.INDESTRUCTABLE.invert())
 
 
 	private PathfindingSetting destructive = new PathfindingSetting(

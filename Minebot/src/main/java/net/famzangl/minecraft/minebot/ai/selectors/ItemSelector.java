@@ -16,13 +16,14 @@
  *******************************************************************************/
 package net.famzangl.minecraft.minebot.ai.selectors;
 
-import com.google.common.base.Predicate;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.ItemEntity;
 
+import java.util.function.Predicate;
+
 public final class ItemSelector implements Predicate<Entity> {
 	@Override
-	public boolean apply(Entity e) {
+	public boolean test(Entity e) {
 		return e instanceof ItemEntity;
 	}
 }

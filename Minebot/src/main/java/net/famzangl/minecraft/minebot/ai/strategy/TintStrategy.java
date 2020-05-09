@@ -16,13 +16,9 @@
  *******************************************************************************/
 package net.famzangl.minecraft.minebot.ai.strategy;
 
-import com.google.common.base.Predicate;
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.ItemFilter;
-import net.famzangl.minecraft.minebot.ai.selectors.AndSelector;
 import net.famzangl.minecraft.minebot.ai.selectors.ColorSelector;
-import net.famzangl.minecraft.minebot.ai.selectors.NotSelector;
-import net.famzangl.minecraft.minebot.ai.selectors.OrSelector;
 import net.famzangl.minecraft.minebot.ai.selectors.OwnTameableSelector;
 import net.famzangl.minecraft.minebot.ai.task.FaceAndInteractTask;
 import net.minecraft.client.entity.player.ClientPlayerEntity;
@@ -32,6 +28,8 @@ import net.minecraft.entity.passive.WolfEntity;
 import net.minecraft.item.DyeColor;
 import net.minecraft.item.DyeItem;
 import net.minecraft.item.ItemStack;
+
+import java.util.function.Predicate;
 
 public class TintStrategy extends TaskStrategy {
 	private static final int DISTANCE = 20;
@@ -47,7 +45,7 @@ public class TintStrategy extends TaskStrategy {
 
 	private static final class SheepSelector implements Predicate<Entity> {
 		@Override
-		public boolean apply(Entity var1) {
+		public boolean test(Entity var1) {
 			return var1 instanceof SheepEntity;
 		}
 	}
@@ -58,8 +56,8 @@ public class TintStrategy extends TaskStrategy {
 		}
 
 		@Override
-		public boolean apply(Entity entity) {
-			return entity instanceof WolfEntity && super.apply(entity);
+		public boolean test(Entity entity) {
+			return entity instanceof WolfEntity && super.test(entity);
 		}
 	}
 
@@ -110,13 +108,13 @@ public class TintStrategy extends TaskStrategy {
 			selector = sheepSelector;
 			break;
 		default:
-			selector = new OrSelector(sheepSelector, wolfSelector);
+			selector = sheepSelector.or(wolfSelector);
 		}
 		if (current != null) {
-			selector = new AndSelector(selector, new ColorSelector(current));
+			selector = selector.and(new ColorSelector(current));
 		}
-		selector = new AndSelector(selector, new NotSelector(new ColorSelector(
-				holdingColor)));
+		selector = selector.and(new ColorSelector(
+				holdingColor).negate());
 
 		final Entity found = helper.getClosestEntity(DISTANCE, selector);
 

@@ -16,7 +16,6 @@
  *******************************************************************************/
 package net.famzangl.minecraft.minebot.ai.task;
 
-import com.google.common.base.Predicate;
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.ExperienceOrbEntity;
@@ -24,6 +23,8 @@ import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.util.MovementInput;
 import net.minecraft.util.math.EntityRayTraceResult;
 import net.minecraft.util.math.RayTraceResult;
+
+import java.util.function.Predicate;
 
 /**
  * Try to interact with a given entity. If it is not clickable, the bot attempts
@@ -80,15 +81,18 @@ public class FaceAndInteractTask extends AITask {
 		final RayTraceResult position = aiHelper.getObjectMouseOver();
 		if (ticksRun > 2 && position != null
 				&& position.getType() == RayTraceResult.Type.ENTITY
-				&& alsoAcceptedAnimal.apply(((EntityRayTraceResult)position).getEntity())) {
+				// We interact with any accepted entity, gives good results in crowded places
+				&& alsoAcceptedAnimal.test(((EntityRayTraceResult)position).getEntity())) {
 			doInteractWithCurrent(aiHelper);
 		} else {
+			LOGGER.debug("Attempting to face entitiy {}", preferedAnimal);
 			double x = aiHelper.getMinecraft().player.getMotion().x;
 			double z = aiHelper.getMinecraft().player.getMotion().z;
 			final double speed = x * x + z * z;
 			aiHelper.face(preferedAnimal.getPosX(), preferedAnimal.getPosY(),
 					preferedAnimal.getPosZ());
 			final MovementInput movement = new MovementInput();
+			// jump if we are stuck, e.g. a wall or inside a crowd of entities
 			movement.jump = speed < 0.01 && ticksRun > 8;
 			movement.moveForward = 1;
 			aiHelper.overrideMovement(movement);
@@ -103,8 +107,10 @@ public class FaceAndInteractTask extends AITask {
 	 */
 	protected void doInteractWithCurrent(AIHelper aiHelper) {
 		if (doRightClick) {
+			LOGGER.debug("Interacting using the use item key");
 			aiHelper.overrideUseItem();
 		} else {
+			LOGGER.debug("Interacting using the attack key");
 			aiHelper.overrideAttack();
 		}
 		interacted = true;

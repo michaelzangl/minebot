@@ -16,22 +16,18 @@
  *******************************************************************************/
 package net.famzangl.minecraft.minebot.ai.commands;
 
-import net.famzangl.minecraft.minebot.ai.AIHelper;
+import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import net.famzangl.minecraft.minebot.ai.command.AICommand;
-import net.famzangl.minecraft.minebot.ai.command.AICommandInvocation;
-import net.famzangl.minecraft.minebot.ai.command.AICommandParameter;
-import net.famzangl.minecraft.minebot.ai.command.ParameterType;
+import net.famzangl.minecraft.minebot.ai.command.IAIControllable;
 import net.famzangl.minecraft.minebot.ai.command.SafeStrategyRule;
-import net.famzangl.minecraft.minebot.ai.strategy.AIStrategy;
 import net.famzangl.minecraft.minebot.ai.strategy.FishStrategy;
 
 @AICommand(helpText = "Catch some fish.", name = "minebot")
 public class CommandFish {
 
-	@AICommandInvocation(safeRule = SafeStrategyRule.DEFEND)
-	public static AIStrategy run(
-			AIHelper helper,
-			@AICommandParameter(type = ParameterType.FIXED, fixedName = "fish", description = "") String nameArg) {
-		return new FishStrategy();
-	}
+    public static void register(LiteralArgumentBuilder<IAIControllable> dispatcher) {
+        dispatcher.then(
+                Commands.literal("feed").executes(context -> context.getSource().requestUseStrategy(new FishStrategy(), SafeStrategyRule.DEFEND))
+        );
+    }
 }

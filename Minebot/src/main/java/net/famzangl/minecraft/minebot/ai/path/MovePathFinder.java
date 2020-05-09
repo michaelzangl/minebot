@@ -24,12 +24,7 @@ import net.famzangl.minecraft.minebot.ai.path.world.BlockSets;
 import net.famzangl.minecraft.minebot.ai.path.world.Pos;
 import net.famzangl.minecraft.minebot.ai.path.world.WorldData;
 import net.famzangl.minecraft.minebot.ai.task.AITask;
-import net.famzangl.minecraft.minebot.ai.task.move.AlignToGridTask;
-import net.famzangl.minecraft.minebot.ai.task.move.DownwardsMoveTask;
-import net.famzangl.minecraft.minebot.ai.task.move.HorizontalMoveTask;
-import net.famzangl.minecraft.minebot.ai.task.move.JumpMoveTask;
-import net.famzangl.minecraft.minebot.ai.task.move.UpwardsMoveTask;
-import net.famzangl.minecraft.minebot.ai.task.move.WalkTowardsTask;
+import net.famzangl.minecraft.minebot.ai.task.move.*;
 import net.famzangl.minecraft.minebot.settings.MinebotSettings;
 import net.famzangl.minecraft.minebot.settings.MinebotSettingsRoot;
 import net.famzangl.minecraft.minebot.settings.PathfindingSetting;
@@ -56,7 +51,9 @@ public class MovePathFinder extends PathFinderField {
 			Blocks.DIRT,
 			Blocks.GRAVEL, 
 			Blocks.SAND, 
-			Blocks.SANDSTONE).build();
+			Blocks.SANDSTONE)
+			.add(BlockSets.LEAVES)
+			.build();
 
 	/**
 	 * Blocks we should not dig through, e.g. because we cannot handle them
@@ -182,12 +179,25 @@ public class MovePathFinder extends PathFinderField {
 	@Override
 	protected int getNeighbour(int currentNode, int cx, int cy, int cz) {
 		final int res = super.getNeighbour(currentNode, cx, cy, cz);
-		if (res > 0 && !isSafeToTravel(currentNode, cx, cy, cz)) {
+		if (res > 0 && (
+				// We cannot go there (world constraints)
+				!isSafeToTravel(currentNode, cx, cy, cz)
+						// Do not go up when standing on a slab
+						// TODO: There may be more such blocks, like snow
+						|| (getY(currentNode) < cy && BlockSets.LOWER_SLABS.isAt(world, cx, getY(currentNode) - 1, cz)))) {
 			return -1;
 		}
 		return res;
 	}
 
+	/**
+	 * Check if a position is safe to travel to
+	 * @param currentNode The node we are comming from
+	 * @param cx Destination x
+	 * @param cy Destination y
+	 * @param cz Destination z
+	 * @return true if we can go there
+	 */
 	protected boolean isSafeToTravel(int currentNode, int cx, int cy, int cz) {
 		return BlockSets.safeSideAround(world, cx, cy + 1, cz)
 				&& isAllowedPosition(cx, cy, cz)
@@ -211,6 +221,7 @@ public class MovePathFinder extends PathFinderField {
 
 	protected boolean checkGroundBlock(int currentNode, int cx, int cy, int cz) {
 		if (getY(currentNode) < cy) {
+			// Moving up
 			return allowedGroundForUpwardsBlocks.isAt(world, cx, cy - 1, cz);
 		} else {
 			return allowedGroundBlocks.isAt(world, cx, cy - 1, cz);
@@ -219,12 +230,14 @@ public class MovePathFinder extends PathFinderField {
 
 	private boolean checkHeadBlock(int currentNode, int cx, int cy, int cz) {
 		if (getY(currentNode) > cy) {
+			// Moving down
 			if (getX(currentNode) != cx || getZ(currentNode) != cz) {
+				// Moving sideways down
 				return BlockSets.SAFE_CEILING.isAt(world, cx, cy + 3, cz)
 						&& BlockSets.HEAD_CAN_WALK_THROUGH.isAt(world, cx,
 								cy + 2, cz);
 			} else if (BlockSets.FALLING.isAt(world, cx, cy + 2, cz)) {
-				// moving down, so ignoring sand, gravel.
+				// moving straight down, so ignoring sand, gravel.
 				return true;
 			}
 		}

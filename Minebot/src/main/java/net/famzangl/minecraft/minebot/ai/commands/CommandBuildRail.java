@@ -16,36 +16,31 @@
  *******************************************************************************/
 package net.famzangl.minecraft.minebot.ai.commands;
 
-import net.famzangl.minecraft.minebot.ai.AIHelper;
-import net.famzangl.minecraft.minebot.ai.command.AICommandInvocation;
-import net.famzangl.minecraft.minebot.ai.command.AICommandParameter;
-import net.famzangl.minecraft.minebot.ai.command.ParameterType;
+import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+import net.famzangl.minecraft.minebot.ai.command.IAIControllable;
 import net.famzangl.minecraft.minebot.ai.command.SafeStrategyRule;
 import net.famzangl.minecraft.minebot.ai.path.LayRailPathFinder;
-import net.famzangl.minecraft.minebot.ai.strategy.AIStrategy;
 import net.famzangl.minecraft.minebot.ai.strategy.PathFinderStrategy;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 
 public class CommandBuildRail {
-	@AICommandInvocation(safeRule = SafeStrategyRule.DEFEND_MINING)
-	public static AIStrategy run(
-			AIHelper helper,
-			@AICommandParameter(type = ParameterType.FIXED, fixedName = "rails", description = "") String nameArg) {
-		final Direction horizontalLook = helper.getLookDirection();
-		return run(helper, nameArg, horizontalLook);
-	}
-	
-	@AICommandInvocation(safeRule = SafeStrategyRule.DEFEND_MINING)
-	public static AIStrategy run(
-			AIHelper helper,
-			@AICommandParameter(type = ParameterType.FIXED, fixedName = "rails", description = "") String nameArg,
-			@AICommandParameter(type = ParameterType.ENUM, description = "direction") Direction inDirection) {
-
-		final BlockPos playerPosition = helper.getPlayerPosition();
-		return new PathFinderStrategy(
-				new LayRailPathFinder(inDirection.getXOffset(),
-						inDirection.getZOffset(), playerPosition.getX(), playerPosition.getY(), playerPosition.getZ()),
-				"Building a railway");
+	public static void register(LiteralArgumentBuilder<IAIControllable> dispatcher) {
+		dispatcher.then(
+				Commands.optionalHorizontalDirection(
+						Commands.literal("rails"),
+						(builder2, direction) -> builder2.executes(context -> {
+							Direction inDirection = direction.get(context);
+							BlockPos playerPosition = context.getSource().getAiHelper().getPlayerPosition();
+							return context.getSource().requestUseStrategy(
+									new PathFinderStrategy(
+											new LayRailPathFinder(inDirection.getXOffset(),
+													inDirection.getZOffset(), playerPosition.getX(), playerPosition.getY(), playerPosition.getZ()),
+											"Building a railway"),
+									SafeStrategyRule.DEFEND_MINING
+							);
+						})
+				)
+		);
 	}
 }

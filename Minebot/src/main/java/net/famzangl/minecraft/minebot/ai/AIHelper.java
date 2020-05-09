@@ -16,7 +16,6 @@
  *******************************************************************************/
 package net.famzangl.minecraft.minebot.ai;
 
-import com.google.common.base.Predicate;
 import net.famzangl.minecraft.minebot.ai.command.AIChatController;
 import net.famzangl.minecraft.minebot.ai.input.KeyboardInputController;
 import net.famzangl.minecraft.minebot.ai.input.KeyboardInputController.KeyType;
@@ -33,24 +32,14 @@ import net.famzangl.minecraft.minebot.map.MapReader;
 import net.famzangl.minecraft.minebot.settings.MinebotSettings;
 import net.famzangl.minecraft.minebot.settings.SaferuleSettings;
 import net.famzangl.minecraft.minebot.stats.StatsManager;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.FenceBlock;
-import net.minecraft.block.FenceGateBlock;
-import net.minecraft.block.SlabBlock;
-import net.minecraft.block.WallBlock;
+import net.minecraft.block.*;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Direction;
 import net.minecraft.util.MovementInput;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockRayTraceResult;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.*;
 import net.minecraft.world.chunk.Chunk;
-import net.minecraft.world.chunk.ChunkSection;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.Marker;
@@ -59,6 +48,7 @@ import org.apache.logging.log4j.MarkerManager;
 import java.io.File;
 import java.util.HashMap;
 import java.util.List;
+import java.util.function.Predicate;
 
 /**
  * Lots and lots of helpful methods to control the current player. This contains
@@ -80,17 +70,7 @@ public abstract class AIHelper {
 	private static final double SNEAK_OFFSET = .2;
 	private static final double WALK_PER_STEP = 4.3 / 20;
 	private static final double MIN_DISTANCE_ERROR = 0.05;
-	private static final float MAX_PITCH_CHANGE;
-	private static final float MAX_YAW_CHANGE;
-	private static final boolean ALLOW_TOP_OF_WORLD_HIT;
-	
-	static {
-		SaferuleSettings settings = MinebotSettings.getSettings().getSaferules();
-		MAX_PITCH_CHANGE = settings.getMaxPitchChangeDegrees();
-		MAX_YAW_CHANGE = settings.getMaxYawChangeDegrees();
-		ALLOW_TOP_OF_WORLD_HIT = settings.isAllowTopOfWorldHit();
-	}
-	
+
 	private static Minecraft mc = Minecraft.getInstance();
 	/**
 	 * A world that never gets a delta applied to it.
@@ -331,9 +311,10 @@ public abstract class AIHelper {
 			float yawChange = closestRotation(yaw - rotationYaw);
 			float pitchChange = pitch - rotationPitch;
 			assert -Math.PI <= yawChange && yawChange <= Math.PI;
-			float yawClamp = Math.min(Math.abs(MAX_YAW_CHANGE / yawChange), 1);
+			SaferuleSettings saferules = MinebotSettings.getSettings().getSaferules();
+			float yawClamp = Math.min(Math.abs(saferules.getMaxYawChangeDegrees() / yawChange), 1);
 			float pitchClamp = Math.min(
-					Math.abs(MAX_PITCH_CHANGE / pitchChange), 1);
+					Math.abs(saferules.getMaxPitchChangeDegrees() / pitchChange), 1);
 			float clamp = Math.min(yawClamp, pitchClamp);
 			if (yawInfluence <= 0e-5 && pitchInfluence <= 0e-5) {
 				// only test, do not set
@@ -393,7 +374,7 @@ public abstract class AIHelper {
 	}
 
 	private boolean allowTopOfWorldHit() {
-		return ALLOW_TOP_OF_WORLD_HIT;
+		return MinebotSettings.getSettings().getSaferules().isAllowTopOfWorldHit();
 	}
 
 	public boolean isFacingBlock(BlockPos pos, Direction blockSide,
@@ -658,10 +639,12 @@ public abstract class AIHelper {
 	 */
 	public void faceAndDestroy(final BlockPos pos) {
 		if (!isFacingBlock(pos)) {
+			LOGGER.debug("Attempt to face {} to destroy it", pos);
 			faceBlock(pos);
 		}
 
 		if (isFacingBlock(pos)) {
+			LOGGER.debug("Facing block at {} and destroying it", pos);
 			selectToolFor(pos);
 			overrideAttack();
 			stats.markIntentionalBlockBreak(pos);
@@ -677,6 +660,7 @@ public abstract class AIHelper {
 				if (isFacingBlock(offseted)) {
 					BlockPos hanging = getWorld().getHangingOnBlock(offseted);
 					if (hanging != null && hanging.equals(pos)) {
+						LOGGER.debug("Found a hanging block at {} that is in the way to destroy {}", offseted, pos);
 						overrideAttack();
 					}
 				}
@@ -691,7 +675,7 @@ public abstract class AIHelper {
 	 * @return
 	 */
 	public boolean faceBlock(BlockPos pos) {
-		return face(getWorld().getBlockBounds(pos).random(pos, .95));
+		return face(getWorld().getFacingBounds(pos).random(pos, .95));
 	}
 
 	/**
@@ -702,7 +686,7 @@ public abstract class AIHelper {
 	 * @return
 	 */
 	public boolean faceSideOf(BlockPos pos, Direction sideToFace) {
-		BlockBounds bounds = getWorld().getBlockBounds(pos);
+		BlockBounds bounds = getWorld().getFacingBounds(pos);
 		return face(bounds.onlySide(sideToFace).random(pos, 0.8));
 	}
 
@@ -724,63 +708,10 @@ public abstract class AIHelper {
 	 */
 	public void faceSideOf(BlockPos pos, Direction sideToFace, double minY,
 			double maxY, double centerX, double centerZ, Direction xzdir) {
-		// System.out.println("x = " + x + " y=" + y + " z=" + z + " dir="
-		// + sideToFace);
-		BlockBounds bounds = getWorld().getBlockBounds(pos);
+		BlockBounds bounds = getWorld().getFacingBounds(pos);
 		BlockBounds faceArea = bounds.clampY(minY, maxY).onlySide(sideToFace);
-		LOGGER.trace(MARKER_FACING, "Facing: " + faceArea);
+		LOGGER.trace(MARKER_FACING, "Facing {} clamped to {}", bounds, faceArea);
 		face(faceArea.random(pos, .9));
-
-		// minY = Math.max(minY, block.getBlockBoundsMinY());
-		// maxY = Math.min(maxY, block.getBlockBoundsMaxY());
-		// double faceY = randBetweenNice(minY, maxY);
-		// double faceX, faceZ;
-		//
-		// if (xzdir == Direction.EAST) {
-		// faceX = randBetween(Math.max(block.getBlockBoundsMinX(), centerX),
-		// block.getBlockBoundsMaxX());
-		// faceZ = centerZ;
-		// } else if (xzdir == Direction.WEST) {
-		// faceX = randBetween(block.getBlockBoundsMinX(),
-		// Math.min(block.getBlockBoundsMaxX(), centerX));
-		// faceZ = centerZ;
-		// } else if (xzdir == Direction.SOUTH) {
-		// faceZ = randBetween(Math.max(block.getBlockBoundsMinZ(), centerZ),
-		// block.getBlockBoundsMaxZ());
-		// faceX = centerX;
-		// } else if (xzdir == Direction.NORTH) {
-		// faceZ = randBetween(block.getBlockBoundsMinZ(),
-		// Math.min(block.getBlockBoundsMaxZ(), centerZ));
-		// faceX = centerX;
-		// } else {
-		// faceX = randBetweenNice(block.getBlockBoundsMinX(),
-		// block.getBlockBoundsMaxX());
-		// faceZ = randBetweenNice(block.getBlockBoundsMinZ(),
-		// block.getBlockBoundsMaxZ());
-		// }
-		// switch (sideToFace) {
-		// case UP:
-		// faceY = block.getBlockBoundsMaxY();
-		// break;
-		// case DOWN:
-		// faceY = block.getBlockBoundsMinY();
-		// break;
-		// case EAST:
-		// faceX = block.getBlockBoundsMaxX();
-		// break;
-		// case WEST:
-		// faceX = block.getBlockBoundsMinX();
-		// break;
-		// case SOUTH:
-		// faceZ = block.getBlockBoundsMaxZ();
-		// break;
-		// case NORTH:
-		// faceZ = block.getBlockBoundsMinZ();
-		// break;
-		// default:
-		// break;
-		// }
-		// face(faceX + pos.getX(), faceY + pos.getY(), faceZ + pos.getZ());
 	}
 
 	/**
@@ -814,7 +745,12 @@ public abstract class AIHelper {
 	 * Presses the use item key in the next game tick.
 	 */
 	public void overrideUseItem() {
-		LOGGER.debug(MARKER_FACING, "Using item while facing " + ((BlockRayTraceResult)getObjectMouseOver()).getPos());
+		if (LOGGER.isDebugEnabled(MARKER_FACING)) {
+			RayTraceResult rayTrace = getObjectMouseOver();
+			LOGGER.debug(MARKER_FACING, "Using item while facing pos=" +
+					(rayTrace instanceof BlockRayTraceResult ? ((BlockRayTraceResult) rayTrace).getPos() : "-")
+					+ ", entity=" + (rayTrace instanceof EntityRayTraceResult ? ((EntityRayTraceResult) rayTrace).getEntity() : "-"));
+		}
 		overrideKey(KeyType.USE);
 	}
 
@@ -887,12 +823,16 @@ public abstract class AIHelper {
 	 */
 	@SuppressWarnings("unchecked")
 	public List<Entity> getEntities(int dist, Predicate<Entity> selector) {
-		return getMinecraft().world.getEntitiesInAABBexcluding(
+		List<Entity> entities = getMinecraft().world.getEntitiesInAABBexcluding(
 				getMinecraft().getRenderViewEntity(),
 				getMinecraft().getRenderViewEntity().getBoundingBox()
 						.expand(-dist, -dist, -dist)
 						.expand(dist, dist, dist)
 						.grow(1), selector);
+
+		LOGGER.debug("Searching for entities around {} using distance {} and selector {} resulted in {} entities",
+				getMinecraft().getRenderViewEntity().getPosition(), dist, selector, entities.size());
+		return entities;
 	}
 
 	/**
@@ -1098,14 +1038,7 @@ public abstract class AIHelper {
 	public int getLightAt(BlockPos pos) {
 		final Chunk chunk = getMinecraft().world.getChunk(
 				pos.getX() >> 4, pos.getZ() >> 4);
-		final ChunkSection storage = chunk.getSections()[pos
-				.getY() >> 4];
-		if (storage == null) {
-			return 0;
-		} else {
-			return storage.getBlockState(pos.getX() & 15,
-					pos.getY() & 15, pos.getZ() & 15).getLightValue();
-		}
+		return chunk.getLightValue(pos);
 	}
 
 	public void setActiveMapReader(MapReader activeMapReader) {

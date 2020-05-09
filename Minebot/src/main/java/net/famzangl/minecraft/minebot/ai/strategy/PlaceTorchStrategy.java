@@ -26,6 +26,8 @@ import net.minecraft.block.Blocks;
 import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.HashSet;
 import java.util.Queue;
@@ -36,6 +38,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
  * @author Michael Zangl
  */
 public class PlaceTorchStrategy extends AIStrategy {
+	private static final Logger LOGGER = LogManager.getLogger(PlaceTorchStrategy.class);
 
 	public static class PosAndDir {
 		public final BlockPos place;
@@ -122,7 +125,7 @@ public class PlaceTorchStrategy extends AIStrategy {
 	@Override
 	protected void onActivate(AIHelper helper) {
 		inCurrentTick = 0;
-		System.out.println("Placing torch.");
+		LOGGER.debug("Took over to place a torch.");
 		super.onActivate(helper);
 	}
 
@@ -135,7 +138,7 @@ public class PlaceTorchStrategy extends AIStrategy {
 		}
 
 		PosAndDir pos = attemptPositions.peek();
-		System.out.println("Attempt to  place at " + pos + " in tick " + inCurrentTick);
+		LOGGER.debug("Attempt to  place at " + pos + " in tick " + inCurrentTick);
 		if (pos == null) {
 			done();
 			return TickResult.NO_MORE_WORK;

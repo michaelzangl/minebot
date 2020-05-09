@@ -142,4 +142,12 @@ public class StrategyStack {
 	public List<AIStrategy> getStrategies() {
 		return Collections.unmodifiableList(strategies);
 	}
+
+	@Override
+	public String toString() {
+		return "StrategyStack{" +
+				"strategies=" + strategies +
+				", paused=" + paused +
+				'}';
+	}
 }

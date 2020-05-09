@@ -16,25 +16,25 @@
  *******************************************************************************/
 package net.famzangl.minecraft.minebot.ai.commands;
 
-import net.famzangl.minecraft.minebot.ai.AIHelper;
-import net.famzangl.minecraft.minebot.ai.command.AICommand;
-import net.famzangl.minecraft.minebot.ai.command.AICommandInvocation;
-import net.famzangl.minecraft.minebot.ai.command.AICommandParameter;
-import net.famzangl.minecraft.minebot.ai.command.ParameterType;
+import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+import net.famzangl.minecraft.minebot.ai.command.IAIControllable;
 import net.famzangl.minecraft.minebot.ai.command.SafeStrategyRule;
 import net.famzangl.minecraft.minebot.ai.path.GoToPathfinder;
-import net.famzangl.minecraft.minebot.ai.strategy.AIStrategy;
 import net.famzangl.minecraft.minebot.ai.strategy.PathFinderStrategy;
+import net.minecraft.command.arguments.BlockPosArgument;
 import net.minecraft.util.math.BlockPos;
 
-@AICommand(name = "minebot", helpText = "Use the pathfinder to get to a given location.")
 public class CommandPathfind {
-	@AICommandInvocation(safeRule = SafeStrategyRule.DEFEND)
-	public static AIStrategy pathfind(
-			AIHelper helper,
-			@AICommandParameter(type = ParameterType.FIXED, description = "", fixedName = "pathfind") String nameArg,
-			@AICommandParameter(type = ParameterType.POSITION, description = "Position to walk to") BlockPos position) {
-		return new PathFinderStrategy(new GoToPathfinder(position), "Go to "
-				+ position);
+    public static void register(LiteralArgumentBuilder<IAIControllable> dispatcher) {
+    	dispatcher.then(
+				Commands.literal("pathfind").then(
+						Commands.argument("to", BlockPosArgument.blockPos())
+								.executes(context -> {
+									BlockPos position = Commands.getBlockPos(context, "to");
+									return context.getSource().requestUseStrategy(new PathFinderStrategy(new GoToPathfinder(position), "Go to "
+											+ position.getX() + "," + position.getY() + "," + position.getZ()), SafeStrategyRule.DEFEND);
+								})
+				)
+		);
 	}
 }

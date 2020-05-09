@@ -8,6 +8,7 @@ import com.google.gson.JsonParseException;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockFloatMap;
+import net.famzangl.minecraft.minebot.ai.path.world.BlockSet;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.util.ResourceLocation;
@@ -34,7 +35,7 @@ public class BlockFloatAdapter implements JsonSerializer<BlockFloatMap>,
 					List<BlockState> blockStates;
 					if (e.getKey().matches("\\d+")) {
 						int blockStateId = Integer.parseInt(e.getKey());
-						blockStates = Collections.singletonList(Block.getStateById(blockStateId));
+						blockStates = Collections.singletonList(BlockSet.getStateById(blockStateId));
 					} else {
 						blockStates = Registry.BLOCK.getOrDefault(new ResourceLocation(e.getKey()))
 								.getStateContainer().getValidStates();

@@ -63,7 +63,7 @@ public class PlantPathFinder extends MovePathFinder {
 			Blocks.SOUL_SAND).build();
 
 	private static final BlockSet FARMLANDABLE = BlockSet.builder().add(Blocks.DIRT,
-			Blocks.GRASS).build();
+			Blocks.GRASS_BLOCK).build();
 
 	private final class PlaceSeedsTask extends PlaceBlockAtFloorTask implements CanWorkWhileApproaching {
 		private final SeedFilter seedFilter;

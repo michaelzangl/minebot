@@ -16,10 +16,10 @@
  *******************************************************************************/
 package net.famzangl.minecraft.minebot.ai.selectors;
 
-import com.google.common.base.Predicate;
 import net.minecraft.entity.Entity;
 
 import java.util.List;
+import java.util.function.Predicate;
 
 public class OneOfListSelector implements Predicate<Entity> {
 
@@ -30,7 +30,7 @@ public class OneOfListSelector implements Predicate<Entity> {
 	}
 
 	@Override
-	public boolean apply(Entity var1) {
+	public boolean test(Entity var1) {
 		return list.contains(var1);
 	}
 

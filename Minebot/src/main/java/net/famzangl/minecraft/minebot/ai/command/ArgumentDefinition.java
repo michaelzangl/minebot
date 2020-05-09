@@ -16,8 +16,13 @@
  *******************************************************************************/
 package net.famzangl.minecraft.minebot.ai.command;
 
+import com.mojang.brigadier.tree.CommandNode;
+import net.minecraft.command.ISuggestionProvider;
+
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Stream;
 
 /**
  * This is the definition of a single argument to be passed on the command line.
@@ -81,4 +86,13 @@ public class ArgumentDefinition {
 	private String getDescriptionInfo() {
 		return descriptionInfo;
 	}
+
+	/**
+	 * Adds my tab complete options to the given command node
+	 * @param node The node to add the completions to
+	 * @return A set of leave nodes that the next argument can be added to.
+	 */
+    public List<CommandNode<ISuggestionProvider>> addTabCompleteNodesTo(CommandNode<ISuggestionProvider> node) {
+    	return new ArrayList<>();
+    }
 }

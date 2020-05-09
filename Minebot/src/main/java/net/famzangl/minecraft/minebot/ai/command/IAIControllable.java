@@ -35,7 +35,9 @@ public interface IAIControllable {
 	 * 
 	 * @return
 	 */
-	Minecraft getMinecraft();
+	default Minecraft getMinecraft() {
+		return getAiHelper().getMinecraft();
+	}
 
 	AIHelper getAiHelper();
 
@@ -45,6 +47,10 @@ public interface IAIControllable {
 	 * @param strategy
 	 *            The new strategy.
 	 */
-	void requestUseStrategy(AIStrategy strategy);
+	int requestUseStrategy(AIStrategy strategy);
+
+	default int requestUseStrategy(AIStrategy strategy, SafeStrategyRule rule) {
+		return requestUseStrategy(strategy);
+	}
 
 }

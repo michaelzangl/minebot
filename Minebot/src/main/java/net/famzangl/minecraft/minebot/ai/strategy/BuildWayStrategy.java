@@ -23,12 +23,12 @@ public class BuildWayStrategy extends PathFinderStrategy {
 
 
 	public BuildWayStrategy(BuildWayPathfinder pathfinder) {
-		super(pathfinder, "Build a way.");
+		super(pathfinder, "Build a road.");
 	}
 
 	@Override
 	public String getDescription(AIHelper helper) {
-		return "Build way";
+		return "Build a road";
 	}
 
 	@Override

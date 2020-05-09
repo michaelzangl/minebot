@@ -54,7 +54,7 @@ public class BlockRangeScanner {
 	public void addHandler(BlockHandler h) {
 		handlers.add(h);
 		for (BlockState block : h.getIds()) {
-			int i = Block.getStateId(block);
+			int i = BlockSet.getStateId(block);
 			if (handlersCache.length < i) {
 				handlersCache = Arrays.copyOf(handlersCache, Math.max(handlersCache.length * 2, i + 1));
 			}

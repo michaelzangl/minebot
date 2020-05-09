@@ -41,10 +41,8 @@ public class MinebotMod {
 
 	public MinebotMod() {
 		instance = this;
-		IEventBus modBus = FMLJavaModLoadingContext.get().getModEventBus();
 		IEventBus mcBus = MinecraftForge.EVENT_BUS;
 
-		modBus.addListener(this::init);
 		mcBus.addListener(new PlayerUpdateHandler()::onPlayerTick);
 		new AIController().initialize(mcBus);
 	}
@@ -64,10 +62,6 @@ public class MinebotMod {
 	}
 	
 	// Note: 6364136223846793005L * 0xc097ef87329e28a5l = 1
-
-	public void init(FMLCommonSetupEvent event) {
-		BlockBoundsCache.initialize();
-	}
 
 	public static String getVersion() {
 		return ModList.get().getModContainerById(MOD_ID).map(

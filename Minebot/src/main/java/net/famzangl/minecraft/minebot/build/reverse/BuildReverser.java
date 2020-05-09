@@ -19,6 +19,7 @@ package net.famzangl.minecraft.minebot.build.reverse;
 import net.famzangl.minecraft.minebot.MinebotMod;
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.command.AIChatController;
+import net.famzangl.minecraft.minebot.ai.path.world.BlockSets;
 import net.famzangl.minecraft.minebot.ai.path.world.Pos;
 import net.famzangl.minecraft.minebot.build.reverse.factories.BuildTaskFactories;
 import net.minecraft.block.Block;
@@ -110,8 +111,6 @@ public class BuildReverser {
 							.getAbsolutePath()));
 		} catch (final FileNotFoundException e) {
 			AIChatController.addChatLine("File/dir does not exist: " + outFile);
-		} catch (final IOException e) {
-			AIChatController.addChatLine("IO-Error for: " + outFile);
 		} finally {
 			if (out != null) {
 				out.close();
@@ -131,7 +130,7 @@ public class BuildReverser {
 		LOGGER.trace(MARKER_RECONSTRUCT, "Reconstructing block at " + pos);
 
 		final Block block = helper.getBlock(pos);
-		if (block != Blocks.AIR) {
+		if (!BlockSets.AIR.contains(block.getDefaultState())) {
 			try {
 				final TaskDescription taskString = BuildTaskFactories.getTaskFor(helper.getWorld(), pos) ;
 				LOGGER.trace(MARKER_RECONSTRUCT, "Resulting description: " + taskString);

@@ -75,4 +75,12 @@ public class PlaceBlockTask extends AITask {
 		attemptsLeft--;
 	}
 
+	@Override
+	public String toString() {
+		return "PlaceBlockTask{" +
+				"placeOn=" + placeOn +
+				", onSide=" + onSide +
+				", blocks=" + blocks +
+				'}';
+	}
 }

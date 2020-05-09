@@ -53,6 +53,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Scanner;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * The minescript object that is exported to js.
@@ -82,10 +84,9 @@ public class MineScript {
 	 * @throws UnknownCommandException
 	 */
 	public ScriptStrategy safeStrategy(String command, Object... arguments)
-			throws UnknownCommandException {
+			throws CommandSyntaxException {
 		return new ScriptStrategy(AIChatController.getRegistry()
-				.evaluateCommandWithSaferule(waitForTick(), command,
-						toStringArray(arguments)));
+				.evaluateCommandWithSaferule(waitForTick(), toCommandString(command, arguments)));
 	}
 
 	/**
@@ -95,20 +96,18 @@ public class MineScript {
 	 * @throws UnknownCommandException
 	 */
 	public ScriptStrategy strategy(String command, Object... arguments)
-			throws UnknownCommandException {
+			throws CommandSyntaxException {
 		return new ScriptStrategy(AIChatController.getRegistry()
-				.evaluateCommand(waitForTick(), command,
-						toStringArray(arguments)));
+				.evaluateCommand(waitForTick(), toCommandString(command, arguments)));
 	}
 
-	private String[] toStringArray(Object[] arguments) {
-		String[] strs = new String[arguments.length];
-		for (int i = 0; i < arguments.length; i++) {
-			Object arg = arguments[i];
-			strs[i] = arg.toString();
-		}
-		return strs;
+	private String toCommandString(String command, Object[] arguments) {
+		return Stream.concat(
+				Stream.of(command),
+				Stream.of(arguments).map(Object::toString)
+		).collect(Collectors.joining(" "));
 	}
+
 
 	public ScriptStrategy strategyWalkTowards(double x, double z) {
 		return new ScriptStrategy(new WalkTowardsStrategy(x, z));

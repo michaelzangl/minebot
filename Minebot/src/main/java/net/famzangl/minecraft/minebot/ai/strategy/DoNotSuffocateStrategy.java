@@ -17,9 +17,8 @@
 package net.famzangl.minecraft.minebot.ai.strategy;
 
 import net.famzangl.minecraft.minebot.ai.AIHelper;
-import net.famzangl.minecraft.minebot.ai.commands.CommandSettings;
+import net.famzangl.minecraft.minebot.ai.path.world.BlockSet;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSets;
-import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
 import org.apache.logging.log4j.LogManager;
@@ -64,7 +63,7 @@ public class DoNotSuffocateStrategy extends AIStrategy {
 		if (LOGGER.isDebugEnabled()) {
 			BlockState blockState = helper.getWorld().getBlockState(toDestroy);
 			LOGGER.debug("Detected that we are inside unsafe block: " + blockState
-					+ " (id=" + Block.getStateId(blockState) + "). Attempting to destroy it.");
+					+ " (id=" + BlockSet.getStateId(blockState) + "). Attempting to destroy it.");
 		}
 		helper.faceAndDestroy(toDestroy);
 	}

@@ -25,6 +25,7 @@ import net.famzangl.minecraft.minebot.ai.command.ParameterType;
 import net.famzangl.minecraft.minebot.ai.command.SafeStrategyRule;
 import net.famzangl.minecraft.minebot.ai.path.ClearAreaPathfinder;
 import net.famzangl.minecraft.minebot.ai.path.ClearAreaPathfinder.ClearMode;
+import net.famzangl.minecraft.minebot.ai.path.world.WorldData;
 import net.famzangl.minecraft.minebot.ai.strategy.AIStrategy;
 import net.famzangl.minecraft.minebot.ai.strategy.PathFinderStrategy;
 import net.famzangl.minecraft.minebot.ai.utils.BlockCuboid;
@@ -81,14 +82,14 @@ public class CommandClearArea {
 		}
 	}
 	
-	public static BlockCuboid getArea(AIHelper helper) {
+	public static <W extends WorldData> BlockCuboid<W> getArea(AIHelper helper) {
 		final BlockPos pos1 = helper.getPos1();
 		final BlockPos pos2 = helper.getPos2();
 		if (pos1 == null || pos2 == null) {
 			AIChatController.addChatLine("Set positions first.");
 			return null;
 		} else {
-			return new BlockCuboid(pos1, pos2);
+			return new BlockCuboid<>(pos1, pos2);
 		}
 	}
 }

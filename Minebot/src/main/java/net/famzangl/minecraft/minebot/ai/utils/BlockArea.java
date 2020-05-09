@@ -10,8 +10,9 @@ import net.minecraft.util.math.BlockPos;
  * @author Michael Zangl
  */
 public abstract class BlockArea<WorldT extends WorldData> {
+	@FunctionalInterface
 	public interface AreaVisitor<WorldT extends WorldData> {
-		public void visit(WorldT world, int x, int y, int z);
+		void visit(WorldT world, int x, int y, int z);
 	}
 
 	private static class VolumeVisitor implements AreaVisitor<WorldData> {
@@ -37,8 +38,12 @@ public abstract class BlockArea<WorldT extends WorldData> {
 		return volumeVisitor.volume;
 	}
 	
-	public BlockIntersection<WorldT> intersectWith(BlockArea<WorldT> other) {
-		return new BlockIntersection<>(this, other);
+	public AreaIntersection<WorldT> intersectWith(BlockArea<WorldT> other) {
+		return new AreaIntersection<>(this, other);
+	}
+
+	public AreaUnion<WorldT> unionWith(BlockArea<WorldT> other) {
+		return new AreaUnion<>(this, other);
 	}
 
 }

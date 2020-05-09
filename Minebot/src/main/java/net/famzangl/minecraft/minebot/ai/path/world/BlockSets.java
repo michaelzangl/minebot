@@ -18,7 +18,7 @@ public class BlockSets {
 
 	public static final BlockSet EMPTY = BlockSet.builder().build();
 
-	public static final BlockSet AIR = BlockSet.builder().add(Blocks.AIR).build();
+	public static final BlockSet AIR = BlockSet.builder().add(Blocks.AIR, Blocks.VOID_AIR, Blocks.CAVE_AIR).build();
 	/**
 	 * All rail blocks.
 	 */
@@ -287,6 +287,22 @@ public class BlockSets {
 			Blocks.DARK_OAK_LOG,
 			Blocks.ACACIA_LOG).build();
 
+	public static final BlockSet STRIPPED_WOOD = BlockSet.builder().add(
+			Blocks.STRIPPED_OAK_WOOD,
+			Blocks.STRIPPED_SPRUCE_WOOD,
+			Blocks.STRIPPED_BIRCH_WOOD,
+			Blocks.STRIPPED_JUNGLE_WOOD,
+			Blocks.STRIPPED_DARK_OAK_WOOD,
+			Blocks.STRIPPED_ACACIA_WOOD).build();
+
+	public static final BlockSet STRIPPED_LOGS = BlockSet.builder().add(
+			Blocks.STRIPPED_OAK_LOG,
+			Blocks.STRIPPED_SPRUCE_LOG,
+			Blocks.STRIPPED_BIRCH_LOG,
+			Blocks.STRIPPED_JUNGLE_LOG,
+			Blocks.STRIPPED_DARK_OAK_LOG,
+			Blocks.STRIPPED_ACACIA_LOG).build();
+
 
 	public static final BlockSet LOWER_SLABS;
 	public static final BlockSet UPPER_SLABS;
@@ -354,6 +370,7 @@ public class BlockSets {
 			Blocks.CORNFLOWER,
 			Blocks.CHORUS_FLOWER,
 			Blocks.SUNFLOWER,
+			Blocks.POPPY,
 			Blocks.WHEAT,
 			Blocks.CARROTS,
 			Blocks.POTATOES,
@@ -371,7 +388,8 @@ public class BlockSets {
             Blocks.END_ROD,
             Blocks.BEETROOTS,
 			Blocks.DEAD_BUSH,
-			Blocks.ROSE_BUSH).add(RAILS).add(CARPET).add(SAPLING).add(SIGN).add(WALL_SIGN).build();
+			Blocks.ROSE_BUSH,
+			Blocks.GRASS_BLOCK).add(RAILS).add(CARPET).add(SAPLING).add(SIGN).add(WALL_SIGN).build();
 
 	/**
 	 * Blocks that fall down.
@@ -397,10 +415,9 @@ public class BlockSets {
 	 * away from them for now.
 	 */
 	public static final BlockSet HEAD_CAN_WALK_THROUGH = BlockSet.builder().add(
-			Blocks.AIR,
 			Blocks.KELP_PLANT,
 			Blocks.CHORUS_PLANT,
-			Blocks.SUGAR_CANE).add(TORCH).build();
+			Blocks.SUGAR_CANE).add(AIR).add(TORCH).build();
 
 	public static final BlockSet FEET_CAN_WALK_THROUGH = BlockSet.builder().add(explicitFootWalkableBlocks).add(HEAD_CAN_WALK_THROUGH).build();
 
@@ -442,6 +459,7 @@ public class BlockSets {
 			Blocks.DIAMOND_BLOCK,
 			Blocks.DIAMOND_ORE,
 			Blocks.DIRT,
+			Blocks.PODZOL,
 			Blocks.EMERALD_BLOCK,
 			Blocks.PURPUR_BLOCK,
 			Blocks.PURPUR_PILLAR,
@@ -453,7 +471,7 @@ public class BlockSets {
 			Blocks.OBSERVER,
 			// FIXME: Not a cube.
 			Blocks.FARMLAND, Blocks.FURNACE, Blocks.GLASS, Blocks.GLOWSTONE,
-			Blocks.GRASS, Blocks.GOLD_BLOCK, Blocks.GOLD_ORE,
+			Blocks.GRASS_BLOCK, Blocks.GOLD_BLOCK, Blocks.GOLD_ORE,
 			Blocks.CLAY, Blocks.IRON_BLOCK, Blocks.IRON_ORE,
 			Blocks.LAPIS_BLOCK, Blocks.LAPIS_ORE,
 			Blocks.MELON,
@@ -469,10 +487,16 @@ public class BlockSets {
 			Blocks.REDSTONE_BLOCK, Blocks.REDSTONE_LAMP, Blocks.REDSTONE_ORE,
 			Blocks.SANDSTONE, Blocks.FROSTED_ICE,
 			Blocks.SNOW,
-			// FIXME: Not a cube.
+			// FIXME: Both are not cubes
 			Blocks.SOUL_SAND, Blocks.GRASS_PATH,
 			Blocks.STONE, Blocks.BRICKS,
-			Blocks.SNOW_BLOCK).add(WOOL).add(LEAVES).add(LOGS).add(CONCRETE).add(STAINED_GLASS).add(TERRACOTTA).add(GLAZED_TERRACOTTA).add(PLANKS).add(DOUBLE_SLABS).build();
+			Blocks.SNOW_BLOCK,
+			Blocks.DIORITE,
+			Blocks.POLISHED_ANDESITE,
+			Blocks.POLISHED_DIORITE,
+			Blocks.POLISHED_GRANITE).add(WOOL).add(LEAVES)
+			.add(LOGS).add(STRIPPED_LOGS).add(STRIPPED_WOOD)
+			.add(CONCRETE).add(STAINED_GLASS).add(TERRACOTTA).add(GLAZED_TERRACOTTA).add(PLANKS).add(DOUBLE_SLABS).build();
 
 	/**
 	 * All stairs. It is no problem to walk on them.
@@ -492,7 +516,12 @@ public class BlockSets {
 	public static final BlockSet SAFE_SIDE = 
 			BlockSet.builder().add(explicitSafeSideBlocks).add(SAFE_GROUND).add(FEET_CAN_WALK_THROUGH).add(AIR).build();
 
-	public static final BlockSet SAFE_CEILING = BlockSet.builder().add(STAIRS).add(HALF_SLABS).add(FEET_CAN_WALK_THROUGH).add(SIMPLE_CUBE).add(AIR).add(Blocks.VINE, Blocks.CACTUS).build();
+	public static final BlockSet SAFE_CEILING = BlockSet.builder()
+			.add(STAIRS)
+			.add(HALF_SLABS)
+			.add(FEET_CAN_WALK_THROUGH)
+			.add(SIMPLE_CUBE)
+			.add(AIR).add(Blocks.VINE, Blocks.CACTUS).build();
 
 	/**
 	 * Blocks you need to destroy but that are then safe.

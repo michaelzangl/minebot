@@ -18,6 +18,7 @@ package net.famzangl.minecraft.minebot.ai.task.place;
 
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.ItemFilter;
+import net.famzangl.minecraft.minebot.ai.path.world.BlockBounds;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSets;
 import net.famzangl.minecraft.minebot.ai.task.BlockHalf;
 import net.famzangl.minecraft.minebot.ai.task.TaskOperations;
@@ -73,24 +74,38 @@ public class JumpingPlaceAtHalfTask extends JumpingPlaceBlockAtFloorTask {
 	}
 
 	protected boolean faceSideBlock(AIHelper aiHelper, Direction dir) {
-		LOGGER.trace(MARKER_JUMPING_PLACE_HALF, "Facing side " + dir);
 		BlockPos facingBlock = getPlaceAtPos().offset(dir);
 		if (BlockSets.AIR.isAt(aiHelper.getWorld(), facingBlock)) {
+			LOGGER.trace(MARKER_JUMPING_PLACE_HALF, "Skipped placing at {} looking at air {}", dir, facingBlock);
 			return false;
 		} else {
-			aiHelper.faceSideOf(facingBlock, dir.getOpposite(),
-					getSide(dir) == BlockHalf.UPPER_HALF ? 0.5 : 0,
-					getSide(dir) == BlockHalf.LOWER_HALF ? 0.5 : 1,
-					aiHelper.getMinecraft().player.getPosX() - pos.getX(),
-					aiHelper.getMinecraft().player.getPosZ() - pos.getZ(),
-					lookingDirection);
+			if (LOGGER.isTraceEnabled()) {
+				LOGGER.trace(MARKER_JUMPING_PLACE_HALF, "Facing towards {} looking at block {} ({})", dir, facingBlock,
+						aiHelper.getBlockState(facingBlock));
+			}
+			if (dir == Direction.DOWN) {
+				aiHelper.faceSideOf(facingBlock, Direction.UP);
+			} else {
+				BlockBounds areaToFace = SneakAndPlaceAtHalfTask.getPlaceOnBounds(
+						aiHelper.getWorld(),
+						facingBlock,
+						side,
+						dir.getOpposite()
+				);
+				aiHelper.face(areaToFace.random(facingBlock, .9));
+			}
 			return true;
 		}
 	}
 
+	protected boolean isAtDesiredHeight(AIHelper aiHelper) {
+		return aiHelper.getMinecraft().player.getBoundingBox().minY >=
+				getPlaceAtPos().getY() + (side == BlockHalf.LOWER_HALF ? 0.5 : 1);
+	}
+
 	protected BlockHalf getSide(Direction dir) {
 		return dir == Direction.DOWN ? BlockHalf.UPPER_HALF
-				: BlockHalf.LOWER_HALF;
+				: side;
 	}
 
 	@Override

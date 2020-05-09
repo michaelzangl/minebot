@@ -229,7 +229,7 @@ public class AirbridgeStrategy extends TaskStrategy {
 			addTask(new SneakToSideTask(beforeBuild, direction));
 
 			BlockCuboid area = getSidewardsArea(buildPos.add(0, -1, 0));
-			BlockArea toPlace = new BlockFilteredArea(area, BlockSets.AIR);
+			BlockArea toPlace = new BlockFilteredArea<>(area, BlockSets.AIR);
 			if ((buildPos.getX() & 1) == (buildPos.getZ() & 1)) {
 				toPlace = new ReverseAcceptingArea(toPlace);
 			}
@@ -251,7 +251,7 @@ public class AirbridgeStrategy extends TaskStrategy {
 	}
 
 	private boolean isInLength(BlockPos pos) {
-		return length < 0 || start.distanceSq(pos) + .5 < length * length;		
+		return length < 0 || start.distanceSq(pos) + .5 < length * length;
 	}
 
 	private boolean isHalfslabAt(WorldData world, BlockPos buildPos) {

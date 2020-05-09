@@ -8,4 +8,4 @@ For this, we use a BlockSet class. It allows fast isIn checks.
 
 The checks are run against the raw integer data stored in the minecraft world binary files, but BlockSet attempts to abstract this away.
 
-You can do conversion between BlockState and id using Block.getStateById / Block.getStateId 
+You can do conversion between BlockState and id using BlockSet.getStateById / BlockSet.getStateId 

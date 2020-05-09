@@ -22,6 +22,7 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
 
+import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -74,7 +75,7 @@ public class BlockSet implements Iterable<BlockState> {
 	}
 
 	public boolean contains(BlockState state) {
-		return contains(Block.getStateId(state));
+		return contains(BlockSet.getStateId(state));
 	}
 
 	public BlockSet invert() {
@@ -231,7 +232,7 @@ public class BlockSet implements Iterable<BlockState> {
 					throw new IllegalStateException();
 				}
 
-				BlockState next = Block.getStateById(nextId);
+				BlockState next = BlockSet.getStateById(nextId);
 				scanNext();
 				return next;
 			}
@@ -262,7 +263,7 @@ public class BlockSet implements Iterable<BlockState> {
 		}
 
 		public Builder add(BlockState state) {
-			statesToAdd.add(Block.getStateId(state));
+			statesToAdd.add(getStateId(state));
 			return this;
 		}
 
@@ -295,5 +296,24 @@ public class BlockSet implements Iterable<BlockState> {
 		public BlockSet build() {
 			return new BlockSet(statesToAdd.stream().mapToInt(it -> it).toArray());
 		}
+
+		public Builder intersectWith(BlockSet toIntersectWith) {
+			statesToAdd.removeIf(state -> !toIntersectWith.contains(state));
+			return this;
+		}
+    }
+
+	public static int getStateId(@Nonnull BlockState state) {
+		if (Block.BLOCK_STATE_IDS.size() == 0) {
+			throw new IllegalStateException("Block states not initialized yet.");
+		}
+		return Block.BLOCK_STATE_IDS.get(state);
+	}
+
+	public static BlockState getStateById(int id) {
+		if (Block.BLOCK_STATE_IDS.size() == 0) {
+			throw new IllegalStateException("Block states not initialized yet.");
+		}
+		return Block.BLOCK_STATE_IDS.getByValue(id);
 	}
 }

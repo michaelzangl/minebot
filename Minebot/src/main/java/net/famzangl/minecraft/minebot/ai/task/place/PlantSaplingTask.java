@@ -19,6 +19,7 @@ package net.famzangl.minecraft.minebot.ai.task.place;
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.BlockItemFilter;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSet;
+import net.famzangl.minecraft.minebot.ai.path.world.BlockSets;
 import net.famzangl.minecraft.minebot.build.block.WoodType;
 import net.minecraft.block.Blocks;
 import net.minecraft.util.math.BlockPos;
@@ -34,11 +35,11 @@ public class PlantSaplingTask extends PlaceBlockAtFloorTask {
 	private static final class SaplingFilter extends BlockItemFilter {
 
 		private SaplingFilter(WoodType type) {
-			super(type.getSapling());
+			super(type == null ? BlockSets.SAPLING : BlockSet.builder().add(type.getSapling()).build());
 		}
 	}
 
-	private final static BlockSet PLANTABLE = BlockSet.builder().add(Blocks.DIRT, Blocks.GRASS).build();
+	private final static BlockSet PLANTABLE = BlockSet.builder().add(Blocks.DIRT, Blocks.GRASS_BLOCK).build();
 
 	public PlantSaplingTask(BlockPos pos, WoodType type) {
 		super(pos, new SaplingFilter(type));

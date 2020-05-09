@@ -136,13 +136,13 @@ public class WorldWithDelta extends WorldData {
 	}
 
 	public void setBlock(BlockPos pos, BlockState block) {
-		setBlockIdAndMeta(pos.getX(), pos.getY(), pos.getZ(), Block.getStateId(block));
+		setBlockIdAndMeta(pos.getX(), pos.getY(), pos.getZ(), BlockSet.getStateId(block));
 	}
 
 	private void setBlockIdAndMeta(int x, int y, int z, int blockWithMeta) {
 		if (LOGGER.isTraceEnabled()) {
 			LOGGER.trace(MARKER_WORLD_DELTA, "Setblock at (" + x + "," + y + "," + z +
-					") with " + Block.getStateById(blockWithMeta));
+					") with " + BlockSet.getStateById(blockWithMeta));
 		}
 		int chunkX = x >> 4;
 		int chunkZ = z >> 4;

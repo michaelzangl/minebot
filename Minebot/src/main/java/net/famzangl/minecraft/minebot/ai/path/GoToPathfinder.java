@@ -16,10 +16,16 @@
  *******************************************************************************/
 package net.famzangl.minecraft.minebot.ai.path;
 
+import net.famzangl.minecraft.minebot.ai.path.world.WorldData;
+import net.famzangl.minecraft.minebot.ai.utils.BlockArea;
+import net.famzangl.minecraft.minebot.ai.utils.BlockCuboid;
 import net.minecraft.util.math.BlockPos;
 
 public class GoToPathfinder extends WalkingPathfinder {
 	private final BlockPos position;
+	int HORIZONTAL_SEARCH_MIN = (int) (HORIZONTAL_SEARCH_DISTANCE * .8);
+	int VERTICAL_SEARCH_MIN = (int) (VERTICAL_SEARCH_DISTANCE * .8);
+	private BlockArea<WorldData> targetArea;
 
 	public GoToPathfinder(BlockPos position) {
 		this.position = position;
@@ -30,11 +36,60 @@ public class GoToPathfinder extends WalkingPathfinder {
 		if (playerPosition.equals(position)) {
 			return true;
 		}
+		BlockPos posDiff = position.subtract(playerPosition);
+		BlockArea<WorldData> area = new BlockCuboid<>(
+				playerPosition, playerPosition
+		);
+		// X
+		if (posDiff.getX() > HORIZONTAL_SEARCH_MIN) {
+			area = area.unionWith(
+					new BlockCuboid<>(
+							playerPosition.add(HORIZONTAL_SEARCH_MIN, -VERTICAL_SEARCH_DISTANCE, -HORIZONTAL_SEARCH_DISTANCE),
+							playerPosition.add(HORIZONTAL_SEARCH_DISTANCE, VERTICAL_SEARCH_DISTANCE, HORIZONTAL_SEARCH_DISTANCE)
+					));
+		} else if (posDiff.getX() < -HORIZONTAL_SEARCH_MIN) {
+			area = area.unionWith(
+					new BlockCuboid<>(
+							playerPosition.add(-HORIZONTAL_SEARCH_MIN, -VERTICAL_SEARCH_DISTANCE, -HORIZONTAL_SEARCH_DISTANCE),
+							playerPosition.add(-HORIZONTAL_SEARCH_DISTANCE, VERTICAL_SEARCH_DISTANCE, HORIZONTAL_SEARCH_DISTANCE)
+					));
+		}
+		// Y
+		if (posDiff.getY() > VERTICAL_SEARCH_MIN) {
+			area = area.unionWith(
+					new BlockCuboid<>(
+							playerPosition.add(-HORIZONTAL_SEARCH_DISTANCE, VERTICAL_SEARCH_MIN, -HORIZONTAL_SEARCH_DISTANCE),
+							playerPosition.add(HORIZONTAL_SEARCH_DISTANCE, VERTICAL_SEARCH_DISTANCE, HORIZONTAL_SEARCH_DISTANCE)
+					));
+		} else if (posDiff.getY() < -VERTICAL_SEARCH_MIN) {
+			area = area.unionWith(
+					new BlockCuboid<>(
+							playerPosition.add(-HORIZONTAL_SEARCH_DISTANCE, -VERTICAL_SEARCH_MIN, -HORIZONTAL_SEARCH_DISTANCE),
+							playerPosition.add(HORIZONTAL_SEARCH_DISTANCE, -VERTICAL_SEARCH_DISTANCE, -HORIZONTAL_SEARCH_DISTANCE)
+					));
+		}
+
+		// Z
+		if (posDiff.getZ() > HORIZONTAL_SEARCH_MIN) {
+			area = area.unionWith(
+					new BlockCuboid<>(
+							playerPosition.add(-HORIZONTAL_SEARCH_DISTANCE, -VERTICAL_SEARCH_DISTANCE, HORIZONTAL_SEARCH_MIN),
+							playerPosition.add(HORIZONTAL_SEARCH_DISTANCE, VERTICAL_SEARCH_DISTANCE, HORIZONTAL_SEARCH_DISTANCE)
+					));
+		} else if (posDiff.getZ() < -HORIZONTAL_SEARCH_MIN) {
+			area = area.unionWith(
+					new BlockCuboid<>(
+							playerPosition.add(-HORIZONTAL_SEARCH_DISTANCE, -VERTICAL_SEARCH_DISTANCE, -HORIZONTAL_SEARCH_MIN),
+							playerPosition.add(HORIZONTAL_SEARCH_DISTANCE, VERTICAL_SEARCH_DISTANCE, -HORIZONTAL_SEARCH_DISTANCE)
+					));
+		}
+		targetArea = area;
+
 		return super.runSearch(playerPosition);
 	}
 
 	@Override
 	protected float rateDestination(int distance, int x, int y, int z) {
-		return position.getX() == x && position.getY() == y && position.getZ() == z ? 1 : -1;
+		return targetArea.contains(world, position) ? distance : -1;
 	}
 }

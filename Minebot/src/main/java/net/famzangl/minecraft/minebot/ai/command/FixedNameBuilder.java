@@ -16,10 +16,16 @@
  *******************************************************************************/
 package net.famzangl.minecraft.minebot.ai.command;
 
+import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+import com.mojang.brigadier.tree.CommandNode;
+import com.mojang.brigadier.tree.LiteralCommandNode;
 import net.famzangl.minecraft.minebot.ai.AIHelper;
+import net.minecraft.command.ISuggestionProvider;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 
 public class FixedNameBuilder extends ParameterBuilder {
 
@@ -36,6 +42,13 @@ public class FixedNameBuilder extends ParameterBuilder {
 			if (fixedName.startsWith(currentStart)) {
 				addTo.add(fixedName);
 			}
+		}
+
+		@Override
+		public List<CommandNode<ISuggestionProvider>> addTabCompleteNodesTo(CommandNode<ISuggestionProvider> node) {
+			LiteralCommandNode<ISuggestionProvider> literal = LiteralArgumentBuilder.<ISuggestionProvider>literal(fixedName).build();
+			node.addChild(literal);
+			return Collections.singletonList(literal);
 		}
 
 		@Override

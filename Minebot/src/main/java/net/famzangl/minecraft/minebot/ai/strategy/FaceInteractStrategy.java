@@ -16,22 +16,21 @@
  *******************************************************************************/
 package net.famzangl.minecraft.minebot.ai.strategy;
 
-import com.google.common.base.Predicate;
 import net.famzangl.minecraft.minebot.ai.AIHelper;
-import net.famzangl.minecraft.minebot.ai.selectors.AndSelector;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.MovementInput;
 import net.minecraft.util.math.EntityRayTraceResult;
 import net.minecraft.util.math.RayTraceResult;
 
 import java.util.ArrayList;
+import java.util.function.Predicate;
 
 public abstract class FaceInteractStrategy extends AIStrategy {
 
 	private final class NotOnBlacklistSelector implements
 			Predicate<Entity> {
 		@Override
-		public boolean apply(Entity var1) {
+		public boolean test(Entity var1) {
 			return !blacklist.contains(var1);
 		}
 	}
@@ -92,7 +91,7 @@ public abstract class FaceInteractStrategy extends AIStrategy {
 	}
 
 	protected boolean doInteractWithCurrent(Entity entityHit, AIHelper helper) {
-		if (entitiesToInteract(helper).apply(entityHit)) {
+		if (entitiesToInteract(helper).test(entityHit)) {
 			doInteract(entityHit, helper);
 			return true;
 		} else {
@@ -106,7 +105,7 @@ public abstract class FaceInteractStrategy extends AIStrategy {
 
 	private Entity getCloseEntity(AIHelper helper) {
 		Predicate<Entity> collect = entitiesToFace(helper);
-		collect = new AndSelector(collect, new NotOnBlacklistSelector());
+		collect = collect.and(new NotOnBlacklistSelector());
 		return helper.getClosestEntity(DISTANCE, collect);
 	}
 

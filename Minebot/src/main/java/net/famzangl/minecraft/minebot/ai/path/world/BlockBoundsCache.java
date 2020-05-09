@@ -30,7 +30,7 @@ public class BlockBoundsCache {
 	}
 
 	public static BlockBounds getBounds(BlockState blockState) {
-		return getBounds(Block.getStateId(blockState));
+		return getBounds(BlockSet.getStateId(blockState));
 	}
 
 	public static BlockBounds getBounds(int blockStateId) {
@@ -43,24 +43,30 @@ public class BlockBoundsCache {
 	}
 
 	public static void initialize() {
-		bounds = new BlockBounds[16 * 4096];
-		HashMap<BlockBounds, BlockBounds> usedBounds = new HashMap<BlockBounds, BlockBounds>();
-		usedBounds.put(BlockBounds.FULL_BLOCK, BlockBounds.FULL_BLOCK);
-		usedBounds.put(BlockBounds.LOWER_HALF_BLOCK, BlockBounds.LOWER_HALF_BLOCK);
-		usedBounds.put(BlockBounds.UPPER_HALF_BLOCK, BlockBounds.UPPER_HALF_BLOCK);
-		Block.BLOCK_STATE_IDS.forEach(state -> {
-		    int i = Block.getStateId(state);
-			try {
-				BlockBounds bound = attemptLoad(state);
-				usedBounds.computeIfAbsent(bound, __ -> bound);
-				// Reduces instances we keep in memory
-				bounds[i] = usedBounds.get(bound);
-			} catch (Throwable e) {
-				LOGGER.warn(MARKER_BOUNDS_PROBLEM,
-						"Could not create bounds for " + Block.getStateById(i));
-				bounds[i] = BlockBounds.FULL_BLOCK;
-			}
-		});
+	    if (bounds == null) {
+            int maxId = 0;
+	        for (BlockState state: Block.BLOCK_STATE_IDS) {
+	            maxId = Math.max(maxId, Block.BLOCK_STATE_IDS.get(state));
+            }
+            bounds = new BlockBounds[maxId + 1];
+            HashMap<BlockBounds, BlockBounds> usedBounds = new HashMap<BlockBounds, BlockBounds>();
+            usedBounds.put(BlockBounds.FULL_BLOCK, BlockBounds.FULL_BLOCK);
+            usedBounds.put(BlockBounds.LOWER_HALF_BLOCK, BlockBounds.LOWER_HALF_BLOCK);
+            usedBounds.put(BlockBounds.UPPER_HALF_BLOCK, BlockBounds.UPPER_HALF_BLOCK);
+            Block.BLOCK_STATE_IDS.forEach(state -> {
+                int i = BlockSet.getStateId(state);
+                try {
+                    BlockBounds bound = attemptLoad(state);
+                    usedBounds.computeIfAbsent(bound, __ -> bound);
+                    // Reduces instances we keep in memory
+                    bounds[i] = usedBounds.get(bound);
+                } catch (Throwable e) {
+                    LOGGER.warn(MARKER_BOUNDS_PROBLEM,
+                            "Could not create bounds for " + BlockSet.getStateById(i));
+                    bounds[i] = BlockBounds.FULL_BLOCK;
+                }
+            });
+        }
 	}
 
 	private static BlockBounds attemptLoad(BlockState state) {

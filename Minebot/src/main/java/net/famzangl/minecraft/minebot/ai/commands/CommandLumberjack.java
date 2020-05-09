@@ -16,14 +16,12 @@
  *******************************************************************************/
 package net.famzangl.minecraft.minebot.ai.commands;
 
+import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.command.AICommand;
-import net.famzangl.minecraft.minebot.ai.command.AICommandInvocation;
-import net.famzangl.minecraft.minebot.ai.command.AICommandParameter;
-import net.famzangl.minecraft.minebot.ai.command.ParameterType;
+import net.famzangl.minecraft.minebot.ai.command.IAIControllable;
 import net.famzangl.minecraft.minebot.ai.command.SafeStrategyRule;
 import net.famzangl.minecraft.minebot.ai.path.TreePathFinder;
-import net.famzangl.minecraft.minebot.ai.strategy.AIStrategy;
 import net.famzangl.minecraft.minebot.ai.strategy.PathFinderStrategy;
 import net.famzangl.minecraft.minebot.build.block.WoodType;
 
@@ -31,28 +29,42 @@ import net.famzangl.minecraft.minebot.build.block.WoodType;
 public class CommandLumberjack {
 	public static class TreePathFinderStrategy extends PathFinderStrategy {
 
-		private TreePathFinder treeFinder;
-
 		public TreePathFinderStrategy(TreePathFinder pathFinder,
 				String description) {
 			super(pathFinder, description);
-			treeFinder = pathFinder;
 		}
-		
+
+		public TreePathFinderStrategy(WoodType type, boolean replant) {
+			this(new TreePathFinder(type, replant), "Getting some " + (type == null ? "wood" : type.toString().toLowerCase()));
+		}
+
 		@Override
 		public void searchTasks(AIHelper helper) {
 			super.searchTasks(helper);
 		}
 	}
-	
-	@AICommandInvocation(safeRule = SafeStrategyRule.DEFEND_MINING)
-	public static AIStrategy run(
-			AIHelper helper,
-			@AICommandParameter(type = ParameterType.FIXED, fixedName = "lumberjack", description = "") String nameArg,
-			@AICommandParameter(type = ParameterType.ENUM, description = "wood type", optional = true) WoodType type,
-			@AICommandParameter(type = ParameterType.FIXED, fixedName = "replant", description = "", optional = true) String replant) {
-		return new TreePathFinderStrategy(
-				new TreePathFinder(type, replant != null), "Getting some " + (type == null ? "wood" : type.toString().toLowerCase()));
+
+    public static void register(LiteralArgumentBuilder<IAIControllable> dispatcher) {
+		dispatcher.then(
+				Commands.optional(
+						Commands.literal("lumberjack"),
+						x -> null,
+						"wood",
+						EnumArgument.of(WoodType.class),
+						WoodType.class,
+						(builder, wood) ->
+							builder.executes(context -> context.getSource().requestUseStrategy(
+									new TreePathFinderStrategy(wood.get(context), false),
+									SafeStrategyRule.DEFEND_MINING
+							))
+							.then(
+									Commands.literal("replant").executes(context -> context.getSource().requestUseStrategy(
+											new TreePathFinderStrategy(wood.get(context), true),
+											SafeStrategyRule.DEFEND_MINING
+									))
+							)
+				)
+		);
 	}
 
 }

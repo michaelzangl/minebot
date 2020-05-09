@@ -35,6 +35,8 @@ import net.famzangl.minecraft.minebot.ai.utils.BlockCuboid;
 import net.famzangl.minecraft.minebot.build.block.WoodType;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.Comparator;
 import java.util.stream.Stream;
@@ -52,6 +54,7 @@ import java.util.stream.Stream;
  *
  */
 public class TreePathFinder extends MovePathFinder {
+	private static final Logger LOGGER = LogManager.getLogger(TreePathFinder.class);
 	
 	private static class PrefaceBarrier extends AITask {
 
@@ -158,9 +161,7 @@ public class TreePathFinder extends MovePathFinder {
 				BlockPos pos = getPosition(y);
 				if (BlockSets.LOGS.isAt(world, pos.add(0, 3, 0))) {
 					topY = y + 3;
-				} else if (allowedGroundBlocks.isAt(world, pos.add(0, -1, 0))) {
-					// good
-				} else {
+				} else if (!allowedGroundBlocks.isAt(world, pos.add(0, -1, 0))) {
 					break;
 				}
 			}
@@ -317,9 +318,10 @@ public class TreePathFinder extends MovePathFinder {
 		protected void runOnce(AIHelper aiHelper, TaskOperations taskOperations) {
 			if (state != null
 					&& !state.isValidPlayerPosition(aiHelper.getPlayerPosition())) {
-				taskOperations.desync(new StringTaskError("Not in a tree."));
+				taskOperations.desync(new StringTaskError("Attempted to start a large tree taks, but player is in a tree."));
 				largeTree = null;
 			} else {
+				LOGGER.debug("Starting with large tree {}", largeTree);
 				largeTree = state;
 			}
 		}
@@ -358,6 +360,7 @@ public class TreePathFinder extends MovePathFinder {
 	 */
 	public boolean addTasksForLargeTree(AIHelper aiHelper) {
 		if (largeTree != null) {
+			LOGGER.debug("Adding tasks for lage tree {}", largeTree);
 			largeTree.addTasks(aiHelper);
 			addTask(new SwitchToLargeTreeTask(null));
 			return true;
@@ -384,7 +387,7 @@ public class TreePathFinder extends MovePathFinder {
 			}
 		}
 
-		return points == 0 ? -1 : distance + 20 - points * 2;
+		return points == 0 ? -1 : distance + (TREE_HEIGHT + 5 - points) * 2;
 	}
 
 	private boolean isLog(int x, int y, int z) {
@@ -438,6 +441,7 @@ public class TreePathFinder extends MovePathFinder {
 			if (state.getTreeHeight() > 6 || state.getTreeHeightAbovePlayer() > 4) {
 				// we are in a large tree that should be handled by this special algorithm.
 				state.setYOffsetByPosition(currentPos);
+				LOGGER.debug("Found a tree that is large (4x4) and tall at {}, using special handling.", currentPos);
 				addTask(new SwitchToLargeTreeTask(state));
 				return true;
 			}

@@ -91,11 +91,13 @@ final public class CommandHelp {
 			AIHelper helper,
 			@AICommandParameter(type = ParameterType.FIXED, fixedName = "help", description = "") String nameArg,
 			@AICommandParameter(type = ParameterType.NUMBER, description = "help page") int page) {
+		/*
 		final List<CommandDefinition> commands = new ArrayList<CommandDefinition>(
 				AIChatController.getRegistry().getAllCommands());
 		Collections.sort(commands, new CommandComperator());
 		AIChatController.addToChatPaged("Help", page, commands,
 				new CommandToTextConverter());
+		 */
 		return new StopStrategy();
 
 	}
@@ -105,6 +107,7 @@ final public class CommandHelp {
 			AIHelper helper,
 			@AICommandParameter(type = ParameterType.FIXED, fixedName = "help", description = "") String nameArg,
 			@AICommandParameter(type = ParameterType.COMMAND, description = "command help") String commandName) {
+		/*
 		boolean found = false;
 		final ClientPlayerEntity player = helper.getMinecraft().player;
 		for (final CommandDefinition command : AIChatController.getRegistry()
@@ -122,6 +125,7 @@ final public class CommandHelp {
 			AIChatController.addChatLine("Command could not be found: "
 					+ commandName);
 		}
+		 */
 		return new StopStrategy();
 	}
 

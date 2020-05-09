@@ -24,7 +24,7 @@ import net.famzangl.minecraft.minebot.ai.task.DestroyInRangeTask;
 import net.famzangl.minecraft.minebot.ai.utils.BlockArea.AreaVisitor;
 import net.famzangl.minecraft.minebot.ai.utils.BlockCuboid;
 import net.famzangl.minecraft.minebot.ai.utils.BlockFilteredArea;
-import net.famzangl.minecraft.minebot.ai.utils.BlockIntersection;
+import net.famzangl.minecraft.minebot.ai.utils.AreaIntersection;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.util.math.BlockPos;
@@ -45,8 +45,8 @@ public class ClearAreaPathfinder extends MovePathFinder {
 	private final BlockCuboid area;
 	private ClearMode mode;
 
-	private static final BlockSet CLEARED_BLOCKS = BlockSet.builder().add(Blocks.AIR,
-			Blocks.TORCH, Blocks.WALL_TORCH).build();
+	private static final BlockSet CLEARED_BLOCKS = BlockSet.builder().add(
+			Blocks.TORCH, Blocks.WALL_TORCH).add(BlockSets.AIR).build();
 
 	private final BlockSet clearedBlocks;
 
@@ -117,7 +117,7 @@ public class ClearAreaPathfinder extends MovePathFinder {
 		}
 		BlockCuboid range = new BlockCuboid(currentPos, top);
 		range = range.extendXZ(mode.maxExtendXZ);
-		BlockIntersection clamped = range.intersectWith(new BlockFilteredArea(
+		AreaIntersection clamped = range.intersectWith(new BlockFilteredArea(
 				area, clearedBlocks.invert()));
 
 		addTask(new DestroyInRangeTask(clamped));

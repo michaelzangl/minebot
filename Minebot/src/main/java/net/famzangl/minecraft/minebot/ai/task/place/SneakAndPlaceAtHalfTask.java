@@ -50,15 +50,7 @@ public class SneakAndPlaceAtHalfTask extends SneakAndPlaceTask {
 
 		protected BlockBounds getBounds() {
 			BlockPos placeOn = getPlaceOn();
-			BlockBounds bounds = world.getBlockBounds(placeOn);
-			BlockBounds faceArea = bounds.clampY(
-					blockHalf == BlockHalf.UPPER_HALF ? 0.5 : 0.1,
-					blockHalf == BlockHalf.LOWER_HALF ? 0.45 : 0.9 // <- 0.5 but
-																// craftbukkit
-																// has a problem
-																// with that.
-					).onlySide(direction.getOpposite());
-			return faceArea;
+			return getPlaceOnBounds(world, placeOn, blockHalf, direction);
 		}
 
 		public Vec3d getRandomPoint(double faceCentered) {
@@ -154,6 +146,20 @@ public class SneakAndPlaceAtHalfTask extends SneakAndPlaceTask {
 	}
 
 	@Override
+	public void runTick(AIHelper aiHelper, TaskOperations taskOperations) {
+		double playerDy = aiHelper.getMinecraft().player.getBoundingBox().minY - positionToPlace.getY() + (blockHalf == BlockHalf.LOWER_HALF ? .5 : 1);
+		if (playerDy < - 1.2) {
+			LOGGER.debug("Player dy is at {}, we cannot jump up from there", playerDy);
+			taskOperations.desync(new StringTaskError("Attempted to sneak-place a block at " + positionToPlace + " but seem to have fallen down there."));
+		} else {
+			if (playerDy < -.2) {
+				// TODO: Jump
+			}
+			super.runTick(aiHelper, taskOperations);
+		}
+	}
+
+	@Override
 	protected boolean faceBlock(AIHelper aiHelper, TaskOperations taskOperations) {
 		final PlacingDirection[] dirs = getBuildDirs(aiHelper);
 		attempts++;
@@ -223,4 +229,16 @@ public class SneakAndPlaceAtHalfTask extends SneakAndPlaceTask {
 				+ ", startStandPosition=" + startStandPosition + ", filter="
 				+ filter + "]";
 	}
+
+	public static BlockBounds getPlaceOnBounds(WorldData world, BlockPos placeOn, BlockHalf blockHalf, Direction direction) {
+		BlockBounds bounds = world.getBlockBounds(placeOn);
+		return bounds.clampY(
+				blockHalf == BlockHalf.UPPER_HALF ? 0.5 : 0.1,
+				blockHalf == BlockHalf.LOWER_HALF ? 0.45 : 0.9 // <- 0.5 but
+				// craftbukkit
+				// has a problem
+				// with that.
+		).onlySide(direction.getOpposite());
+	}
+
 }

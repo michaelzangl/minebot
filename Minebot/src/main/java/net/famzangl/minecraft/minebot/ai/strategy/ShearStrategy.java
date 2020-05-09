@@ -16,18 +16,17 @@
  *******************************************************************************/
 package net.famzangl.minecraft.minebot.ai.strategy;
 
-import com.google.common.base.Predicate;
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.ItemFilter;
-import net.famzangl.minecraft.minebot.ai.selectors.AndSelector;
 import net.famzangl.minecraft.minebot.ai.selectors.ColorSelector;
 import net.famzangl.minecraft.minebot.ai.selectors.ItemSelector;
-import net.famzangl.minecraft.minebot.ai.selectors.OrSelector;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.passive.SheepEntity;
 import net.minecraft.item.DyeColor;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ShearsItem;
+
+import java.util.function.Predicate;
 
 public class ShearStrategy extends FaceInteractStrategy {
 	private final DyeColor color;
@@ -46,7 +45,7 @@ public class ShearStrategy extends FaceInteractStrategy {
 
 	private final class SheepSelector implements Predicate<Entity> {
 		@Override
-		public boolean apply(Entity var1) {
+		public boolean test(Entity var1) {
 			return var1 instanceof SheepEntity
 					&& !((SheepEntity) var1).getSheared() && !((SheepEntity) var1).isChild();
 		}
@@ -57,13 +56,13 @@ public class ShearStrategy extends FaceInteractStrategy {
 		Predicate<Entity> selector = new SheepSelector();
 
 		if (color != null) {
-			selector = new AndSelector(selector, new ColorSelector(color));
+			selector = selector.and(new ColorSelector(color));
 		}
 		return selector;
 	}
 	@Override
 	protected Predicate<Entity> entitiesToFace(AIHelper helper) {
-		return new OrSelector(super.entitiesToFace(helper), new ItemSelector());
+		return super.entitiesToFace(helper).or(new ItemSelector());
 	}
 	
 	@Override

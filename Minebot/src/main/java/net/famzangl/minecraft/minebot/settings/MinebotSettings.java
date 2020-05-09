@@ -52,8 +52,6 @@ public class MinebotSettings {
 	
 	private static final MinebotSettings INSTANCE = new MinebotSettings();
 
-	private static final MinebotSettingsRoot defaultSettings = new MinebotSettingsRoot();
-
 	private MinebotSettingsRoot settings;
 	private ArrayList<String> keys;
 
@@ -83,7 +81,7 @@ public class MinebotSettings {
 			}
 			if (settings == null) {
 				LOGGER.info(MARKER_SETTINGS, "Fall back to default settings.");
-				settings = defaultSettings;
+				settings = new MinebotSettingsRoot();
 			}
 		}
 
@@ -134,7 +132,7 @@ public class MinebotSettings {
 	public static File getDataDir() {
 		File dir = new File(Minecraft.getInstance().gameDir, "minebot");
 		LOGGER.trace(MARKER_SETTINGS, "Data directory: " + dir);
-		if (!dir.isDirectory()) {
+		if (false && !dir.isDirectory()) {
 			try {
 				return new MinebotDirectoryCreator().createDirectory(dir);
 			} catch (IOException e) {

@@ -1,333 +1,185 @@
-/*******************************************************************************
- * This file is part of Minebot.
- *
- * Minebot is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * Minebot is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with Minebot.  If not, see <http://www.gnu.org/licenses/>.
- *******************************************************************************/
 package net.famzangl.minecraft.minebot.ai.command;
 
-import com.mojang.brigadier.context.StringRange;
-import com.mojang.brigadier.suggestion.Suggestion;
-import com.mojang.brigadier.suggestion.Suggestions;
+import com.mojang.brigadier.CommandDispatcher;
+import com.mojang.brigadier.StringReader;
+import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+import com.mojang.brigadier.context.CommandContext;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import com.mojang.brigadier.tree.ArgumentCommandNode;
+import com.mojang.brigadier.tree.CommandNode;
+import com.mojang.brigadier.tree.LiteralCommandNode;
+import com.mojang.brigadier.tree.RootCommandNode;
 import net.famzangl.minecraft.minebot.ai.AIHelper;
-import net.famzangl.minecraft.minebot.ai.net.MinebotNetHandler;
+import net.famzangl.minecraft.minebot.ai.commands.Commands;
 import net.famzangl.minecraft.minebot.ai.strategy.AIStrategy;
-import net.famzangl.minecraft.minebot.ai.strategy.AbortOnDeathStrategy;
-import net.famzangl.minecraft.minebot.ai.strategy.CreeperComesActionStrategy;
-import net.famzangl.minecraft.minebot.ai.strategy.DamageTakenStrategy;
-import net.famzangl.minecraft.minebot.ai.strategy.DoNotSuffocateStrategy;
-import net.famzangl.minecraft.minebot.ai.strategy.EatStrategy;
-import net.famzangl.minecraft.minebot.ai.strategy.PlaceTorchStrategy;
-import net.famzangl.minecraft.minebot.ai.strategy.PlayerComesActionStrategy;
-import net.famzangl.minecraft.minebot.ai.strategy.StackStrategy;
-import net.famzangl.minecraft.minebot.ai.strategy.StrategyStack;
-import net.minecraft.network.ThreadQuickExitException;
-import net.minecraft.network.play.client.CTabCompletePacket;
-import net.minecraft.network.play.server.STabCompletePacket;
-import net.minecraft.util.math.BlockPos;
-import org.apache.commons.lang3.StringUtils;
+import net.minecraft.command.ISuggestionProvider;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.MarkerManager;
 
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Hashtable;
-import java.util.LinkedHashSet;
-import java.util.List;
+import java.util.Collection;
+import java.util.Objects;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class CommandRegistry {
-
 	private static final Marker MARKER_REGISTER = MarkerManager.getMarker("register");
-	private static final Marker MARKER_TAB_COMPLETE = MarkerManager.getMarker("tab_complete");
-	private static final Marker MARKER_EVALUATE = MarkerManager.getMarker("evaluate");
-	private static final Logger LOGGER = LogManager.getLogger(CommandRegistry.class);
-	
-	private final Hashtable<String, List<CommandDefinition>> commandTable = new Hashtable<String, List<CommandDefinition>>();
-	private IAIControllable controlled;
+    private static final Logger LOGGER = LogManager.getLogger(CommandRegistry.class);
+    private IAIControllable controllable;
+    private final CommandDispatcher<IAIControllable> commands = new CommandDispatcher<>();
 
-	public void register(Class<?> commandClass) {
-		LOGGER.info(MARKER_REGISTER, "Scanning commands from: " + commandClass.getCanonicalName());
-		checkCommandClass(commandClass);
-		final String name = commandClass.getAnnotation(AICommand.class).name();
-		List<CommandDefinition> list = commandTable.computeIfAbsent(name, k -> new ArrayList<>());
-		getCommandsForClass(commandClass, list);
-	}
+    public CommandRegistry() {
+        LiteralArgumentBuilder<IAIControllable> minebot = Commands.literal("minebot");
+        LiteralArgumentBuilder<IAIControllable> minebuild = Commands.literal("minebuild");
+        Commands.register(minebot, minebuild);
+        commands.register(minebot);
+        commands.register(minebuild);
 
-	public void execute(String name, String[] args) {
-		if (controlled == null) {
-			AIChatController.addChatLine("ERROR: No controller started.");
-			LOGGER.error(MARKER_EVALUATE, "controlled has not been set.");
-			return;
-		}
-		LOGGER.info(MARKER_EVALUATE, "Evaluating: " + combine(args));
-		try {
-			final AIStrategy strategy = evaluateCommandWithSaferule(
-					controlled.getAiHelper(), name, args);
-			if (strategy != null) {
-				controlled.requestUseStrategy(strategy);
-			}
-		} catch (final UnknownCommandException e) {
-			if (e.getEvaluateable().size() > 0) {
-				AIChatController
-						.addChatLine("ERROR: More than 1 command matches your command line.");
-				LOGGER.error(MARKER_EVALUATE, "Multiple commands found for: " + String.join(" ", args), e);
-				e.getEvaluateable().forEach(matched ->
-						LOGGER.error(MARKER_EVALUATE, "Command that matched: "
-								+ matched.getArguments().stream().map(ArgumentDefinition::getDescriptionType)
-								.collect(Collectors.joining(" "))));
-			} else {
-				AIChatController.addChatLine("ERROR: No command:"
-						+ combine(args) + ".");
-				LOGGER.error(MARKER_EVALUATE, "No command found for: " + String.join(" ", args), e);
-			}
-		} catch (final CommandEvaluationException e) {
-			AIChatController.addChatLine("ERROR while evaluating: "
-					+ e.getMessage());
-			LOGGER.error(MARKER_EVALUATE, "Command evaluation failed.", e);
-			
-		} catch (final Throwable e) {
-			e.printStackTrace();
-			AIChatController
-					.addChatLine("ERROR: Could not evaluate. Please report and send your minecraft log to https://github.com/michaelzangl/minebot/issues.");
-			LOGGER.error(MARKER_EVALUATE, "Command evaluation failed because of unknown error.", e);
-		}
-	}
+        if (LOGGER.isDebugEnabled(MARKER_REGISTER)) {
+            LOGGER.debug(MARKER_REGISTER, "Commands that are registered:");
+            debugCommands(commands.getRoot(), 0);
+        }
+    }
 
-	private String combine(String[] args) {
-		return StringUtils.join(args, " ");
-	}
+    private void debugCommands(CommandNode<IAIControllable> root, int depth) {
+        String prefix = IntStream.range(0, depth).mapToObj(it -> "  ").collect(Collectors.joining());
+        root.getChildren().forEach(child -> {
+            String commandDescr = "?";
+            if (child instanceof LiteralCommandNode) {
+                commandDescr = ((LiteralCommandNode<IAIControllable>) child).getLiteral();
+            } else if (child instanceof ArgumentCommandNode) {
+                commandDescr = "[" + child.getName() + "] of type " + ((ArgumentCommandNode) child).getType();
+            }
+            LOGGER.debug(MARKER_REGISTER, "{}{}", prefix, commandDescr);
 
-	public List<String> addTabCompletionOptions(String name, String[] args,
-			BlockPos pos) {
-		LOGGER.info(MARKER_TAB_COMPLETE, "Requested tab complete options: " +name + " " + combine(args));
-		if (controlled == null) {
-			LOGGER.error(MARKER_TAB_COMPLETE, "Evaluating: " + combine(args));
-			return Collections.emptyList();
-		}
-		List<String> completion = tabCompletion(controlled.getAiHelper(), name, args);
-		LOGGER.debug(MARKER_TAB_COMPLETE, "Resulting options: " + completion);
-		return completion;
-	}
+            debugCommands(child, depth + 1);
+        });
+    }
 
-	private void checkCommandClass(Class<?> commandClass) {
-		if (!commandClass.isAnnotationPresent(AICommand.class)) {
-			throw new IllegalArgumentException(
-					"AICommand is not set for the class " + commandClass.getName() + ".");
-		}
-	}
+    public IAIControllable getControlled() {
+        if (controllable == null) {
+            throw new IllegalStateException("Controllable not set");
+        }
+        return controllable;
+    }
 
-	public AIStrategy evaluateCommandWithSaferule(AIHelper helper,
-			String commandID, String[] arguments)
-			throws UnknownCommandException {
-		CommandDefinition evaluateableCommand = getEvaluatebale(commandID,
-				arguments);
-		AIStrategy strategy = evaluateableCommand.evaluate(helper, arguments);
-		SafeStrategyRule safeRule = evaluateableCommand.getSafeStrategyRule();
-		if (safeRule != SafeStrategyRule.NONE && strategy != null) {
-			strategy = makeSafe(strategy, safeRule);
-		}
-		return strategy;
-	}
+    public void setControlled(IAIControllable controllable) {
+        Objects.requireNonNull(controllable, "controllable");
+        this.controllable = controllable;
+    }
 
-	public AIStrategy evaluateCommand(AIHelper helper, String commandID,
-			String[] arguments) throws UnknownCommandException {
-		CommandDefinition evaluateableCommand = getEvaluatebale(commandID,
-				arguments);
-		return evaluateableCommand.evaluate(helper, arguments);
-	}
+    public AIStrategy evaluateCommand(AIHelper helper, String command) throws CommandSyntaxException {
+        StrategyReceiver receiver = new StrategyReceiver(helper);
+        commands.execute(command, receiver);
+        return receiver.get();
+    }
 
-	private CommandDefinition getEvaluatebale(String commandID,
-			String[] arguments) throws UnknownCommandException {
-		final List<CommandDefinition> commands = getCommands(commandID);
-		final ArrayList<CommandDefinition> evaluateable = new ArrayList<CommandDefinition>();
-		for (final CommandDefinition c : commands) {
-			if (c.couldEvaluateAgainst(arguments)) {
-				evaluateable.add(c);
-			}
-		}
-		if (evaluateable.size() != 1) {
-			throw new UnknownCommandException(commandID, arguments, evaluateable);
-		}
-		CommandDefinition evaluateableCommand = evaluateable.get(0);
-		return evaluateableCommand;
-	}
+    public AIStrategy evaluateCommandWithSaferule(AIHelper helper, String command) throws CommandSyntaxException {
+        StrategyReceiver receiver = new StrategyReceiver(helper);
+        commands.execute(command, receiver);
+        return receiver.get();
+    }
 
-	private AIStrategy makeSafe(AIStrategy strategy, SafeStrategyRule safeRule) {
-		final StrategyStack stack = new StrategyStack();
-		stack.addStrategy(new AbortOnDeathStrategy());
-		if (safeRule == SafeStrategyRule.DEFEND_MINING) {
-			stack.addStrategy(new DoNotSuffocateStrategy());
-		}
-		stack.addStrategy(new DamageTakenStrategy());
-		stack.addStrategy(new PlayerComesActionStrategy());
-		stack.addStrategy(new CreeperComesActionStrategy());
-		stack.addStrategy(new EatStrategy());
-		if (safeRule == SafeStrategyRule.DEFEND_MINING) {
-			stack.addStrategy(new PlaceTorchStrategy());
-		}
-		stack.addStrategy(strategy);
-		return new StackStrategy(stack);
-	}
+    public boolean interceptCommand(String message) {
+        try {
+            StringReader reader = new StringReader(message);
+            if (reader.canRead()) {
+                char first = reader.read();
+                if (first == '/') {
+                    commands.execute(reader, controllable);
+                    return true;
+                }
+            }
+        } catch (Throwable e) {
+            // Do not send on to server if message starts with /minebot
+            for (CommandNode<IAIControllable> literal : commands.getRoot().getChildren()) {
+                if (message.startsWith("/" + ((LiteralCommandNode<IAIControllable>) literal).getLiteral())) {
+                    // Show chat message to client. TODO: Use nice minecraft message
+                    AIChatController.addChatLine("ERROR while evaluating: "
+                            + e.getMessage());
+                }
+            }
+            // Otherwise ignored, let Minecraft handle this
+        }
+        return false;
+    }
 
-	public List<String> tabCompletion(AIHelper helper, String commandID,
-			String[] currentArgs) {
-		final List<CommandDefinition> commands = getCommands(commandID);
-		final HashSet<String> suggestions = new HashSet<String>();
-		final String[] fixedArgs;
-		if (currentArgs.length > 0) {
-			fixedArgs = Arrays.copyOf(currentArgs, currentArgs.length - 1);
-		} else {
-			fixedArgs = currentArgs;
-			currentArgs = new String[] { "" };
-		}
-		for (final CommandDefinition c : commands) {
-			final ArrayList<ArgumentDefinition> args = c.getArguments();
-			if (c.couldEvaluateStartingWith(fixedArgs)
-					&& args.size() > fixedArgs.length) {
-				final ArgumentDefinition lastArg = c.getArguments().get(
-						fixedArgs.length);
-				lastArg.getTabCompleteOptions(currentArgs[fixedArgs.length],
-						suggestions);
-			}
-		}
-		final ArrayList<String> asList = new ArrayList<String>(suggestions);
-		Collections.sort(asList);
-		return asList;
-	}
+    public void addCommandsTo(RootCommandNode<ISuggestionProvider> root) {
+        Collection<CommandNode<IAIControllable>> toConvert = commands.getRoot().getChildren();
+        convertInto(root, toConvert);
+    }
 
-	public Suggestions fillTabComplete(MinebotNetHandler minebotNetHandler, Suggestions serverResponse,
-			String lastSendTabComplete) {
-		String command = getCommandId(lastSendTabComplete);
-		LinkedHashSet<Suggestion> res = new LinkedHashSet<>();
-		for (String c : commandTable.keySet()) {
-			if (c.startsWith(command)) {
-				res.add(new Suggestion(serverResponse.getRange(), "/" + c));
-			}
-		}
-		if (res.isEmpty())
-			return serverResponse;
-		res.addAll(serverResponse.getList());
+    private void convertInto(CommandNode<ISuggestionProvider> into, Collection<CommandNode<IAIControllable>> toConvert) {
+        toConvert.forEach(
+                child -> {
+                    CommandNode<ISuggestionProvider> node;
+                    if (child.getRedirect() != null) {
+                        throw new IllegalArgumentException("Cannot redirect");
+                    }
+                    if (child instanceof LiteralCommandNode) {
+                        LiteralCommandNode<IAIControllable> literal = (LiteralCommandNode<IAIControllable>) child;
+                        node = new LiteralCommandNode<>(literal.getLiteral(),
+                                suggestionContext -> literal.getCommand().run(convertCommandContext(suggestionContext)),
+                                suggestionContext -> literal.getRequirement().test(controllable),
+                                null,
+                                null,
+                                literal.isFork());
+                    } else if (child instanceof ArgumentCommandNode){
+                        ArgumentCommandNode<IAIControllable, ?> argumentNode = (ArgumentCommandNode<IAIControllable, ?>) child;
 
-		return new Suggestions(serverResponse.getRange(), new ArrayList<>(res));
-	}
+                        node = new ArgumentCommandNode<>(
+                                argumentNode.getName(),
+                                argumentNode.getType(),
+                                suggestionContext -> argumentNode.getCommand().run(convertCommandContext(suggestionContext)),
+                                suggestionContext -> argumentNode.getRequirement().test(controllable),
+                                null,
+                                null,
+                                argumentNode.isFork(),
+                                argumentNode.getCustomSuggestions() == null ? null : (suggestionContext, builder) -> argumentNode.getCustomSuggestions().getSuggestions(convertCommandContext(suggestionContext), builder)
 
-	public boolean interceptCommand(String m) {
-		if (!m.startsWith("/")) {
-			return false;
-		}
-		String commandId = getCommandId(m);
-		if (commandTable.containsKey(commandId)) {
-			LOGGER.debug(MARKER_EVALUATE, "Minebot handling command: %s", m);
-			String[] args = getCommandArgs(m);
-			execute(commandId, args);
-			return true;
-		}
+                        );
+                    } else {
+                        throw new IllegalStateException("Could not find node type " + child.getClass().getSimpleName());
+                    }
 
-		return false;
-	}
+                    convertInto(node, child.getChildren());
 
-	private String[] getCommandArgs(String m) {
-		String[] args = m.split("\\s+", -1);
-		args = Arrays.copyOfRange(args, 1, args.length);
-		return args;
-	}
+                    into.addChild(node);
+                }
+        );
+    }
 
-	private String getCommandId(String m) {
-		int end = m.indexOf(' ');
-		if (end < 0) {
-			end = m.length();
-		}
-		String commandId = m.substring(1, end);
-		return commandId;
-	}
+    private CommandContext<IAIControllable> convertCommandContext(CommandContext<ISuggestionProvider> suggestionContext) {
+        // Generics get erased on runtime => this works
+        return ((CommandContext<IAIControllable>) (CommandContext<?>) suggestionContext).copyFor(controllable);
+    }
 
-	public boolean interceptTab(CTabCompletePacket in, final MinebotNetHandler respondTo) {
-		String m = in.getCommand();
-		if (!m.startsWith("/")) {
-			return false;
-		}
-		String commandId = getCommandId(m);
-		if (commandTable.containsKey(commandId)) {
-			String[] args = getCommandArgs(m);
+    private static class StrategyReceiver implements IAIControllable {
+        private final AIHelper helper;
+        AIStrategy strategy;
 
-			LOGGER.debug(MARKER_TAB_COMPLETE, "Minebot handling tab: " + commandId + ", "
-					+ combine(args));
-			List<String> options = addTabCompletionOptions(commandId, args,
-					null);
-			final STabCompletePacket packet = new STabCompletePacket(
-					in.getTransactionId(),
-					new Suggestions(
-					new StringRange(0, 0),
-					options.stream().map(it -> new Suggestion(new StringRange(0, 0), it))
-					.collect(Collectors.toList())));
-			new Thread("Tab response") {
-				public void run() {
-					try {
-						respondTo.handleTabComplete(packet);
-					} catch (ThreadQuickExitException t) {
-					}
-				};
-			}.start();
-			return true;
-		}
+        public StrategyReceiver(AIHelper helper) {
+            this.helper = helper;
+            strategy = null;
+        }
 
-		return false;
-	}
+        @Override
+        public AIHelper getAiHelper() {
+            return helper;
+        }
 
-	private List<CommandDefinition> getCommands(String commandID) {
-		List<CommandDefinition> commands = commandTable.get(commandID);
-		if (commands == null) {
-			commands = Collections.emptyList();
-		}
-		return commands;
-	}
+        @Override
+        public int requestUseStrategy(AIStrategy strategy) {
+            return 0;
+        }
 
-	private void getCommandsForClass(Class<?> commandClass,
-			List<CommandDefinition> commands) {
-		for (final Method m : commandClass.getMethods()) {
-			if (Modifier.isStatic(m.getModifiers())
-					&& m.isAnnotationPresent(AICommandInvocation.class)) {
-				LOGGER.debug(MARKER_REGISTER, "Registering method: " + commandClass.getSimpleName() + "#" + m.getName());
-				commands.addAll(getCommandsForMethod(m));
-			}
-		}
-	}
-
-	private ArrayList<CommandDefinition> getCommandsForMethod(Method m) {
-		return CommandDefinition.getDefinitions(m);
-	}
-
-	public List<CommandDefinition> getAllCommands() {
-		final ArrayList<CommandDefinition> defs = new ArrayList<CommandDefinition>();
-		for (final List<CommandDefinition> list : commandTable.values()) {
-			defs.addAll(list);
-		}
-		return defs;
-	}
-
-	public IAIControllable getControlled() {
-		return controlled;
-	}
-
-	public void setControlled(IAIControllable controlled) {
-		this.controlled = controlled;
-	}
-
+        public AIStrategy get() {
+            if (strategy == null) {
+                throw new IllegalStateException("No strategy has been set");
+            } else {
+                return strategy;
+            }
+        }
+    }
 }

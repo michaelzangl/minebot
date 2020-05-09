@@ -41,7 +41,7 @@ import java.util.List;
 public class PlaceTorchSomewhereTask extends AITask {
 	private LinkedList<PosAndDir> attemptOnPositions;
 	private final List<BlockPos> places;
-	private final Direction[] preferedDirection;
+	private final Direction[] allowedDirections;
 	private BlockPos lastAttempt;
 
 	private int delayAfter;
@@ -73,14 +73,14 @@ public class PlaceTorchSomewhereTask extends AITask {
 	 * 
 	 * @param positions
 	 *            The positions on which the torch should be placed.
-	 * @param preferedDirection The
+	 * @param allowedDirections The
 	 *            direction in which the stick of the torch should be mounted.
 	 */
 	public PlaceTorchSomewhereTask(List<BlockPos> positions,
-			Direction... preferedDirection) {
+			Direction... allowedDirections) {
 		super();
 		this.places = positions;
-		this.preferedDirection = preferedDirection;
+		this.allowedDirections = allowedDirections;
 	}
 
 	@Override
@@ -107,7 +107,7 @@ public class PlaceTorchSomewhereTask extends AITask {
 		if (attemptOnPositions == null) {
 			attemptOnPositions = new LinkedList<PlaceTorchSomewhereTask.PosAndDir>();
 			for (final BlockPos place : places) {
-				for (final Direction direction : preferedDirection) {
+				for (final Direction direction : allowedDirections) {
 					final PosAndDir current = new PosAndDir(place, direction);
 					final BlockPos placeOn = current.getPlaceOn();
 					if (!BlockSets.AIR.isAt(aiHelper.getWorld(), placeOn)) {
@@ -158,7 +158,7 @@ public class PlaceTorchSomewhereTask extends AITask {
 	@Override
 	public String toString() {
 		return "PlaceTorchSomewhereTask [places=" + places
-				+ ", preferedDirection=" + Arrays.toString(preferedDirection)
+				+ ", preferedDirection=" + Arrays.toString(allowedDirections)
 				+ "]";
 	}
 

@@ -16,7 +16,6 @@
  *******************************************************************************/
 package net.famzangl.minecraft.minebot.ai.enchanting;
 
-import com.google.common.base.Predicate;
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.task.AITask;
 import net.famzangl.minecraft.minebot.ai.task.TaskOperations;
@@ -27,11 +26,12 @@ import net.minecraft.util.math.AxisAlignedBB;
 
 import java.util.List;
 import java.util.Random;
+import java.util.function.Predicate;
 
 public class FaceAnyMobTask extends AITask {
 	private final class LivingSelector implements Predicate<Entity> {
 		@Override
-		public boolean apply(Entity var1) {
+		public boolean test(Entity var1) {
 			// TODO: better filter
 			return var1 instanceof LivingEntity;
 		}

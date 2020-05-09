@@ -101,4 +101,10 @@ public class GetOnHotBarTask extends AITask {
 		playerController.windowClick(windowId, i, 0, ClickType.PICKUP, player);
 	}
 
+	@Override
+	public String toString() {
+		return "GetOnHotBarTask{" +
+				"itemFiler=" + itemFiler +
+				'}';
+	}
 }

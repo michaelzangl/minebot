@@ -30,6 +30,8 @@ import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
 import net.minecraftforge.event.TickEvent;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.MarkerManager;
 
@@ -46,6 +48,7 @@ import java.util.List;
  *
  */
 public class DestroyInRangeTask extends AITask implements CanPrefaceAndDestroy {
+	private static final Logger LOGGER = LogManager.getLogger(DestroyInRangeTask.class);
 	private static final Marker MARKER_DESTROY_IN_RANGE = MarkerManager.getMarker("destroy_in_range");
 	private class ClosestBlockFinder implements AreaVisitor<WorldData> {
 		BlockPos next = null;
@@ -124,6 +127,7 @@ public class DestroyInRangeTask extends AITask implements CanPrefaceAndDestroy {
 		ClosestBlockFinder blockFinder = new ClosestBlockFinder(aiHelper);
 		range.accept(blockFinder, aiHelper.getWorld());
 		currentAttemptingPos = blockFinder.next;
+		LOGGER.debug(MARKER_DESTROY_IN_RANGE, "Found next block {} with distance rating {}", blockFinder.next, blockFinder.currentMin);
 		return currentAttemptingPos;
 	}
 
@@ -134,7 +138,9 @@ public class DestroyInRangeTask extends AITask implements CanPrefaceAndDestroy {
 			double distanceSq = aiHelper.getMinecraft().player.getDistanceSq(x + .5, y
 					+ .5 - aiHelper.getMinecraft().player.getEyeHeight(), z + .5);
 			double distance = Math.sqrt(distanceSq);
-			// 0..1
+
+			// Use the change in player rotation as well => this prevents the player from spinning a lot
+			// Will be in range 0..1
 			double change = aiHelper
 					.getRequiredAngularChangeTo(x + .5, y + .5, z + .5)
 					/ Math.PI;
@@ -177,6 +183,7 @@ public class DestroyInRangeTask extends AITask implements CanPrefaceAndDestroy {
 	public void runTick(AIHelper aiHelper, TaskOperations taskOperations) {
 		BlockPos destructPos = getNextToDestruct(aiHelper);
 		if (facingAttempts > 23) {
+			LOGGER.debug(MARKER_DESTROY_IN_RANGE, "Too many failed attempts to face block {}, skipping destruction of that block", destructPos);
 			failedBlocks.add(destructPos);
 			destructPos = getNextToDestruct(aiHelper);
 			facingAttempts = 0;
@@ -184,17 +191,19 @@ public class DestroyInRangeTask extends AITask implements CanPrefaceAndDestroy {
 		if (destructPos != null) {
 			if (facingAttempts % 5 == 4 || lastFacingFor == null
 					|| !lastFacingFor.equals(destructPos)) {
-				facingPos = aiHelper.getWorld().getBlockBounds(destructPos).random(destructPos, .9);
+				facingPos = aiHelper.getWorld().getFacingBounds(destructPos).random(destructPos, .9);
 				lastFacingFor = destructPos;
 			}
 
 			BlockPos pos = checkFacingAcceptableBlock(aiHelper, destructPos, aiHelper.isFacing(facingPos));
 			if (pos != null) {
+				LOGGER.debug(MARKER_DESTROY_IN_RANGE, "Scheduled block is {}. Facing block at position {} and destrying it", destructPos, pos);
 				aiHelper.selectToolFor(pos);
 				aiHelper.overrideAttack();
 				aiHelper.getStats().markIntentionalBlockBreak(pos);
 				facingAttempts = 0;
 			} else {
+				LOGGER.debug(MARKER_DESTROY_IN_RANGE, "Facing block to destroy at {}", facingPos);
 				aiHelper.face(facingPos);
 				facingAttempts++;
 			}
@@ -203,11 +212,12 @@ public class DestroyInRangeTask extends AITask implements CanPrefaceAndDestroy {
 
 	protected boolean isAcceptedFacingPos(AIHelper aiHelper, BlockPos n, BlockPos pos) {
 		return !noDestructionRequired(aiHelper.getWorld(), pos.getX(), pos.getY(),
-				pos.getZ());
+				pos.getZ()) && range.contains(aiHelper.getWorld(), pos);
 	}
 
 	protected BlockPos checkFacingAcceptableBlock(AIHelper aiHelper, BlockPos n, boolean isFacingRightDirection) {
 		RayTraceResult position = aiHelper.getObjectMouseOver();
+		// If there is a block in the way while facing our desired block, destroy that one too
 		if (isFacingRightDirection && position instanceof BlockRayTraceResult) {
 			BlockPos pos = ((BlockRayTraceResult) position).getPos();
 			if (isAcceptedFacingPos(aiHelper, n, pos)) {
@@ -230,17 +240,6 @@ public class DestroyInRangeTask extends AITask implements CanPrefaceAndDestroy {
 		return "DestroyInRangeTask [range=" + range + ", facingAttempts="
 				+ facingAttempts + ", failedBlocks=" + failedBlocks + "]";
 	}
-
-	// /**
-	// * Add a {@link BlockPos} to the list of blocks that should be excluded
-	// from
-	// * this area.
-	// *
-	// * @param pos
-	// */
-	// public void blacklist(BlockPos pos) {
-	// failedBlocks.add(pos);
-	// }
 
 	@Override
 	public List<BlockPos> getPredestroyPositions(AIHelper helper) {

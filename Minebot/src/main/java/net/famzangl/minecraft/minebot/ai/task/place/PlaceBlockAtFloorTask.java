@@ -66,6 +66,10 @@ public class PlaceBlockAtFloorTask extends AITask {
 		return BlockHalf.ANY;
 	}
 
+	/**
+	 * Where to place the block
+	 * @return The position at which the new block will be placed
+	 */
 	protected final BlockPos getPlaceAtPos() {
 		return pos.add(0, getRelativePlaceAtY(), 0);
 	}
