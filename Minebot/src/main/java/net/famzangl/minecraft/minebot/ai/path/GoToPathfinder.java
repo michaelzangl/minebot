@@ -20,8 +20,12 @@ import net.famzangl.minecraft.minebot.ai.path.world.WorldData;
 import net.famzangl.minecraft.minebot.ai.utils.BlockArea;
 import net.famzangl.minecraft.minebot.ai.utils.BlockCuboid;
 import net.minecraft.util.math.BlockPos;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class GoToPathfinder extends WalkingPathfinder {
+	private static final Logger LOGGER = LogManager.getLogger(FillAreaPathfinder.class);
+
 	private final BlockPos position;
 	int HORIZONTAL_SEARCH_MIN = (int) (HORIZONTAL_SEARCH_DISTANCE * .8);
 	int VERTICAL_SEARCH_MIN = (int) (VERTICAL_SEARCH_DISTANCE * .8);
@@ -38,7 +42,7 @@ public class GoToPathfinder extends WalkingPathfinder {
 		}
 		BlockPos posDiff = position.subtract(playerPosition);
 		BlockArea<WorldData> area = new BlockCuboid<>(
-				playerPosition, playerPosition
+				position, position
 		);
 		// X
 		if (posDiff.getX() > HORIZONTAL_SEARCH_MIN) {
@@ -85,11 +89,13 @@ public class GoToPathfinder extends WalkingPathfinder {
 		}
 		targetArea = area;
 
+		LOGGER.debug("Pathfinder target area is: {}", area);
+
 		return super.runSearch(playerPosition);
 	}
 
 	@Override
 	protected float rateDestination(int distance, int x, int y, int z) {
-		return targetArea.contains(world, position) ? distance : -1;
+		return targetArea.contains(world, x, y, z) ? distance : -1;
 	}
 }

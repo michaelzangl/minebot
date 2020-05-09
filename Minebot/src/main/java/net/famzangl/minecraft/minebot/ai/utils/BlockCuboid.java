@@ -97,6 +97,8 @@ public class BlockCuboid<WorldT extends WorldData> extends BlockArea<WorldT> {
 
 	@Override
 	public String toString() {
-		return "BlockCuboid [min=" + min + ", max=" + max + "]";
+		return "BlockCuboid [x=" + min.getX() + ".." + max.getX() + "," +
+				"y=" + min.getY() + ".." + max.getY() + "," +
+				"z=" + min.getZ() + ".." + max.getZ() + "]";
 	}
 }

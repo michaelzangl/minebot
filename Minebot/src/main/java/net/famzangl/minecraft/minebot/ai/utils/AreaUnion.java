@@ -26,4 +26,9 @@ public class AreaUnion<WorldT extends WorldData> extends BlockArea<WorldT> {
     public boolean contains(WorldT world, int x, int y, int z) {
         return a.contains(world, x, y, z) || b.contains(world, x, y, z);
     }
+
+    @Override
+    public String toString() {
+        return a + " ∪ " + b;
+    }
 }

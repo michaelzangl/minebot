@@ -43,4 +43,9 @@ public class AreaIntersection<WorldT extends WorldData> extends BlockArea<WorldT
 	public <WorldT2 extends WorldT> void accept(AreaVisitor<? super WorldT2> visitor, WorldT2 world) {
 		a.accept(new FilteredAreaVisitor<WorldT2>(visitor, b), world);
 	}
+
+	@Override
+	public String toString() {
+		return a + " ∩ " + b;
+	}
 }

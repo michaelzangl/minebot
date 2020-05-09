@@ -16,7 +16,6 @@
  *******************************************************************************/
 package net.famzangl.minecraft.minebot.ai.path;
 
-import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.command.AICommandParameter.BlockFilter;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSet;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSets;
@@ -35,7 +34,7 @@ import org.apache.logging.log4j.MarkerManager;
 
 public class FillAreaPathfinder extends MovePathFinder {
 	private static final Marker MARKER_FILL = MarkerManager.getMarker("fill");
-	private static final Logger LOGGER = LogManager.getLogger(AIHelper.class);
+	private static final Logger LOGGER = LogManager.getLogger(FillAreaPathfinder.class);
 	private static final BlockSet PLACEABLE_BLOCKS = BlockSets.SIMPLE_CUBE;
 	private static final BlockSet GROUND_BLOCKS = BlockSet.builder().add(BlockSets.SIMPLE_CUBE).add(
 			BlockSets.FALLING).build();

@@ -98,6 +98,7 @@ public class CommandRegistry {
                     // Show chat message to client. TODO: Use nice minecraft message
                     AIChatController.addChatLine("ERROR while evaluating: "
                             + e.getMessage());
+                    LOGGER.warn("Error during command evaluation", e);
                 }
             }
             // Otherwise ignored, let Minecraft handle this
