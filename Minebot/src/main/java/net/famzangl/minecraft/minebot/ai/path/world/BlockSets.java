@@ -455,7 +455,8 @@ public class BlockSets {
 			Blocks.STONE_PRESSURE_PLATE,
 			Blocks.STONE_BUTTON,
 			Blocks.DRAGON_EGG,
-			Blocks.TURTLE_EGG).add(WALL).add(FENCE).add(FENCE_GATE).add(BED).add(WOODEN_PRESSURE_PLATE).add(WOODEN_BUTTON).build();
+			Blocks.TURTLE_EGG,
+			Blocks.FLOWER_POT).add(WALL).add(FENCE).add(FENCE_GATE).add(BED).add(WOODEN_PRESSURE_PLATE).add(WOODEN_BUTTON).build();
 
 	/**
 	 * Blocks we can just walk over/next to without problems.

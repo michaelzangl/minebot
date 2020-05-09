@@ -73,6 +73,15 @@ public class BlockFloatMap {
 	public String toString() {
 		return "BlockFloatMap [floats=..., defaultValue=" + defaultValue + "]";
 	}
-	
-	
+
+	public BlockSet getUsedBlocks() {
+		BlockSet.Builder builder = BlockSet.builder();
+		for (int i = 0; i < floats.length; i++) {
+			if (!Float.isNaN(floats[i])) {
+				// Go through id → state map to validate.
+				builder.add(BlockSet.getStateById(i));
+			}
+		}
+		return builder.build();
+	}
 }

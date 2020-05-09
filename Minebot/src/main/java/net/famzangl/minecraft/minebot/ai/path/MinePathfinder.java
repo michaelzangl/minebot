@@ -20,8 +20,6 @@ import net.famzangl.minecraft.minebot.ai.path.world.BlockFloatMap;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSet;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSets;
 import net.famzangl.minecraft.minebot.ai.task.DestroyInRangeTask;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 
@@ -90,30 +88,27 @@ public abstract class MinePathfinder extends MovePathFinder {
 	@Override
 	protected final boolean runSearch(BlockPos playerPosition) {
 		// lazy init
-		if (points == null) {
+		if (points == null && factors == null) {
 			points = getPointsProvider();
-			if (points == null) {
-				throw new NullPointerException("No points map provided.");
-			}
+			factors = getFactorProvider();
+
+			headAllowedBlocks = BlockSet.builder()
+							.add(headAllowedBlocks)
+							.add(points.getUsedBlocks())
+							.add(factors.getUsedBlocks())
+							.build();
+
+			footAllowedBlocks = BlockSet.builder()
+					.add(footAllowedBlocks)
+					.add(points.getUsedBlocks())
+					.add(factors.getUsedBlocks())
+					.build();
+		}
+		if (points == null) {
+			throw new NullPointerException("No points map provided.");
 		}
 		if (factors == null) {
-			factors = getFactorProvider();
-			if (factors == null) {
-				throw new NullPointerException("No points map provided.");
-			}
-			for (BlockState state : Block.BLOCK_STATE_IDS) {
-				float f = factors.get(state);
-				if (f > 0) {
-					headAllowedBlocks = BlockSet.builder()
-							.add(headAllowedBlocks)
-							.add(state)
-							.build();
-					footAllowedBlocks = BlockSet.builder()
-							.add(footAllowedBlocks)
-							.add(state)
-							.build();
-				}
-			}
+			throw new NullPointerException("No factors map provided.");
 		}
 		
 		onPreRunSearch(playerPosition);
