@@ -220,8 +220,8 @@ public class MovePathFinder extends PathFinderField {
 	}
 
 	protected boolean checkGroundBlock(int currentNode, int cx, int cy, int cz) {
-		if (getY(currentNode) < cy) {
-			// Moving up
+		if (getY(currentNode) < cy && cx == getX(currentNode) && cz == getZ(currentNode)) {
+			// Moving straight up - this needs to place a block
 			return allowedGroundForUpwardsBlocks.isAt(world, cx, cy - 1, cz);
 		} else {
 			return allowedGroundBlocks.isAt(world, cx, cy - 1, cz);

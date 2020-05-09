@@ -383,7 +383,7 @@ public class BlockSets {
 	 * Flowers and stuff like that
 	 */
 	private static final BlockSet explicitFootWalkableBlocks = BlockSet.builder().add(
-			Blocks.TALL_GRASS,
+			Blocks.GRASS,
 			Blocks.CORNFLOWER,
 			Blocks.CHORUS_FLOWER,
 			Blocks.SUNFLOWER,
@@ -434,14 +434,14 @@ public class BlockSets {
 	public static final BlockSet HEAD_CAN_WALK_THROUGH = BlockSet.builder().add(
 			Blocks.KELP_PLANT,
 			Blocks.CHORUS_PLANT,
+			Blocks.TALL_GRASS,
 			Blocks.SUGAR_CANE).add(AIR).add(TORCH).build();
 
 	public static final BlockSet FEET_CAN_WALK_THROUGH = BlockSet.builder().add(explicitFootWalkableBlocks).add(HEAD_CAN_WALK_THROUGH).build();
 
 	private static final BlockSet explicitSafeSideBlocks = BlockSet.builder().add(
 			Blocks.ANVIL,
-			Blocks.CACTUS, 
-			Blocks.SUGAR_CANE,
+			Blocks.CACTUS,
 			Blocks.COBWEB,
 			Blocks.GLASS_PANE,
 			Blocks.ENCHANTING_TABLE,
@@ -456,7 +456,7 @@ public class BlockSets {
 			Blocks.STONE_BUTTON,
 			Blocks.DRAGON_EGG,
 			Blocks.TURTLE_EGG,
-			Blocks.FLOWER_POT).add(WALL).add(FENCE).add(FENCE_GATE).add(BED).add(WOODEN_PRESSURE_PLATE).add(WOODEN_BUTTON).build();
+			Blocks.FLOWER_POT).add(FEET_CAN_WALK_THROUGH).add(WALL).add(FENCE).add(FENCE_GATE).add(BED).add(WOODEN_PRESSURE_PLATE).add(WOODEN_BUTTON).build();
 
 	/**
 	 * Blocks we can just walk over/next to without problems.
@@ -488,7 +488,9 @@ public class BlockSets {
 			Blocks.EMERALD_ORE,
 			Blocks.OBSERVER,
 			// FIXME: Not a cube.
-			Blocks.FARMLAND, Blocks.FURNACE, Blocks.GLASS, Blocks.GLOWSTONE,
+			Blocks.FARMLAND,
+
+			Blocks.FURNACE, Blocks.GLASS, Blocks.GLOWSTONE,
 			Blocks.GRASS_BLOCK, Blocks.GOLD_BLOCK, Blocks.GOLD_ORE,
 			Blocks.CLAY, Blocks.IRON_BLOCK, Blocks.IRON_ORE,
 			Blocks.LAPIS_BLOCK, Blocks.LAPIS_ORE,
