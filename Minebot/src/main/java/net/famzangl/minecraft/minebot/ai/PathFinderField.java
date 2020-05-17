@@ -81,6 +81,7 @@ public class PathFinderField implements Comparator<Integer> {
 	 */
 	private int[] field;
 	private long startTime;
+	protected int statsVisited;
 
 	public PathFinderField() {
 	}
@@ -235,6 +236,7 @@ public class PathFinderField implements Comparator<Integer> {
 			} else {
 				currentDest = null;
 			}
+			statsVisited = 0;
 			isRunning = true;
 		}
 		LOGGER.trace(MARKER_PATH, "Start path finding.");
@@ -288,6 +290,7 @@ public class PathFinderField implements Comparator<Integer> {
 				}
 			}
 			setVisited(currentNode);
+			statsVisited++;
 		}
 		if (pqEmpty()) {
 			if (currentDest != null) {
@@ -343,7 +346,7 @@ public class PathFinderField implements Comparator<Integer> {
 	}
 
 	protected void noPathFound() {
-		LOGGER.info(MARKER_PATH, "Path finder did not find a path.");
+		LOGGER.info(MARKER_PATH, "Path finder did not find a path. Positions visited: {}", statsVisited);
 	}
 
 	private void planPathTo(int currentNode, int origX, int origY, int origZ) {

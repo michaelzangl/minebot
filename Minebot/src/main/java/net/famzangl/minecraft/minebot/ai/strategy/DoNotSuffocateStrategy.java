@@ -78,7 +78,11 @@ public class DoNotSuffocateStrategy extends AIStrategy {
 
 	@Override
 	public String getDescription(AIHelper helper) {
-		return "Do not suffocate in walls.";
+		return "Destroy block the player is hanging in";
 	}
 
+	@Override
+	public String toString() {
+		return "DoNotSuffocateStrategy{}";
+	}
 }

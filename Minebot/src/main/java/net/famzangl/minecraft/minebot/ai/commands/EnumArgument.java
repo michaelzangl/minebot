@@ -15,18 +15,23 @@ import java.util.EnumSet;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class EnumArgument<T extends Enum<T>> implements ArgumentType<T> {
 
     private final EnumSet<T> constants;
+    private final Function<T, String> getName;
 
     public static  <T extends Enum<T>> EnumArgument<T> of(Class<T> allOf) {
         return of(EnumSet.allOf(allOf));
     }
     public static  <T extends Enum<T>> EnumArgument<T> of(EnumSet<T> set) {
-        return new EnumArgument<>(set);
+        return of(set, Enum::name);
+    }
+    public static  <T extends Enum<T>> EnumArgument<T> of(EnumSet<T> set, Function<T, String> getName) {
+        return new EnumArgument<>(set, getName);
     }
 
     @SafeVarargs
@@ -34,7 +39,8 @@ public class EnumArgument<T extends Enum<T>> implements ArgumentType<T> {
         return of(EnumSet.of(first, remaining));
     }
 
-    public EnumArgument(EnumSet<T> allOf) {
+    private EnumArgument(EnumSet<T> allOf, Function<T, String> getName) {
+        this.getName = getName;
         if (allOf.size() == 0) {
             throw new IllegalArgumentException("At least one enum constant needs to be provided");
         }
@@ -47,7 +53,7 @@ public class EnumArgument<T extends Enum<T>> implements ArgumentType<T> {
         String value = reader.readUnquotedString();
         Optional<T> result = constants
                 .stream()
-                .filter(it -> it.name().equalsIgnoreCase(value))
+                .filter(it -> getName.apply(it).equalsIgnoreCase(value))
                 .findFirst();
         if (result.isPresent()) {
             return result.get();
@@ -71,7 +77,7 @@ public class EnumArgument<T extends Enum<T>> implements ArgumentType<T> {
     private Stream<String> constantNames() {
         return constants
                 .stream()
-                .map(it -> it.name().toLowerCase(Locale.US));
+                .map(it -> getName.apply(it).toLowerCase(Locale.US));
     }
 
     @Override

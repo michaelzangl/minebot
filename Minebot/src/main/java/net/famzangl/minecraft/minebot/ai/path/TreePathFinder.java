@@ -17,6 +17,7 @@
 package net.famzangl.minecraft.minebot.ai.path;
 
 import net.famzangl.minecraft.minebot.ai.AIHelper;
+import net.famzangl.minecraft.minebot.ai.command.AIChatController;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSet;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSets;
 import net.famzangl.minecraft.minebot.ai.path.world.WorldData;
@@ -460,5 +461,13 @@ public class TreePathFinder extends MovePathFinder {
 			playerPosition = playerPosition.offset(Direction.DOWN);
 		}
 		return super.runSearch(playerPosition);
+	}
+
+	@Override
+	protected void noPathFound() {
+		super.noPathFound();
+		if (statsVisited < 50) {
+			AIChatController.addChatLine("No more more trees found. The area the bot can walk to is pretty small.");
+		}
 	}
 }

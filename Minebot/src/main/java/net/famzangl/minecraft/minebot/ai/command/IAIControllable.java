@@ -53,4 +53,9 @@ public interface IAIControllable {
 		return requestUseStrategy(strategy);
 	}
 
+	/**
+	 * The stack builder. Used for stacking tasks on the command line
+	 * @return A stack builder instance
+	 */
+    StackBuilder getStackBuilder();
 }

@@ -16,66 +16,32 @@
  *******************************************************************************/
 package net.famzangl.minecraft.minebot.ai.commands;
 
-import net.famzangl.minecraft.minebot.ai.AIHelper;
-import net.famzangl.minecraft.minebot.ai.command.AICommand;
-import net.famzangl.minecraft.minebot.ai.command.AICommandInvocation;
-import net.famzangl.minecraft.minebot.ai.command.AICommandParameter;
-import net.famzangl.minecraft.minebot.ai.command.AICommandParameter.BlockFilter;
-import net.famzangl.minecraft.minebot.ai.command.ParameterType;
-import net.famzangl.minecraft.minebot.ai.path.world.BlockSet;
-import net.famzangl.minecraft.minebot.ai.path.world.BlockSets;
-import net.famzangl.minecraft.minebot.ai.strategy.AIStrategy;
+import com.mojang.brigadier.arguments.IntegerArgumentType;
+import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+import net.famzangl.minecraft.minebot.ai.command.IAIControllable;
+import net.famzangl.minecraft.minebot.ai.command.SafeStrategyRule;
 import net.famzangl.minecraft.minebot.ai.strategy.CraftStrategy;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
+import net.minecraft.command.arguments.ItemArgument;
 
-@AICommand(helpText = "Crafts items of the given type.", name = "minebot")
 public class CommandCraft {
 
-	/**
-	 * Blocks that can not be crafted.
-	 */
-	private static final BlockSet simpleBlocks = BlockSet.builder().add(
-			Blocks.BREWING_STAND, Blocks.NETHER_WART,
-			Blocks.CAULDRON, Blocks.FLOWER_POT, Blocks.WHEAT, Blocks.SUGAR_CANE,
-			Blocks.CAKE, Blocks.SKELETON_SKULL, Blocks.SKELETON_WALL_SKULL, Blocks.WITHER_SKELETON_SKULL,
-			Blocks.WITHER_SKELETON_WALL_SKULL, Blocks.PISTON_HEAD,
-			Blocks.MOVING_PISTON, Blocks.REDSTONE_WIRE,
-			Blocks.PUMPKIN_STEM,
-			Blocks.TRIPWIRE,
-			Blocks.MELON_STEM,
-			Blocks.REDSTONE_WIRE,
-			Blocks.IRON_DOOR)
-			.add(BlockSets.AIR)
-			.add(BlockSets.WALL_SIGN)
-			.add(BlockSets.WOOL)
-			.add(BlockSets.BED)
-			.add(BlockSets.WOODEN_DOR).build().invert();
+	public static void register(LiteralArgumentBuilder<IAIControllable> dispatcher) {
+		dispatcher.then(
+				Commands.literal("craft")
+					.then(Commands.optional(
+							Commands.argument("type", ItemArgument.item()),
+							__ -> 1,
+							"count",
+							IntegerArgumentType.integer(1, 64),
+							Integer.class,
+							(builder, count) ->
+								builder.executes(
+										context -> context.getSource().requestUseStrategy(new CraftStrategy(count.get(context),
+												ItemArgument.getItem(context, "type").getItem()), SafeStrategyRule.DEFEND)
+								)
+							)
+					)
 
-	public static final class MyBlockFilter extends BlockFilter {
-		@Override
-		public boolean matches(BlockState b) {
-			return simpleBlocks.contains(b);
-		}
+		);
 	}
-
-	@AICommandInvocation()
-	public static AIStrategy run(
-			AIHelper helper,
-			@AICommandParameter(type = ParameterType.FIXED, fixedName = "craft", description = "") String nameArg,
-			@AICommandParameter(type = ParameterType.NUMBER, description = "Item count") int itemCount,
-			@AICommandParameter(type = ParameterType.BLOCK_STATE, description = "Block", blockFilter = MyBlockFilter.class) BlockState itemType) {
-		return new CraftStrategy(itemCount, itemType);
-	}
-
-	/* TODO
-	@AICommandInvocation()
-	public static AIStrategy run(
-			AIHelper helper,
-			@AICommandParameter(type = ParameterType.FIXED, fixedName = "craft", description = "") String nameArg,
-			@AICommandParameter(type = ParameterType.NUMBER, description = "Item count") int itemCount,
-			@AICommandParameter(type = ParameterType.NUMBER, description = "Item type") int itemType,
-			@AICommandParameter(type = ParameterType.NUMBER, description = "Item subtype", optional = true) Integer itemSubtype) {
-		return new CraftStrategy(itemCount, itemType, itemSubtype == null ? 0 : itemSubtype);
-	} */
 }

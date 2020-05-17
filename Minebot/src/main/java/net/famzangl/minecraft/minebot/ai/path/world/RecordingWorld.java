@@ -1,10 +1,16 @@
 package net.famzangl.minecraft.minebot.ai.path.world;
 
-import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.BlockPos;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
+/**
+ * Records how long (in game ticks) the changes to the world will take. Used to determine the timeout.
+ */
 public class RecordingWorld extends WorldWithDelta {
+	private static final Logger LOGGER = LogManager.getLogger(RecordingWorld.class);
 
 	private static final int TIME_TO_PLACE = 5;
 	private static final int TIME_TO_FACE = 3;
@@ -17,30 +23,35 @@ public class RecordingWorld extends WorldWithDelta {
 	}
 
 	@Override
-	public void setBlock(int x, int y, int z, int blockId, int meta) {
-		int currentBlock = getBlockStateId(x, y, z);
-		if (currentBlock >> 4 != 0) {
-			timeInTicks += getTimeToDestroy(new BlockPos(x, y, z), currentBlock);
+	public void setBlock(BlockPos pos, BlockState block) {
+		BlockState currentBlock = getBlockState(pos);
+		// Destroy the old one
+		if (!BlockSets.AIR.contains(currentBlock)) {
+			timeInTicks += getTimeToDestroy(pos, currentBlock);
 		}
-		
-		if (blockId != 0) {
+
+		// Place the new one
+		if (!BlockSets.AIR.contains(block)) {
+			LOGGER.debug("Determined time to place block {} at {}: {}", block, pos, TIME_TO_PLACE);
 			timeInTicks += TIME_TO_PLACE;
 		}
-		super.setBlock(x, y, z, blockId, meta);
+		super.setBlock(pos, block);
 	}
 
-	private int getTimeToDestroy(BlockPos blockPos, int blockWithMeta) {
-		Block block = Block.BLOCK_STATE_IDS.getByValue(blockWithMeta >> 4).getBlock();
+	private int getTimeToDestroy(BlockPos blockPos, BlockState blockState) {
 		//how much damage to give the block per tick. The block is destroyed on damage >= 1;
-		// TODO: Use real block state
-		float hardness = block.getPlayerRelativeBlockHardness(block.getDefaultState(), blockBreaker, getBackingWorld(), blockPos);
-		System.out.println("TIME to destroy block at " + blockPos + ": " + 1 / hardness);
-		return (int) Math.round(1 / hardness) + TIME_TO_FACE;
+		float hardness = blockState.getPlayerRelativeBlockHardness(
+				blockBreaker, getBackingWorld(), blockPos
+		);
+		LOGGER.debug("Determined time to destroy block {} at {}: {}", blockState, blockPos, 1 / hardness);
+		return Math.round(1 / hardness) + TIME_TO_FACE;
 	}
 
 	@Override
 	public void setPlayerPosition(BlockPos playerPosition) {
-		timeInTicks += timeToWalk(playerPosition, getPlayerPosition());
+		int walkingTime = timeToWalk(playerPosition, getPlayerPosition());
+		LOGGER.debug("Determined time walk from {} to {}: {}", getPlayerPosition(), playerPosition, walkingTime);
+		this.timeInTicks += walkingTime;
 
 		super.setPlayerPosition(playerPosition);
 	}

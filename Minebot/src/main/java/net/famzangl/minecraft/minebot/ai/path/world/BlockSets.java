@@ -2,6 +2,7 @@ package net.famzangl.minecraft.minebot.ai.path.world;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
+import net.minecraft.block.LeavesBlock;
 import net.minecraft.block.SlabBlock;
 import net.minecraft.state.properties.SlabType;
 import net.minecraft.util.math.BlockPos;
@@ -278,7 +279,7 @@ public class BlockSets {
 			Blocks.ACACIA_FENCE_GATE).build();
 
 	/**
-	 * All leaves. FIXME: Only consider leaves that do not decay as safe ground.
+	 * All leaves.
 	 */
 	public static final BlockSet LEAVES = BlockSet.builder().add(
 			Blocks.OAK_LEAVES,
@@ -287,6 +288,14 @@ public class BlockSets {
 			Blocks.JUNGLE_LEAVES,
 			Blocks.DARK_OAK_LEAVES,
 			Blocks.ACACIA_LEAVES).build();
+
+	/**
+	 * Only consider leaves that do not decay as safe ground.
+	 */
+	public static final BlockSet PERSISTENT_LEAVES = BlockSet.builder().add(
+			LEAVES,
+			state -> state.get(LeavesBlock.PERSISTENT)
+	).build();
 
 	public static final BlockSet PLANKS = BlockSet.builder().add(
 			Blocks.OAK_PLANKS,
@@ -405,8 +414,7 @@ public class BlockSets {
             Blocks.END_ROD,
             Blocks.BEETROOTS,
 			Blocks.DEAD_BUSH,
-			Blocks.ROSE_BUSH,
-			Blocks.GRASS_BLOCK).add(RAILS).add(CARPET).add(SAPLING).add(SIGN).add(WALL_SIGN).build();
+			Blocks.ROSE_BUSH).add(RAILS).add(CARPET).add(SAPLING).add(SIGN).add(WALL_SIGN).build();
 
 	/**
 	 * Blocks that fall down.
@@ -462,6 +470,8 @@ public class BlockSets {
 	 * Blocks we can just walk over/next to without problems.
 	 */
 	public static final BlockSet SIMPLE_CUBE = BlockSet.builder().add(
+			Blocks.ANDESITE,
+			Blocks.GRANITE,
 			Blocks.BEDROCK,
 			Blocks.END_STONE,
 			Blocks.END_STONE_BRICKS,
@@ -514,7 +524,7 @@ public class BlockSets {
 			Blocks.DIORITE,
 			Blocks.POLISHED_ANDESITE,
 			Blocks.POLISHED_DIORITE,
-			Blocks.POLISHED_GRANITE).add(WOOL).add(LEAVES)
+			Blocks.POLISHED_GRANITE).add(WOOL).add(PERSISTENT_LEAVES)
 			.add(LOGS).add(STRIPPED_LOGS).add(STRIPPED_WOOD)
 			.add(CONCRETE).add(STAINED_GLASS).add(TERRACOTTA).add(GLAZED_TERRACOTTA).add(PLANKS).add(DOUBLE_SLABS).build();
 
@@ -534,13 +544,15 @@ public class BlockSets {
 	public static final BlockSet SAFE_GROUND = BlockSet.builder().add(SIMPLE_CUBE).add(FALLING).add(HALF_SLABS).build();
 
 	public static final BlockSet SAFE_SIDE = 
-			BlockSet.builder().add(explicitSafeSideBlocks).add(SAFE_GROUND).add(FEET_CAN_WALK_THROUGH).add(AIR).build();
+			BlockSet.builder().add(explicitSafeSideBlocks).add(SAFE_GROUND).add(LEAVES).add(FEET_CAN_WALK_THROUGH).add(AIR).build();
 
 	public static final BlockSet SAFE_CEILING = BlockSet.builder()
 			.add(STAIRS)
 			.add(HALF_SLABS)
 			.add(FEET_CAN_WALK_THROUGH)
 			.add(SIMPLE_CUBE)
+			// Decaying leaves are usually not considered safe
+			.add(LEAVES)
 			.add(AIR).add(Blocks.VINE, Blocks.CACTUS).build();
 
 	/**

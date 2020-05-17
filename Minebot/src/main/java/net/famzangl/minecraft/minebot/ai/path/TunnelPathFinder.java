@@ -20,6 +20,7 @@ import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.BlockItemFilter;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSet;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSets;
+import net.famzangl.minecraft.minebot.ai.path.world.WorldData;
 import net.famzangl.minecraft.minebot.ai.path.world.WorldWithDelta;
 import net.famzangl.minecraft.minebot.ai.task.DestroyInRangeTask;
 import net.famzangl.minecraft.minebot.ai.task.PlaceTorchSomewhereTask;
@@ -117,8 +118,11 @@ public class TunnelPathFinder extends AlongTrackPathFinder {
 	 *
 	 */
 	public enum TorchSide {
-		NONE(false, false, false), LEFT(true, false, false), RIGHT(false, true,
-				false), BOTH(true, true, false), FLOOR(false, false, true);
+		TORCH_NONE(false, false, false),
+		TORCH_LEFT(true, false, false),
+		TORCH_RIGHT(false, true,false),
+		TORCH_BOTH(true, true, false),
+		TORCH_FLOOR(false, false, true);
 
 		private final boolean left;
 		private final boolean right;
@@ -131,35 +135,40 @@ public class TunnelPathFinder extends AlongTrackPathFinder {
 		}
 	}
 
+	public interface TunnelMode {
+		default int getAddToSide() {
+			return 0;
+		}
+		default int getAddToTop() {
+			return 0;
+		}
+		default boolean addBranches() {
+			return false;
+		}
+	}
+
 	private final static BlockSet FREE_TUNNEL_BLOCKS = BlockSet.builder().add(BlockSets.AIR)
 			.add(BlockSets.TORCH).build();
 
 	private BitSet finishedTunnels = new BitSet();
 	private BitSet inQueueTunnels = new BitSet();
+	private final TunnelMode tunnelMode;
+
 	/**
 	 * How often did we attempt to tunnel at a given position?
 	 */
 	private Hashtable<Integer, Integer> tunnelPositionStartCount = new Hashtable<Integer, Integer>();
 
-	/**
-	 * How much more to tunnel to the side.
-	 */
-	private final int addToSide;
-	private final int addToTop;
 	private final TorchSide torches;
-
-	private final boolean addBranches;
 
 	private int currentStepNumber = 0;
 	private final Object currentStepNumberMutex = new Object();
 
 	public TunnelPathFinder(int dx, int dz, int cx, int cy, int cz,
-			int addToSide, int addToTop, TorchSide torches, int length) {
+			TunnelMode tunnelMode, TorchSide torches, int length) {
 		super(dx, dz, cx, cy, cz, length);
-		this.addToSide = Math.max(0, addToSide);
-		this.addToTop = addToTop;
+		this.tunnelMode = tunnelMode;
 		this.torches = torches;
-		this.addBranches = addToSide < 0;
 	}
 
 	@Override
@@ -223,14 +232,14 @@ public class TunnelPathFinder extends AlongTrackPathFinder {
 		addTask(new MarkAsReachedTask(stepNumber));
 		BlockPos p1, p2;
 		if (dx == 0) {
-			p1 = currentPos.add(addToSide, 0, 0);
-			p2 = currentPos.add(-addToSide, 1 + addToTop, 0);
+			p1 = currentPos.add(tunnelMode.getAddToSide(), 0, 0);
+			p2 = currentPos.add(-tunnelMode.getAddToSide(), 1 + tunnelMode.getAddToTop(), 0);
 		} else {
-			p1 = currentPos.add(0, 0, addToSide);
-			p2 = currentPos.add(0, 1 + addToTop, -addToSide);
+			p1 = currentPos.add(0, 0, tunnelMode.getAddToSide());
+			p2 = currentPos.add(0, 1 + tunnelMode.getAddToTop(), -tunnelMode.getAddToSide());
 		}
-		BlockCuboid tunnelArea = new BlockCuboid(p1, p2);
-		BlockFilteredArea area = new BlockFilteredArea(tunnelArea,
+		BlockCuboid<WorldData> tunnelArea = new BlockCuboid<>(p1, p2);
+		BlockFilteredArea<WorldData> area = new BlockFilteredArea<>(tunnelArea,
 				FREE_TUNNEL_BLOCKS.invert());
 		addTask(new DestroyInRangeTask(area));
 
@@ -249,15 +258,15 @@ public class TunnelPathFinder extends AlongTrackPathFinder {
 			}
 		}
 		final boolean isBranchStep = stepNumber % 4 == 2;
-		if (addBranches && isBranchStep) {
+		if (tunnelMode.addBranches() && isBranchStep) {
 			addBranchTask(currentPos, -dz, dx);
 			addBranchTask(currentPos, dz, -dx);
 		}
 		addTask(new MarkAsDoneTask(stepNumber));
 	}
 
-	private boolean containsTorches(BlockCuboid tunnelArea) {
-		BlockFilteredArea torchArea = new BlockFilteredArea(tunnelArea,
+	private boolean containsTorches(BlockCuboid<WorldData> tunnelArea) {
+		BlockFilteredArea<WorldData> torchArea = new BlockFilteredArea<>(tunnelArea,
 				BlockSets.TORCH);
 		return torchArea.getVolume(world) > 0;
 	}
@@ -282,10 +291,10 @@ public class TunnelPathFinder extends AlongTrackPathFinder {
 
 	private void addTorchesTask(BlockPos currentPos, int dirX, int dirZ) {
 		final ArrayList<BlockPos> positions = new ArrayList<BlockPos>();
-		positions.add(new BlockPos(currentPos.getX() + dirX * addToSide, currentPos
-				.getY() + 1, currentPos.getZ() + dirZ * addToSide));
+		positions.add(new BlockPos(currentPos.getX() + dirX * tunnelMode.getAddToSide(), currentPos
+				.getY() + 1, currentPos.getZ() + dirZ * tunnelMode.getAddToSide()));
 
-		for (int i = addToSide; i >= 0; i--) {
+		for (int i = tunnelMode.getAddToSide(); i >= 0; i--) {
 			positions.add(new BlockPos(currentPos.getX() + dirX * i, currentPos
 					.getY(), currentPos.getZ() + dirZ * i));
 		}
@@ -305,8 +314,7 @@ public class TunnelPathFinder extends AlongTrackPathFinder {
 
 	@Override
 	public String toString() {
-		return "TunnelPathFinder [addToSide=" + addToSide + ", addToTop="
-				+ addToTop + ", dx=" + dx + ", dz=" + dz + ", cx=" + cx
+		return "TunnelPathFinder [tunnelMode=" + tunnelMode + ", dx=" + dx + ", dz=" + dz + ", cx=" + cx
 				+ ", cy=" + cy + ", cz=" + cz + ", torches=" + torches
 				+ ", length=" + length + "]";
 	}

@@ -16,80 +16,128 @@
  *******************************************************************************/
 package net.famzangl.minecraft.minebot.build.commands;
 
+import com.mojang.brigadier.builder.ArgumentBuilder;
+import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+import com.mojang.brigadier.builder.RequiredArgumentBuilder;
+import com.mojang.brigadier.context.CommandContext;
 import net.famzangl.minecraft.minebot.ai.AIHelper;
-import net.famzangl.minecraft.minebot.ai.command.AIChatController;
-import net.famzangl.minecraft.minebot.ai.command.AICommand;
-import net.famzangl.minecraft.minebot.ai.command.AICommandInvocation;
-import net.famzangl.minecraft.minebot.ai.command.AICommandParameter;
-import net.famzangl.minecraft.minebot.ai.command.ParameterType;
+import net.famzangl.minecraft.minebot.ai.command.CommandEvaluationException;
+import net.famzangl.minecraft.minebot.ai.command.IAIControllable;
 import net.famzangl.minecraft.minebot.ai.command.SafeStrategyRule;
+import net.famzangl.minecraft.minebot.ai.commands.Commands;
+import net.famzangl.minecraft.minebot.ai.commands.EnumArgument;
 import net.famzangl.minecraft.minebot.ai.path.ClearAreaPathfinder;
 import net.famzangl.minecraft.minebot.ai.path.ClearAreaPathfinder.ClearMode;
+import net.famzangl.minecraft.minebot.ai.path.world.BlockSet;
+import net.famzangl.minecraft.minebot.ai.path.world.BlockSets;
 import net.famzangl.minecraft.minebot.ai.path.world.WorldData;
-import net.famzangl.minecraft.minebot.ai.strategy.AIStrategy;
 import net.famzangl.minecraft.minebot.ai.strategy.PathFinderStrategy;
 import net.famzangl.minecraft.minebot.ai.utils.BlockCuboid;
-import net.minecraft.block.BlockState;
+import net.minecraft.command.arguments.BlockPosArgument;
+import net.minecraft.command.arguments.BlockStateArgument;
+import net.minecraft.command.arguments.BlockStateInput;
+import net.minecraft.command.arguments.ILocationArgument;
 import net.minecraft.util.math.BlockPos;
 
-@AICommand(helpText = "Clears the selected area.", name = "minebuild")
+import java.util.function.Function;
+
+/**
+ * Clear a selected / specified area
+ */
 public class CommandClearArea {
 
-	private static final class ClearAreaStrategy extends PathFinderStrategy {
-		private String progress = "?";
-		private boolean done = false;
-		private final ClearAreaPathfinder pathFinder;
+    private static final class ClearAreaStrategy extends PathFinderStrategy {
+        private String progress = "?";
+        private boolean done = false;
+        private final ClearAreaPathfinder pathFinder;
 
-		private ClearAreaStrategy(ClearAreaPathfinder pathFinder) {
-			super(pathFinder, "");
-			this.pathFinder = pathFinder;
-		}
+        private ClearAreaStrategy(ClearAreaPathfinder pathFinder) {
+            super(pathFinder, "");
+            this.pathFinder = pathFinder;
+        }
 
-		@Override
-		public void searchTasks(AIHelper helper) {
-			final int max = pathFinder.getAreaSize();
-			if (max <= 100000) {
-				float toClearCount = pathFinder.getToClearCount(helper);
-				progress = 100 - Math.round(100f * toClearCount / max) + "%";
-				done = toClearCount == 0;
-			}
-			super.searchTasks(helper);
-		}
+        @Override
+        public void searchTasks(AIHelper helper) {
+            final int max = pathFinder.getAreaSize();
+            if (max <= 100000) {
+                float toClearCount = pathFinder.getToClearCount(helper);
+                progress = 100 - Math.round(100f * toClearCount / max) + "%";
+                done = toClearCount == 0;
+            }
+            if (!done) {
+                super.searchTasks(helper);
+            }
+        }
 
-		@Override
-		public String getDescription(AIHelper helper) {
-			return "Clear area: " + progress;
-		}
+        @Override
+        public String getDescription(AIHelper helper) {
+            return "Clear area: " + progress;
+        }
 
-		@Override
-		public boolean hasFailed() {
-			return !done;
-		}
-	}
+        @Override
+        public boolean hasFailed() {
+            return !done;
+        }
+    }
 
-	@AICommandInvocation(safeRule = SafeStrategyRule.DEFEND_MINING)
-	public static AIStrategy run(
-			AIHelper helper,
-			@AICommandParameter(type = ParameterType.FIXED, fixedName = "clear", description = "") String nameArg,
-			@AICommandParameter(type = ParameterType.BLOCK_STATE, description = "restrict to block", optional = true) BlockState block,
-			@AICommandParameter(type = ParameterType.ENUM, description = "clear mode", optional = true) ClearMode mode) {
-		BlockCuboid area =  getArea(helper);
-		if (area != null)  {
-			return new ClearAreaStrategy(new ClearAreaPathfinder(area, block,
-					mode == null ? ClearMode.VISIT_EVERY_POS : mode));
-		} else {
-			return null;
-		}
-	}
-	
-	public static <W extends WorldData> BlockCuboid<W> getArea(AIHelper helper) {
-		final BlockPos pos1 = helper.getPos1();
-		final BlockPos pos2 = helper.getPos2();
-		if (pos1 == null || pos2 == null) {
-			AIChatController.addChatLine("Set positions first.");
-			return null;
-		} else {
-			return new BlockCuboid<>(pos1, pos2);
-		}
-	}
+    public static void register(LiteralArgumentBuilder<IAIControllable> dispatcher, LiteralArgumentBuilder<IAIControllable> minebuild) {
+        // /minebuild clear uses the area set by minebuild
+        LiteralArgumentBuilder<IAIControllable> normalClearCommand = Commands.literal("clear");
+        generateCommand(normalClearCommand, context -> getArea(context.getSource().getAiHelper()));
+        minebuild.then(normalClearCommand);
+
+        // Minecraft syntax: /minebot clear [from] [to]
+        RequiredArgumentBuilder<IAIControllable, ILocationArgument> clearWithRange = Commands.argument("to", BlockPosArgument.blockPos());
+        generateCommand(clearWithRange, context -> new BlockCuboid<>(
+                Commands.getBlockPos(context, "from"),
+                Commands.getBlockPos(context, "to")
+        ));
+        dispatcher.then(
+                Commands.literal("clear")
+                        .then(
+                                Commands.argument("from", BlockPosArgument.blockPos()).then(clearWithRange)));
+    }
+
+    /**
+     * Add mode and block type parameters
+     * @param base base command
+     */
+    private static void generateCommand(ArgumentBuilder<IAIControllable, ?> base,
+                                        Function<CommandContext<IAIControllable>, BlockCuboid<WorldData>> areaGetter) {
+        Commands.optional(base,
+                __ -> BlockSets.EMPTY.invert(),
+                "block",
+                BlockStateArgument.blockState(),
+                BlockStateInput.class,
+                (blockStateInput, context) -> BlockSet.builder().add(blockStateInput.getState()).build(),
+                (withBlock, block) -> Commands.optional(
+                        withBlock,
+                        __ -> ClearMode.VISIT_EVERY_POS,
+                        "mode",
+                        EnumArgument.of(ClearMode.class),
+                        ClearMode.class,
+                        (builder, mode) -> builder.executes(
+                                context -> requestUseStrategy(context, areaGetter.apply(context), block, mode)
+                        )
+                )
+        );
+    }
+
+    private static int requestUseStrategy(CommandContext<IAIControllable> context, BlockCuboid<WorldData> area,
+                                          Commands.ArgExecutorSupplier<BlockSet> toClear,
+                                          Commands.ArgExecutorSupplier<ClearMode> mode) {
+        return context.getSource().requestUseStrategy(
+                new ClearAreaStrategy(new ClearAreaPathfinder(area, toClear.get(context), mode.get(context))),
+                SafeStrategyRule.DEFEND_MINING);
+    }
+
+    public static <W extends WorldData> BlockCuboid<W> getArea(AIHelper helper) {
+        final BlockPos pos1 = helper.getPos1();
+        final BlockPos pos2 = helper.getPos2();
+        if (pos1 == null || pos2 == null) {
+            throw new CommandEvaluationException("No area has been set yet. Set an area to fill using /minebot posN");
+        } else {
+            return new BlockCuboid<>(pos1, pos2);
+        }
+    }
 }

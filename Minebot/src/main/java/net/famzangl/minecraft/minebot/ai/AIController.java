@@ -19,6 +19,7 @@ package net.famzangl.minecraft.minebot.ai;
 import net.famzangl.minecraft.minebot.ai.command.AIChatController;
 import net.famzangl.minecraft.minebot.ai.command.IAIControllable;
 import net.famzangl.minecraft.minebot.ai.command.SafeStrategyRule;
+import net.famzangl.minecraft.minebot.ai.command.StackBuilder;
 import net.famzangl.minecraft.minebot.ai.net.MinebotNetHandler;
 import net.famzangl.minecraft.minebot.ai.net.NetworkHelper;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockBoundsCache;
@@ -58,6 +59,8 @@ import java.util.Map.Entry;
  * 
  */
 public class AIController extends AIHelper implements IAIControllable {
+	private final StackBuilder stackBuilder = new StackBuilder();
+
 	private final class UngrabMouseHelper extends MouseHelper {
 		public UngrabMouseHelper(Minecraft minecraftIn) {
 			super(minecraftIn);
@@ -87,26 +90,6 @@ public class AIController extends AIHelper implements IAIControllable {
 			InputMappings.getInputByName("key.keyboard.u").getKeyCode(), "Command Mod");
 
 	static {
-		// final KeyBinding mine = new KeyBinding("Farm ores",
-		// Keyboard.getKeyIndex("K"), "Command Mod");
-		// final KeyBinding lumberjack = new KeyBinding("Farm wood",
-		// Keyboard.getKeyIndex("J"), "Command Mod");
-		// final KeyBinding build_rail = new KeyBinding("Build Minecart tracks",
-		// Keyboard.getKeyIndex("H"), "Command Mod");
-		// final KeyBinding mobfarm = new KeyBinding("Farm mobs",
-		// Keyboard.getKeyIndex("M"), "Command Mod");
-		// final KeyBinding plant = new KeyBinding("Plant seeds",
-		// Keyboard.getKeyIndex("P"), "Command Mod");
-		// uses.put(mine, new MineStrategy());
-		// uses.put(lumberjack, new LumberjackStrategy());
-		// uses.put(build_rail, new LayRailStrategy());
-		// uses.put(mobfarm, new EnchantStrategy());
-		// uses.put(plant, new PlantStrategy());
-		// ClientRegistry.registerKeyBinding(mine);
-		// ClientRegistry.registerKeyBinding(lumberjack);
-		// ClientRegistry.registerKeyBinding(build_rail);
-		// ClientRegistry.registerKeyBinding(mobfarm);
-		// ClientRegistry.registerKeyBinding(plant);
 		ClientRegistry.registerKeyBinding(stop);
 		ClientRegistry.registerKeyBinding(ungrab);
 	}
@@ -400,31 +383,15 @@ public class AIController extends AIHelper implements IAIControllable {
 
 	@Override
 	public int requestUseStrategy(AIStrategy strategy, SafeStrategyRule rule) {
-		LOGGER.trace(MARKER_STRATEGY, "Request to use strategy " + strategy + " using saferule " + rule);
-
-		requestedStrategy = makeSafe(strategy, rule);
-
-		return 1;
-	}
-	private AIStrategy makeSafe(AIStrategy strategy, SafeStrategyRule safeRule) {
-		if (safeRule == SafeStrategyRule.NONE) {
-			return strategy;
+		if (stackBuilder.collect(strategy, rule)) {
+			// We are in strack building mode (/minebot stack), only schedule strategy
+			LOGGER.debug(MARKER_STRATEGY, "Scheduled strategy for stack: {}", strategy);
+			AIChatController.addChatLine("Strategy scheduled. To start, use: /minebot stack done");
 		} else {
-			final StrategyStack stack = new StrategyStack();
-			stack.addStrategy(new AbortOnDeathStrategy());
-			if (safeRule == SafeStrategyRule.DEFEND_MINING) {
-				stack.addStrategy(new DoNotSuffocateStrategy());
-			}
-			stack.addStrategy(new DamageTakenStrategy());
-			stack.addStrategy(new PlayerComesActionStrategy());
-			stack.addStrategy(new CreeperComesActionStrategy());
-			stack.addStrategy(new EatStrategy());
-			if (safeRule == SafeStrategyRule.DEFEND_MINING) {
-				stack.addStrategy(new PlaceTorchStrategy());
-			}
-			stack.addStrategy(strategy);
-			return new StackStrategy(stack);
+			LOGGER.debug(MARKER_STRATEGY, "Request to use strategy {} using saferule {}", strategy, rule);
+			requestedStrategy = rule.makeSafe(strategy);
 		}
+		return 1;
 	}
 
 	// @SubscribeEvent
@@ -461,4 +428,9 @@ public class AIController extends AIHelper implements IAIControllable {
 		return networkHelper;
 	}
 
+
+	@Override
+	public StackBuilder getStackBuilder() {
+		return stackBuilder;
+	}
 }

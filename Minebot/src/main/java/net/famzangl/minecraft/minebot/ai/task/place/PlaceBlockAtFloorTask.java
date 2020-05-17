@@ -33,6 +33,7 @@ public class PlaceBlockAtFloorTask extends AITask {
 	private int faceTimer;
 	protected final BlockPos pos;
 	private Vec3d positionToFace;
+	protected boolean hasPlacedBlock;
 
 	/**
 	 * 
@@ -120,6 +121,7 @@ public class PlaceBlockAtFloorTask extends AITask {
 	protected void tryPlaceBlock(AIHelper aiHelper) {
 		if (isAtDesiredHeight(aiHelper) && isFacingRightBlock(aiHelper)) {
 			aiHelper.overrideUseItem();
+			hasPlacedBlock = true;
 		}
 	}
 

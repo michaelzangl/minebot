@@ -16,6 +16,7 @@
  *******************************************************************************/
 package net.famzangl.minecraft.minebot.ai.path;
 
+import net.famzangl.minecraft.minebot.ai.command.AIChatController;
 import net.famzangl.minecraft.minebot.ai.command.AICommandParameter.BlockFilter;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSet;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSets;
@@ -81,6 +82,8 @@ public class FillAreaPathfinder extends MovePathFinder {
 			currentFillLayer++;
 			LOGGER.debug(MARKER_FILL, "Advance to layer " + currentFillLayer);
 			addTask(new WaitTask());
+		} else {
+			AIChatController.addChatLine("Done filling area");
 		}
 	}
 

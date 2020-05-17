@@ -17,9 +17,11 @@
 package net.famzangl.minecraft.minebot.ai.commands;
 
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+import com.mojang.brigadier.context.CommandContext;
 import net.famzangl.minecraft.minebot.ai.command.IAIControllable;
 import net.famzangl.minecraft.minebot.ai.command.SafeStrategyRule;
 import net.famzangl.minecraft.minebot.ai.path.GoToPathfinder;
+import net.famzangl.minecraft.minebot.ai.path.GoToPathfinderDestructive;
 import net.famzangl.minecraft.minebot.ai.strategy.PathFinderStrategy;
 import net.minecraft.command.arguments.BlockPosArgument;
 import net.minecraft.util.math.BlockPos;
@@ -29,12 +31,15 @@ public class CommandPathfind {
     	dispatcher.then(
 				Commands.literal("pathfind").then(
 						Commands.argument("to", BlockPosArgument.blockPos())
-								.executes(context -> {
-									BlockPos position = Commands.getBlockPos(context, "to");
-									return context.getSource().requestUseStrategy(new PathFinderStrategy(new GoToPathfinder(position), "Go to "
-											+ position.getX() + "," + position.getY() + "," + position.getZ()), SafeStrategyRule.DEFEND);
-								})
+								.executes(context -> runPathfind(context, false))
+						.then(Commands.literal("destructive").executes(context -> runPathfind(context, true)))
 				)
 		);
+	}
+
+	private static int runPathfind(CommandContext<IAIControllable> context, boolean destroy) {
+		BlockPos position = Commands.getBlockPos(context, "to");
+		return context.getSource().requestUseStrategy(new PathFinderStrategy(destroy ? new GoToPathfinderDestructive(position) : new GoToPathfinder(position), "Go to "
+				+ position.getX() + "," + position.getY() + "," + position.getZ()), destroy ? SafeStrategyRule.DEFEND_MINING : SafeStrategyRule.DEFEND);
 	}
 }

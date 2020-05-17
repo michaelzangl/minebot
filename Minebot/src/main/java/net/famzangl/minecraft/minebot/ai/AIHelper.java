@@ -39,7 +39,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.Direction;
 import net.minecraft.util.MovementInput;
 import net.minecraft.util.math.*;
-import net.minecraft.world.chunk.Chunk;
+import net.minecraft.world.LightType;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.Marker;
@@ -117,8 +117,9 @@ public abstract class AIHelper {
 
 	protected void invalidateChunkCache() {
 		if (minecraftWorld == null
-				|| getMinecraft().world != minecraftWorld.getBackingWorld()) {
-			if (getMinecraft().world == null) {
+				|| getMinecraft().world != minecraftWorld.getBackingWorld()
+				|| getMinecraft().player != minecraftWorld.getBackingPlayer()) {
+			if (getMinecraft().world == null || getMinecraft().player == null) {
 				minecraftWorld = null;
 			} else {
 				minecraftWorld = new WorldData(
@@ -1036,9 +1037,7 @@ public abstract class AIHelper {
 
 	// TODO: Move this to WorldData
 	public int getLightAt(BlockPos pos) {
-		final Chunk chunk = getMinecraft().world.getChunk(
-				pos.getX() >> 4, pos.getZ() >> 4);
-		return chunk.getLightValue(pos);
+		return getMinecraft().world.getLightFor(LightType.BLOCK, pos);
 	}
 
 	public void setActiveMapReader(MapReader activeMapReader) {

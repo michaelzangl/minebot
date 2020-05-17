@@ -60,7 +60,10 @@ public class PlaceTorchStrategy extends AIStrategy {
 		}
 	}
 
-	private static final BlockSet CAN_PLACE_ON = BlockSets.SIMPLE_CUBE;
+	// TODO: Instead, use net.minecraft.block.Block.hasEnoughSolidSide valid block states.
+	private static final BlockSet CAN_PLACE_ON = BlockSets.SIMPLE_CUBE
+			// Cannot place a torch on leaves
+			.minus(BlockSets.LEAVES);
 
 	private static final BlockItemFilter TORCH_FILTER = new BlockItemFilter(
 			Blocks.TORCH);

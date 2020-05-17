@@ -75,7 +75,7 @@ public class StoreStrategy extends PathFinderStrategy {
 			if (chests != null) {
 				for (ChestData c : chests) {
 					for (ItemStack stack : helper.getMinecraft().player.inventory.mainInventory) {
-						if (c.couldPutItem(stack)) {
+						if (c.couldPutItem(stack, helper.getWorld())) {
 							return distance + chestBlockHandler.getExpectedPutRating(c.getPos(), stack);
 						}
 					}
@@ -93,7 +93,7 @@ public class StoreStrategy extends PathFinderStrategy {
 				NonNullList<ItemStack> inventory = helper.getMinecraft().player.inventory.mainInventory;
 				for (int i = 0; i < inventory.size(); i++) {
 					final ItemStack stack = inventory.get(i);
-					if (c.couldPutItem(stack)) {
+					if (c.couldPutItem(stack, helper.getWorld())) {
 						if (!chestOpen) {
 							addTask(new OpenChestTask(c.getSecondaryPos(),
 									c.getPos()));

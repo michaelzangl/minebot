@@ -3,6 +3,7 @@ package net.famzangl.minecraft.minebot.ai.strategy;
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.command.AIChatController;
 import net.famzangl.minecraft.minebot.ai.command.IAIControllable;
+import net.famzangl.minecraft.minebot.ai.command.StackBuilder;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.ChatScreen;
 
@@ -26,6 +27,11 @@ public final class RunFileStrategy extends AIStrategy {
 		public int requestUseStrategy(AIStrategy strategy) {
 			receivedStrategy = strategy;
 			return 0;
+		}
+
+		@Override
+		public StackBuilder getStackBuilder() {
+			throw new UnsupportedOperationException("Cannot use /minebot stack inside a script. Use stack: instead");
 		}
 
 		@Override

@@ -193,6 +193,10 @@ public class WorldData {
 		return theWorld;
 	}
 
+	public ClientPlayerEntity getBackingPlayer() {
+		return thePlayerToGetPositionFrom;
+	}
+
 	public int getBlockStateId(BlockPos pos) {
 		return getBlockStateId(pos.getX(), pos.getY(), pos.getZ());
 	}

@@ -92,15 +92,6 @@ public abstract class AITask {
 	 * @return The expected game tick timeout.
 	 */
 	protected int computeGameTickTimeout(AIHelper helper) {
-		// List<BlockPos> blocks = getBlocksToDestory(helper.getWorld());
-		// if (blocks.isEmpty()) {
-		// return 20 * 5;
-		// } else {
-		// int time = 5;
-		// for (BlockPos b : blocks) {
-		// time += getTimeToMine(helper.getWorld(), b);
-		// }
-		// }
 		RecordingWorld world = new RecordingWorld(helper.getWorld(),
 				helper.getMinecraft().player);
 		if (applyToDelta(world)) {

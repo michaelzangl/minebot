@@ -27,4 +27,8 @@ public class StrategyDeactivatedError extends TaskError {
 		return false;
 	}
 
+	@Override
+	public String toString() {
+		return "StrategyDeactivatedError{}";
+	}
 }

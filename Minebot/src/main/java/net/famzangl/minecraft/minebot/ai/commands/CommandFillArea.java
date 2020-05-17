@@ -19,7 +19,6 @@ package net.famzangl.minecraft.minebot.ai.commands;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import net.famzangl.minecraft.minebot.ai.command.AICommand;
-import net.famzangl.minecraft.minebot.ai.command.CommandEvaluationException;
 import net.famzangl.minecraft.minebot.ai.command.IAIControllable;
 import net.famzangl.minecraft.minebot.ai.command.SafeStrategyRule;
 import net.famzangl.minecraft.minebot.ai.path.FillAreaPathfinder;
@@ -43,11 +42,7 @@ public class CommandFillArea {
                                         .executes(
                                                 context -> {
                                                     BlockCuboid<WorldData> area = CommandClearArea.getArea(context.getSource().getAiHelper());
-                                                    if (area != null) {
-                                                        return requestUseStrategy(context, area);
-                                                    } else {
-                                                        throw new CommandEvaluationException("No area has been set yet. Set an area to fill using /minebot posN");
-                                                    }
+                                                    return requestUseStrategy(context, area);
                                                 }
                                         )
                         )

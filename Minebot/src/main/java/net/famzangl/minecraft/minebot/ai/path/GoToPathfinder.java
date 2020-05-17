@@ -16,6 +16,7 @@
  *******************************************************************************/
 package net.famzangl.minecraft.minebot.ai.path;
 
+import net.famzangl.minecraft.minebot.ai.command.AIChatController;
 import net.famzangl.minecraft.minebot.ai.path.world.WorldData;
 import net.famzangl.minecraft.minebot.ai.utils.BlockArea;
 import net.famzangl.minecraft.minebot.ai.utils.BlockCuboid;
@@ -24,25 +25,33 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 public class GoToPathfinder extends WalkingPathfinder {
-	private static final Logger LOGGER = LogManager.getLogger(FillAreaPathfinder.class);
+	private static final Logger LOGGER = LogManager.getLogger(GoToPathfinder.class);
+	private static final int HORIZONTAL_SEARCH_MIN = (int) (HORIZONTAL_SEARCH_DISTANCE * .8);
+	private static final int VERTICAL_SEARCH_MIN = (int) (VERTICAL_SEARCH_DISTANCE * .8);
 
-	private final BlockPos position;
-	int HORIZONTAL_SEARCH_MIN = (int) (HORIZONTAL_SEARCH_DISTANCE * .8);
-	int VERTICAL_SEARCH_MIN = (int) (VERTICAL_SEARCH_DISTANCE * .8);
+	private final BlockPos destination;
 	private BlockArea<WorldData> targetArea;
 
-	public GoToPathfinder(BlockPos position) {
-		this.position = position;
+	public GoToPathfinder(BlockPos destination) {
+		this.destination = destination;
 	}
-	
+
 	@Override
 	protected boolean runSearch(BlockPos playerPosition) {
-		if (playerPosition.equals(position)) {
+		if (playerPosition.equals(destination)) {
 			return true;
 		}
-		BlockPos posDiff = position.subtract(playerPosition);
+		targetArea = computeTargetArea(playerPosition, destination);
+
+		LOGGER.debug("Pathfinder target area is: {}", targetArea);
+
+		return super.runSearch(playerPosition);
+	}
+
+	static BlockArea<WorldData> computeTargetArea(BlockPos playerPosition, BlockPos destination) {
+		BlockPos posDiff = destination.subtract(playerPosition);
 		BlockArea<WorldData> area = new BlockCuboid<>(
-				position, position
+				destination, destination
 		);
 		// X
 		if (posDiff.getX() > HORIZONTAL_SEARCH_MIN) {
@@ -69,7 +78,7 @@ public class GoToPathfinder extends WalkingPathfinder {
 			area = area.unionWith(
 					new BlockCuboid<>(
 							playerPosition.add(-HORIZONTAL_SEARCH_DISTANCE, -VERTICAL_SEARCH_MIN, -HORIZONTAL_SEARCH_DISTANCE),
-							playerPosition.add(HORIZONTAL_SEARCH_DISTANCE, -VERTICAL_SEARCH_DISTANCE, -HORIZONTAL_SEARCH_DISTANCE)
+							playerPosition.add(HORIZONTAL_SEARCH_DISTANCE, -VERTICAL_SEARCH_DISTANCE, HORIZONTAL_SEARCH_DISTANCE)
 					));
 		}
 
@@ -87,15 +96,26 @@ public class GoToPathfinder extends WalkingPathfinder {
 							playerPosition.add(HORIZONTAL_SEARCH_DISTANCE, VERTICAL_SEARCH_DISTANCE, -HORIZONTAL_SEARCH_DISTANCE)
 					));
 		}
-		targetArea = area;
-
-		LOGGER.debug("Pathfinder target area is: {}", area);
-
-		return super.runSearch(playerPosition);
+		return area;
 	}
 
 	@Override
 	protected float rateDestination(int distance, int x, int y, int z) {
 		return targetArea.contains(world, x, y, z) ? distance : -1;
+	}
+
+	@Override
+	protected void noPathFound() {
+		if (statsVisited < 50) {
+			AIChatController.addChatLine("Cannot reach destination. Cannot go far from start position.");
+		}
+	}
+
+	@Override
+	public String toString() {
+		return "GoToPathfinder{" +
+				"destination=" + destination +
+				", targetArea=" + targetArea +
+				'}';
 	}
 }

@@ -121,20 +121,6 @@ public class WorldWithDelta extends WorldData {
 		setBlock(pos, block.getDefaultState());
 	}
 
-	@Deprecated
-	public void setBlock(BlockPos pos, int blockId, int meta) {
-		setBlock(pos.getX(), pos.getY(), pos.getZ(), blockId, meta);
-	}
-
-	@Deprecated
-	public void setBlock(int x, int y, int z, int blockId, int meta) {
-		if (blockId > 0xfff || meta > 0xf) {
-			throw new IllegalArgumentException("block id/meta " + blockId + ":"
-					+ meta + " out of range.");
-		}
-		setBlockIdAndMeta(x, y, z, blockId << 4 | meta);
-	}
-
 	public void setBlock(BlockPos pos, BlockState block) {
 		setBlockIdAndMeta(pos.getX(), pos.getY(), pos.getZ(), BlockSet.getStateId(block));
 	}

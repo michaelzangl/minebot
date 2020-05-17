@@ -31,6 +31,8 @@ import net.famzangl.minecraft.minebot.settings.PathfindingSetting;
 import net.minecraft.block.Blocks;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.LinkedList;
 
@@ -44,6 +46,8 @@ import java.util.LinkedList;
  * 
  */
 public class MovePathFinder extends PathFinderField {
+	private static final Logger LOGGER = LogManager.getLogger(MovePathFinder.class);
+
 	/**
 	 * Blocks that are destructable faster.
 	 */
@@ -245,11 +249,6 @@ public class MovePathFinder extends PathFinderField {
 	}
 
 	@Override
-	protected void noPathFound() {
-		super.noPathFound();
-	}
-
-	@Override
 	protected void foundPath(LinkedList<BlockPos> path) {
 		super.foundPath(path);
 		BlockPos currentPos = path.removeFirst();
@@ -258,15 +257,15 @@ public class MovePathFinder extends PathFinderField {
 		while (!path.isEmpty()) {
 			BlockPos nextPos = path.removeFirst();
 			Direction moveDirection = direction(currentPos, nextPos);
-			int stepsAdded = 0;
+			int fastMoveStepsAdded = 0;
 			while (path.peekFirst() != null
 					&& isAreaClear(currentPos, path.peekFirst())
-					&& stepsAdded < 40) {
+					&& fastMoveStepsAdded < 40) {
 				nextPos = path.removeFirst();
-				stepsAdded++;
+				fastMoveStepsAdded++;
 			}
 			final BlockPos peeked = path.peekFirst();
-			if (stepsAdded > 0) {
+			if (fastMoveStepsAdded > 0) {
 				addHorizontalFastMove(currentPos, nextPos);
 			} else if (moveDirection == Direction.UP && peeked != null
 					&& nextPos.subtract(peeked).getY() == 0) {
@@ -298,8 +297,7 @@ public class MovePathFinder extends PathFinderField {
 	}
 
 	private void addHorizontalFastMove(BlockPos currentPos, BlockPos nextPos) {
-		System.out.println("Shortcut from " + currentPos + " to "
-				+ nextPos);
+		LOGGER.debug("Using fast move from " + currentPos + " to " + nextPos);
 		addTask(new WalkTowardsTask(nextPos.getX(), nextPos.getZ(),
 				currentPos));
 	}

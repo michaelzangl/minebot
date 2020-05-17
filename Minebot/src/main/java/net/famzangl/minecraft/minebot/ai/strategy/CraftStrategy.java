@@ -16,7 +16,10 @@
  *******************************************************************************/
 package net.famzangl.minecraft.minebot.ai.strategy;
 
+import it.unimi.dsi.fastutil.ints.IntArrayList;
+import it.unimi.dsi.fastutil.ints.IntList;
 import net.famzangl.minecraft.minebot.ai.AIHelper;
+import net.famzangl.minecraft.minebot.ai.command.AIChatController;
 import net.famzangl.minecraft.minebot.ai.enchanting.CloseScreenTask;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSet;
 import net.famzangl.minecraft.minebot.ai.path.world.WorldData;
@@ -26,30 +29,28 @@ import net.famzangl.minecraft.minebot.ai.scanner.RangeBlockHandler;
 import net.famzangl.minecraft.minebot.ai.task.UseItemOnBlockAtTask;
 import net.famzangl.minecraft.minebot.ai.task.WaitTask;
 import net.famzangl.minecraft.minebot.ai.task.error.TaskError;
-import net.famzangl.minecraft.minebot.ai.task.inventory.ItemCountList;
 import net.famzangl.minecraft.minebot.ai.task.inventory.ItemWithSubtype;
 import net.famzangl.minecraft.minebot.ai.task.inventory.PutOnCraftingTableTask;
 import net.famzangl.minecraft.minebot.ai.task.inventory.TakeResultItem;
-import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
+import net.minecraft.client.gui.recipebook.RecipeList;
 import net.minecraft.client.gui.screen.inventory.ContainerScreen;
 import net.minecraft.client.gui.screen.inventory.CraftingScreen;
+import net.minecraft.client.util.ClientRecipeBook;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.item.crafting.IRecipe;
-import net.minecraft.item.crafting.Ingredient;
-import net.minecraft.item.crafting.ShapedRecipe;
+import net.minecraft.item.crafting.IRecipePlacer;
+import net.minecraft.item.crafting.RecipeItemHelper;
 import net.minecraft.util.math.BlockPos;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.MarkerManager;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Hashtable;
-import java.util.List;
+import javax.annotation.Nonnull;
+import java.util.*;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -66,98 +67,20 @@ public class CraftStrategy extends PathFinderStrategy {
 	private static final Logger LOGGER = LogManager
 			.getLogger(CraftStrategy.class);
 
+	/**
+	 * Apply all RecipeWithListAndCount in that order (used for multiple crafting steps)
+	 */
 	public static final class CraftingPossibility {
-		public static final int SUBTYPE_IGNORED = 32767;
 
 		private final ItemWithSubtype[][][] slots = new ItemWithSubtype[3][3][];
+		private List<RecipeWithListAndCount> recipesToApply;
 
-		public CraftingPossibility(IRecipe recipe) {
-			LOGGER.trace(MARKER_RECIPE, "Parsing recipe: " + recipe);
-			if (recipe instanceof ShapedRecipe) {
-				ShapedRecipe shapedRecipes = (ShapedRecipe) recipe;
-				LOGGER.trace(MARKER_RECIPE, "Interpreting ShapedRecipe: "
-						+ shapedRecipes.getRecipeOutput().getItem()
-								.getRegistryName());
-				int width = shapedRecipes.getRecipeWidth();
-				int height = shapedRecipes.getRecipeHeight();
-
-				LOGGER.trace(MARKER_RECIPE, "Found items of size " + width
-						+ "x" + height + ": " + shapedRecipes.getIngredients());
-				for (int x = 0; x < width; x++) {
-					for (int y = 0; y < height; y++) {
-						Ingredient itemStack = shapedRecipes.getIngredients().get(x + y * width);
-						if (itemStack != null && itemStack.getMatchingStacks().length > 0) {
-							this.slots[x][y] = Stream.of(itemStack.getMatchingStacks())
-									.map(ItemWithSubtype::new)
-									.toArray(ItemWithSubtype[]::new);
-						}
-					}
-				}
-				LOGGER.trace(MARKER_RECIPE, "Slots " + Arrays.toString(slots));
-			}/* TODO: Still needed? else if (recipe instanceof ShapedOreRecipe) {
-				ShapedOreRecipe shapedRecipes = (ShapedOreRecipe) recipe;
-				try {
-					// Width is the first integer field.
-					int width = PrivateFieldUtils.getField(shapedRecipes, ShapedOreRecipe.class, Integer.TYPE).getInt(shapedRecipes);
-					for (int x = 0; x < width; x++) {
-						int height = shapedRecipes.getHeight();
-						for (int y = 0; y < height; y++) {
-							//TODO: Test
-							Object itemStack = shapedRecipes.getIngredients().get(x + y
-									* width);
-							if (itemStack instanceof ItemStack) {
-								this.slots[x][y] = new ItemWithSubtype[] { new ItemWithSubtype(
-										(ItemStack) itemStack) };
-							} else if (itemStack instanceof List) {
-								List<ItemStack> list = (List<ItemStack>) itemStack;
-								this.slots[x][y] = list.stream()
-										.map(ItemWithSubtype::new)
-										.toArray(ItemWithSubtype[]::new);
-							} else if (itemStack != null) {
-								LOGGER.error(MARKER_RECIPE, "Cannot handle " + itemStack.getClass());
-								throw new IllegalArgumentException("Cannot handle " + itemStack.getClass());
-							}
-						}
-					}
-				} catch (SecurityException e) {
-					throw new IllegalArgumentException("Cannot access " + recipe);
-				} catch (IllegalAccessException e) {
-					throw new IllegalArgumentException("Cannot access " + recipe);
-				}
-			} */ else {
-				LOGGER.error(MARKER_RECIPE,
-						"An item recipe has been found but the item cannot be crafted. The class "
-								+ recipe.getClass().getCanonicalName()
-								+ " cannot be understood.");
-				throw new IllegalArgumentException("Cannot (yet) craft " + recipe);
-			}
+		public CraftingPossibility(List<RecipeWithListAndCount> recipesToApply) {
+			this.recipesToApply = recipesToApply;
 		}
 
-		public ItemCountList getRequiredItems(int count) {
-			ItemCountList list = new ItemCountList();
-			for (ItemWithSubtype[][] subtypes : slots) {
-				for (ItemWithSubtype[] subtype : subtypes) {
-					list.add(subtype[0], count);
-				}
-			}
-			LOGGER.trace(MARKER_RECIPE, "Items required for " + this + ": "
-					+ list);
-			return list;
-		}
-
-		public boolean goodForPosition(ItemWithSubtype item, int x, int y) {
-			if (slots[x][y] != null) {
-				if (item == null) {
-					return false;
-				} else {
-					ItemWithSubtype genericItem = item;
-					return Stream.of(slots[x][y]).anyMatch(
-									slot -> slot.equals(item) || slot.equals(genericItem)
-								);
-				}
-			} else {
-				return item == null;
-			}
+		public List<RecipeWithListAndCount> getRecipesToApply() {
+			return recipesToApply;
 		}
 
 		@Override
@@ -167,30 +90,133 @@ public class CraftStrategy extends PathFinderStrategy {
 
 	}
 
+	public static class RecipePlacement{
+		private final ItemStack[][] stacksToPlace;
+
+		public RecipePlacement(int width, int height) {
+			this.stacksToPlace = new ItemStack[height][width];
+			for (int x = 0; x < width; x++) {
+				for (int y = 0; y < height; y++) {
+					stacksToPlace[y][x] = new ItemStack(() -> Items.AIR, 0);
+				}
+			}
+		}
+
+		public int getWidht() {
+			return stacksToPlace[0].length;
+		}
+
+		public int getHeight() {
+			return stacksToPlace.length;
+		}
+
+		static RecipePlacement of(int size, IRecipe<?> recipe, Iterator<Integer> ingredients, int count) {
+			RecipePlacement placement = new RecipePlacement(size, size);
+
+			new IRecipePlacer<Integer>(){
+				@Override
+				public void setSlotContents(Iterator<Integer> ingredients, int slotIn, int maxAmount, int y, int x) {
+					ItemStack itemstack = RecipeItemHelper.unpack(ingredients.next());
+					LOGGER.trace("Placing stack at {},{}: {}", x, y, itemstack);
+					placement.stacksToPlace[y][x] = itemstack;
+				}
+			}.placeRecipe(size, size, -1, recipe, ingredients, count);
+
+			return placement;
+		}
+
+		@Nonnull
+		public ItemStack getStack(int x, int y) {
+			return stacksToPlace[y][x];
+		}
+
+		@Override
+		public String toString() {
+			return "RecipePlacement{" +
+					"stacksToPlace=" + Arrays.toString(stacksToPlace) +
+					'}';
+		}
+
+		public int getSlotsWithType(Item item) {
+			return (int) Stream.of(stacksToPlace)
+					.flatMap(Stream::of)
+					.filter(it -> it.getItem() == item)
+					.count();
+		}
+	}
+
+	/**
+	 * A recipe and how often it should be used
+	 */
+	public static class RecipeWithListAndCount{
+		private final RecipeList list;
+		private final IRecipe<?> recipe;
+		private final int count;
+		private final RecipeItemHelper helper = new RecipeItemHelper();
+
+		public RecipeWithListAndCount(RecipeList list, IRecipe<?> recipe, int count) {
+			this.list = list;
+			this.recipe = recipe;
+			this.count = count;
+		}
+
+		public Optional<RecipePlacement> getPlacement(AIHelper aiHelper) {
+			LOGGER.trace(MARKER_RECIPE, "Attempt to place recipe {} ", recipe);
+
+			helper.clear();
+			// Now determine all te items we have in the inventory
+			aiHelper.getMinecraft().player.inventory.accountStacks(helper);
+			int realMaxCount = Math.min(count, helper.getBiggestCraftableStack(recipe, null));
+			LOGGER.trace(MARKER_RECIPE, "Requested {} stacks. Attempting to caraft {} stacks.", count, realMaxCount);
+
+			IntList intlist = new IntArrayList();
+			if (helper.canCraft(recipe, intlist, realMaxCount)) {
+				return Optional.of(RecipePlacement.of(3, recipe, intlist.iterator(), realMaxCount));
+			} else {
+				return Optional.empty();
+			}
+		}
+
+		@Override
+		public String toString() {
+			return "RecipeWithListAndCount{" +
+					"list=" + list +
+					", recipe=" + recipe +
+					", count=" + count +
+					'}';
+		}
+	}
+
 	public static final class CraftingWish {
 		private final int amount;
-		private final ItemWithSubtype item;
+		private final Item item;
 
-		public CraftingWish(int amount, ItemWithSubtype item) {
+		public CraftingWish(int amount, Item item) {
 			this.amount = amount;
 			this.item = item;
 		}
 
-		public List<CraftingPossibility> getPossibility() {
-			return Collections.emptyList();
-			/* TODO try {
-				return CraftingManager.REGISTRY.getKeys().stream()
-						.map(id -> CraftingManager.REGISTRY.getObject(id))
-						.filter(recipe -> {
-							ItemStack out = recipe.getRecipeOutput();
-							return out != null && new ItemWithSubtype(out).equals(item);
-						})
-						.map(CraftingPossibility::new)
-						.collect(Collectors.toList());
-			} catch (IllegalArgumentException e) {
-				System.err.println("Cannot craft: " + e.getMessage());
-				return Collections.emptyList();
-			}*/
+		public List<CraftingPossibility> getPossibility(AIHelper helper) {
+			ClientRecipeBook book = helper.getMinecraft().player.getRecipeBook();
+			// Minecraft stores a list of list of recipies.
+			List<RecipeList> available = book.getRecipes();
+
+			// Now find the one we need
+			List<RecipeWithListAndCount> found = new ArrayList<>();
+			available.forEach(list ->
+					list.getRecipes().forEach(recipe -> {
+						ItemStack out = recipe.getRecipeOutput();
+						if (out.getItem() == item) {
+							found.add(new RecipeWithListAndCount(list, recipe,
+									// ceil
+									(amount + out.getCount() - 1) / out.getCount()));
+						}
+					}));
+
+			LOGGER.debug(MARKER_RECIPE, "For crafting {}, the following recipes were found: {}", item, found);
+
+
+			return found.stream().map(it -> new CraftingPossibility(Collections.singletonList(it))).collect(Collectors.toList());
 		}
 
 		@Override
@@ -301,19 +327,23 @@ public class CraftStrategy extends PathFinderStrategy {
 			ArrayList<CraftingTableData> tables = craftingTableHandler
 					.getReachableForPos(currentPos);
 			CraftingTableData table = tables.get(0);
-			List<CraftingPossibility> possibilities = wish.getPossibility();
+			List<CraftingPossibility> possibilities = wish.getPossibility(helper);
 			LOGGER.trace("Crafting one of: " + possibilities);
 
-			ItemWithSubtype[][] grid = getCraftablePossibility(helper,
-					possibilities);
-			if (grid == null) {
+			Optional<RecipePlacement> grid = possibilities
+				.stream()
+					// For now, only support one recipe. TODO: Find out how to best support multiple of them
+					.map(p -> p.getRecipesToApply().get(0))
+					.map(p -> p.getPlacement(helper))
+					.flatMap(optional -> optional.isPresent() ? Stream.of(optional.get()) : Stream.of())
+					.findAny();
+			if (!grid.isPresent()) {
 				failed = true;
-				System.err.println("Could not find any way to craft this.");
-				// FIXME: Desync. Error.
+				AIChatController.addChatLine("Could not find a way to craft this item");
 				return;
 			}
 			
-			LOGGER.trace(MARKER_RECIPE, "Crafting: " + Arrays.deepToString(grid));
+			LOGGER.trace(MARKER_RECIPE, "Crafting: {}", grid.get());
 
 			addTask(new UseItemOnBlockAtTask(table.pos) {
 				@Override
@@ -327,104 +357,42 @@ public class CraftStrategy extends PathFinderStrategy {
 							&& aiHelper.getMinecraft().currentScreen instanceof CraftingScreen;
 				}
 			});
-			addCraftTaks(grid);
+			addCraftTaks(grid.get());
 			addTask(new WaitTask(5));
 			addTask(new TakeResultItem(CraftingScreen.class, 0));
 			addTask(new WaitTask(5));
 			addTask(new CloseScreenTask());
 		}
 
-		private void addCraftTaks(ItemWithSubtype[][] grid) {
+		private void addCraftTaks(RecipePlacement grid) {
 			int missing = getMissing();
 			if (missing <= 0) {
 				return;
 			}
 			for (int x = 0; x < 3; x++) {
 				for (int y = 0; y < 3; y++) {
-					if (grid[x][y] != null) {
-						int inventoryTotal = countInInventory(grid[x][y]);
-						int slotCount = countInGrid(grid, grid[x][y]);
-						int itemCount = Math.min(inventoryTotal / slotCount,
+					ItemStack stack = grid.getStack(x, y);
+					if (stack.getItem() != Items.AIR) {
+						int inventoryTotal = countInInventory(stack.getItem());
+						int slotsWithThatType = grid.getSlotsWithType(stack.getItem());
+						int itemCount = Math.min(inventoryTotal / slotsWithThatType,
 								missing);
 						addTask(new PutOnCraftingTableTask(y * 3 + x,
-								grid[x][y], itemCount));
+								stack.getItem(), itemCount));
 						addTask(new WaitTask(3));
 					}
 				}
 			}
 		}
 
-		private int countInGrid(ItemWithSubtype[][] grid,
-				ItemWithSubtype itemWithSubtype) {
-			int count = 0;
-			for (ItemWithSubtype[] ss : grid) {
-				for (ItemWithSubtype s : ss) {
-					if (itemWithSubtype.equals(s)) {
-						count++;
-					}
-				}
-			}
-			return count;
-		}
-
-		private int countInInventory(ItemWithSubtype itemWithSubtype) {
+		private int countInInventory(Item itemWithSubtype) {
 			int count = 0;
 			for (ItemStack stack : helper.getMinecraft().player.inventory.mainInventory) {
-				if (itemWithSubtype.equals(ItemWithSubtype.fromStack(stack))) {
-					count += stack.getMaxStackSize();
+				if (itemWithSubtype.equals(stack.getItem())) {
+					count += stack.getCount();
 				}
 			}
 			return count;
-		}
-
-		/**
-		 * Gets an array of items that specifies how they need to be placed on
-		 * the crafting grid.
-		 * 
-		 * @param aiHelper
-		 * @param possibilities
-		 * @return
-		 */
-		private ItemWithSubtype[][] getCraftablePossibility(AIHelper aiHelper,
-				List<CraftingPossibility> possibilities) {
-			for (CraftingPossibility possibility : possibilities) {
-				ItemWithSubtype[][] assignedSlots = new ItemWithSubtype[3][3];
-				// TODO: Order this in a better way. We need to have multiples of our item count first.
-				for (ItemStack stack : aiHelper.getMinecraft().player.inventory.mainInventory) {
-					if (stack == null) {
-						continue;
-					}
-					ItemWithSubtype item = new ItemWithSubtype(stack);
-					int leftOver = stack.getMaxStackSize();
-					for (int x = 0; x < 3 && leftOver > 0; x++) {
-						for (int y = 0; y < 3 && leftOver > 0; y++) {
-							if (possibility.goodForPosition(item, x, y)
-									&& assignedSlots[x][y] == null) {
-								assignedSlots[x][y] = item;
-								leftOver--;
-								LOGGER.trace("Placing at " + x + "," + y + ": "
-										+ item);
-							}
-						}
-					}
-				}
-				boolean allGood = true;
-				for (int x = 0; x < 3; x++) {
-					for (int y = 0; y < 3; y++) {
-						if (!possibility.goodForPosition(assignedSlots[x][y], x, y)) {
-							allGood = false;
-							LOGGER.warn(MARKER_RECIPE, "Placed wrong item at "
-									+ x + "," + y + ": " + assignedSlots[x][y]);
-						}
-					}
-				}
-				if (allGood) {
-					return assignedSlots;
-				}
-			}
-			LOGGER.warn("Could not find any way to craft any of "
-					+ possibilities);
-			return null;
 		}
 
 		@Override
@@ -434,15 +402,9 @@ public class CraftStrategy extends PathFinderStrategy {
 		}
 	}
 
-	public CraftStrategy(int amount, ItemWithSubtype item) {
+	public CraftStrategy(int amount, Item item) {
 		super(new CraftingTableFinder(new CraftingWish(amount, item)),
 				"Crafting");
-	}
-
-	public CraftStrategy(int amount, BlockState itemType) {
-		super(null, null);
-		throw new UnsupportedOperationException("TODO");
-		// TODO this(amount, new ItemWithSubtype(itemType));
 	}
 
 	@Override

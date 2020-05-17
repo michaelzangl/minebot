@@ -18,6 +18,7 @@ package net.famzangl.minecraft.minebot.ai.strategy;
 
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.enchanting.CloseScreenTask;
+import net.famzangl.minecraft.minebot.ai.path.world.WorldData;
 import net.famzangl.minecraft.minebot.ai.scanner.BlockRangeFinder;
 import net.famzangl.minecraft.minebot.ai.scanner.BlockRangeScanner;
 import net.famzangl.minecraft.minebot.ai.scanner.ChestBlockHandler;
@@ -48,14 +49,14 @@ public class UnstoreStrategy extends PathFinderStrategy {
 			this.wantedInventory = wantedInventory;
 		}
 
-		public boolean couldUseOneOf(ChestData chestData) {
+		public boolean couldUseOneOf(ChestData chestData, WorldData world) {
 			for (int i = 0; i < 36; i++) {
 				InventorySlot slot = wantedInventory.getSlot(i);
 				if (slot.isEmpty() || noMoreWork[i]) {
 					continue;
 				}
 
-				if (chestData.couldTakeItem(slot.getFakeMcStack())) {
+				if (chestData.couldTakeItem(slot.getFakeMcStack(), world)) {
 					return true;
 				}
 			}
@@ -63,11 +64,11 @@ public class UnstoreStrategy extends PathFinderStrategy {
 		}
 
 		public ArrayList<AITask> getTakeTasks(List<ItemStack> inventory,
-				ChestData chestData) {
+				ChestData chestData, WorldData world) {
 			ArrayList<AITask> tasks = new ArrayList<AITask>();
 			for (int inventorySlot = 0; inventorySlot < 36; inventorySlot++) {
 				InventorySlot slot = wantedInventory.getSlot(inventorySlot);
-				if (slot.isEmpty() || !chestData.couldTakeItem(slot.getFakeMcStack())) {
+				if (slot.isEmpty() || !chestData.couldTakeItem(slot.getFakeMcStack(), world)) {
 					continue;
 				}
 				ItemStack itemInSlot = inventory.get(inventorySlot);
@@ -186,7 +187,7 @@ public class UnstoreStrategy extends PathFinderStrategy {
 					.getReachableForPos(new BlockPos(x, y, z));
 			if (chests != null) {
 				for (ChestData chestData : chests) {
-					if (list.couldUseOneOf(chestData)) {
+					if (list.couldUseOneOf(chestData, world)) {
 						return distance;
 					}
 				}
@@ -200,7 +201,7 @@ public class UnstoreStrategy extends PathFinderStrategy {
 					.getReachableForPos(currentPos);
 			for (final ChestData chestData : chests) {
 				NonNullList<ItemStack> inventory = helper.getMinecraft().player.inventory.mainInventory;
-				ArrayList<AITask> tasks = list.getTakeTasks(inventory, chestData);
+				ArrayList<AITask> tasks = list.getTakeTasks(inventory, chestData, helper.getWorld());
 
 				if (!tasks.isEmpty()) {
 					addTask(new OpenChestTask(chestData.getSecondaryPos(), chestData.getPos()));

@@ -16,8 +16,44 @@
  *******************************************************************************/
 package net.famzangl.minecraft.minebot.ai.command;
 
+import net.famzangl.minecraft.minebot.ai.strategy.*;
+
 public enum SafeStrategyRule {
-	NONE,
-	DEFEND,
-	DEFEND_MINING
+    NONE {
+        @Override
+        public AIStrategy makeSafe(AIStrategy strategy) {
+            // NOP
+            return strategy;
+        }
+    },
+    DEFEND {
+        @Override
+        public AIStrategy makeSafe(AIStrategy strategy) {
+            final StrategyStack stack = new StrategyStack();
+            stack.addStrategy(new AbortOnDeathStrategy());
+            stack.addStrategy(new DamageTakenStrategy());
+            stack.addStrategy(new PlayerComesActionStrategy());
+            stack.addStrategy(new CreeperComesActionStrategy());
+            stack.addStrategy(new EatStrategy());
+            stack.addStrategy(strategy);
+            return new StackStrategy(stack);
+        }
+    },
+    DEFEND_MINING {
+        @Override
+        public AIStrategy makeSafe(AIStrategy strategy) {
+            final StrategyStack stack = new StrategyStack();
+            stack.addStrategy(new AbortOnDeathStrategy());
+            stack.addStrategy(new DoNotSuffocateStrategy());
+            stack.addStrategy(new DamageTakenStrategy());
+            stack.addStrategy(new PlayerComesActionStrategy());
+            stack.addStrategy(new CreeperComesActionStrategy());
+            stack.addStrategy(new EatStrategy());
+            stack.addStrategy(new PlaceTorchStrategy());
+            stack.addStrategy(strategy);
+            return new StackStrategy(stack);
+        }
+    };
+
+    public abstract AIStrategy makeSafe(AIStrategy strategy);
 }

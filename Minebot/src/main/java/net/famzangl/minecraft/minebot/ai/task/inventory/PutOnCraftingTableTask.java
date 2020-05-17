@@ -17,7 +17,9 @@
 package net.famzangl.minecraft.minebot.ai.task.inventory;
 
 import net.famzangl.minecraft.minebot.ai.AIHelper;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.util.NonNullList;
 
 /**
@@ -32,12 +34,18 @@ public class PutOnCraftingTableTask extends MoveInInventoryTask {
 	 * Slot 0..8
 	 */
 	private final int craftingSlot;
-	private final ItemWithSubtype item;
+	private final Item item;
 	private final int itemCount;
 
-	public PutOnCraftingTableTask(int craftingSlot, ItemWithSubtype item,
+	public PutOnCraftingTableTask(int craftingSlot, Item item,
 			int itemCount) {
 		super();
+		if (item == Items.AIR) {
+			throw new IllegalArgumentException("Cannot place air");
+		}
+		if (itemCount <= 0) {
+			throw new IllegalArgumentException("Count out of range: " + itemCount);
+		}
 		this.craftingSlot = craftingSlot;
 		this.item = item;
 		this.itemCount = itemCount;
@@ -48,7 +56,7 @@ public class PutOnCraftingTableTask extends MoveInInventoryTask {
 		NonNullList<ItemStack> mainInventory = aiHelper.getMinecraft().player.inventory.mainInventory;
 		int inventorySlot = -1;
 		for (int i = 0; i < mainInventory.size(); i++) {
-			if (item.equals(ItemWithSubtype.fromStack(mainInventory.get(i)))) {
+			if (item.equals(mainInventory.get(i).getItem())) {
 				inventorySlot = i;
 			}
 		}

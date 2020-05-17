@@ -6,6 +6,7 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.builder.RequiredArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import net.famzangl.minecraft.minebot.ai.command.IAIControllable;
+import net.famzangl.minecraft.minebot.build.commands.CommandClearArea;
 import net.minecraft.command.arguments.ILocationArgument;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
@@ -83,13 +84,19 @@ public class Commands {
         CommandAirbridge.register(minebot);
         CommandBuildRail.register(minebot);
         CommandBuildWay.register(minebot);
+        CommandCraft.register(minebot);
         CommandEat.register(minebot);
         CommandFeed.register(minebot);
         CommandFish.register(minebot);
         CommandFillArea.register(minebot, minebuild);
-        CommandPathfind.register(minebot);
+        CommandClearArea.register(minebot, minebuild);
         CommandLumberjack.register(minebot);
         CommandMine.register(minebot);
         CommandPathfind.register(minebot);
+        CommandRespawn.register(minebot);
+        CommandResume.register(minebot);
+        CommandStack.register(minebot);
+        CommandStore.register(minebot);
+        CommandTunnel.register(minebot);
     }
 }

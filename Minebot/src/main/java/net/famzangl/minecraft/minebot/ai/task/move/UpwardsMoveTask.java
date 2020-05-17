@@ -59,18 +59,13 @@ public class UpwardsMoveTask extends JumpingPlaceBlockAtFloorTask {
 				obsidianMining = true;
 			}
 			aiHelper.faceAndDestroy(pos.add(0, 1, 0));
-		} else if (!BlockSets.AIR.isAt(aiHelper.getWorld(), pos.add(0, -1, 0))) {
+		} else if (!BlockSets.AIR.isAt(aiHelper.getWorld(), pos.add(0, -1, 0))
+				&& !(isAtDesiredHeight(aiHelper) && hasPlacedBlock)) {
 			aiHelper.faceAndDestroy(pos.add(0, -1, 0));
 		} else {
 			super.runTick(aiHelper, taskOperations);
 		}
 	}
-
-//	@Override
-//	public int getGameTickTimeout(AIHelper helper) {
-//		return super.getGameTickTimeout(helper)
-//				+ (obsidianMining ? HorizontalMoveTask.OBSIDIAN_TIME : 0);
-//	}
 
 	@Override
 	public String toString() {

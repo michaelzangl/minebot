@@ -18,9 +18,7 @@ package net.famzangl.minecraft.minebot.ai.scanner;
 
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSet;
 import net.famzangl.minecraft.minebot.ai.path.world.WorldData;
-import net.famzangl.minecraft.minebot.ai.utils.BlockArea.AreaVisitor;
 import net.famzangl.minecraft.minebot.ai.utils.BlockCuboid;
-import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
 
@@ -55,7 +53,7 @@ public class BlockRangeScanner {
 		handlers.add(h);
 		for (BlockState block : h.getIds()) {
 			int i = BlockSet.getStateId(block);
-			if (handlersCache.length < i) {
+			if (handlersCache.length <= i) {
 				handlersCache = Arrays.copyOf(handlersCache, Math.max(handlersCache.length * 2, i + 1));
 			}
 			handlersCache[i] = h;
@@ -65,10 +63,10 @@ public class BlockRangeScanner {
 	public void scanArea(WorldData world) {
 		BlockCuboid<WorldData> area = new BlockCuboid<>(center.add(-HORIZONTAL_SCAN,  -VERTICAL_SCAN, -HORIZONTAL_SCAN), center.add(HORIZONTAL_SCAN,  VERTICAL_SCAN, HORIZONTAL_SCAN));
 		area.accept((world1, x, y, z) -> {
-			int id = world1.getBlockStateId(x, y, z);
-			BlockHandler handler = handlersCache[id];
+			int blockStateId = world1.getBlockStateId(x, y, z);
+			BlockHandler handler = handlersCache.length > blockStateId ? handlersCache[blockStateId] : null;
 			if (handler != null) {
-				handler.scanBlock(world1, id, x, y, z);
+				handler.scanBlock(world1, blockStateId, x, y, z);
 			}
 		}, world);
 		for (BlockHandler handler : handlers) {

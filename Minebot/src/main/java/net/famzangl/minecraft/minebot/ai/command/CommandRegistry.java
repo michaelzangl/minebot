@@ -175,6 +175,11 @@ public class CommandRegistry {
             return 0;
         }
 
+        @Override
+        public StackBuilder getStackBuilder() {
+            throw new UnsupportedOperationException("Cannot use /minebot stack in scripts");
+        }
+
         public AIStrategy get() {
             if (strategy == null) {
                 throw new IllegalStateException("No strategy has been set");

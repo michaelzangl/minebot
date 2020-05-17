@@ -45,4 +45,8 @@ public class AbortOnDeathStrategy extends AIStrategy {
 		return "Stop when dead.";
 	}
 
+	@Override
+	public String toString() {
+		return "AbortOnDeathStrategy{}";
+	}
 }

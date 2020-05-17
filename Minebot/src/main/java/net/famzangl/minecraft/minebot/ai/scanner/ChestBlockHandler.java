@@ -18,25 +18,34 @@ package net.famzangl.minecraft.minebot.ai.scanner;
 
 import net.famzangl.minecraft.minebot.ai.ItemFilter;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSet;
+import net.famzangl.minecraft.minebot.ai.path.world.BlockSets;
 import net.famzangl.minecraft.minebot.ai.path.world.WorldData;
 import net.famzangl.minecraft.minebot.ai.scanner.ChestBlockHandler.ChestData;
-import net.famzangl.minecraft.minebot.ai.utils.PrivateFieldUtils;
+import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
-import net.minecraft.entity.item.HangingEntity;
+import net.minecraft.block.ChestBlock;
+import net.minecraft.block.WallSignBlock;
 import net.minecraft.entity.item.ItemFrameEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
+import net.minecraft.state.properties.ChestType;
+import net.minecraft.tileentity.SignTileEntity;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.ITextComponent;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 import java.util.Map.Entry;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class ChestBlockHandler extends RangeBlockHandler<ChestData> {
+	private static final Logger LOGGER = LogManager.getLogger(RangeBlockHandler.class);
+
 	private static final BlockSet CHEST = BlockSet.builder().add(Blocks.CHEST,
 			Blocks.TRAPPED_CHEST).build();
 
@@ -76,12 +85,18 @@ public class ChestBlockHandler extends RangeBlockHandler<ChestData> {
 			return false;
 		}
 
-		public boolean couldPutItem(ItemStack stack) {
-			return !isFullFor(stack) && isItemAllowed(stack);
+		public boolean couldPutItem(ItemStack stack, WorldData world) {
+			return !isFullFor(stack) && canOpen(world) && isItemAllowed(stack);
 		}
 
-		public boolean couldTakeItem(ItemStack stack) {
-			return !isEmptyFor(stack) && isItemAllowed(stack);
+		public boolean couldTakeItem(ItemStack stack, WorldData world) {
+			return !isEmptyFor(stack) && canOpen(world) && isItemAllowed(stack);
+		}
+
+		private boolean canOpen(WorldData world) {
+			// Won't use world state, but we assume that bot will not add / remove blocks above chest
+			return !ChestBlock.isBlocked(world.getBackingWorld(), pos)
+					&& secondaryPos == null || !ChestBlock.isBlocked(world.getBackingWorld(), secondaryPos);
 		}
 
 		private boolean isEmptyFor(ItemStack stack) {
@@ -104,11 +119,8 @@ public class ChestBlockHandler extends RangeBlockHandler<ChestData> {
 	}
 
 	public static class ChestData extends AbstractChestData {
-		private final int chestBlockId;
-
-		public ChestData(BlockPos pos, int chestBlockId) {
+		public ChestData(BlockPos pos) {
 			super(pos);
-			this.chestBlockId = chestBlockId;
 		}
 
 		@Override
@@ -142,11 +154,6 @@ public class ChestBlockHandler extends RangeBlockHandler<ChestData> {
 					+ "]";
 		}
 
-		public void allowItem(final ItemStack displayed) {
-			allowedItems.add(new SameItemFilter(displayed));
-			persistentStatus.update(this);
-		}
-
 		public void markAsFullFor(ItemStack stack, boolean full) {
 			removeFrom(fullItems, stack);
 			if (full) {
@@ -170,24 +177,48 @@ public class ChestBlockHandler extends RangeBlockHandler<ChestData> {
 		}
 
 		private void removeFrom(ArrayList<ItemFilter> list, ItemStack stack) {
-			Iterator<ItemFilter> iterator = list.iterator();
-			while (iterator.hasNext()) {
-				ItemFilter filter = iterator.next();
-				if (filter.matches(stack)) {
-					iterator.remove();
-				}
-			}
-		}
-
-		public boolean isOfType(int id) {
-			return id == chestBlockId;
+			list.removeIf(filter -> filter.matches(stack));
 		}
 
 		public void registerByItemFrame(ItemFrameEntity frame) {
 			ItemStack displayed = frame.getDisplayedItem();
-			if (displayed != null && !displayed.isEmpty()) {
-				allowItem(displayed);
+			if (!displayed.isEmpty()) {
+				allowedItems.add(new SameItemFilter(displayed));
+				LOGGER.debug("Allow item by item frame for {}: {}", pos, displayed.getItem());
+				persistentStatus.update(this);
 			}
+		}
+
+		public void registerBySign(TileEntity tileEntity) {
+			if (!(tileEntity instanceof SignTileEntity)) {
+				throw new IllegalArgumentException("Expected a sign tile entity to be passed for chest at " + pos + " but got " + tileEntity);
+			}
+
+			Set<String> lines = Stream.of(((SignTileEntity) tileEntity).signText)
+					.map(ITextComponent::getString)
+					.map(str -> str.trim().toLowerCase(Locale.US))
+					.collect(Collectors.toSet());
+			Set<String> words = Stream.of(String.join(" ", lines)
+					.replaceAll("\\W+", " ")
+					.trim()
+					.split("\\s+"))
+					.collect(Collectors.toSet());
+
+			LOGGER.debug("Registered text from sign for chest at {}. Words: {}, Lines: {}", pos, words, lines);
+
+			// Text needs to contain item name
+			allowedItems.add(itemToTest ->
+					itemToTest.getItem() != Items.AIR && (
+							// Display name as full line => supports i18n
+							lines.contains(itemToTest.getDisplayName().getString().toLowerCase(Locale.US))
+									// minecraft:xxx
+									||
+									itemToTest.getItem().getRegistryName() != null && (
+											words.contains(itemToTest.getItem().getRegistryName().toString().toLowerCase(Locale.US))
+													// only xxx
+													|| words.contains(itemToTest.getItem().getRegistryName().getPath().toLowerCase(Locale.US)))
+					));
+			persistentStatus.update(this);
 		}
 	}
 
@@ -246,62 +277,61 @@ public class ChestBlockHandler extends RangeBlockHandler<ChestData> {
 	public void scanBlock(WorldData world, int id, int x, int y, int z) {
 		if (CHEST.isAt(world, x, y, z)) {
 			BlockPos myPos = new BlockPos(x, y, z);
-			ChestData chest = getChestAt(myPos, id);
-			scanForItemFrames(world, x, y, z, chest);
+			ChestData chest = getChestAt(world, myPos);
+			scanForItemFrames(world, myPos, chest);
 		}
 	}
 
-	private void scanForItemFrames(WorldData world, int x, int y, int z,
+	private void scanForItemFrames(WorldData world, BlockPos pos,
 			ChestData chest) {
-		BlockPos myPos = new BlockPos(x, y, z);
-		AxisAlignedBB abb = new AxisAlignedBB(x - 1, y, z - 1, x + 2, y + 1,
-				z + 2);
+		AxisAlignedBB abb = new AxisAlignedBB(pos.add(-1, 0, -1), pos.add(2, 1, 2));
 		List<ItemFrameEntity> frames = world.getBackingWorld()
 				.getEntitiesWithinAABB(ItemFrameEntity.class, abb);
 		for (ItemFrameEntity frame : frames) {
-			Direction direction = getDirection(frame);
-			if (direction == null) {
-				continue;
-			}
-			BlockPos pos = PrivateFieldUtils.getFieldValue(frame,
-					HangingEntity.class, BlockPos.class);
-			Direction dir = PrivateFieldUtils.getFieldValue(frame,
-					HangingEntity.class, Direction.class);
-			if (pos.offset(dir, -1).equals(myPos)) {
+			BlockPos attachedTo = frame.getHangingPosition().offset(frame.getHorizontalFacing().getOpposite());
+			if (attachedTo.equals(pos)) {
 				// Frame attached to this chest
 				chest.registerByItemFrame(frame);
 			}
 		}
+
+		for (Direction dir : new Direction[] { Direction.EAST, Direction.SOUTH, Direction.NORTH, Direction.WEST }) {
+			BlockPos signPos = pos.offset(dir);
+			if (BlockSets.WALL_SIGN.isAt(world, signPos)) {
+				// Wall sign
+				BlockState state = world.getBlockState(signPos);
+				BlockPos attachedTo = signPos.offset(state.get(WallSignBlock.FACING).getOpposite());
+				if (attachedTo.equals(pos)) {
+					chest.registerBySign(world.getBackingWorld().getTileEntity(signPos));
+				}
+			}
+		}
 	}
 
-	private ChestData getChestAt(BlockPos pos, int id) {
+	private ChestData getChestAt(WorldData world, BlockPos pos) {
 		ChestData chest = null;
-		for (Direction d : new Direction[] { Direction.UP, Direction.NORTH,
-				Direction.SOUTH, Direction.EAST, Direction.WEST }) {
-			BlockPos blockPos = pos.add(d.getXOffset(), 0, d.getZOffset());
-			ChestData attempted = chests.get(blockPos);
-			if (attempted != null && attempted.isOfType(id)) {
+
+		// Merged chests => handle them as one
+		BlockState chestState = world.getBlockState(pos);
+		if (chestState.get(ChestBlock.TYPE) != ChestType.SINGLE) {
+			Direction directionAttached = ChestBlock.getDirectionToAttached(chestState);
+			BlockPos otherChestPos = pos.offset(directionAttached);
+			ChestData attempted = chests.get(otherChestPos);
+			if (attempted != null) {
 				chest = attempted;
 				if (!chest.pos.equals(pos)) {
+					LOGGER.debug("Merging chest at {} with {}", chest.pos, pos);
 					chest.setSecondaryPos(pos);
 				}
 			}
 		}
+
 		if (chest == null) {
-			chest = new ChestData(pos, id);
+			chest = new ChestData(pos);
 			chests.put(pos, chest);
+			LOGGER.debug("Found new chest at {}", pos);
 		}
 		return chest;
-	}
-
-	/**
-	 * Gets the direction of whatever this frame is attached to
-	 * 
-	 * @param itemFrame
-	 * @return
-	 */
-	private Direction getDirection(ItemFrameEntity itemFrame) {
-		return itemFrame.getHorizontalFacing();
 	}
 
 	public int getExpectedPutRating(BlockPos pos, ItemStack stack) {

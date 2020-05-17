@@ -1,21 +1,17 @@
 package net.famzangl.minecraft.minebot.ai.commands;
 
-import net.famzangl.minecraft.minebot.ai.AIHelper;
+import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import net.famzangl.minecraft.minebot.ai.command.AICommand;
-import net.famzangl.minecraft.minebot.ai.command.AICommandInvocation;
-import net.famzangl.minecraft.minebot.ai.command.AICommandParameter;
-import net.famzangl.minecraft.minebot.ai.command.ParameterType;
-import net.famzangl.minecraft.minebot.ai.command.SafeStrategyRule;
-import net.famzangl.minecraft.minebot.ai.strategy.AIStrategy;
+import net.famzangl.minecraft.minebot.ai.command.IAIControllable;
 
 @AICommand(helpText = "Resume the last thing that was aborted.", name = "minebot")
 public class CommandResume {
 
-	@AICommandInvocation(safeRule = SafeStrategyRule.NONE)
-	public static AIStrategy run(
-			AIHelper helper,
-			@AICommandParameter(type = ParameterType.FIXED, fixedName = "resume", description = "") String nameArg) {
-		AIStrategy toResume = helper.getResumeStrategy();
-		return toResume;
+	public static void register(LiteralArgumentBuilder<IAIControllable> dispatcher) {
+		dispatcher.then(
+				Commands.literal("resume")
+						.executes(context ->
+								context.getSource().requestUseStrategy(context.getSource().getAiHelper().getResumeStrategy())
+						));
 	}
 }

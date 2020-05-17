@@ -29,6 +29,7 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Predicate;
 import java.util.stream.IntStream;
 
 /**
@@ -216,13 +217,20 @@ public class BlockSet implements Iterable<BlockState> {
 				if (nextId < 0) {
 					scanNext();
 				}
-				return nextId < set.length * 64;
+				return nextId < getMaxIndex();
+			}
+
+			/**
+			 * @return 1 more than the maximum block state id this iterator could return
+			 */
+			private int getMaxIndex() {
+				return remaining ? Block.BLOCK_STATE_IDS.size() :  set.length * 64;
 			}
 
 			private void scanNext() {
 				do {
 					nextId++;
-				} while (nextId < set.length * 64
+				} while (nextId < getMaxIndex()
 						&& !contains(nextId));
 			}
 
@@ -244,7 +252,15 @@ public class BlockSet implements Iterable<BlockState> {
 		};
 	}
 
-	public static class Builder {
+	public BlockSet minus(BlockSet other) {
+		return BlockSet.builder().add(this.invert()).add(other).build().invert();
+	}
+
+	public BlockSet intersect(BlockSet other) {
+		return BlockSet.builder().add(this.invert()).add(other.invert()).build().invert();
+	}
+
+    public static class Builder {
 		// May contain duplicates => we don't care
 		private final List<Integer> statesToAdd = new ArrayList<>();
 		private Builder() {
@@ -287,8 +303,22 @@ public class BlockSet implements Iterable<BlockState> {
 		}
 
 		public Builder add(BlockSet blockSet) {
-			for (BlockState stateId: blockSet) {
-				add(stateId);
+			for (BlockState state: blockSet) {
+				add(state);
+			}
+			return this;
+		}
+
+		public Builder add(Predicate<BlockState> condition) {
+			return add(BlockSets.EMPTY.invert());
+		}
+
+		public Builder add(BlockSet set, Predicate<BlockState> condition) {
+			if (Block.BLOCK_STATE_IDS.size() == 0) {
+				throw new IllegalStateException("Block states not initialized yet.");
+			}
+			for (BlockState state: set) {
+				add(state);
 			}
 			return this;
 		}

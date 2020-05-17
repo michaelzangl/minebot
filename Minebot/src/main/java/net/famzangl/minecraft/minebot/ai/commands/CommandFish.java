@@ -27,7 +27,7 @@ public class CommandFish {
 
     public static void register(LiteralArgumentBuilder<IAIControllable> dispatcher) {
         dispatcher.then(
-                Commands.literal("feed").executes(context -> context.getSource().requestUseStrategy(new FishStrategy(), SafeStrategyRule.DEFEND))
+                Commands.literal("fish").executes(context -> context.getSource().requestUseStrategy(new FishStrategy(), SafeStrategyRule.DEFEND))
         );
     }
 }
