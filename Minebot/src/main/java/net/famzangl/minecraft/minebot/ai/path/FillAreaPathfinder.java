@@ -20,6 +20,7 @@ import net.famzangl.minecraft.minebot.ai.command.AIChatController;
 import net.famzangl.minecraft.minebot.ai.command.AICommandParameter.BlockFilter;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSet;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSets;
+import net.famzangl.minecraft.minebot.ai.path.world.WorldData;
 import net.famzangl.minecraft.minebot.ai.task.WaitTask;
 import net.famzangl.minecraft.minebot.ai.utils.BlockCuboid;
 import net.famzangl.minecraft.minebot.build.blockbuild.AbstractBuildTask;
@@ -49,11 +50,11 @@ public class FillAreaPathfinder extends MovePathFinder {
 
 	}
 
-	private final BlockCuboid fillCuboid;
+	private final BlockCuboid<WorldData> fillCuboid;
 	private int currentFillLayer;
 	private final BlockState blockToPlace;
 
-	public FillAreaPathfinder(BlockCuboid cuboid,
+	public FillAreaPathfinder(BlockCuboid<WorldData> cuboid,
 			BlockState blockToPlace) {
 		fillCuboid = cuboid;
 		this.blockToPlace = blockToPlace;
@@ -123,7 +124,11 @@ public class FillAreaPathfinder extends MovePathFinder {
 			BlockPos placeAtPos = currentPos.subtract(pos);
 			if (placeAtPos.getY() == currentFillLayer
 					&& fillCuboid.contains(world, placeAtPos)
-					&& BlockSets.AIR.isAt(world, placeAtPos)) {
+					&& BlockSets.AIR.isAt(world, placeAtPos)
+					&& BlockSets.AIR.isAt(world, placeAtPos.up())
+					&& BlockSets.AIR.isAt(world, placeAtPos.up(2))
+					&& BlockSets.safeSideAround(world, placeAtPos.up())
+					&& BlockSets.safeSideAround(world, placeAtPos.up(2))) {
 				addTask(new BlockBuildTask(placeAtPos, blockToPlace)
 						.getPlaceBlockTask(pos));
 				return true;
