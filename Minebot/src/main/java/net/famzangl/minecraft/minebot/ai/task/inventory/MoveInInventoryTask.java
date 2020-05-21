@@ -23,6 +23,9 @@ import net.famzangl.minecraft.minebot.ai.task.error.StringTaskError;
 import net.minecraft.client.gui.screen.inventory.ContainerScreen;
 import net.minecraft.inventory.container.ClickType;
 import net.minecraft.inventory.container.Slot;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.NonNullList;
 import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.MarkerManager;
 
@@ -51,6 +54,17 @@ public abstract class MoveInInventoryTask extends AITask {
 	 * @return
 	 */
 	protected abstract int getFromStack(AIHelper aiHelper);
+
+	protected int findItemInInventory(AIHelper aiHelper, Item item) {
+		NonNullList<ItemStack> mainInventory = aiHelper.getMinecraft().player.inventory.mainInventory;
+		int inventorySlot = -1;
+		for (int i = 0; i < mainInventory.size(); i++) {
+			if (item.equals(mainInventory.get(i).getItem())) {
+				inventorySlot = i;
+			}
+		}
+		return inventorySlot;
+	}
 
 	protected abstract int getToStack(AIHelper aiHelper);
 
@@ -92,28 +106,36 @@ public abstract class MoveInInventoryTask extends AITask {
 			clicks.removeFirst().click(aiHelper);
 			delay = 1;
 		} else {
-			int fromStack = getFromStack(aiHelper);
 			int toStack = getToStack(aiHelper);
-			if (fromStack < 0
-					|| toStack < 0
-					|| fromStack >= screen.getContainer().inventorySlots
-							.size()
+			if (toStack < 0
 					|| toStack >= screen.getContainer().inventorySlots
 							.size()) {
-				LOGGER.error("Attempt to move : " + fromStack + " -> "
-						+ toStack);
-				taskOperations.desync(new StringTaskError("Invalid item move specification."));
+				LOGGER.error("Invalid stack to put to : {}", toStack);
+				taskOperations.desync(new StringTaskError("Attempted to put item into an invalid stack."));
 				return;
 			}
-			Slot from = screen.getContainer().getSlot(fromStack);
 
 			Slot to = screen.getContainer().getSlot(toStack);
 			
 			int amount = getMissingAmount(aiHelper, getSlotContentCount(to));
-
 			if (amount <= 0) {
 				moveDone = true;
-			} else if (getSlotContentCount(from) <= 0) {
+				return;
+			}
+
+			// Only compute from stack after amount has been checked => some tasks don't specify a from stack when amount is 0
+			int fromStack = getFromStack(aiHelper);
+			if (fromStack < 0
+					|| fromStack >= screen.getContainer().inventorySlots
+					.size()) {
+				LOGGER.error("Invalid stack to take from: {}", fromStack);
+				taskOperations.desync(new StringTaskError("Attempted to take an item from an invalid stack."));
+				return;
+			}
+
+			Slot from = screen.getContainer().getSlot(fromStack);
+
+			if (getSlotContentCount(from) <= 0) {
 				taskOperations.desync(new StringTaskError("Nothing in source slot."));
 				LOGGER.error(MARKER_MOVE, "Attempted to move from slot "
 						+ fromStack + " but it was empty (" + from.slotNumber
@@ -129,11 +151,14 @@ public abstract class MoveInInventoryTask extends AITask {
 
 			LOGGER.debug("Still missing items: " + missing);
 			if (getSlotContentCount(from) <= missing && getSlotContentCount(from) > 0) {
+				LOGGER.debug(MARKER_MOVE, "moving all items (left klick to take, left click to put)");
 				missing -= moveAll(aiHelper, from, to);
 			} else if (getSlotContentCount(from) - getSlotContentCount(from) / 2 <= missing
 					&& getSlotContentCount(from) > 0) {
+				LOGGER.debug(MARKER_MOVE, "moving half of the items (right klick to take, left click to put)");
 				missing -= moveHalf(aiHelper, from, to);
 			} else if (missing > 0 && getSlotContentCount(from) > 0) {
+				LOGGER.debug(MARKER_MOVE, "moving {} items (left klick to take, {}x right click to put, left click to put back)", missing, missing);
 				missing -= moveStackPart(aiHelper, from, to, missing);
 			} else if (missing > 0) {
 				missingItems(missing);

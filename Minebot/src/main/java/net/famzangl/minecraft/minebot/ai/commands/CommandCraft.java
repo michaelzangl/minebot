@@ -20,7 +20,8 @@ import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import net.famzangl.minecraft.minebot.ai.command.IAIControllable;
 import net.famzangl.minecraft.minebot.ai.command.SafeStrategyRule;
-import net.famzangl.minecraft.minebot.ai.strategy.CraftStrategy;
+import net.famzangl.minecraft.minebot.ai.strategy.crafting.CraftStrategy;
+import net.famzangl.minecraft.minebot.ai.strategy.crafting.CraftingWish;
 import net.minecraft.command.arguments.ItemArgument;
 
 public class CommandCraft {
@@ -36,8 +37,8 @@ public class CommandCraft {
 							Integer.class,
 							(builder, count) ->
 								builder.executes(
-										context -> context.getSource().requestUseStrategy(new CraftStrategy(count.get(context),
-												ItemArgument.getItem(context, "type").getItem()), SafeStrategyRule.DEFEND)
+										context -> context.getSource().requestUseStrategy(new CraftStrategy(new CraftingWish(count.get(context),
+												ItemArgument.getItem(context, "type").getItem())), SafeStrategyRule.DEFEND)
 								)
 							)
 					)

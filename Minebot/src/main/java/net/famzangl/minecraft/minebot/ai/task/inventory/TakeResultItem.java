@@ -64,23 +64,30 @@ public class TakeResultItem extends AITask {
 			return;
 		}
 		final ContainerScreen<?> screen = (ContainerScreen<?>) currentScreen;
-		if (!screen.getContainer().getInventory().get(slot).isEmpty()
-				&& shouldTakeStack(screen.getContainer().getInventory().get(slot)
-						.getStack())) {
+		ItemStack stack = screen.getContainer().getInventory().get(slot);
+		if (stack.isEmpty()) {
+			taskOperations.desync(new StringTaskError("The slot to take the item from is empty."));
+			LOGGER.error(MARKER_TAKE_RESULT, "Empty stack in " + slot + ".");
+		} else if (!shouldTakeStack(stack.getStack())) {
+			taskOperations.desync(new StringTaskError("No good stack in slot."));
+			LOGGER.error(MARKER_TAKE_RESULT, "No good stack in slot " + slot + ".");
+		} else {
 			aiHelper.getMinecraft().playerController.windowClick(
 					screen.getContainer().windowId, slot, 0, ClickType.QUICK_MOVE,
 					aiHelper.getMinecraft().player);
 			LOGGER.trace(MARKER_TAKE_RESULT, "Taking item");
 			tookItem = true;
-			return;
-		} else {
-			taskOperations.desync(new StringTaskError("No good stack in slot."));
-			LOGGER.error(MARKER_TAKE_RESULT, "No good stack in slot " + slot + ".");
-			return;
 		}
 	}
 
 	protected boolean shouldTakeStack(ItemStack stack) {
 		return true;
+	}
+
+	@Override
+	public String toString() {
+		return "TakeResultItem{" +
+				"slot=" + slot +
+				'}';
 	}
 }

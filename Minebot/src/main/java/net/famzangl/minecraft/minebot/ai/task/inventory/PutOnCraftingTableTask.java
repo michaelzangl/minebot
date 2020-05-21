@@ -18,9 +18,7 @@ package net.famzangl.minecraft.minebot.ai.task.inventory;
 
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.util.NonNullList;
 
 /**
  * Put an item in a given slot of the currently open crafting table.
@@ -36,30 +34,28 @@ public class PutOnCraftingTableTask extends MoveInInventoryTask {
 	private final int craftingSlot;
 	private final Item item;
 	private final int itemCount;
+	private int x;
+	private int y;
 
-	public PutOnCraftingTableTask(int craftingSlot, Item item,
+	public PutOnCraftingTableTask(int x, int y, Item item,
 			int itemCount) {
 		super();
+		this.x = x;
+		this.y = y;
 		if (item == Items.AIR) {
 			throw new IllegalArgumentException("Cannot place air");
 		}
 		if (itemCount <= 0) {
 			throw new IllegalArgumentException("Count out of range: " + itemCount);
 		}
-		this.craftingSlot = craftingSlot;
+		this.craftingSlot = y * 3 + x;
 		this.item = item;
 		this.itemCount = itemCount;
 	}
 
 	@Override
 	protected int getFromStack(AIHelper aiHelper) {
-		NonNullList<ItemStack> mainInventory = aiHelper.getMinecraft().player.inventory.mainInventory;
-		int inventorySlot = -1;
-		for (int i = 0; i < mainInventory.size(); i++) {
-			if (item.equals(mainInventory.get(i).getItem())) {
-				inventorySlot = i;
-			}
-		}
+		int inventorySlot = findItemInInventory(aiHelper, item);
 		if (inventorySlot < 0) {
 			return -1;
 		}
@@ -76,5 +72,15 @@ public class PutOnCraftingTableTask extends MoveInInventoryTask {
 	@Override
 	protected int getMissingAmount(AIHelper aiHelper, int currentCount) {
 		return itemCount - currentCount;
+	}
+
+	@Override
+	public String toString() {
+		return "PutOnCraftingTableTask{" +
+				"item=" + item +
+				", itemCount=" + itemCount +
+				", x=" + x +
+				", y=" + y +
+				'}';
 	}
 }
