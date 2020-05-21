@@ -64,6 +64,6 @@ public class WalkingPathfinder extends MovePathFinder {
 	}
 
 	private double getBlockHeight(int cx, int cy, int cz) {
-		return world.getBlockBounds(cx, cy, cz).getMaxY();
+		return world.getCollisionBounds(cx, cy, cz).getMaxY();
 	}
 }

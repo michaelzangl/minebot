@@ -29,17 +29,13 @@ public class BlockBounds {
 		this.maxZ = maxZ;
 	}
 
-	public BlockBounds(VoxelShape vs) {
-		this(vs.getBoundingBox());
+	public static BlockBounds from(VoxelShape vs) {
+		return vs.isEmpty() ? new BlockBounds(0.5, 0.5, 0.5, 0.5, 0.5, 0.5) : new BlockBounds(vs.getBoundingBox());
 	}
 
 	public BlockBounds(AxisAlignedBB axisAlignedBB) {
-		this.minX = axisAlignedBB.minX;
-		this.maxX = axisAlignedBB.maxX;
-		this.minY = axisAlignedBB.minY;
-		this.maxY = axisAlignedBB.maxY;
-		this.minZ = axisAlignedBB.minZ;
-		this.maxZ = axisAlignedBB.maxZ;
+		this(axisAlignedBB.minX, axisAlignedBB.maxX, axisAlignedBB.minY, axisAlignedBB.maxY,
+				axisAlignedBB.minZ, axisAlignedBB.maxZ);
 	}
 
 	/**
@@ -49,33 +45,8 @@ public class BlockBounds {
 	public static final BlockBounds UNKNOWN_BLOCK = new BlockBounds(0, 1);
 
 	public static final BlockBounds FULL_BLOCK = new BlockBounds(0, 1);
-	private static final BlockSet FULL_BLOCKS = BlockSet.builder().add(BlockSets.SIMPLE_CUBE).add(BlockSets.LEAVES).add(BlockSets.AIR).build();
 	public static final BlockBounds LOWER_HALF_BLOCK = new BlockBounds(0, 0.5);
-	private static final BlockSet LOWER_HALF_BLOCKS = BlockSets.LOWER_SLABS;
 	public static final BlockBounds UPPER_HALF_BLOCK = new BlockBounds(0.5, 1);
-
-	private static final BlockSet UPPER_HALF_BLOCKS = BlockSets.UPPER_SLABS;
-
-	public static BlockBounds forBlockWithMeta(int blockIdWithMeta) {
-		return BlockBoundsCache.getBounds(blockIdWithMeta);
-//		if (FULL_BLOCKS.containsWithMeta(blockIdWithMeta)) {
-//			return FULL_BLOCK;
-//		} else if (LOWER_HALF_BLOCKS.containsWithMeta(blockIdWithMeta)) {
-//			return LOWER_HALF_BLOCK;
-//		} else if (UPPER_HALF_BLOCKS.containsWithMeta(blockIdWithMeta)) {
-//			return UPPER_HALF_BLOCK;
-//		}
-//
-//		LOGGER.warn(MARKER_BOUNDS_PROBLEM, "Missing bounds for block+meta: "
-//				+ blockIdWithMeta);
-//		return FULL_BLOCK;
-		// Block block = Block.getBlockById(blockIdWithMeta >> 4);
-		// FIXME: Set bounds based on state.
-		// return new BlockBounds(block.getBlockBoundsMinX(),
-		// block.getBlockBoundsMaxX(), block.getBlockBoundsMinY(),
-		// block.getBlockBoundsMaxY(), block.getBlockBoundsMinZ(),
-		// block.getBlockBoundsMaxZ());
-	}
 
 	public BlockBounds onlySide(Direction side) {
 		return new BlockBounds(side == Direction.EAST ? maxX : minX,

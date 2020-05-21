@@ -108,7 +108,7 @@ public class PlaceBlockAtFloorTask extends AITask {
 	}
 
 	private Vec3d getPositionToFace(AIHelper aiHelper) {
-		BlockBounds bounds = aiHelper.getWorld().getBlockBounds(pos.add(0, -1, 0));
+		BlockBounds bounds = aiHelper.getWorld().getRaytraceBounds(pos.add(0, -1, 0));
 		return bounds.onlySide(Direction.UP).random(pos.add(0, -1, 0), 0.8);
 	}
 

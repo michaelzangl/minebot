@@ -885,7 +885,7 @@ public abstract class AIHelper {
 	 * @return <code>true</code> on arrival.
 	 */
 	public boolean sneakFrom(BlockPos pos, Direction inDirection, boolean face) {
-		BlockBounds bounds = getWorld().getBlockBounds(pos);
+		BlockBounds bounds = getWorld().getCollisionBounds(pos);
 		double destX = pos.getX() + .5;
 		double destZ = pos.getZ() + .5;
 		switch (inDirection) {

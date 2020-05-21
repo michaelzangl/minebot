@@ -231,7 +231,7 @@ public class SneakAndPlaceAtHalfTask extends SneakAndPlaceTask {
 	}
 
 	public static BlockBounds getPlaceOnBounds(WorldData world, BlockPos placeOn, BlockHalf blockHalf, Direction direction) {
-		BlockBounds bounds = world.getBlockBounds(placeOn);
+		BlockBounds bounds = world.getCollisionBounds(placeOn);
 		return bounds.clampY(
 				blockHalf == BlockHalf.UPPER_HALF ? 0.5 : 0.1,
 				blockHalf == BlockHalf.LOWER_HALF ? 0.45 : 0.9 // <- 0.5 but

@@ -189,7 +189,7 @@ public class PlantPathFinder extends MovePathFinder {
 
 		@Override
 		protected void notFacingBlock(AIHelper aiHelper) {
-			BlockBounds bounds = aiHelper.getWorld().getBlockBounds(getPos());
+			BlockBounds bounds = aiHelper.getWorld().getCollisionBounds(getPos());
 			facingPosition = bounds.onlySide(Direction.UP).random(getPos(), 0.7);
 			reFace(aiHelper);
 		}

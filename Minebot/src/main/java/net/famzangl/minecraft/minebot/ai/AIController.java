@@ -122,8 +122,6 @@ public class AIController extends AIHelper implements IAIControllable {
 	public void connect(ClientPlayerNetworkEvent.LoggedInEvent e) {
 		AIChatController.getRegistry().setControlled(this);
 
-		BlockBoundsCache.initialize();
-
 		networkHelper = MinebotNetHandler.inject(getMinecraft().getConnection());
 		profilerHelper = InterceptingProfiler.inject(getMinecraft());
 		// Hook into

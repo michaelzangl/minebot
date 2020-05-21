@@ -280,27 +280,20 @@ public class WorldData {
 
 
 	public BlockBounds getFacingBounds(BlockPos pos) {
-		BlockBounds bounds = getBlockBounds(pos);
+		BlockBounds bounds = getRaytraceBounds(pos);
 		return bounds.clampY(0, 1);
 	}
 
-	public BlockBounds getBlockBounds(BlockPos pos) {
-		return getBlockBounds(pos.getX(), pos.getY(), pos.getZ());
+	public BlockBounds getRaytraceBounds(BlockPos pos) {
+		return BlockBoundsCache.RAYTRACE.get(pos.getX(), pos.getY(), pos.getZ(), this);
 	}
 
-	public BlockBounds getBlockBounds(int x, int y, int z) {
-		BlockBounds res = BlockBounds.forBlockWithMeta(getBlockStateId(x, y,
-				z));
-		if (res == BlockBounds.UNKNOWN_BLOCK) {
-			// TODO: Replace this.
-			ClientWorld world = getBackingWorld();
-			BlockPos pos = new BlockPos(x, y, z);
-			BlockState state = world.getBlockState(pos);
-			VoxelShape bounds = state.getShape(world, pos);
+	public BlockBounds getCollisionBounds(BlockPos pos) {
+		return getCollisionBounds(pos.getX(), pos.getY(), pos.getZ());
+	}
 
-			return new BlockBounds(bounds);
-		}
-		return res;
+	public BlockBounds getCollisionBounds(int x, int y, int z) {
+		return BlockBoundsCache.COLLISION.get(x, y, z, this);
 	}
 
 	/**
