@@ -33,7 +33,7 @@ public class ColorNameBuilder extends ParameterBuilder {
 		@Override
 		public boolean couldEvaluateAgainst(String string) {
 			for (DyeColor v : DyeColor.values()) {
-				if (v.getName().equalsIgnoreCase(string)) {
+				if (v.name().equalsIgnoreCase(string)) {
 					return true;
 				}
 			}
@@ -44,8 +44,8 @@ public class ColorNameBuilder extends ParameterBuilder {
 		public void getTabCompleteOptions(String currentStart,
 				Collection<String> addTo) {
 			for (final DyeColor color : DyeColor.values()) {
-				if (color.getName().toLowerCase().startsWith(currentStart.toLowerCase())) {
-					addTo.add(color.getName());
+				if (color.name().toLowerCase().startsWith(currentStart.toLowerCase())) {
+					addTo.add(color.name());
 				}
 			}
 		}
@@ -63,7 +63,7 @@ public class ColorNameBuilder extends ParameterBuilder {
 	@Override
 	public Object getParameter(AIHelper helper, String[] arguments) {
 		for (DyeColor v : DyeColor.values()) {
-			if (v.getName().equalsIgnoreCase(arguments[0])) {
+			if (v.name().equalsIgnoreCase(arguments[0])) {
 				return v;
 			}
 		}

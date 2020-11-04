@@ -4,7 +4,7 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.vector.Vector3d;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.Marker;
@@ -149,8 +149,8 @@ public class WorldWithDelta extends WorldData {
 	}
 
 	@Override
-	public Vec3d getExactPlayerPosition() {
-		return new Vec3d(playerPosition.getX() + .5, playerPosition.getY(),
+	public Vector3d getExactPlayerPosition() {
+		return new Vector3d(playerPosition.getX() + .5, playerPosition.getY(),
 				playerPosition.getZ() + .5);
 	}
 

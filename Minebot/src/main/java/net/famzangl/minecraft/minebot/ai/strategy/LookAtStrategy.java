@@ -1,7 +1,7 @@
 package net.famzangl.minecraft.minebot.ai.strategy;
 
 import net.famzangl.minecraft.minebot.ai.AIHelper;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.vector.Vector3d;
 
 /**
  * Look at the given position.
@@ -10,9 +10,9 @@ import net.minecraft.util.math.Vec3d;
  */
 public class LookAtStrategy extends AIStrategy{
 
-	private Vec3d lookAt;
+	private Vector3d lookAt;
 
-	public LookAtStrategy(Vec3d lookAt) {
+	public LookAtStrategy(Vector3d lookAt) {
 		this.lookAt = lookAt;
 	}
 

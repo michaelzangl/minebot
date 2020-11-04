@@ -6,6 +6,7 @@ import net.famzangl.minecraft.minebot.ai.command.IAIControllable;
 import net.famzangl.minecraft.minebot.ai.command.StackBuilder;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.ChatScreen;
+//import net.minecraft.client.gui.screen.ChatScreen;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -113,6 +114,7 @@ public final class RunFileStrategy extends AIStrategy {
 		} else if (activeStrategy != null) {
 			final TickResult result = activeStrategy.gameTick(helper);
 			if (result == TickResult.NO_MORE_WORK) {
+				System.out.println("NO MORE WORK");
 				activeStrategy.setActive(false, helper);
 				activeStrategy = null;
 				return TickResult.TICK_AGAIN;
@@ -202,9 +204,11 @@ public final class RunFileStrategy extends AIStrategy {
 
 	public static void runCommand(AIHelper helper, String command) {
 		if (helper.getMinecraft().ingameGUI.getChatGUI() != null) {
-			final ChatScreen chat = new ChatScreen("");
-			chat.init(helper.getMinecraft(), 100, 100);
-			chat.sendMessage(command);
+			final ChatScreen chat = new ChatScreen(command);
+			chat.func_231158_b_(helper.getMinecraft(), 100, 100);
+			//init
+			chat.func_231161_c_(command);
+			//sendMessage
 		}
 	}
 

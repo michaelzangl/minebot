@@ -16,14 +16,15 @@
  *******************************************************************************/
 package net.famzangl.minecraft.minebot.build.commands;
 
+import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import net.famzangl.minecraft.minebot.ai.AIHelper;
-import net.famzangl.minecraft.minebot.ai.command.AICommand;
-import net.famzangl.minecraft.minebot.ai.command.AICommandInvocation;
-import net.famzangl.minecraft.minebot.ai.command.AICommandParameter;
-import net.famzangl.minecraft.minebot.ai.command.ParameterType;
+import net.famzangl.minecraft.minebot.ai.command.*;
+import net.famzangl.minecraft.minebot.ai.commands.Commands;
 import net.famzangl.minecraft.minebot.ai.strategy.AIStrategy;
 import net.famzangl.minecraft.minebot.ai.strategy.RunOnceStrategy;
+import net.minecraft.client.Minecraft;
 import net.minecraft.util.math.BlockPos;
+
 
 @AICommand(helpText = "Set bounding position manually.", name = "minebuild")
 public class CommandSetPos {
@@ -51,7 +52,20 @@ public class CommandSetPos {
 			@AICommandParameter(type = ParameterType.POSITION, description = "The position", optional = true) BlockPos pos) {
 		return setPos(pos, false);
 	}
-
+	public static void registerp1(LiteralArgumentBuilder<IAIControllable> dispatcher) {
+		dispatcher.then(
+				Commands.literal("pos1").executes(context -> context.getSource().requestUseStrategy(new SetPositionStrategy(
+						new BlockPos(Minecraft.getInstance().player.getPosX(), Minecraft.getInstance().player.getPosY(),Minecraft.getInstance().player.getPosZ()),
+						false))
+				));
+	}
+	public static void registerp2(LiteralArgumentBuilder<IAIControllable> dispatcher) {
+		dispatcher.then(
+				Commands.literal("pos2").executes(context -> context.getSource().requestUseStrategy(new SetPositionStrategy(
+						new BlockPos(Minecraft.getInstance().player.getPosX(), Minecraft.getInstance().player.getPosY(),Minecraft.getInstance().player.getPosZ()),
+						true))
+				));
+	}
 	@AICommandInvocation()
 	public static AIStrategy run2(
 			AIHelper helper,

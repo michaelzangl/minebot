@@ -16,12 +16,10 @@
  *******************************************************************************/
 package net.famzangl.minecraft.minebot.stats;
 
-import net.famzangl.minecraft.minebot.stats.BlockBreakStats.BlockBreakStatsChangeListener;
-
 import javax.swing.*;
 import java.awt.*;
 
-public class StatsTable extends JPanel implements BlockBreakStatsChangeListener {
+public class StatsTable extends JPanel implements BlockBreakStats.BlockBreakStatsChangeListener {
 	private final JLabel all = new JLabel("");
 	private final JLabel perHour = new JLabel("");
 	private final JLabel perMinute = new JLabel("");

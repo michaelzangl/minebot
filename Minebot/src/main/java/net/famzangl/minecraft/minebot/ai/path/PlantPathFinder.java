@@ -45,7 +45,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraftforge.common.IPlantable;
 
 public class PlantPathFinder extends MovePathFinder {
@@ -149,7 +149,7 @@ public class PlantPathFinder extends MovePathFinder {
 
 	private static class UseHoeTask extends UseItemOnBlockAtTask implements CanWorkWhileApproaching {
 
-		private Vec3d facingPosition;
+		private Vector3d facingPosition;
 
 		public UseHoeTask(BlockPos farmlandPos) {
 			super(new ClassItemFilter(HoeItem.class), farmlandPos);

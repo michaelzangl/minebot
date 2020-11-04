@@ -47,7 +47,7 @@ public class AIChatController {
 
 	private static void addToChat(String string) {
 		Minecraft.getInstance().player
-				.sendMessage(new StringTextComponent(string));
+				.sendMessage(new StringTextComponent(string), Minecraft.getInstance().player.getUniqueID());
 	}
 
 	public static <T> void addToChatPaged(String title, int page, List<T> data,

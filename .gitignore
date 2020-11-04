@@ -24,6 +24,7 @@ Minebot/options.txt
 Minebot/saves
 Minebot/screenshots
 Minecraft/
-
+Minebot/run
+Minebot/gradle
 !gradle-wrapper.jar
 

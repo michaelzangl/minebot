@@ -97,6 +97,7 @@ public class StrategyStack {
 	private void setCurrentStrategy(AIHelper helper, AIStrategy s) {
 		if (currentStrategy != null) {
 			currentStrategy.setActive(false, helper);
+			paused = false;
 		}
 		currentStrategy = s;
 		if (currentStrategy != null) {

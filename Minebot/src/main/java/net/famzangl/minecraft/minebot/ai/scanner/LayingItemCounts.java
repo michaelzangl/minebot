@@ -41,10 +41,11 @@ public class LayingItemCounts implements ChunkCubeProvider<BlockCubeCounter> {
 				continue;
 			}
 			if (filter.matches(item)) {
-				BlockPos pos = i.getPosition();
-				counter.increment(pos.getX(), pos.getY(), pos.getZ(), 1);
-				if (pos.getY() > 0) {
-					counter.increment(pos.getX(), pos.getY() - 1, pos.getZ(), 1);
+				//BlockPos pos = i.getPositionVec();
+				//counter.increment(pos.getX(), pos.getY(), pos.getZ(), 1);
+				counter.increment((int) i.getPosX(), (int) i.getPosY(), (int) i.getPosZ(), 1);
+				if (i.getPosY() > 0) {
+					counter.increment((int) i.getPosX(), (int) i.getPosY() - 1, (int) i.getPosZ(), 1);
 				}
 			}
 		}

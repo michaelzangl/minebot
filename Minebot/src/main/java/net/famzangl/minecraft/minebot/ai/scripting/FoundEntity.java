@@ -54,7 +54,7 @@ public class FoundEntity extends EntityPos {
 	}
 
 	public String getColor() {
-		return color == null ? null : color.getName();
+		return color == null ? null : color.name();
 	}
 	
 	public String getName() {

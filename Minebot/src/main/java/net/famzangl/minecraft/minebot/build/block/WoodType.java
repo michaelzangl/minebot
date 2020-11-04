@@ -20,10 +20,12 @@ import net.famzangl.minecraft.minebot.ai.path.world.BlockSet;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
-import net.minecraft.block.LogBlock;
+//import net.minecraft.block.LogBlock;
 import net.minecraft.util.Direction;
 
 import java.util.stream.Stream;
+
+import static net.minecraft.state.properties.BlockStateProperties.AXIS;
 
 /**
  * A type of wood used in the game.
@@ -55,7 +57,13 @@ public enum WoodType {
 		}
 
 		public static LogDirection forData(BlockState block) {
-			Direction.Axis axis = block.get(LogBlock.AXIS);
+			Direction.Axis axis = null;
+			if (block.getBlock().equals(Blocks.OAK_LOG) || block.getBlock().equals(Blocks.ACACIA_LOG) ||
+					block.getBlock().equals(Blocks.BIRCH_LOG) || block.getBlock().equals(Blocks.SPRUCE_LOG) ||
+					block.getBlock().equals(Blocks.JUNGLE_LOG) || block.getBlock().equals(Blocks.DARK_OAK_LOG)) {
+				axis = block.get(AXIS);
+			}
+			//Direction.Axis axis = block.get(LogBlock.AXIS);
 			if (axis == null) {
 				throw new IllegalArgumentException("Not a log: " + block);
 			}
@@ -118,7 +126,8 @@ public enum WoodType {
 	}
 
 	public BlockState getBlockState(LogDirection newDir) {
-		return block.getDefaultState().with(LogBlock.AXIS, newDir.axis);
+		//return block.getDefaultState().with(LogBlock.AXIS, newDir.axis);
+		return block.getDefaultState();
 	}
 
 	public Block getSapling() {

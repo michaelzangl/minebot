@@ -4,7 +4,7 @@ import net.famzangl.minecraft.minebot.ai.utils.RandUtils;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.util.math.shapes.VoxelShape;
 
 public class BlockBounds {
@@ -57,8 +57,8 @@ public class BlockBounds {
 				side == Direction.NORTH ? minZ : maxZ);
 	}
 
-	public Vec3d random(BlockPos pos, double centered) {
-		return new Vec3d(
+	public Vector3d random(BlockPos pos, double centered) {
+		return new Vector3d(
 				pos.getX() + RandUtils.getBetweenCentered(minX, maxX, centered),
 				pos.getY() + RandUtils.getBetweenCentered(minY, maxY, centered),
 				pos.getZ() + RandUtils.getBetweenCentered(minZ, maxZ, centered));

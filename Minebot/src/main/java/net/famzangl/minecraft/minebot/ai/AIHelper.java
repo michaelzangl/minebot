@@ -28,10 +28,8 @@ import net.famzangl.minecraft.minebot.ai.task.BlockHalf;
 import net.famzangl.minecraft.minebot.ai.tools.ToolRater;
 import net.famzangl.minecraft.minebot.ai.utils.RandUtils;
 import net.famzangl.minecraft.minebot.build.BuildManager;
-import net.famzangl.minecraft.minebot.map.MapReader;
 import net.famzangl.minecraft.minebot.settings.MinebotSettings;
 import net.famzangl.minecraft.minebot.settings.SaferuleSettings;
-import net.famzangl.minecraft.minebot.stats.StatsManager;
 import net.minecraft.block.*;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
@@ -39,6 +37,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.Direction;
 import net.minecraft.util.MovementInput;
 import net.minecraft.util.math.*;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.LightType;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -53,12 +52,12 @@ import java.util.function.Predicate;
 /**
  * Lots and lots of helpful methods to control the current player. This contains
  * the current marked positions ({@link #pos1}, {@link #pos2}), fast methods to
- * access/check minecraft blocks ({@link #getBlockId(BlockPos)}), many lists of
+ * access/check minecraft blocks (, many lists of
  * different block types/presets useful for filtering, methods to control the
  * player ({@link #face(double, double, double)}, {@link #overrideUseItem()}),
  * some methods to get the player state ({@link #isAlive()},
  * {@link #getPlayerPosition()}) and some to simplify block handling (
- * {@link #getSignDirection(BlockState)})
+ * {@link #(BlockState)})
  * 
  * @author michael
  * 
@@ -67,7 +66,7 @@ public abstract class AIHelper {
 	private static final Marker MARKER_FACING = MarkerManager
 			.getMarker("facing");
 	private static final Logger LOGGER = LogManager.getLogger(AIHelper.class);
-	private static final double SNEAK_OFFSET = .2;
+	private static final double SNEAK_OFFSET = .4;
 	private static final double WALK_PER_STEP = 4.3 / 20;
 	private static final double MIN_DISTANCE_ERROR = 0.05;
 
@@ -88,11 +87,7 @@ public abstract class AIHelper {
 	private HashMap<KeyType, KeyboardInputController> keys = new HashMap<KeyType, KeyboardInputController>();
 	
 	protected boolean doUngrab;
-
-	protected MapReader activeMapReader;
 	
-	private final StatsManager stats = new StatsManager();
-
 	public AIHelper() {
 		for (KeyType key : KeyType.values()) {
 			keys.put(key, new KeyboardInputController(mc, key));
@@ -265,11 +260,11 @@ public abstract class AIHelper {
 			return 0;
 		}
 		
-		Vec3d playerLook = getMinecraft().player.getLookVec().normalize();
-		return Math.acos(playerLook.dotProduct(new Vec3d(d0, d1, d2).normalize()));
+		Vector3d playerLook = getMinecraft().player.getLookVec().normalize();
+		return Math.acos(playerLook.dotProduct(new Vector3d(d0, d1, d2).normalize()));
 	}
 	
-	public boolean isFacing(Vec3d vec) {
+	public boolean isFacing(Vector3d vec) {
 		return isFacing(vec.x, vec.y, vec.z);
 	}
 
@@ -277,7 +272,7 @@ public abstract class AIHelper {
 		return face(x, y, z, 0, 0);
 	}
 
-	public boolean face(Vec3d vec) {
+	public boolean face(Vector3d vec) {
 		return face(vec.x, vec.y, vec.z);
 	}
 
@@ -648,7 +643,6 @@ public abstract class AIHelper {
 			LOGGER.debug("Facing block at {} and destroying it", pos);
 			selectToolFor(pos);
 			overrideAttack();
-			stats.markIntentionalBlockBreak(pos);
 		}
 	}
 
@@ -832,7 +826,7 @@ public abstract class AIHelper {
 						.grow(1), selector);
 
 		LOGGER.debug("Searching for entities around {} using distance {} and selector {} resulted in {} entities",
-				getMinecraft().getRenderViewEntity().getPosition(), dist, selector, entities.size());
+				getMinecraft().getRenderViewEntity().getPosY(), dist, selector, entities.size());
 		return entities;
 	}
 
@@ -967,7 +961,7 @@ public abstract class AIHelper {
 	}
 
 	public boolean isJumping() {
-		return !getMinecraft().player.onGround;
+		return getMinecraft().player.isAirBorne;
 	}
 
 	/**
@@ -1040,23 +1034,9 @@ public abstract class AIHelper {
 		return getMinecraft().world.getLightFor(LightType.BLOCK, pos);
 	}
 
-	public void setActiveMapReader(MapReader activeMapReader) {
-		if (this.activeMapReader != null) {
-			this.activeMapReader.onStop();
-		}
-		this.activeMapReader = activeMapReader;
-	}
 
 	public abstract AIStrategy getResumeStrategy();
 
 	public abstract NetworkHelper getNetworkHelper();
-
-	public MapReader getActiveMapReader() {
-		return activeMapReader;
-	}
-	
-	public StatsManager getStats() {
-		return stats;
-	}
 
 }

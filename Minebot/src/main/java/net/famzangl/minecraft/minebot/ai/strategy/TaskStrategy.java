@@ -196,7 +196,7 @@ public abstract class TaskStrategy extends AIStrategy implements
 
 	/**
 	 * Searches for tasks to do. Always called in a game tick. The tasks should
-	 * be added with {@link AIHelper#addTask(AITask)}.
+	 * be added with {@link AIHelper#(AITask)}.
 	 * <p>
 	 * You cannot make any assumptions on the state of the world. Tasks may even
 	 * have been interrupted in between. You can be sure that there are no tasks

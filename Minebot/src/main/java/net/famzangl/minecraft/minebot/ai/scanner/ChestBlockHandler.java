@@ -193,8 +193,11 @@ public class ChestBlockHandler extends RangeBlockHandler<ChestData> {
 			if (!(tileEntity instanceof SignTileEntity)) {
 				throw new IllegalArgumentException("Expected a sign tile entity to be passed for chest at " + pos + " but got " + tileEntity);
 			}
-
-			Set<String> lines = Stream.of(((SignTileEntity) tileEntity).signText)
+			ITextComponent l1 = ((SignTileEntity) tileEntity).getText(1);
+			ITextComponent l2 = ((SignTileEntity) tileEntity).getText(2);
+			ITextComponent l3 = ((SignTileEntity) tileEntity).getText(3);
+			ITextComponent[] texts = {l1,l2,l3};
+			Set<String> lines = Stream.of(texts)
 					.map(ITextComponent::getString)
 					.map(str -> str.trim().toLowerCase(Locale.US))
 					.collect(Collectors.toSet());

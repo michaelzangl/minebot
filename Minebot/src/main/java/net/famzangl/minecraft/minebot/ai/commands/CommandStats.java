@@ -5,24 +5,22 @@ import net.famzangl.minecraft.minebot.ai.command.AICommand;
 import net.famzangl.minecraft.minebot.ai.command.AICommandInvocation;
 import net.famzangl.minecraft.minebot.ai.command.AICommandParameter;
 import net.famzangl.minecraft.minebot.ai.command.ParameterType;
-import net.famzangl.minecraft.minebot.ai.path.world.BlockSet;
 import net.famzangl.minecraft.minebot.ai.strategy.AIStrategy;
 import net.famzangl.minecraft.minebot.ai.strategy.RunOnceStrategy;
-import net.famzangl.minecraft.minebot.stats.StatsWindow;
-import net.minecraft.block.Blocks;
-
-@AICommand(helpText = "Dump all signs to a text file.", name = "minebot")
-public class CommandStats {
-	@AICommandInvocation()
-	public static AIStrategy run(
-			AIHelper helper,
-			@AICommandParameter(type = ParameterType.FIXED, fixedName = "stats", description = "") String nameArg) {
-		return new RunOnceStrategy() {
-			@Override
-			protected void singleRun(AIHelper helper) {
-				new StatsWindow(helper.getStats()).setVisible(true);
-			}
-		};
-	}
-
-}
+//import net.famzangl.minecraft.minebot.stats.StatsWindow;
+//
+//@AICommand(helpText = "Dump all signs to a text file.", name = "minebot")
+//public class CommandStats {
+//	@AICommandInvocation()
+//	public static AIStrategy run(
+//			AIHelper helper,
+//			@AICommandParameter(type = ParameterType.FIXED, fixedName = "stats", description = "") String nameArg) {
+//		return new RunOnceStrategy() {
+//			@Override
+//			protected void singleRun(AIHelper helper) {
+//				new StatsWindow(helper.getStats()).setVisible(true);
+//			}
+//		};
+//	}
+//
+//}

@@ -64,9 +64,12 @@ public final class PrivateFieldUtils {
 		for (Field f : baseClass.getDeclaredFields()) {
 			if (typeEquals(f.getType(), fieldType)
 					&& !Modifier.isStatic(f.getModifiers())) {
+			//try {
 				f.setAccessible(true);
 				return f;
-			}
+			}// catch(Exception e) {
+			//	continue;
+			//}
 		}
 
 		throw new IllegalArgumentException("No field of type " + fieldType

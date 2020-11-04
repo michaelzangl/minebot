@@ -1,7 +1,8 @@
 # The name of the mod loader type to load - for regular FML @Mod mods it should be javafml
 modLoader="javafml" #mandatory
+license="The GNU License (GNU)"
 # A version range to match for said mod loader - for regular FML @Mod it will be the forge version
-loaderVersion="[31,)" #mandatory This is typically bumped every Minecraft version by Forge. See our download page for lists of versions.
+loaderVersion="[34,)" #mandatory This is typically bumped every Minecraft version by Forge. See our download page for lists of versions.
 # A URL to refer people to when problems occur with this mod
 issueTrackerURL="https://github.com/michaelzangl/minebot/issues" #optional
 # A list of mods - how many allowed here is determined by the individual mod loader
@@ -19,6 +20,8 @@ displayURL="https://github.com/michaelzangl/minebot/" #optional
 # A file name (in the root of the mod JAR) containing a logo for display
 #logoFile="examplemod.png" #optional
 # A text field displayed in the mod UI
+license="The GNU License (GNU)"
+#I repeated the license twice but it works (:
 #credits="Thanks for this example mod goes to Java" #optional
 # A text field displayed in the mod UI
 # authors="See github log" #optional

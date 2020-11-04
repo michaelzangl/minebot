@@ -26,13 +26,13 @@ import net.famzangl.minecraft.minebot.ai.task.TaskOperations;
 import net.famzangl.minecraft.minebot.ai.task.error.SelectTaskError;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.vector.Vector3d;
 
 public class PlaceBlockAtFloorTask extends AITask {
 	private final ItemFilter filter;
 	private int faceTimer;
 	protected final BlockPos pos;
-	private Vec3d positionToFace;
+	private Vector3d positionToFace;
 	protected boolean hasPlacedBlock;
 
 	/**
@@ -107,7 +107,7 @@ public class PlaceBlockAtFloorTask extends AITask {
 		reFace(aiHelper);
 	}
 
-	private Vec3d getPositionToFace(AIHelper aiHelper) {
+	private Vector3d getPositionToFace(AIHelper aiHelper) {
 		BlockBounds bounds = aiHelper.getWorld().getRaytraceBounds(pos.add(0, -1, 0));
 		return bounds.onlySide(Direction.UP).random(pos.add(0, -1, 0), 0.8);
 	}

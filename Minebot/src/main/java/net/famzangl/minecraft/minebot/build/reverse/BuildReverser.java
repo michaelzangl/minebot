@@ -141,7 +141,7 @@ public class BuildReverser {
 			} catch (final UnsupportedBlockException e) {
 				out.println("# Missing: ~" + localPos.getX() + " ~"
 						+ localPos.getY() + " ~" + localPos.getZ() + " "
-						+ block.getNameTextComponent().getString());
+						+ block.getClass());
 				LOGGER.warn(MARKER_RECONSTRUCT, "Error: " + e.getMessage());
 				missingBlocks++;
 			}

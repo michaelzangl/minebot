@@ -135,18 +135,16 @@ final public class CommandHelp {
 
 		final StringTextComponent headline = new StringTextComponent(
 				conv.apply(command));
-		headline.getStyle().setBold(true);
-		player.sendMessage(headline);
+		player.sendMessage(headline, player.getUniqueID());
 		for (final String line : command.getHelpText().split("\n")) {
 			final StringTextComponent text = new StringTextComponent(line);
-			text.getStyle().setItalic(true);
-			player.sendMessage(text);
+			player.sendMessage(text, player.getUniqueID());
 		}
 
 		for (final ArgumentDefinition arg : command.getArguments()) {
 			final String[] help = arg.getDescriptionString().split("\n");
 			for (final String text : help) {
-				player.sendMessage(new StringTextComponent("   " + text));
+				player.sendMessage(new StringTextComponent("   " + text), player.getUniqueID());
 			}
 		}
 	}

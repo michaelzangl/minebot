@@ -17,12 +17,14 @@
 package net.famzangl.minecraft.minebot.ai;
 
 
+
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.util.text.StringTextComponent;
 
 public class UngrabScreen extends Screen {
 	public UngrabScreen() {
 		super(new StringTextComponent(""));
-		this.passEvents = true;
+		//this.field_230711_n_ = true;
+		//Screen.getMineraft(), first person Renderer
 	}
 }

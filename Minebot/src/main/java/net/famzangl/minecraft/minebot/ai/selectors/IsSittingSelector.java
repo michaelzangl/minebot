@@ -31,6 +31,6 @@ public final class IsSittingSelector extends OwnTameableSelector {
 	@Override
 	public boolean test(Entity entity) {
 		return super.test(entity)
-				&& ((WolfEntity) entity).isSitting() == sitting;
+				&& ((WolfEntity) entity).isCrouching() == sitting;
 	}
 }

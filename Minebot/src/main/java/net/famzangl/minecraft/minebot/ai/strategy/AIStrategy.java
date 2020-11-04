@@ -62,9 +62,13 @@ public abstract class AIStrategy {
 	public final void setActive(boolean active, AIHelper helper) {
 		this.active = active;
 		if (active) {
+			//System.out.println("ACTIVATED" + helper.getResumeStrategy());
 			onActivate(helper);
+			System.out.println("ACTIVATED" + helper.getResumeStrategy());
 		} else {
+			System.out.println("DEACTIVATED" + helper.getResumeStrategy());
 			onDeactivate(helper);
+			//System.out.println("DEACTIVATED" + helper.getResumeStrategy());
 		}
 	}
 
