@@ -85,12 +85,12 @@ public class Commands {
         //CommandAirbridge.register(minebot); Not gonna lie not sure what's going on here with the sneak off block
         //Doesn't use axe or shovels.
         CommandBuildRail.register(minebot);
-        //CommandBuildWay.register(minebot); Not really sure what build road does
+        CommandBuildWay.register(minebot);// Not really sure what build road does
         CommandCraft.register(minebot); //Works
         CommandEat.register(minebot); //Works
         CommandFeed.register(minebot); //Works
         CommandFish.register(minebot); //Works
-        //CommandFillArea.register(minebot, minebuild); Confused with sneaking here
+        CommandFillArea.register(minebot, minebuild);
         CommandClearArea.register(minebot, minebuild); //Works
         CommandSetPos.registerp1(minebuild); //Redone, works
         CommandSetPos.registerp2(minebuild); //Redone, works

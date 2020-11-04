@@ -34,15 +34,20 @@ import net.minecraft.block.*;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.tileentity.SignTileEntity;
 import net.minecraft.util.Direction;
 import net.minecraft.util.MovementInput;
 import net.minecraft.util.math.*;
 import net.minecraft.util.math.vector.Vector3d;
+import net.minecraft.util.text.ITextComponent;
 import net.minecraft.world.LightType;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.MarkerManager;
+
+import net.famzangl.minecraft.minebot.map.MapReader;
+import net.famzangl.minecraft.minebot.stats.StatsManager;
 
 import java.io.File;
 import java.util.HashMap;
@@ -66,7 +71,7 @@ public abstract class AIHelper {
 	private static final Marker MARKER_FACING = MarkerManager
 			.getMarker("facing");
 	private static final Logger LOGGER = LogManager.getLogger(AIHelper.class);
-	private static final double SNEAK_OFFSET = .4;
+	private static final double SNEAK_OFFSET = .2;
 	private static final double WALK_PER_STEP = 4.3 / 20;
 	private static final double MIN_DISTANCE_ERROR = 0.05;
 
@@ -87,7 +92,10 @@ public abstract class AIHelper {
 	private HashMap<KeyType, KeyboardInputController> keys = new HashMap<KeyType, KeyboardInputController>();
 	
 	protected boolean doUngrab;
-	
+	protected MapReader activeMapReader;
+
+	private final StatsManager stats = new StatsManager();
+
 	public AIHelper() {
 		for (KeyType key : KeyType.values()) {
 			keys.put(key, new KeyboardInputController(mc, key));
@@ -168,6 +176,9 @@ public abstract class AIHelper {
 		if (isPos2) {
 			pos2 = pos;
 			posIndex = 2;
+
+
+
 		} else {
 			pos1 = pos;
 			posIndex = 1;
@@ -643,6 +654,7 @@ public abstract class AIHelper {
 			LOGGER.debug("Facing block at {} and destroying it", pos);
 			selectToolFor(pos);
 			overrideAttack();
+			stats.markIntentionalBlockBreak(pos);
 		}
 	}
 
@@ -1033,7 +1045,18 @@ public abstract class AIHelper {
 	public int getLightAt(BlockPos pos) {
 		return getMinecraft().world.getLightFor(LightType.BLOCK, pos);
 	}
-
+	public void setActiveMapReader(MapReader activeMapReader) {
+		if (this.activeMapReader != null) {
+			this.activeMapReader.onStop();
+		}
+		this.activeMapReader = activeMapReader;
+	}
+	public MapReader getActiveMapReader() {
+		return activeMapReader;
+	}
+	public StatsManager getStats() {
+		return stats;
+	}
 
 	public abstract AIStrategy getResumeStrategy();
 

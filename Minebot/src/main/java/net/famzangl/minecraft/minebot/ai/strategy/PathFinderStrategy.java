@@ -86,6 +86,8 @@ public class PathFinderStrategy extends TaskStrategy {
 		BlockPos under = new BlockPos(Minecraft.getInstance().player.getPosX(), Minecraft.getInstance().player.getPosY() - 0.55, Minecraft.getInstance().player.getPosZ());
 		return Minecraft.getInstance().world.isAirBlock(under);
 
+		//Maybe Minecraft.getInstance() should be helper.getMinecraft().player ?
+
 	}
 
 	private boolean searchTasksWithPathfinder(AIHelper helper) {

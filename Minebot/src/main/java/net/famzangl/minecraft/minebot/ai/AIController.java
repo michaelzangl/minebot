@@ -162,7 +162,7 @@ public class AIController extends AIHelper implements IAIControllable {
 			doUngrab = true;
 		}
 
-		//getStats().setGameTickTimer(getWorld());
+		getStats().setGameTickTimer(getWorld());
 		
 		AIStrategy newStrategy;
 		if (dead || /*stop.isPressed() ||*/ stop.isKeyDown()) {
@@ -210,7 +210,9 @@ public class AIController extends AIHelper implements IAIControllable {
 		
 		keyboardPostTick();
 		LOGGER.debug(MARKER_STRATEGY, "Strategy game tick done");
-
+		if (activeMapReader != null) {
+			activeMapReader.tick(this);
+		}
 
 	}
 
@@ -301,6 +303,7 @@ public class AIController extends AIHelper implements IAIControllable {
 		LOGGER.trace(MARKER_EVENT, "Unloading world.");
 		dead = true;
 		buildManager.reset();
+		setActiveMapReader(null);
 	}
 
 	public void resetOnGameEnd2(PlayerEvent.PlayerRespawnEvent unload) {

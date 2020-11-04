@@ -196,10 +196,11 @@ public class BlockSet implements Iterable<BlockState> {
 				states.forEach(state -> {
 					sb.append(block.getRegistryName().toString());
 					sb.append("@");
-					//state.get(FACING).forEach(prop -> {
+					//state.getProperties().forEach(prop -> {
 					//	sb.append(prop.getName());
 					//	sb.append(state.get(prop).toString());
 					//});
+					//Needs Fixing I think?
 				});
 			}
 			sb.append(")");

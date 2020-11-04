@@ -5,6 +5,7 @@ import net.famzangl.minecraft.minebot.ai.path.world.BlockSets;
 import net.famzangl.minecraft.minebot.ai.path.world.WorldData;
 import net.famzangl.minecraft.minebot.ai.utils.BlockCounter;
 import net.famzangl.minecraft.minebot.ai.utils.BlockCuboid;
+import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.material.MaterialColor;
 import net.minecraft.util.math.BlockPos;
@@ -96,22 +97,21 @@ public enum RenderMode {
 	private static class MapRenderer implements RenderMode.IRenderer {
 		@Override
 		public int getColor(WorldData world, Chunk chunk, int dx, int dz) {
-			/*int height = chunk.getTopBlockY(Heightmap.Type.WORLD_SURFACE, dx & 0xf, dz & 0xf) + 1;
+			int height = chunk.getTopBlockY(Heightmap.Type.WORLD_SURFACE, dx & 0xf, dz & 0xf) + 1;
 			BlockState state;
 			do {
 				--height;
 				state = chunk.getBlockState(new BlockPos(dx, height, dz));
 			} while ((GLOBAL_COVER_BLACKLIST.contains(state) || state
-					.getBlock().getMaterialColor(state, world.getBackingWorld(), new BlockPos(dx, height, dz)) == MaterialColor.AIR)
+					.getMaterialColor(world.getBackingWorld(), new BlockPos(dx, height, dz)) == MaterialColor.AIR)
 					&& height > 0);
 
 			if (state.getBlock() == Blocks.SANDSTONE || state.getBlock() == Blocks.SANDSTONE_STAIRS) {
 				return 0xffb4ad8a;
-			}*/
+			}
 
-			//MaterialColor color = (state.getBlock().getMaterialColor(state, world.getBackingWorld(), new BlockPos(dx, height, dz)));
-			//return getColor(1,1,1);
-			return 0xffb4ad8a;
+			MaterialColor color = (state.getMaterialColor(world.getBackingWorld(), new BlockPos(dx, height, dz)));
+			return color.colorValue; //Not sure? return getColor(1,1,1);
 		}
 
 		private int getColor(MaterialColor color) {

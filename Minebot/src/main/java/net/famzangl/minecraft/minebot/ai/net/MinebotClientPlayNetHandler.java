@@ -13,7 +13,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 
 @ParametersAreNonnullByDefault
 public class MinebotClientPlayNetHandler implements IClientPlayNetHandler {
-    private ClientPlayNetHandler client;
+    //private ClientPlayNetHandler client;
     private IClientPlayNetHandler parentHandler;
     private Intercepts<IPacket<IClientPlayNetHandler>> handlers;
 

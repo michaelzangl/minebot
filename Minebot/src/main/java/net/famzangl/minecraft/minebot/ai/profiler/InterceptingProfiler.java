@@ -24,7 +24,7 @@ public class InterceptingProfiler extends Profiler implements IProfiler {
 	public InterceptingProfiler(LongSupplier tickCounter) {
 		super(tickCounter,null,true);
 	}
-
+	//Failed Mapping for the parameters, but otherwise not really sure what to use it for(?)
 	@Override
 	public void startSection(String name) {
 		Runnable runnable = runOnSection.get(name);
@@ -43,6 +43,7 @@ public class InterceptingProfiler extends Profiler implements IProfiler {
 		IProfiler old = minecraft.getProfiler();
 		IntSupplier ticks = PrivateFieldUtils.getFieldValue(old, Profiler.class, IntSupplier.class); // < the field is in the parent class
 		InterceptingProfiler profiler = new InterceptingProfiler((LongSupplier) ticks);
+		//Not sure why?
 		// set minecraft.Profiler
 		PrivateFieldUtils.setFieldValue(minecraft, Minecraft.class, Profiler.class, profiler);
 		return profiler;

@@ -199,7 +199,7 @@ public class DestroyInRangeTask extends AITask implements CanPrefaceAndDestroy {
 				LOGGER.debug(MARKER_DESTROY_IN_RANGE, "Scheduled block is {}. Facing block at position {} and destrying it", destructPos, pos);
 				aiHelper.selectToolFor(pos);
 				aiHelper.overrideAttack();
-			//	aiHelper.getStats().markIntentionalBlockBreak(pos);
+				aiHelper.getStats().markIntentionalBlockBreak(pos);
 				facingAttempts = 0;
 			} else {
 				LOGGER.debug(MARKER_DESTROY_IN_RANGE, "Facing block to destroy at {}", facingPos);

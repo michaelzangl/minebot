@@ -70,6 +70,8 @@ Step 5: That should open a section with the gradle project, Minebot, and a littl
 Step 6: Expand Minebot, Tasks, fg_runs, genIntelliJRuns.
 Step 7: Double click, it will set your IntelliJ up to be ready to run Minecraft and import the project
 Step 8: Expand Minebot, Tasks, fg_runs, double click runClient
+Step 9: When in IntelliJ, Set up your SDK to use Java 1.8 (I believe it's the only one working with
+Minecraft at the given time)
 This will run the code and open a Minecraft launcher with this version of Minecraft on it.
 Happy development!
 
