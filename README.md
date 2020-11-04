@@ -47,6 +47,54 @@ But I will be accepting PRs to this repository.
 
 I use eclipse neon for development. You can simply import Minebot as existing project.
 
+================== Message from 1.16.3 Porter (Vaccinate) =============
+Some kind of law message saying I'm not responsible if you get banned for botting anywhere etc.
+Not accountable for anything that goes wrong here, it's your choice if you choose to use the code
+and all the consequences of doing so.
+I was mainly focused on Minebot and not AimBow.
+Another point: There are some slight mapping issues with functions, do take a look at documentation
+https://forge.yue.moe/javadoc/1.16.3/overview-summary.html
+https://gist.github.com/gigaherz/2dfa77c6efc7d1248ef88ec1920c0a93#file-1152to1161-xml
+Especially helpful for 1.16.3 development links.
+
+Using IntelliJ IDE & Gradle:
+Setting up:
+I have commented out the maps and the stats sections - I did delete instead of comment out some code
+(I know, my bad) but if you look through the first commit and ctrl-F for map and stats you should find
+most of the calls.
+Step 1: Clone the repo
+Step 2: Open the project with IntelliJ
+Step 3: Inside IntelliJ, Navigate to minebot/Minebot/src/build.gradle
+Step 4: Right click it and select "Import Gradle Project"
+Step 5: That should open a section with the gradle project, Minebot, and a little elephant to the left
+Step 6: Expand Minebot, Tasks, fg_runs, genIntelliJRuns.
+Step 7: Double click, it will set your IntelliJ up to be ready to run Minecraft and import the project
+Step 8: Expand Minebot, Tasks, fg_runs, double click runClient
+This will run the code and open a Minecraft launcher with this version of Minecraft on it.
+Happy development!
+
+If I'm gone when it comes to implementing 1.17.x or future versions, essentially:
+First you need to upgrade the build.gradle and the mods.toml. These can be found
+in Minebot/src/main/resources/META-INF. For 1.16.3 it was important that we
+updated the mods.toml to include a license="x" portion for mods to run.
+I assumed it was GNU based on Michael's comments. When you're here, increase
+loaderVersion="[xx,)" to the valid one for the version. If you're not sure, find some other
+mod's github and check what they're using for the version you're trying to port to.
+
+Then, you'll need to update the build.gradle - once again see what other modders use here, but
+look for mappings channel: 'snapshot', version: 'xxxx' for your version and then the 
+dependencies { minecraft '...' } needs your forge version in it.
+
+Now, you can "Reimport all gradle projects" in your IntelliJ Gradle window (Above the little elephant)
+
+If there are many errors, unlucky. Go through each one by one - if it's a fault import, look
+for the new mapping in the documentation for your version. See one of the links to know
+what I'm talking about. Then, one by one, replace all references to it.
+Good luck & Happy coding,
+- Vaccinate 04/11/2020
+===================== End Message from 1.16.3 Porter =========================
+
+
 The main classes of Minebot have some Javadoc in them. Most other classes are undocumented but should explain themselves.
 
 How to add a new command:
