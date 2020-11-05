@@ -795,6 +795,8 @@ public class BlockSets {
 			Blocks.POLISHED_DIORITE,
 			Blocks.POLISHED_GRANITE,
 			Blocks.HAY_BLOCK,
+
+			Blocks.NETHER_WART_BLOCK,
 			nameConvert("nether_gold_ore"),
 			nameConvert("basalt"),
 			nameConvert("polished_basalt"),
@@ -873,8 +875,8 @@ public class BlockSets {
             //Fix SHULKER_BOX !!!!! Deals Damage to walking Player but found no matching category.
             // Blocks.SHULKER_BOX,
             //Fix NETHER_WART_BLOCK !!!!! Deals Damage to walking Player but found no matching category.
-			//Do you mean Magma block?
-            Blocks.NETHER_WART_BLOCK,
+            //Blocks.NETHER_WART_BLOCK, these are safe decorative full blocks. Magma is the one we're looking for
+			Blocks.MAGMA_BLOCK,
 			Blocks.OBSIDIAN).build();
 
 	public static final BlockSet WATER = BlockSet.builder().add(Blocks.WATER).build();

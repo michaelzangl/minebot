@@ -94,7 +94,7 @@ public class Commands {
         CommandClearArea.register(minebot, minebuild); //Works
         CommandSetPos.registerp1(minebuild); //Redone, works
         CommandSetPos.registerp2(minebuild); //Redone, works
-        CommandLumberjack.register(minebot); //Works, doesn't use axe, known issue (will patch maybe)
+        CommandLumberjack.register(minebot); //Works,
         CommandMine.register(minebot);  //Works
         CommandPathfind.register(minebot); //Probably works
         CommandRespawn.register(minebot);
@@ -102,5 +102,6 @@ public class Commands {
         CommandStack.register(minebot);
         CommandStore.register(minebot); //Works
         CommandTunnel.register(minebot); //Works
+        CommandPlant.register(minebot);
     }
 }

@@ -620,27 +620,57 @@ public abstract class AIHelper {
 		getMinecraft().player.inventory.currentItem = res.getBestSlot();
 		return res;
 	}
-	/* OLD VERSION
-		public ToolRaterResult searchToolFor(final BlockPos pos, ToolRater rater) {
-		int bestRatingSlot = getMinecraft().player.inventory.currentItem;
-		if (bestRatingSlot < 0 || bestRatingSlot >= 9) {
-			bestRatingSlot = 0;
-		}
-		int block = pos == null ? -1 : getWorld().getBlockStateId(pos);
-		float bestRating = rater.rateTool(
-				getMinecraft().player.inventory.getStackInSlot(bestRatingSlot), block);
-		for (int i = 0; i < 9; ++i) {
-			float rating = rater.rateTool(
-					getMinecraft().player.inventory.getStackInSlot(i), block);
-			if (rating > bestRating) {
-				bestRating = rating;
-				bestRatingSlot = i;
-			}
-		}
+//	// OLD VERSION
+//		public ToolRaterResult searchToolFor(final BlockPos pos, ToolRater rater) {
+//		int bestRatingSlot = getMinecraft().player.inventory.currentItem;
+//		if (bestRatingSlot < 0 || bestRatingSlot >= 9) {
+//			bestRatingSlot = 0;
+//		}
+//		int block = pos == null ? -1 : getWorld().getBlockStateId(pos);
+//		float bestRating = rater.rateTool(
+//				getMinecraft().player.inventory.getStackInSlot(bestRatingSlot), block);
+//		for (int i = 0; i < 9; ++i) {
+//			float rating = rater.rateTool(
+//					getMinecraft().player.inventory.getStackInSlot(i), block);
+//			if (rating > bestRating) {
+//				bestRating = rating;
+//				bestRatingSlot = i;
+//			}
+//		}
+//
+//		return new ToolRaterResult(bestRatingSlot, bestRating);
+//	}
 
-		return new ToolRaterResult(bestRatingSlot, bestRating);
-	}
-	 */
+//	public ToolRaterResult searchToolFor(final BlockPos pos, ToolRater rater) {
+//		int bestRatingSlot = getMinecraft().player.inventory.currentItem;
+//		if (bestRatingSlot < 0 || bestRatingSlot >= 9) {
+//			bestRatingSlot = 0;
+//		}
+//		int block = pos == null ? -1 : getWorld().getBlockStateId(pos);
+//		float bestRating = rater.rateTool(
+//			getMinecraft().player.inventory.getStackInSlot(bestRatingSlot), block);
+//		for (int i = 0; i < 9; ++i) {
+//			float rating = rater.rateTool(
+//				getMinecraft().player.inventory.getStackInSlot(i), block);
+//
+//			BlockState b = getWorld().getBlockState(pos);
+//			int currSlotDurability = getMinecraft().player.inventory.getStackInSlot(i).getMaxDamage() -
+//				getMinecraft().player.inventory.getStackInSlot(i).getDamage();
+//			if (getMinecraft().player.inventory.getStackInSlot(i).canHarvestBlock(b) &&
+//					currSlotDurability > 5) {
+//				rating += 10 * (getMinecraft().player.inventory.getStackInSlot(i).getDestroySpeed(b));
+//			} //The path finder gets scared of farmland ):
+//			//Shears can I don't think hoes can, will test.
+//
+//
+//			if (rating > bestRating) {
+//				bestRating = rating;
+//				bestRatingSlot = i;
+//		}
+//	}
+//
+//	return new ToolRaterResult(bestRatingSlot, bestRating);
+//}
 	public ToolRaterResult searchToolFor(final BlockPos pos, ToolRater rater) {
 		int bestRatingSlot = getMinecraft().player.inventory.currentItem;
 		if (bestRatingSlot < 0 || bestRatingSlot >= 9) {
@@ -1027,7 +1057,7 @@ public abstract class AIHelper {
 	}
 
 	public boolean isJumping() {
-		return getMinecraft().player.isAirBorne;
+		return getMinecraft().player.isAirBorne; //Not sure if this works reliably
 	}
 
 	/**

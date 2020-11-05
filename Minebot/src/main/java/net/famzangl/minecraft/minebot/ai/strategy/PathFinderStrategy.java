@@ -83,8 +83,8 @@ public class PathFinderStrategy extends TaskStrategy {
 	private boolean isInAir(AIHelper helper) {
 		//return Minecraft.getInstance().player.isAirBorne; //Change to get block beneath and if not air.
 		//55 for half-slabs
-		BlockPos under = new BlockPos(Minecraft.getInstance().player.getPosX(), Minecraft.getInstance().player.getPosY() - 0.55, Minecraft.getInstance().player.getPosZ());
-		return Minecraft.getInstance().world.isAirBlock(under);
+		BlockPos under = new BlockPos(helper.getMinecraft().player.getPosX(), helper.getMinecraft().player.getPosY() - 0.55, helper.getMinecraft().player.getPosZ());
+		return helper.getMinecraft().world.isAirBlock(under);
 
 		//Maybe Minecraft.getInstance() should be helper.getMinecraft().player ?
 
