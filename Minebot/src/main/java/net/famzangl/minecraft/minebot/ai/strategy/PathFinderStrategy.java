@@ -68,8 +68,8 @@ public class PathFinderStrategy extends TaskStrategy {
 			// Path finding needs more time
 			System.out.println("Path finder needs time");
 			if (!(noPathFound && inShouldTakeOver)) {
-				System.out.println("Not no parth found and not in should take over");
-				addTask(new WaitTask(1));
+				System.out.println("Not no path found and not in should take over");
+				addTask(new WaitTask(10));
 			}
 		} else {
 			if (!hasMoreTasks()) {

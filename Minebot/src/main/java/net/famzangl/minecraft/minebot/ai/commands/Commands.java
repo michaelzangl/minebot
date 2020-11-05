@@ -82,7 +82,7 @@ public class Commands {
 
     public static void register(LiteralArgumentBuilder<IAIControllable> minebot,
                                 LiteralArgumentBuilder<IAIControllable> minebuild) {
-        //CommandAirbridge.register(minebot); Not gonna lie not sure what's going on here with the sneak off block
+        CommandAirbridge.register(minebot); //Not gonna lie not sure what's going on here with the sneak off block
         //Doesn't use axe or shovels.
         CommandBuildRail.register(minebot);
         CommandBuildWay.register(minebot);// Not really sure what build road does

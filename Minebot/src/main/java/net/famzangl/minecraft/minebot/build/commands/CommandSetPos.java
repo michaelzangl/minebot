@@ -28,7 +28,6 @@ import net.minecraft.util.math.BlockPos;
 
 @AICommand(helpText = "Set bounding position manually.", name = "minebuild")
 public class CommandSetPos {
-
 	private static final class SetPositionStrategy extends RunOnceStrategy {
 		private final BlockPos pos;
 		private final boolean pos2;

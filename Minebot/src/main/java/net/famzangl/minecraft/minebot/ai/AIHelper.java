@@ -33,7 +33,9 @@ import net.famzangl.minecraft.minebot.settings.SaferuleSettings;
 import net.minecraft.block.*;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.ToolItem;
 import net.minecraft.tileentity.SignTileEntity;
 import net.minecraft.util.Direction;
 import net.minecraft.util.MovementInput;
@@ -41,6 +43,7 @@ import net.minecraft.util.math.*;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.world.LightType;
+import net.minecraftforge.common.ToolType;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.Marker;
@@ -617,8 +620,8 @@ public abstract class AIHelper {
 		getMinecraft().player.inventory.currentItem = res.getBestSlot();
 		return res;
 	}
-	
-	public ToolRaterResult searchToolFor(final BlockPos pos, ToolRater rater) {
+	/* OLD VERSION
+		public ToolRaterResult searchToolFor(final BlockPos pos, ToolRater rater) {
 		int bestRatingSlot = getMinecraft().player.inventory.currentItem;
 		if (bestRatingSlot < 0 || bestRatingSlot >= 9) {
 			bestRatingSlot = 0;
@@ -629,6 +632,57 @@ public abstract class AIHelper {
 		for (int i = 0; i < 9; ++i) {
 			float rating = rater.rateTool(
 					getMinecraft().player.inventory.getStackInSlot(i), block);
+			if (rating > bestRating) {
+				bestRating = rating;
+				bestRatingSlot = i;
+			}
+		}
+
+		return new ToolRaterResult(bestRatingSlot, bestRating);
+	}
+	 */
+	public ToolRaterResult searchToolFor(final BlockPos pos, ToolRater rater) {
+		int bestRatingSlot = getMinecraft().player.inventory.currentItem;
+		if (bestRatingSlot < 0 || bestRatingSlot >= 9) {
+			bestRatingSlot = 0;
+		}
+		int block = pos == null ? -1 : getWorld().getBlockStateId(pos);
+		float bestRating = rater.rateTool(
+				getMinecraft().player.inventory.getStackInSlot(bestRatingSlot), block);
+		String bestToolName = null;
+		try {
+			bestToolName = getMinecraft().world.getBlockState(pos).getHarvestTool().getName(); //Never returns axe?
+			//System.out.println("BestToolName:" + bestToolName + "for block: " + getMinecraft().world.getBlockState(pos).getBlock().toString());
+		} catch (Exception e) {
+			//System.out.println("No Harvest Tool found for this block" + getMinecraft().world.getBlockState(pos).getBlock().toString());
+			String blockName = getMinecraft().world.getBlockState(pos).getBlock().toString();
+			if (blockName.contains("birch_") || blockName.contains("acacia_") ||
+					blockName.contains("oak_") || blockName.contains("jungle_") || blockName.contains("spruce_") ||
+			blockName.contains("warped_") || blockName.contains("crimson_")) {
+				//System.out.println("Hopefully using the Axe");
+				bestToolName = "axe";
+			} else if (blockName.contains("_wool") || blockName.contains("cobweb")) {
+				//System.out.println("Hopefully using the Shears");
+				bestToolName = "shears";
+			}
+		}
+		for (int i = 0; i < 9; ++i) {
+			float rating = rater.rateTool(
+					getMinecraft().player.inventory.getStackInSlot(i), block);
+			try {
+				Item currSlot = getMinecraft().player.inventory.getStackInSlot(i).getItem();
+				String currSlotName = currSlot.getName().getString();
+				int currSlotDurability = getMinecraft().player.inventory.getStackInSlot(i).getMaxDamage() -
+						getMinecraft().player.inventory.getStackInSlot(i).getDamage();
+				//System.out.println("Checking Slot:" + currSlotName + " " + currSlotDurability + " for contain: " + bestToolName);
+				//System.out.println(currSlotName.toLowerCase() + "|contains|" + " " + bestToolName.toLowerCase());
+				if ((currSlotName.toLowerCase().equals(bestToolName.toLowerCase())||currSlotName.toLowerCase().contains(" " + bestToolName.toLowerCase())) && currSlotDurability > 5) {
+					rating = rating + 1000; //Tools are still rated by the enchantment system, but if they're the correct tool, they're boosted
+				}
+			}
+				catch(Exception e) {
+				//System.out.println("Atleast you tried");
+			}
 			if (rating > bestRating) {
 				bestRating = rating;
 				bestRatingSlot = i;
