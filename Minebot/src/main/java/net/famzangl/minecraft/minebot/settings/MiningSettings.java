@@ -3,6 +3,8 @@ package net.famzangl.minecraft.minebot.settings;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockFloatMap;
 import net.minecraft.block.Blocks;
 
+import static net.famzangl.minecraft.minebot.ai.path.world.BlockSets.nameConvert;
+
 @MinebotSettingObject
 public class MiningSettings {
 	@ClampedFloat(min = 0, max = 1)
@@ -44,6 +46,12 @@ public class MiningSettings {
 
 		factorMap.setBlock(Blocks.NETHER_QUARTZ_ORE, 1);
 		pointsMap.setBlock(Blocks.NETHER_QUARTZ_ORE, 0);
+		
+		factorMap.setBlock(nameConvert("ancient_debris"), 5);
+		pointsMap.setBlock(nameConvert("ancient_debris"), 5);
+
+		factorMap.setBlock(nameConvert("nether_gold_ore"), 1);
+		pointsMap.setBlock(nameConvert("nether_gold_ore"), 1);
 
 		factorMap.setBlock(Blocks.GLOWSTONE, 2);
 		pointsMap.setBlock(Blocks.GLOWSTONE, 0);

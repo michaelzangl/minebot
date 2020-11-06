@@ -87,7 +87,8 @@ public abstract class AITask {
 	 * <p>
 	 * The default value is the time to apply the world delta.
 	 * <p>
-	 * If that list is empty, the timeout is 5 seconds.
+	 * If that list is empty, the timeout is 6 seconds. (as this is the time for Ancient Debris to be
+	 * mined with a diamond pickaxe from beneath.
 	 * 
 	 * @return The expected game tick timeout.
 	 */
@@ -97,7 +98,7 @@ public abstract class AITask {
 		if (applyToDelta(world)) {
 			return (int) (world.getTimeInTicks() * 1.3f);
 		} else {
-			return 5 * 20;
+			return 6 * 20;
 		}
 	}
 

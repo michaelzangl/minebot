@@ -685,15 +685,19 @@ public abstract class AIHelper {
 			//System.out.println("BestToolName:" + bestToolName + "for block: " + getMinecraft().world.getBlockState(pos).getBlock().toString());
 		} catch (Exception e) {
 			//System.out.println("No Harvest Tool found for this block" + getMinecraft().world.getBlockState(pos).getBlock().toString());
-			String blockName = getMinecraft().world.getBlockState(pos).getBlock().toString();
-			if (blockName.contains("birch_") || blockName.contains("acacia_") ||
-					blockName.contains("oak_") || blockName.contains("jungle_") || blockName.contains("spruce_") ||
-			blockName.contains("warped_") || blockName.contains("crimson_")) {
-				//System.out.println("Hopefully using the Axe");
-				bestToolName = "axe";
-			} else if (blockName.contains("_wool") || blockName.contains("cobweb")) {
-				//System.out.println("Hopefully using the Shears");
-				bestToolName = "shears";
+			try {
+				String blockName = getMinecraft().world.getBlockState(pos).getBlock().toString();
+				if (blockName.contains("birch_") || blockName.contains("acacia_") ||
+						blockName.contains("oak_") || blockName.contains("jungle_") || blockName.contains("spruce_") ||
+						blockName.contains("warped_") || blockName.contains("crimson_")) {
+					//System.out.println("Hopefully using the Axe");
+					bestToolName = "axe";
+				} else if (blockName.contains("_wool") || blockName.contains("cobweb")) {
+					//System.out.println("Hopefully using the Shears");
+					bestToolName = "shears";
+				}
+			} catch (Exception ex) {
+				//For fishing etc.
 			}
 		}
 		for (int i = 0; i < 9; ++i) {
