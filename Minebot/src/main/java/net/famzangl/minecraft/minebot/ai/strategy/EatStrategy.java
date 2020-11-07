@@ -21,6 +21,7 @@ import net.famzangl.minecraft.minebot.ai.ClassItemFilter;
 import net.famzangl.minecraft.minebot.ai.ItemFilter;
 import net.famzangl.minecraft.minebot.ai.command.AIChatController;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 
 /**
  * Eat as soon as you are hungry.
@@ -29,8 +30,8 @@ import net.minecraft.item.ItemStack;
  *
  */
 public class EatStrategy extends AIStrategy {
-	// TODO: Is this really what we want?
-	private static final ItemFilter FILTER = itemStack -> itemStack.getItem().isFood();
+	private static final ItemFilter FILTER = itemStack -> itemStack.getItem().isFood()
+			&& itemStack.getItem() != Items.ROTTEN_FLESH;
 	private boolean failed;
 
 	@Override
