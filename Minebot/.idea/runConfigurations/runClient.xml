@@ -1,26 +1,24 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<component>
-  <configuration default="false" factoryName="Application" name="runClient" singleton="false" type="Application">
-    <option name="MAIN_CLASS_NAME" value="net.minecraftforge.userdev.LaunchTesting"/>
-    <option name="VM_PARAMETERS" value="-XX:HeapDumpPath=MojangTricksIntelDriversForPerformance_javaw.exe_minecraft.exe.heapdump &quot;-Dos.name=Windows 10&quot; -Dos.version=10.0"/>
-    <option name="PROGRAM_PARAMETERS" value=""/>
-    <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$\run"/>
-    <module name="Minebot.main"/>
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="runClient" type="Application" factoryName="Application" singleton="false">
     <envs>
-      <env name="MOD_CLASSES" value="$PROJECT_DIR$\build\resources\main;$PROJECT_DIR$\build\classes\java\main"/>
-      <env name="MCP_MAPPINGS" value="snapshot_20200514-1.16"/>
-      <env name="MCP_VERSION" value="20200911.084530"/>
-      <env name="FORGE_VERSION" value="34.0.17"/>
-      <env name="assetIndex" value="1.16"/>
-      <env name="assetDirectory" value="C:\Users\Wasif\.gradle\caches\forge_gradle\assets"/>
-      <env name="nativesDirectory" value="$PROJECT_DIR$\build\natives"/>
-      <env name="FORGE_GROUP" value="net.minecraftforge"/>
-      <env name="target" value="fmluserdevclient"/>
-      <env name="MC_VERSION" value="1.16.3"/>
+      <env name="MOD_CLASSES" value="$PROJECT_DIR$/build/resources/main;$PROJECT_DIR$/build/classes/java/main" />
+      <env name="MCP_MAPPINGS" value="snapshot_20200514-1.16" />
+      <env name="MCP_VERSION" value="20200911.084530" />
+      <env name="FORGE_VERSION" value="34.0.17" />
+      <env name="assetIndex" value="1.16" />
+      <env name="assetDirectory" value="$USER_HOME$/.gradle/caches/forge_gradle/assets" />
+      <env name="nativesDirectory" value="$PROJECT_DIR$/build/natives" />
+      <env name="FORGE_GROUP" value="net.minecraftforge" />
+      <env name="target" value="fmluserdevclient" />
+      <env name="MC_VERSION" value="1.16.3" />
     </envs>
+    <option name="MAIN_CLASS_NAME" value="net.minecraftforge.userdev.LaunchTesting" />
+    <module name="Minebot.main" />
+    <option name="VM_PARAMETERS" value="-XX:HeapDumpPath=MojangTricksIntelDriversForPerformance_javaw.exe_minecraft.exe.heapdump" />
+    <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/run" />
     <method v="2">
-      <option enabled="true" name="Make"/>
-      <option enabled="true" externalProjectPath="$PROJECT_DIR$" name="Gradle.BeforeRunTask" tasks=":prepareRunClient"/>
+      <option name="Make" enabled="true" />
+      <option name="Gradle.BeforeRunTask" enabled="true" tasks=":prepareRunClient" externalProjectPath="$PROJECT_DIR$" />
     </method>
   </configuration>
 </component>

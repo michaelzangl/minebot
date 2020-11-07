@@ -1,0 +1,6 @@
+# Users should import this as gradle project. So don't include any project structure / dependencies.
+# We only include the run configuration
+
+*
+!runConfigurations
+!.gitignore
