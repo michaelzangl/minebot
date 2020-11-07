@@ -98,7 +98,7 @@ public abstract class AITask {
 		if (applyToDelta(world)) {
 			return (int) (world.getTimeInTicks() * 1.3f);
 		} else {
-			return 6 * 20;
+			return 5 * 20;
 		}
 	}
 

@@ -35,16 +35,6 @@ import net.minecraft.util.math.BlockPos;
  *
  */
 public class UpwardsMoveTask extends JumpingPlaceBlockAtFloorTask {
-	//private static final BlockSet DESTRUCTABLE_GROUND = BlockSets.SAFE_GROUND.intersectWith(BlockSets.AIR.invert());
-
-	private boolean obsidianMining;
-
-	/**
-	 * FIXME: Find a nice, central place for digging times.
-	 */
-	private static final BlockSet hardBlocks = BlockSet.builder().add(Blocks.OBSIDIAN).build();
-
-
 	public UpwardsMoveTask(BlockPos pos, ItemFilter filter) {
 		super(pos, filter);
 	}
@@ -54,9 +44,6 @@ public class UpwardsMoveTask extends JumpingPlaceBlockAtFloorTask {
 		if (!BlockSets.HEAD_CAN_WALK_THROUGH.isAt(aiHelper.getWorld(), pos.add(0, 1, 0))) {
 			if (!aiHelper.isStandingOn(pos.add(0, -1, 0))) {
 				taskOperations.desync(new PositionTaskError(pos.add(0, -1, 0)));
-			}
-			if (hardBlocks.contains(aiHelper.getBlockState(pos.add(0, 1, 0)))) {
-				obsidianMining = true;
 			}
 			aiHelper.faceAndDestroy(pos.add(0, 1, 0));
 		} else if (!BlockSets.AIR.isAt(aiHelper.getWorld(), pos.add(0, -1, 0))
@@ -79,6 +66,7 @@ public class UpwardsMoveTask extends JumpingPlaceBlockAtFloorTask {
 		world.setBlock(getPlaceAtPos(), Blocks.COBBLESTONE);
 		world.setBlock(pos, Blocks.AIR);
 		world.setBlock(pos.add(0, 1, 0), Blocks.AIR);
+		world.setPlayerPosition(pos);
 
 		return true;
 	}

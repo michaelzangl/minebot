@@ -1061,7 +1061,8 @@ public abstract class AIHelper {
 	}
 
 	public boolean isJumping() {
-		return getMinecraft().player.isAirBorne; //Not sure if this works reliably
+		// func_233570_aj_ → onGround
+		return !getMinecraft().player.func_233570_aj_();
 	}
 
 	/**

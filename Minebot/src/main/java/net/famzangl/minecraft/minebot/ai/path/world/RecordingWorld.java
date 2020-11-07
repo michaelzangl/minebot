@@ -56,13 +56,27 @@ public class RecordingWorld extends WorldWithDelta {
 		super.setPlayerPosition(playerPosition);
 	}
 
+	/**
+	 * Time to get from p1 to p2. Just a rough estimate.
+	 * @param p1 Start
+	 * @param p2 Destination
+	 * @return The maximal time in ticks
+	 */
 	public static int timeToWalk(BlockPos p1, BlockPos p2) {
 		if (p1.equals(p2)) {
+			// 5 Ticks
 			return 5;
 		} else {
 			double hDist = Math.hypot(p1.getX() - p2.getX(), p1.getZ() - p2.getZ());
 			double time = 1 + hDist / 4;
-			return (int) Math.ceil(time * 20);
+			int horizontalMovementTime = (int) Math.ceil(time * 20);
+			int verticalMovementTime = p1.getY() > p2.getY()
+					// Falling
+					? (p1.getY() - p2.getY()) * 10
+					// Need to jump up => this takes some time
+					// especially if we need to place blocks and first placement fails
+					: (p2.getY() - p1.getY()) * 40;
+			return horizontalMovementTime + verticalMovementTime;
 		}
 	}
 	
