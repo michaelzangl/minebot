@@ -79,8 +79,8 @@ public class UpwardsMoveTask extends JumpingPlaceBlockAtFloorTask {
 		world.setBlock(getPlaceAtPos(), Blocks.COBBLESTONE);
 		world.setBlock(pos, Blocks.AIR);
 		world.setBlock(pos.add(0, 1, 0), Blocks.AIR);
-		
-		return super.applyToDelta(world);
+
+		return true;
 	}
 
 }
