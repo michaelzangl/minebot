@@ -58,8 +58,8 @@ public class AirbridgeStrategy extends TaskStrategy {
 	 *
 	 */
 	private static class SneakToSideTask extends AITask {
-		private BlockPos pos;
-		private Direction inDirection;
+		private final BlockPos pos;
+		private final Direction inDirection;
 		private boolean arrived;
 
 		public SneakToSideTask(BlockPos pos, Direction inDirection) {
@@ -100,7 +100,7 @@ public class AirbridgeStrategy extends TaskStrategy {
 			};
 		}
 	}
-	private class BuildHalfslabVisitor implements AreaVisitor {
+	private class BuildHalfslabVisitor implements AreaVisitor<WorldData> {
 
 
 		private final BlockPos buildPos;
@@ -158,8 +158,8 @@ public class AirbridgeStrategy extends TaskStrategy {
 				+ ", length=" + length + "]";
 	}
 
-	private BlockCuboid getSidewardsArea(BlockPos center) {
-		return new BlockCuboid(center, center).extend(toLeft,
+	private BlockCuboid<WorldData> getSidewardsArea(BlockPos center) {
+		return new BlockCuboid<>(center, center).extend(toLeft,
 				direction.rotateY()).extend(toRight, direction.rotateYCCW());
 	}
 
@@ -226,6 +226,7 @@ public class AirbridgeStrategy extends TaskStrategy {
 
 		if (isAirAtAndBelow(world, buildPos)) {
 			LOGGER.trace(MARKER_PROGRESS, "Building bridge to: " + buildPos);
+			// The actual block to sneak off from is 1 below the build pos
 			addTask(new SneakToSideTask(beforeBuild, direction));
 
 			BlockCuboid area = getSidewardsArea(buildPos.add(0, -1, 0));
@@ -264,11 +265,11 @@ public class AirbridgeStrategy extends TaskStrategy {
 		if (!isAirAt(world, buildPos)) {
 			return false;
 		}
-		BlockCuboid floor = getSidewardsArea(buildPos.add(0, -1, 0));
+		BlockCuboid<WorldData> floor = getSidewardsArea(buildPos.add(0, -1, 0));
 		if (!BlockSet.builder().add(BlockSets.AIR).add(BlockSets.LOWER_SLABS).build().isAt(world, floor)) {
 			return false;
 		} else {
-			return new BlockFilteredArea(floor, BlockSets.AIR).getVolume(world) > 0;
+			return new BlockFilteredArea<>(floor, BlockSets.AIR).getVolume(world) > 0;
 		}
 	}
 

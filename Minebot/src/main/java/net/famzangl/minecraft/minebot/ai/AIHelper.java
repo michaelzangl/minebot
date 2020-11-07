@@ -972,6 +972,7 @@ public abstract class AIHelper {
 	 * 
 	 * @param pos
 	 *            The position of which we should sneak to the side.
+	 *            One Y above the block we should sneak from.
 	 * @param inDirection
 	 *            The side to sneak at.
 	 * @param face
@@ -979,7 +980,7 @@ public abstract class AIHelper {
 	 * @return <code>true</code> on arrival.
 	 */
 	public boolean sneakFrom(BlockPos pos, Direction inDirection, boolean face) {
-		BlockBounds bounds = getWorld().getCollisionBounds(pos);
+		BlockBounds bounds = getWorld().getCollisionBounds(pos.add(0, -1, 0));
 		double destX = pos.getX() + .5;
 		double destZ = pos.getZ() + .5;
 		switch (inDirection) {

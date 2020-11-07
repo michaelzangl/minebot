@@ -18,13 +18,18 @@ package net.famzangl.minecraft.minebot.ai.task.place;
 
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.BlockItemFilter;
+import net.famzangl.minecraft.minebot.ai.path.world.BlockSet;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSets;
+import net.famzangl.minecraft.minebot.ai.path.world.WorldWithDelta;
 import net.famzangl.minecraft.minebot.ai.task.AITask;
 import net.famzangl.minecraft.minebot.ai.task.TaskOperations;
 import net.famzangl.minecraft.minebot.ai.task.error.SelectTaskError;
+import net.minecraft.block.BlockState;
 import net.minecraft.util.Direction;
 import net.minecraft.util.MovementInput;
 import net.minecraft.util.math.BlockPos;
+
+import java.util.Iterator;
 
 /**
  * Sneak towards (x, y, z) and then place the block below you.
@@ -119,6 +124,26 @@ public class SneakAndPlaceTask extends AITask {
 	
 	protected BlockPos getFromPos() {
 		return startStandPosition;
+	}
+
+	@Override
+	public boolean applyToDelta(WorldWithDelta world) {
+		Iterator<BlockState> matched = filter.getMatched().iterator();
+		if (!matched.hasNext()) {
+			// This task will fail
+			return false;
+		} else {
+			BlockState block = matched.next();
+			if (!matched.hasNext()) {
+				// Exactly one block matches => we can simulate
+				world.setBlock(getPositionToPlaceAt(), block);
+				world.setPlayerPosition(destinationStandPosition);
+				return true;
+			} else {
+				// We don't simultate player items yet, so we don't know which one will be placed
+				return false;
+			}
+		}
 	}
 
 	@Override

@@ -55,6 +55,10 @@ public class BlockItemFilter implements HumanReadableItemFilter {
 		return blockType != null && matched.contains(blockType.getDefaultState());
 	}
 
+	public BlockSet getMatched() {
+		return matched;
+	}
+
 	@Override
 	public String toString() {
 		return "BlockItemFilter [matched=" + matched + "]";
