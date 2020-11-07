@@ -1,12 +1,12 @@
 package net.famzangl.minecraft.minebot.ai.path.world;
 
 import net.minecraft.block.BlockState;
-import net.minecraft.fluid.IFluidState;
+import net.minecraft.fluid.FluidState;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.RayTraceContext;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraft.world.IBlockReader;
 import org.apache.logging.log4j.LogManager;
@@ -41,7 +41,7 @@ public abstract class BlockBoundsCache {
     public static final BlockBoundsCache RAYTRACE = new BlockBoundsCache() {
         @Override
         protected VoxelShape computeBounds(BlockState state, IBlockReader world, BlockPos position) {
-            return state.getRaytraceShape(world, position);
+            return state.getRaytraceShape(world, position, null);
         }
     };
 
@@ -125,7 +125,7 @@ public abstract class BlockBoundsCache {
         }
 
         @Override
-        public IFluidState getFluidState(BlockPos pos) {
+        public FluidState getFluidState(BlockPos pos) {
             throw new CannotComputeBounds("Bounds depend on fluid state");
         }
 
@@ -151,7 +151,7 @@ public abstract class BlockBoundsCache {
 
         @Nullable
         @Override
-        public BlockRayTraceResult rayTraceBlocks(Vec3d p_217296_1_, Vec3d p_217296_2_, BlockPos p_217296_3_,
+        public BlockRayTraceResult rayTraceBlocks(Vector3d p_217296_1_, Vector3d p_217296_2_, BlockPos p_217296_3_,
                                                   VoxelShape p_217296_4_, BlockState p_217296_5_) {
             throw new CannotComputeBounds("Bounds use ray trace");
         }

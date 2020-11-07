@@ -28,22 +28,29 @@ import net.famzangl.minecraft.minebot.ai.task.BlockHalf;
 import net.famzangl.minecraft.minebot.ai.tools.ToolRater;
 import net.famzangl.minecraft.minebot.ai.utils.RandUtils;
 import net.famzangl.minecraft.minebot.build.BuildManager;
-import net.famzangl.minecraft.minebot.map.MapReader;
 import net.famzangl.minecraft.minebot.settings.MinebotSettings;
 import net.famzangl.minecraft.minebot.settings.SaferuleSettings;
-import net.famzangl.minecraft.minebot.stats.StatsManager;
 import net.minecraft.block.*;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.ToolItem;
+import net.minecraft.tileentity.SignTileEntity;
 import net.minecraft.util.Direction;
 import net.minecraft.util.MovementInput;
 import net.minecraft.util.math.*;
+import net.minecraft.util.math.vector.Vector3d;
+import net.minecraft.util.text.ITextComponent;
 import net.minecraft.world.LightType;
+import net.minecraftforge.common.ToolType;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.MarkerManager;
+
+import net.famzangl.minecraft.minebot.map.MapReader;
+import net.famzangl.minecraft.minebot.stats.StatsManager;
 
 import java.io.File;
 import java.util.HashMap;
@@ -53,12 +60,12 @@ import java.util.function.Predicate;
 /**
  * Lots and lots of helpful methods to control the current player. This contains
  * the current marked positions ({@link #pos1}, {@link #pos2}), fast methods to
- * access/check minecraft blocks ({@link #getBlockId(BlockPos)}), many lists of
+ * access/check minecraft blocks (, many lists of
  * different block types/presets useful for filtering, methods to control the
  * player ({@link #face(double, double, double)}, {@link #overrideUseItem()}),
  * some methods to get the player state ({@link #isAlive()},
  * {@link #getPlayerPosition()}) and some to simplify block handling (
- * {@link #getSignDirection(BlockState)})
+ * {@link #(BlockState)})
  * 
  * @author michael
  * 
@@ -88,9 +95,8 @@ public abstract class AIHelper {
 	private HashMap<KeyType, KeyboardInputController> keys = new HashMap<KeyType, KeyboardInputController>();
 	
 	protected boolean doUngrab;
-
 	protected MapReader activeMapReader;
-	
+
 	private final StatsManager stats = new StatsManager();
 
 	public AIHelper() {
@@ -173,6 +179,9 @@ public abstract class AIHelper {
 		if (isPos2) {
 			pos2 = pos;
 			posIndex = 2;
+
+
+
 		} else {
 			pos1 = pos;
 			posIndex = 1;
@@ -265,11 +274,11 @@ public abstract class AIHelper {
 			return 0;
 		}
 		
-		Vec3d playerLook = getMinecraft().player.getLookVec().normalize();
-		return Math.acos(playerLook.dotProduct(new Vec3d(d0, d1, d2).normalize()));
+		Vector3d playerLook = getMinecraft().player.getLookVec().normalize();
+		return Math.acos(playerLook.dotProduct(new Vector3d(d0, d1, d2).normalize()));
 	}
 	
-	public boolean isFacing(Vec3d vec) {
+	public boolean isFacing(Vector3d vec) {
 		return isFacing(vec.x, vec.y, vec.z);
 	}
 
@@ -277,7 +286,7 @@ public abstract class AIHelper {
 		return face(x, y, z, 0, 0);
 	}
 
-	public boolean face(Vec3d vec) {
+	public boolean face(Vector3d vec) {
 		return face(vec.x, vec.y, vec.z);
 	}
 
@@ -611,7 +620,57 @@ public abstract class AIHelper {
 		getMinecraft().player.inventory.currentItem = res.getBestSlot();
 		return res;
 	}
-	
+//	// OLD VERSION
+//		public ToolRaterResult searchToolFor(final BlockPos pos, ToolRater rater) {
+//		int bestRatingSlot = getMinecraft().player.inventory.currentItem;
+//		if (bestRatingSlot < 0 || bestRatingSlot >= 9) {
+//			bestRatingSlot = 0;
+//		}
+//		int block = pos == null ? -1 : getWorld().getBlockStateId(pos);
+//		float bestRating = rater.rateTool(
+//				getMinecraft().player.inventory.getStackInSlot(bestRatingSlot), block);
+//		for (int i = 0; i < 9; ++i) {
+//			float rating = rater.rateTool(
+//					getMinecraft().player.inventory.getStackInSlot(i), block);
+//			if (rating > bestRating) {
+//				bestRating = rating;
+//				bestRatingSlot = i;
+//			}
+//		}
+//
+//		return new ToolRaterResult(bestRatingSlot, bestRating);
+//	}
+
+//	public ToolRaterResult searchToolFor(final BlockPos pos, ToolRater rater) {
+//		int bestRatingSlot = getMinecraft().player.inventory.currentItem;
+//		if (bestRatingSlot < 0 || bestRatingSlot >= 9) {
+//			bestRatingSlot = 0;
+//		}
+//		int block = pos == null ? -1 : getWorld().getBlockStateId(pos);
+//		float bestRating = rater.rateTool(
+//			getMinecraft().player.inventory.getStackInSlot(bestRatingSlot), block);
+//		for (int i = 0; i < 9; ++i) {
+//			float rating = rater.rateTool(
+//				getMinecraft().player.inventory.getStackInSlot(i), block);
+//
+//			BlockState b = getWorld().getBlockState(pos);
+//			int currSlotDurability = getMinecraft().player.inventory.getStackInSlot(i).getMaxDamage() -
+//				getMinecraft().player.inventory.getStackInSlot(i).getDamage();
+//			if (getMinecraft().player.inventory.getStackInSlot(i).canHarvestBlock(b) &&
+//					currSlotDurability > 5) {
+//				rating += 10 * (getMinecraft().player.inventory.getStackInSlot(i).getDestroySpeed(b));
+//			} //The path finder gets scared of farmland ):
+//			//Shears can I don't think hoes can, will test.
+//
+//
+//			if (rating > bestRating) {
+//				bestRating = rating;
+//				bestRatingSlot = i;
+//		}
+//	}
+//
+//	return new ToolRaterResult(bestRatingSlot, bestRating);
+//}
 	public ToolRaterResult searchToolFor(final BlockPos pos, ToolRater rater) {
 		int bestRatingSlot = getMinecraft().player.inventory.currentItem;
 		if (bestRatingSlot < 0 || bestRatingSlot >= 9) {
@@ -620,9 +679,44 @@ public abstract class AIHelper {
 		int block = pos == null ? -1 : getWorld().getBlockStateId(pos);
 		float bestRating = rater.rateTool(
 				getMinecraft().player.inventory.getStackInSlot(bestRatingSlot), block);
+		String bestToolName = null;
+		try {
+			bestToolName = getMinecraft().world.getBlockState(pos).getHarvestTool().getName(); //Never returns axe?
+			//System.out.println("BestToolName:" + bestToolName + "for block: " + getMinecraft().world.getBlockState(pos).getBlock().toString());
+		} catch (Exception e) {
+			//System.out.println("No Harvest Tool found for this block" + getMinecraft().world.getBlockState(pos).getBlock().toString());
+			try {
+				String blockName = getMinecraft().world.getBlockState(pos).getBlock().toString();
+				if (blockName.contains("birch_") || blockName.contains("acacia_") ||
+						blockName.contains("oak_") || blockName.contains("jungle_") || blockName.contains("spruce_") ||
+						blockName.contains("warped_") || blockName.contains("crimson_")) {
+					//System.out.println("Hopefully using the Axe");
+					bestToolName = "axe";
+				} else if (blockName.contains("_wool") || blockName.contains("cobweb")) {
+					//System.out.println("Hopefully using the Shears");
+					bestToolName = "shears";
+				}
+			} catch (Exception ex) {
+				//For fishing etc.
+			}
+		}
 		for (int i = 0; i < 9; ++i) {
 			float rating = rater.rateTool(
 					getMinecraft().player.inventory.getStackInSlot(i), block);
+			try {
+				Item currSlot = getMinecraft().player.inventory.getStackInSlot(i).getItem();
+				String currSlotName = currSlot.getName().getString();
+				int currSlotDurability = getMinecraft().player.inventory.getStackInSlot(i).getMaxDamage() -
+						getMinecraft().player.inventory.getStackInSlot(i).getDamage();
+				//System.out.println("Checking Slot:" + currSlotName + " " + currSlotDurability + " for contain: " + bestToolName);
+				//System.out.println(currSlotName.toLowerCase() + "|contains|" + " " + bestToolName.toLowerCase());
+				if ((currSlotName.toLowerCase().equals(bestToolName.toLowerCase())||currSlotName.toLowerCase().contains(" " + bestToolName.toLowerCase())) && currSlotDurability > 5) {
+					rating = rating + 1000; //Tools are still rated by the enchantment system, but if they're the correct tool, they're boosted
+				}
+			}
+				catch(Exception e) {
+				//System.out.println("Atleast you tried");
+			}
 			if (rating > bestRating) {
 				bestRating = rating;
 				bestRatingSlot = i;
@@ -832,7 +926,7 @@ public abstract class AIHelper {
 						.grow(1), selector);
 
 		LOGGER.debug("Searching for entities around {} using distance {} and selector {} resulted in {} entities",
-				getMinecraft().getRenderViewEntity().getPosition(), dist, selector, entities.size());
+				getMinecraft().getRenderViewEntity().getPosY(), dist, selector, entities.size());
 		return entities;
 	}
 
@@ -967,7 +1061,7 @@ public abstract class AIHelper {
 	}
 
 	public boolean isJumping() {
-		return !getMinecraft().player.onGround;
+		return getMinecraft().player.isAirBorne; //Not sure if this works reliably
 	}
 
 	/**
@@ -1039,24 +1133,21 @@ public abstract class AIHelper {
 	public int getLightAt(BlockPos pos) {
 		return getMinecraft().world.getLightFor(LightType.BLOCK, pos);
 	}
-
 	public void setActiveMapReader(MapReader activeMapReader) {
 		if (this.activeMapReader != null) {
 			this.activeMapReader.onStop();
 		}
 		this.activeMapReader = activeMapReader;
 	}
+	public MapReader getActiveMapReader() {
+		return activeMapReader;
+	}
+	public StatsManager getStats() {
+		return stats;
+	}
 
 	public abstract AIStrategy getResumeStrategy();
 
 	public abstract NetworkHelper getNetworkHelper();
-
-	public MapReader getActiveMapReader() {
-		return activeMapReader;
-	}
-	
-	public StatsManager getStats() {
-		return stats;
-	}
 
 }

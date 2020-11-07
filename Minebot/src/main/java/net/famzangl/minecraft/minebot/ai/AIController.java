@@ -16,6 +16,7 @@
  *******************************************************************************/
 package net.famzangl.minecraft.minebot.ai;
 
+import com.mojang.blaze3d.matrix.MatrixStack;
 import net.famzangl.minecraft.minebot.ai.command.AIChatController;
 import net.famzangl.minecraft.minebot.ai.command.IAIControllable;
 import net.famzangl.minecraft.minebot.ai.command.SafeStrategyRule;
@@ -32,12 +33,14 @@ import net.famzangl.minecraft.minebot.ai.utils.PrivateFieldUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.MouseHelper;
 import net.minecraft.client.entity.player.ClientPlayerEntity;
+
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.client.util.InputMappings;
 import net.minecraft.entity.Entity;
 import net.minecraft.item.Items;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.vector.Matrix4f;
 import net.minecraftforge.client.event.ClientPlayerNetworkEvent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
@@ -123,16 +126,14 @@ public class AIController extends AIHelper implements IAIControllable {
 		AIChatController.getRegistry().setControlled(this);
 
 		networkHelper = MinebotNetHandler.inject(getMinecraft().getConnection());
-		profilerHelper = InterceptingProfiler.inject(getMinecraft());
+		//profilerHelper = InterceptingProfiler.inject(getMinecraft());
 		// Hook into
-		// net.minecraft.client.renderer.RenderGlobal.drawBlockDamageTexture(Tessellator,
-		// WorldRenderer, Entity, float)
-		profilerHelper.addListener("destroyProgress", new Runnable() {
-			@Override
-			public void run() {
-				drawMakers();
-			}
-		});
+		//profilerHelper.addListener("destroyProgress", new Runnable() {
+		//	@Override
+	//		public void run() {
+	//			drawMakers();
+	//		}
+	//	});
 	}
 
 	/**
@@ -164,7 +165,7 @@ public class AIController extends AIHelper implements IAIControllable {
 		getStats().setGameTickTimer(getWorld());
 		
 		AIStrategy newStrategy;
-		if (dead || stop.isPressed() || stop.isKeyDown()) {
+		if (dead || /*stop.isPressed() ||*/ stop.isKeyDown()) {
 			// FIXME: Better way to determine of this stategy can be resumed.
 			if (deactivatedStrategy == null
 					&& !(currentStrategy instanceof RunOnceStrategy)) {
@@ -209,7 +210,6 @@ public class AIController extends AIHelper implements IAIControllable {
 		
 		keyboardPostTick();
 		LOGGER.debug(MARKER_STRATEGY, "Strategy game tick done");
-
 		if (activeMapReader != null) {
 			activeMapReader.tick(this);
 		}
@@ -255,12 +255,14 @@ public class AIController extends AIHelper implements IAIControllable {
 		}
 		int y = 10;
 		for (String s : str) {
-			getMinecraft().fontRenderer.drawStringWithShadow(
-					s,
+			//getMinecraft().fontRenderer.showTextWithShadow or something is what this used to be
+			//D
+			getMinecraft().fontRenderer.func_238405_a_(new MatrixStack(), s,
 					getMinecraft().getMainWindow().getScaledWidth()
 							- getMinecraft().fontRenderer.getStringWidth(s)
 							- 10, y, 16777215);
 			y += 15;
+
 		}
 		
 	}

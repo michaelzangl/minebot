@@ -2,21 +2,21 @@
 <component>
   <configuration default="false" factoryName="Application" name="runClient" singleton="false" type="Application">
     <option name="MAIN_CLASS_NAME" value="net.minecraftforge.userdev.LaunchTesting"/>
-    <option name="VM_PARAMETERS" value=""/>
+    <option name="VM_PARAMETERS" value="-XX:HeapDumpPath=MojangTricksIntelDriversForPerformance_javaw.exe_minecraft.exe.heapdump &quot;-Dos.name=Windows 10&quot; -Dos.version=10.0"/>
     <option name="PROGRAM_PARAMETERS" value=""/>
-    <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/run"/>
+    <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$\run"/>
     <module name="Minebot.main"/>
     <envs>
-      <env name="MOD_CLASSES" value="$PROJECT_DIR$/build/resources/main:$PROJECT_DIR$/build/classes/java/main"/>
-      <env name="MCP_MAPPINGS" value="snapshot_20200225-1.15.1"/>
-      <env name="MCP_VERSION" value="20200307.202953"/>
-      <env name="FORGE_VERSION" value="31.1.43"/>
-      <env name="assetIndex" value="1.15"/>
-      <env name="assetDirectory" value="/home/michael/.gradle/caches/forge_gradle/assets"/>
-      <env name="nativesDirectory" value="$PROJECT_DIR$/build/natives"/>
+      <env name="MOD_CLASSES" value="$PROJECT_DIR$\build\resources\main;$PROJECT_DIR$\build\classes\java\main"/>
+      <env name="MCP_MAPPINGS" value="snapshot_20200514-1.16"/>
+      <env name="MCP_VERSION" value="20200911.084530"/>
+      <env name="FORGE_VERSION" value="34.0.17"/>
+      <env name="assetIndex" value="1.16"/>
+      <env name="assetDirectory" value="C:\Users\Wasif\.gradle\caches\forge_gradle\assets"/>
+      <env name="nativesDirectory" value="$PROJECT_DIR$\build\natives"/>
       <env name="FORGE_GROUP" value="net.minecraftforge"/>
       <env name="target" value="fmluserdevclient"/>
-      <env name="MC_VERSION" value="1.15.2"/>
+      <env name="MC_VERSION" value="1.16.3"/>
     </envs>
     <method v="2">
       <option enabled="true" name="Make"/>

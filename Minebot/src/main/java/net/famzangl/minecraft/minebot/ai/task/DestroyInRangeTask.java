@@ -28,7 +28,7 @@ import net.minecraft.block.Blocks;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraftforge.event.TickEvent;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -42,7 +42,6 @@ import java.util.List;
 
 /**
  * Destroys all Blocks in a given area. Individual blocks can be excluded, see
- * {@link #blacklist(BlockPos)}
  * 
  * @author Michael Zangl
  *
@@ -95,7 +94,7 @@ public class DestroyInRangeTask extends AITask implements CanPrefaceAndDestroy {
 	private volatile BlockPos currentAttemptingPos;
 	private final ArrayList<BlockPos> failedBlocks = new ArrayList<BlockPos>();
 	private BlockArea<WorldData> range;
-	private Vec3d facingPos;
+	private Vector3d facingPos;
 	private BlockPos lastFacingFor;
 
 	private final PosMarkerRenderer renderer = new PosMarkerRenderer(0, 0, 255);

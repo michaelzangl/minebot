@@ -186,7 +186,7 @@ public class BlockSet implements Iterable<BlockState> {
 			if (sb.length() > 0) {
 				sb.append(", ");
 			}
-			sb.append(block.getNameTextComponent().getString())
+			sb.append(block.getDefaultState().toString())
 					.append(" (");
 
 			if (block.getStateContainer().getValidStates().size() == states.size()) {
@@ -196,10 +196,11 @@ public class BlockSet implements Iterable<BlockState> {
 				states.forEach(state -> {
 					sb.append(block.getRegistryName().toString());
 					sb.append("@");
-					state.getProperties().forEach(prop -> {
-						sb.append(prop.getName());
-						sb.append(state.get(prop).toString());
-					});
+					//state.getProperties().forEach(prop -> {
+					//	sb.append(prop.getName());
+					//	sb.append(state.get(prop).toString());
+					//});
+					//Needs Fixing I think?
 				});
 			}
 			sb.append(")");
@@ -337,7 +338,7 @@ public class BlockSet implements Iterable<BlockState> {
 		if (Block.BLOCK_STATE_IDS.size() == 0) {
 			throw new IllegalStateException("Block states not initialized yet.");
 		}
-		return Block.BLOCK_STATE_IDS.get(state);
+		return Block.BLOCK_STATE_IDS.getId(state);
 	}
 
 	public static BlockState getStateById(int id) {

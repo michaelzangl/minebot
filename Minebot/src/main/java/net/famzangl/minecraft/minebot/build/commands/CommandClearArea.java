@@ -65,6 +65,7 @@ public class CommandClearArea {
                 done = toClearCount == 0;
             }
             if (!done) {
+                System.out.println("Searching tasks, Desync:" +  isDesync());
                 super.searchTasks(helper);
             }
         }
@@ -135,7 +136,7 @@ public class CommandClearArea {
         final BlockPos pos1 = helper.getPos1();
         final BlockPos pos2 = helper.getPos2();
         if (pos1 == null || pos2 == null) {
-            throw new CommandEvaluationException("No area has been set yet. Set an area to fill using /minebot posN");
+            throw new CommandEvaluationException("No area has been set yet. Set an area to fill using /minebuild posN");
         } else {
             return new BlockCuboid<>(pos1, pos2);
         }

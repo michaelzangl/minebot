@@ -184,9 +184,9 @@ public class MinebotNetHandler implements NetworkHelper {
 	}
 
 	public InterceptResult handleMultiBlockChange(SMultiBlockChangePacket packetIn) {
-		for (SMultiBlockChangePacket.UpdateData b : packetIn.getChangedBlocks()) {
+		/*for (SMultiBlockChangePacket.BlockUpdateData b : packetIn.getChangedBlocks()) {
 			blockChange(b.getPos());
-		}
+		}*/
 		return InterceptResult.pass();
 	}
 

@@ -43,7 +43,7 @@ public class KeyboardInputController {
 	}
 
 	public enum KeyType {
-		ATTACK(501, new KeyAdapter() {
+		ATTACK(501, new KeyAdapter() { //501?? Occasionally breaks everything and client can no longer can left click
 			@Override
 			public KeyBinding get(GameSettings gameSettings) {
 				return gameSettings.keyBindAttack;

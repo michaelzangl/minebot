@@ -75,6 +75,7 @@ public class MinebotSettings {
 						MinebotSettingsRoot.class);
 				validateAfterLoad(settings);
 			} catch (final IOException e) {
+
 				LOGGER.error(MARKER_SETTINGS, "Could not read settings file: " + e.getMessage());
 			} catch (final JsonParseException e) {
 				LOGGER.error(MARKER_SETTINGS, "Error in settings file:" + e.getMessage());
@@ -134,16 +135,19 @@ public class MinebotSettings {
 		LOGGER.trace(MARKER_SETTINGS, "Data directory: " + dir);
 		if (false && !dir.isDirectory()) {
 			try {
+				System.out.println("CREATING NEW DIR");
 				return new MinebotDirectoryCreator().createDirectory(dir);
 			} catch (IOException e) {
 				LOGGER.error(MARKER_SETTINGS, "Could not create settings directory.");
 				e.printStackTrace();
 			}
 		}
+
 		return dir;
 	}
 
 	public static File getDataDirFile(String name) {
+
 		return new File(getDataDir(), name);
 	}
 

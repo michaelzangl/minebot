@@ -76,7 +76,7 @@ public class CommandMine {
 								.executes(context -> context.getSource().requestUseStrategy(new PathFinderStrategy(
 										new MineSinglePathFinder(BlockSet.builder().add(context.getArgument("block", BlockStateInput.class).getState()).build(),
 												context.getSource().getAiHelper().getLookDirection(), context.getSource().getAiHelper().getPlayerPosition().getY()),
-										"Mining " + context.getArgument("block", BlockStateInput.class).getState().getBlock().getNameTextComponent().getString()), SafeStrategyRule.DEFEND_MINING)))
+										"Mining " + context.getArgument("block", BlockStateInput.class).getState().getBlock().toString()), SafeStrategyRule.DEFEND_MINING)))
 						// /minebot mine orebfuscated
 						.then(
 								Commands.literal("orebfuscated").executes(

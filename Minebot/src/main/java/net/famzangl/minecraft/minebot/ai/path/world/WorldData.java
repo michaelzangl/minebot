@@ -11,8 +11,7 @@ import net.minecraft.util.BitArray;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.math.shapes.VoxelShape;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.util.palette.PalettedContainer;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.ChunkSection;
@@ -272,8 +271,8 @@ public class WorldData {
 	/**
 	 * @return Feet of the player
 	 */
-	public Vec3d getExactPlayerPosition() {
-		return new Vec3d(thePlayerToGetPositionFrom.getPosX(),
+	public Vector3d getExactPlayerPosition() {
+		return new Vector3d(thePlayerToGetPositionFrom.getPosX(),
 				thePlayerToGetPositionFrom.getBoundingBox().minY,
 				thePlayerToGetPositionFrom.getPosZ());
 	}

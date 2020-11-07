@@ -20,10 +20,12 @@ import net.famzangl.minecraft.minebot.ai.path.world.BlockSet;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
-import net.minecraft.block.LogBlock;
+//import net.minecraft.block.LogBlock;
 import net.minecraft.util.Direction;
 
 import java.util.stream.Stream;
+
+import static net.minecraft.state.properties.BlockStateProperties.AXIS;
 
 /**
  * A type of wood used in the game.
@@ -40,7 +42,7 @@ public enum WoodType {
 	JUNGLE(Blocks.JUNGLE_LOG, 3, net.minecraft.block.WoodType.JUNGLE, Blocks.JUNGLE_SAPLING),
 	ACACIA(Blocks.ACACIA_LOG, 0, net.minecraft.block.WoodType.ACACIA, Blocks.ACACIA_SAPLING),
 	DARK_OAK(Blocks.DARK_OAK_LOG, 1, net.minecraft.block.WoodType.DARK_OAK, Blocks.DARK_OAK_SAPLING);
-
+	//Need to add Crimson and the Blue nethers?
 
 	// TODO: Replace with block.get(LogBlock.AXIS) / Direction.Axis
 	public enum LogDirection {
@@ -55,7 +57,17 @@ public enum WoodType {
 		}
 
 		public static LogDirection forData(BlockState block) {
-			Direction.Axis axis = block.get(LogBlock.AXIS);
+			Direction.Axis axis = null;
+			if (block.getBlock().equals(Blocks.OAK_LOG) || block.getBlock().equals(Blocks.ACACIA_LOG) ||
+					block.getBlock().equals(Blocks.BIRCH_LOG) || block.getBlock().equals(Blocks.SPRUCE_LOG) ||
+					block.getBlock().equals(Blocks.JUNGLE_LOG) || block.getBlock().equals(Blocks.DARK_OAK_LOG)) {
+				//LogType is now gone, maybe I need to specify? I remember there was a way of getting it
+				//In the patch notes but I'm not sure the way.
+				//Need to add Crimson and the Blue nethers?
+				//Probably broke this class ):
+				axis = block.get(AXIS);
+			}
+			//Direction.Axis axis = block.get(LogBlock.AXIS);
 			if (axis == null) {
 				throw new IllegalArgumentException("Not a log: " + block);
 			}
@@ -118,7 +130,8 @@ public enum WoodType {
 	}
 
 	public BlockState getBlockState(LogDirection newDir) {
-		return block.getDefaultState().with(LogBlock.AXIS, newDir.axis);
+		//return block.getDefaultState().with(LogBlock.AXIS, newDir.axis);
+		return block.getDefaultState();
 	}
 
 	public Block getSapling() {

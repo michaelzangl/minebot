@@ -16,7 +16,7 @@ public class ChatMessage {
 			throws ScriptException {
 		time = engine.eval("new Date(" + m.getTime() + ")");
 		text = m.getMessage().getUnformattedComponentText();
-		textFormatted = m.getMessage().getFormattedText();
+		textFormatted = m.getMessage().getString();
 		isChat = m.isChat();
 	}
 

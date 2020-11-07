@@ -2,6 +2,7 @@ buildscript {
     repositories {
         jcenter()
         maven { url = 'https://files.minecraftforge.net/maven' }
+        mavenCentral()
     }
     dependencies {
         classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '3.+', changing: true
@@ -19,6 +20,7 @@ def git_tags = git.tag.list().findAll {
     it.commit == git_head
 }
 version = git_tags.size() > 0 ? git_tags[0].getName() : git_head.abbreviatedId;
+
 println "Compiling version ${version}"
 
 group = "de.michaelzangl.minebot"
@@ -32,7 +34,8 @@ minecraft {
     // stable_#            stables are built at the discretion of the MCP team.
     // Use non-default mappings at your own risk. they may not allways work.
     // simply re-run your setup task after changing the mappings to update your workspace.
-    mappings channel: 'snapshot', version: '20200225-1.15.1'
+    // mappings channel: 'snapshot', version: '20200225-1.15.1'
+    mappings channel: 'snapshot', version: '20200514-1.16'
 
     runs {
         client {
@@ -42,7 +45,8 @@ minecraft {
 }
 
 dependencies {
-    minecraft 'net.minecraftforge:forge:1.15.2-31.1.43'
+    // minecraft 'net.minecraftforge:forge:1.15.2-31.1.43'
+    minecraft 'net.minecraftforge:forge:1.16.3-34.0.17'
 }
 
 jar {

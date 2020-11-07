@@ -103,15 +103,15 @@ public enum RenderMode {
 				--height;
 				state = chunk.getBlockState(new BlockPos(dx, height, dz));
 			} while ((GLOBAL_COVER_BLACKLIST.contains(state) || state
-					.getBlock().getMaterialColor(state, world.getBackingWorld(), new BlockPos(dx, height, dz)) == MaterialColor.AIR)
+					.getMaterialColor(world.getBackingWorld(), new BlockPos(dx, height, dz)) == MaterialColor.AIR)
 					&& height > 0);
 
 			if (state.getBlock() == Blocks.SANDSTONE || state.getBlock() == Blocks.SANDSTONE_STAIRS) {
 				return 0xffb4ad8a;
 			}
 
-			MaterialColor color = (state.getBlock().getMaterialColor(state, world.getBackingWorld(), new BlockPos(dx, height, dz)));
-			return getColor(color);
+			MaterialColor color = (state.getMaterialColor(world.getBackingWorld(), new BlockPos(dx, height, dz)));
+			return color.colorValue; //Not sure? return getColor(1,1,1);
 		}
 
 		private int getColor(MaterialColor color) {

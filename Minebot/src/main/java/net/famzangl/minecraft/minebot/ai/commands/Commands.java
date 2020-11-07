@@ -7,6 +7,7 @@ import com.mojang.brigadier.builder.RequiredArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import net.famzangl.minecraft.minebot.ai.command.IAIControllable;
 import net.famzangl.minecraft.minebot.build.commands.CommandClearArea;
+import net.famzangl.minecraft.minebot.build.commands.CommandSetPos;
 import net.minecraft.command.arguments.ILocationArgument;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
@@ -81,22 +82,26 @@ public class Commands {
 
     public static void register(LiteralArgumentBuilder<IAIControllable> minebot,
                                 LiteralArgumentBuilder<IAIControllable> minebuild) {
-        CommandAirbridge.register(minebot);
+        CommandAirbridge.register(minebot); //Not gonna lie not sure what's going on here with the sneak off block
+        //Doesn't use axe or shovels.
         CommandBuildRail.register(minebot);
-        CommandBuildWay.register(minebot);
-        CommandCraft.register(minebot);
-        CommandEat.register(minebot);
-        CommandFeed.register(minebot);
-        CommandFish.register(minebot);
+        CommandBuildWay.register(minebot);// Not really sure what build road does
+        CommandCraft.register(minebot); //Works
+        CommandEat.register(minebot); //Works
+        CommandFeed.register(minebot); //Works
+        CommandFish.register(minebot); //Works
         CommandFillArea.register(minebot, minebuild);
-        CommandClearArea.register(minebot, minebuild);
-        CommandLumberjack.register(minebot);
-        CommandMine.register(minebot);
-        CommandPathfind.register(minebot);
+        CommandClearArea.register(minebot, minebuild); //Works
+        CommandSetPos.registerp1(minebuild); //Redone, works
+        CommandSetPos.registerp2(minebuild); //Redone, works
+        CommandLumberjack.register(minebot); //Works,
+        CommandMine.register(minebot);  //Works
+        CommandPathfind.register(minebot); //Probably works
         CommandRespawn.register(minebot);
         CommandResume.register(minebot);
         CommandStack.register(minebot);
-        CommandStore.register(minebot);
-        CommandTunnel.register(minebot);
+        CommandStore.register(minebot); //Works
+        CommandTunnel.register(minebot); //Works
+        CommandPlant.register(minebot);
     }
 }

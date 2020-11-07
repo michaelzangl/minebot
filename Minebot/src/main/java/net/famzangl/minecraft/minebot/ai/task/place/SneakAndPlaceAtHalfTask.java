@@ -26,7 +26,7 @@ import net.famzangl.minecraft.minebot.ai.task.TaskOperations;
 import net.famzangl.minecraft.minebot.ai.task.error.StringTaskError;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.vector.Vector3d;
 
 import java.util.Arrays;
 
@@ -53,15 +53,15 @@ public class SneakAndPlaceAtHalfTask extends SneakAndPlaceTask {
 			return getPlaceOnBounds(world, placeOn, blockHalf, direction);
 		}
 
-		public Vec3d getRandomPoint(double faceCentered) {
+		public Vector3d getRandomPoint(double faceCentered) {
 			return getBounds().random(getPlaceOn(), Math.min(.9, faceCentered));
 		}
 
 		@Override
 		public int compareTo(PlacingDirection o) {
-			Vec3d player = world.getExactPlayerPosition();
-			Vec3d facing = getRandomPoint(0);
-			Vec3d facingO = o.getRandomPoint(0);
+			Vector3d player = world.getExactPlayerPosition();
+			Vector3d facing = getRandomPoint(0);
+			Vector3d facingO = o.getRandomPoint(0);
 			return -Double.compare(player.distanceTo(facing),
 					player.distanceTo(facingO));
 		}
@@ -91,7 +91,7 @@ public class SneakAndPlaceAtHalfTask extends SneakAndPlaceTask {
 
 	private final BlockPos positionToPlace;
 
-	private Vec3d facePos;
+	private Vector3d facePos;
 
 	private double faceCentered = .3;
 

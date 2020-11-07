@@ -11,7 +11,7 @@ import net.famzangl.minecraft.minebot.ai.strategy.AIStrategy;
 import net.famzangl.minecraft.minebot.ai.strategy.RunOnceStrategy;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3i;
+import net.minecraft.util.math.vector.Vector3i;
 
 @AICommand(helpText = "Expand the selected region.", name = "minebuild")
 public class CommandExpand {
@@ -38,7 +38,7 @@ public class CommandExpand {
 				pos2 = pos1;
 			}
 
-			Vec3i dir = direction.getDirectionVec();
+			Vector3i dir = direction.getDirectionVec();
 
 			boolean usePos2;
 			if (dir.getX() != 0) {

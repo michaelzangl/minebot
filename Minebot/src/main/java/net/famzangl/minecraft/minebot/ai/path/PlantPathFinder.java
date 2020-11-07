@@ -45,7 +45,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraftforge.common.IPlantable;
 
 public class PlantPathFinder extends MovePathFinder {
@@ -81,9 +81,14 @@ public class PlantPathFinder extends MovePathFinder {
 		@Override
 		public boolean applyToDelta(WorldWithDelta world) {
 			Item anyPlaceItem = seedFilter.type.items[0];
-			BlockState block = ((IPlantable) anyPlaceItem)
-					.getPlant(null, null);
-			world.setBlock(pos, block);
+			try {
+
+				BlockState block = ((IPlantable) anyPlaceItem) //BlockNamedItem cannot be cast to net.minecraftforge.common.IPlantable
+						.getPlant(null, null);
+				world.setBlock(pos, block);
+			} catch (Exception e) {
+				return false;
+			}
 			return true;
 		}
 
@@ -149,7 +154,7 @@ public class PlantPathFinder extends MovePathFinder {
 
 	private static class UseHoeTask extends UseItemOnBlockAtTask implements CanWorkWhileApproaching {
 
-		private Vec3d facingPosition;
+		private Vector3d facingPosition;
 
 		public UseHoeTask(BlockPos farmlandPos) {
 			super(new ClassItemFilter(HoeItem.class), farmlandPos);
@@ -198,7 +203,11 @@ public class PlantPathFinder extends MovePathFinder {
 	private final PlantType type;
 
 	public PlantPathFinder(PlantType type) {
-		this.type = type;
+		if (type != null) {
+			this.type = type;
+		} else {
+			this.type = PlantType.NORMAL;
+		}
 	}
 
 	@Override
@@ -208,6 +217,10 @@ public class PlantPathFinder extends MovePathFinder {
 
 	@Override
 	protected float rateDestination(int distance, int x, int y, int z) {
+		System.out.println(world.toString() + " " + distance + " " + x + " " + y + " " + z);
+		System.out.println("Blocksets.air..." + BlockSets.AIR.isAt(world, x, y, z));
+		System.out.println("type.farmland..." + type.farmland.isAt(world, x, y - 1, z));
+		System.out.println("helper.canSelect..." + helper.canSelectItem(new SeedFilter(type)));
 		if (isGrown(world, x, y, z)) {
 			return distance + 1;
 		} else if (BlockSets.AIR.isAt(world, x, y, z)

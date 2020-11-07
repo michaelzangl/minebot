@@ -75,7 +75,10 @@ public class CommandDumpSigns {
 					out.print(p.getY());
 					out.print("\t");
 					out.print(p.getZ());
-					ITextComponent[] texts = ((SignTileEntity) tileentity).signText;
+					ITextComponent l1 = ((SignTileEntity) tileentity).getText(1);
+					ITextComponent l2 = ((SignTileEntity) tileentity).getText(2);
+					ITextComponent l3 = ((SignTileEntity) tileentity).getText(3);
+					ITextComponent[] texts = {l1,l2,l3};
 					for (ITextComponent t : texts) {
 						out.append("\t");
 						out.print(t == null ? "" : t.getString());

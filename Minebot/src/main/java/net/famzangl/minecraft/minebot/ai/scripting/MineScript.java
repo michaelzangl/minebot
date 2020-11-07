@@ -39,7 +39,7 @@ import net.minecraft.command.arguments.EntitySelectorParser;
 import net.minecraft.entity.Entity;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.JsonToNBT;
-import net.minecraft.util.math.Vec2f;
+import net.minecraft.util.math.vector.Vector2f;
 
 import javax.script.Invocable;
 import javax.script.ScriptEngine;
@@ -147,8 +147,8 @@ public class MineScript {
 			entities = new EntitySelectorParser(new StringReader(entityDescr))
 					.build().select(
 							new CommandSource(ICommandSource.DUMMY,
-									helper.getMinecraft().player.getPositionVector(),
-									Vec2f.ZERO, null,
+									helper.getMinecraft().player.getPositionVec(),
+									Vector2f.ZERO, null,
 									2, helper.getMinecraft().player.getName().getString(),
 									helper.getMinecraft().player.getDisplayName(),
 									helper.getMinecraft().world.getServer(),

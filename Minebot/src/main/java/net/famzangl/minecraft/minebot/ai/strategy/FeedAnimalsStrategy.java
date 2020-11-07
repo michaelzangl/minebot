@@ -16,7 +16,7 @@
  *******************************************************************************/
 package net.famzangl.minecraft.minebot.ai.strategy;
 
-import jdk.internal.jline.internal.Nullable;
+import javax.annotation.Nullable;
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.ItemFilter;
 import net.famzangl.minecraft.minebot.ai.command.AIChatController;

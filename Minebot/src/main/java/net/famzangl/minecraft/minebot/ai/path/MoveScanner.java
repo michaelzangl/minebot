@@ -585,8 +585,7 @@ public class MoveScanner {
 
 		/**
 		 * Gets all flags (except safe_to_go) for the given block.
-		 * 
-		 * @param blockIndex
+		 *
 		 * @return A short (packed int an int).
 		 */
 		int getPositionFlags(int blockWithMeta) {
@@ -610,7 +609,7 @@ public class MoveScanner {
 		}
 
 		public int getPositionFlags(BlockState iBlockState) {
-			return Block.BLOCK_STATE_IDS.get(iBlockState);
+			return Block.BLOCK_STATE_IDS.getId(iBlockState);
 		}
 
 		public int getDangerDistanceFor(Entity e) {
@@ -630,7 +629,7 @@ public class MoveScanner {
 
 	/**
 	 * How many chunks this scanner scans. Should be more than
-	 * {@link PathFinderField#SIZE_X_Z}. The real available size is smaller by 1
+	 * {@link PathFinderField#}. The real available size is smaller by 1
 	 * chunk in each direction.
 	 */
 	private final static int CHUNK_SIZE_X_Z = 22;

@@ -193,8 +193,18 @@ public class ChestBlockHandler extends RangeBlockHandler<ChestData> {
 			if (!(tileEntity instanceof SignTileEntity)) {
 				throw new IllegalArgumentException("Expected a sign tile entity to be passed for chest at " + pos + " but got " + tileEntity);
 			}
+			ITextComponent l1 = ((SignTileEntity) tileEntity).getText(1);
+			ITextComponent l2 = ((SignTileEntity) tileEntity).getText(2);
+			ITextComponent l3 = ((SignTileEntity) tileEntity).getText(3);
+			ITextComponent l0 = ((SignTileEntity) tileEntity).getText(0);
+			ITextComponent[] texts = {l0, l1,l2,l3};
 
-			Set<String> lines = Stream.of(((SignTileEntity) tileEntity).signText)
+			//SignTileEntity sign = (SignTileEntity) Minecraft.getInstance().world.getTileEntity(pos);
+			//			AIChatController.addChatLine(sign.getText(1).getString());
+			// 1 gave B from A B C D.
+			//Tested using ^ to see it starts from X. (In setpos code)
+			//Starts from 0.
+			Set<String> lines = Stream.of(texts)
 					.map(ITextComponent::getString)
 					.map(str -> str.trim().toLowerCase(Locale.US))
 					.collect(Collectors.toSet());

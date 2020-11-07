@@ -1,111 +1,28 @@
 package net.famzangl.minecraft.minebot.ai.net;
 
+import net.minecraft.client.network.play.ClientPlayNetHandler;
 import net.minecraft.client.network.play.IClientPlayNetHandler;
 import net.minecraft.network.IPacket;
 import net.minecraft.network.NetworkManager;
-import net.minecraft.network.play.server.SAdvancementInfoPacket;
-import net.minecraft.network.play.server.SAnimateBlockBreakPacket;
-import net.minecraft.network.play.server.SAnimateHandPacket;
-import net.minecraft.network.play.server.SBlockActionPacket;
-import net.minecraft.network.play.server.SCameraPacket;
-import net.minecraft.network.play.server.SChangeBlockPacket;
-import net.minecraft.network.play.server.SChangeGameStatePacket;
-import net.minecraft.network.play.server.SChatPacket;
-import net.minecraft.network.play.server.SChunkDataPacket;
-import net.minecraft.network.play.server.SCloseWindowPacket;
-import net.minecraft.network.play.server.SCollectItemPacket;
-import net.minecraft.network.play.server.SCombatPacket;
-import net.minecraft.network.play.server.SCommandListPacket;
-import net.minecraft.network.play.server.SConfirmTransactionPacket;
-import net.minecraft.network.play.server.SCooldownPacket;
-import net.minecraft.network.play.server.SCustomPayloadPlayPacket;
-import net.minecraft.network.play.server.SDestroyEntitiesPacket;
-import net.minecraft.network.play.server.SDisconnectPacket;
-import net.minecraft.network.play.server.SDisplayObjectivePacket;
-import net.minecraft.network.play.server.SEntityEquipmentPacket;
-import net.minecraft.network.play.server.SEntityHeadLookPacket;
-import net.minecraft.network.play.server.SEntityMetadataPacket;
-import net.minecraft.network.play.server.SEntityPacket;
-import net.minecraft.network.play.server.SEntityPropertiesPacket;
-import net.minecraft.network.play.server.SEntityStatusPacket;
-import net.minecraft.network.play.server.SEntityTeleportPacket;
-import net.minecraft.network.play.server.SEntityVelocityPacket;
-import net.minecraft.network.play.server.SExplosionPacket;
-import net.minecraft.network.play.server.SHeldItemChangePacket;
-import net.minecraft.network.play.server.SJoinGamePacket;
-import net.minecraft.network.play.server.SKeepAlivePacket;
-import net.minecraft.network.play.server.SMapDataPacket;
-import net.minecraft.network.play.server.SMerchantOffersPacket;
-import net.minecraft.network.play.server.SMountEntityPacket;
-import net.minecraft.network.play.server.SMoveVehiclePacket;
-import net.minecraft.network.play.server.SMultiBlockChangePacket;
-import net.minecraft.network.play.server.SOpenBookWindowPacket;
-import net.minecraft.network.play.server.SOpenHorseWindowPacket;
-import net.minecraft.network.play.server.SOpenSignMenuPacket;
-import net.minecraft.network.play.server.SOpenWindowPacket;
-import net.minecraft.network.play.server.SPlaceGhostRecipePacket;
-import net.minecraft.network.play.server.SPlayEntityEffectPacket;
-import net.minecraft.network.play.server.SPlaySoundEffectPacket;
-import net.minecraft.network.play.server.SPlaySoundEventPacket;
-import net.minecraft.network.play.server.SPlaySoundPacket;
-import net.minecraft.network.play.server.SPlayerAbilitiesPacket;
-import net.minecraft.network.play.server.SPlayerDiggingPacket;
-import net.minecraft.network.play.server.SPlayerListHeaderFooterPacket;
-import net.minecraft.network.play.server.SPlayerListItemPacket;
-import net.minecraft.network.play.server.SPlayerLookPacket;
-import net.minecraft.network.play.server.SPlayerPositionLookPacket;
-import net.minecraft.network.play.server.SQueryNBTResponsePacket;
-import net.minecraft.network.play.server.SRecipeBookPacket;
-import net.minecraft.network.play.server.SRemoveEntityEffectPacket;
-import net.minecraft.network.play.server.SRespawnPacket;
-import net.minecraft.network.play.server.SScoreboardObjectivePacket;
-import net.minecraft.network.play.server.SSelectAdvancementsTabPacket;
-import net.minecraft.network.play.server.SSendResourcePackPacket;
-import net.minecraft.network.play.server.SServerDifficultyPacket;
-import net.minecraft.network.play.server.SSetExperiencePacket;
-import net.minecraft.network.play.server.SSetPassengersPacket;
-import net.minecraft.network.play.server.SSetSlotPacket;
-import net.minecraft.network.play.server.SSpawnExperienceOrbPacket;
-import net.minecraft.network.play.server.SSpawnGlobalEntityPacket;
-import net.minecraft.network.play.server.SSpawnMobPacket;
-import net.minecraft.network.play.server.SSpawnMovingSoundEffectPacket;
-import net.minecraft.network.play.server.SSpawnObjectPacket;
-import net.minecraft.network.play.server.SSpawnPaintingPacket;
-import net.minecraft.network.play.server.SSpawnParticlePacket;
-import net.minecraft.network.play.server.SSpawnPlayerPacket;
-import net.minecraft.network.play.server.SSpawnPositionPacket;
-import net.minecraft.network.play.server.SStatisticsPacket;
-import net.minecraft.network.play.server.SStopSoundPacket;
-import net.minecraft.network.play.server.STabCompletePacket;
-import net.minecraft.network.play.server.STagsListPacket;
-import net.minecraft.network.play.server.STeamsPacket;
-import net.minecraft.network.play.server.STitlePacket;
-import net.minecraft.network.play.server.SUnloadChunkPacket;
-import net.minecraft.network.play.server.SUpdateBossInfoPacket;
-import net.minecraft.network.play.server.SUpdateChunkPositionPacket;
-import net.minecraft.network.play.server.SUpdateHealthPacket;
-import net.minecraft.network.play.server.SUpdateLightPacket;
-import net.minecraft.network.play.server.SUpdateRecipesPacket;
-import net.minecraft.network.play.server.SUpdateScorePacket;
-import net.minecraft.network.play.server.SUpdateTileEntityPacket;
-import net.minecraft.network.play.server.SUpdateTimePacket;
-import net.minecraft.network.play.server.SUpdateViewDistancePacket;
-import net.minecraft.network.play.server.SWindowItemsPacket;
-import net.minecraft.network.play.server.SWindowPropertyPacket;
-import net.minecraft.network.play.server.SWorldBorderPacket;
+import net.minecraft.network.play.server.*;
+//import net.minecraft.network.play.server.SSpawnGlobalEntityPacket;
+//import net.minecraft.network.play.server.SSpawnPositionPacket;
 import net.minecraft.util.text.ITextComponent;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 
 @ParametersAreNonnullByDefault
 public class MinebotClientPlayNetHandler implements IClientPlayNetHandler {
-
+    //private ClientPlayNetHandler client;
     private IClientPlayNetHandler parentHandler;
     private Intercepts<IPacket<IClientPlayNetHandler>> handlers;
 
     public MinebotClientPlayNetHandler(IClientPlayNetHandler parentHandler, Intercepts<IPacket<IClientPlayNetHandler>> handlers) {
         this.parentHandler = parentHandler;
         this.handlers = handlers;
+        //client = new ClientPlayNetHandler();
+        //ClientPlayNetHandler(Minecraft mcIn, Screen previousGuiScreen,
+        // NetworkManager networkManagerIn, com.mojang.authlib.GameProfile profileIn)
     }
 
     @Override
@@ -116,11 +33,6 @@ public class MinebotClientPlayNetHandler implements IClientPlayNetHandler {
     @Override
     public void handleSpawnExperienceOrb(SSpawnExperienceOrbPacket packetIn) {
         handlers.withInterceptors(packetIn, parentHandler::handleSpawnExperienceOrb);
-    }
-
-    @Override
-    public void handleSpawnGlobalEntity(SSpawnGlobalEntityPacket packetIn) {
-        handlers.withInterceptors(packetIn, parentHandler::handleSpawnGlobalEntity);
     }
 
     @Override
@@ -379,9 +291,18 @@ public class MinebotClientPlayNetHandler implements IClientPlayNetHandler {
     }
 
     @Override
-    public void handleSpawnPosition(SSpawnPositionPacket packetIn) {
+    //Required functino override, added by mapping issue :/ Unknown what it does
+    public void func_230488_a_(SWorldSpawnChangedPacket p_230488_1_) {
+
+    }
+
+    //@Override
+    /*public void handleSpawnPosition(SSpawnPositionPacket packetIn) {
         handlers.withInterceptors(packetIn, parentHandler::handleSpawnPosition);
     }
+    public void handleSpawnGlobalEntity(SSpawnGlobalEntityPacket packetIn) {
+        handlers.withInterceptors(packetIn, parentHandler::handleSpawnGlobalEntity);
+    }*/
 
     @Override
     public void handleTimeUpdate(SUpdateTimePacket packetIn) {
@@ -394,9 +315,14 @@ public class MinebotClientPlayNetHandler implements IClientPlayNetHandler {
     }
 
     @Override
+    public void handleSpawnMovingSoundEffect(SSpawnMovingSoundEffectPacket packetIn) {
+
+    }
+
+    /*@Override
     public void func_217266_a(SSpawnMovingSoundEffectPacket packetIn) {
         handlers.withInterceptors(packetIn, parentHandler::func_217266_a);
-    }
+    }*/
 
     @Override
     public void handleCustomSound(SPlaySoundPacket packetIn) {
@@ -554,9 +480,14 @@ public class MinebotClientPlayNetHandler implements IClientPlayNetHandler {
     }
 
     @Override
+    public void handleAcknowledgePlayerDigging(SPlayerDiggingPacket packetIn) {
+        handlers.withInterceptors(packetIn, parentHandler::handleAcknowledgePlayerDigging);
+    }
+
+    /*@Override
     public void func_225312_a(SPlayerDiggingPacket packetIn) {
         handlers.withInterceptors(packetIn, parentHandler::func_225312_a);
-    }
+    }*/
 
     @Override
     public void onDisconnect(ITextComponent reason) {

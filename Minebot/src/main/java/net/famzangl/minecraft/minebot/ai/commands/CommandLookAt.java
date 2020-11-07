@@ -8,7 +8,7 @@ import net.famzangl.minecraft.minebot.ai.command.ParameterType;
 import net.famzangl.minecraft.minebot.ai.strategy.AIStrategy;
 import net.famzangl.minecraft.minebot.ai.strategy.LookAtStrategy;
 import net.minecraft.util.Direction;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.vector.Vector3d;
 
 @AICommand(name = "minebot", helpText = "Look at a given position")
 public class CommandLookAt {
@@ -19,7 +19,7 @@ public class CommandLookAt {
 			@AICommandParameter(type = ParameterType.DOUBLE, description = "x") Double x,
 			@AICommandParameter(type = ParameterType.DOUBLE, description = "y") Double y,
 			@AICommandParameter(type = ParameterType.DOUBLE, description = "z") Double z) {
-		return run(helper, new Vec3d(x, y, z));
+		return run(helper, new Vector3d(x, y, z));
 	}
 
 	@AICommandInvocation()
@@ -27,7 +27,7 @@ public class CommandLookAt {
 			AIHelper helper,
 			@AICommandParameter(type = ParameterType.FIXED, fixedName = "look", description = "") String nameArg,
 			@AICommandParameter(type = ParameterType.ENUM, description = "direction") Direction direction) {
-		Vec3d offset = new Vec3d(direction.getXOffset(),
+		Vector3d offset = new Vector3d(direction.getXOffset(),
 				direction.getYOffset()
 						+ helper.getMinecraft().player.getEyeHeight(),
 				direction.getZOffset());
@@ -35,7 +35,7 @@ public class CommandLookAt {
 				helper.getWorld().getExactPlayerPosition().add(offset));
 	}
 
-	private static LookAtStrategy run(AIHelper helper, Vec3d vec3) {
+	private static LookAtStrategy run(AIHelper helper, Vector3d vec3) {
 		return new LookAtStrategy(vec3);
 	}
 }

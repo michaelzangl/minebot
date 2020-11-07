@@ -40,7 +40,7 @@ public class OwnTameableSelector implements Predicate<Entity> {
 		Method method;
 		try {
 			method = TameableEntity.class.getMethod("func_152113_b");
-
+			//Unlucky mapping, real function unknown
 			if (method != null) {
 				// 1.7.10. No fix so far...
 				return entity.isTamed();

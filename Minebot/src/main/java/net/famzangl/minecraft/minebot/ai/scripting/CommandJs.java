@@ -334,6 +334,7 @@ public class CommandJs {
 		public void setActiveStrategy(ScriptStrategy strategy, AIHelper helper) {
 			synchronized (activeStrategyMutex) {
 				LOGGER.trace(MARKER_SYNC, "Change strategy to " + strategy);
+				System.out.println("Change to: " + strategy + "Curr:" + strategy);
 				if (activeStrategy != null) {
 					activeStrategy.setActive(false, helper);
 				}

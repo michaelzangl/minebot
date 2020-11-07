@@ -16,38 +16,46 @@
  *******************************************************************************/
 package net.famzangl.minecraft.minebot.ai.commands;
 
-import net.famzangl.minecraft.minebot.ai.AIHelper;
-import net.famzangl.minecraft.minebot.ai.command.AICommand;
-import net.famzangl.minecraft.minebot.ai.command.AICommandInvocation;
-import net.famzangl.minecraft.minebot.ai.command.AICommandParameter;
-import net.famzangl.minecraft.minebot.ai.command.ParameterType;
-import net.famzangl.minecraft.minebot.ai.command.SafeStrategyRule;
+import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+import net.famzangl.minecraft.minebot.ai.command.*;
 import net.famzangl.minecraft.minebot.ai.path.PlantPathFinder;
-import net.famzangl.minecraft.minebot.ai.path.PlantPathFinder.PlantType;
-import net.famzangl.minecraft.minebot.ai.path.SugarCanePathFinder;
-import net.famzangl.minecraft.minebot.ai.strategy.AIStrategy;
+import net.famzangl.minecraft.minebot.ai.strategy.FeedAnimalsStrategy;
 import net.famzangl.minecraft.minebot.ai.strategy.PathFinderStrategy;
+import net.minecraft.item.DyeColor;
 
 @AICommand(helpText = "Plants plants\n" + "Uses a hoe if needed.", name = "minebot")
 public class CommandPlant {
 
-	@AICommandInvocation(safeRule = SafeStrategyRule.DEFEND)
-	public static AIStrategy run(
-			AIHelper helper,
-			@AICommandParameter(type = ParameterType.FIXED, fixedName = "plant", description = "") String nameArg,
-			@AICommandParameter(type = ParameterType.ENUM, description = "plant type", optional = true) PlantType type) {
-		PlantType type2 = type == null ? PlantType.NORMAL : type;
-		return new PathFinderStrategy(
-				new PlantPathFinder(type2), "Planting " + type2.toString().toLowerCase());
+	public static void register(LiteralArgumentBuilder<IAIControllable> dispatcher) {
+		dispatcher.then(
+				Commands.optional(
+						Commands.literal("plant"),
+						context -> null,
+						"type",
+						EnumArgument.of(PlantPathFinder.PlantType.class),
+						PlantPathFinder.PlantType.class,
+						(builder, type) -> builder.executes(context -> context.getSource().requestUseStrategy(
+								new PathFinderStrategy(new PlantPathFinder(type.get(context)), "Planting"),
+														SafeStrategyRule.DEFEND)))
+								);
 	}
-	
-	@AICommandInvocation(safeRule = SafeStrategyRule.DEFEND)
-	public static AIStrategy run(
-			AIHelper helper,
-			@AICommandParameter(type = ParameterType.FIXED, fixedName = "plant", description = "") String nameArg,
-			@AICommandParameter(type = ParameterType.FIXED, fixedName = "sugar_cane", description = "") String nameArg2) {
-		return new PathFinderStrategy(
-				new SugarCanePathFinder(), "Planting sugar cane");
-	}
+//	@AICommandInvocation(safeRule = SafeStrategyRule.DEFEND)
+//	public static AIStrategy run(
+//			AIHelper helper,
+//			@AICommandParameter(type = ParameterType.FIXED, fixedName = "plant", description = "") String nameArg,
+//			@AICommandParameter(type = ParameterType.ENUM, description = "plant type", optional = true) PlantType type) {
+//		PlantType type2 = type == null ? PlantType.NORMAL : type;
+//		return new PathFinderStrategy(
+//				new PlantPathFinder(type2), "Planting " + type2.toString().toLowerCase());
+//	}
+//
+//	@AICommandInvocation(safeRule = SafeStrategyRule.DEFEND)
+//	public static AIStrategy run(
+//			AIHelper helper,
+//			@AICommandParameter(type = ParameterType.FIXED, fixedName = "plant", description = "") String nameArg,
+//			@AICommandParameter(type = ParameterType.FIXED, fixedName = "sugar_cane", description = "") String nameArg2) {
+//		return new PathFinderStrategy(
+//				new SugarCanePathFinder(), "Planting sugar cane");
+//	}
 
 }
