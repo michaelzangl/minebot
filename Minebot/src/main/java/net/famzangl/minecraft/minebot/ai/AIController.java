@@ -23,24 +23,19 @@ import net.famzangl.minecraft.minebot.ai.command.SafeStrategyRule;
 import net.famzangl.minecraft.minebot.ai.command.StackBuilder;
 import net.famzangl.minecraft.minebot.ai.net.MinebotNetHandler;
 import net.famzangl.minecraft.minebot.ai.net.NetworkHelper;
-import net.famzangl.minecraft.minebot.ai.path.world.BlockBoundsCache;
 import net.famzangl.minecraft.minebot.ai.profiler.InterceptingProfiler;
 import net.famzangl.minecraft.minebot.ai.render.BuildMarkerRenderer;
-import net.famzangl.minecraft.minebot.ai.render.PosMarkerRenderer;
-import net.famzangl.minecraft.minebot.ai.strategy.*;
+import net.famzangl.minecraft.minebot.ai.render.MinebotDebugRenderer;
+import net.famzangl.minecraft.minebot.ai.strategy.AIStrategy;
 import net.famzangl.minecraft.minebot.ai.strategy.AIStrategy.TickResult;
+import net.famzangl.minecraft.minebot.ai.strategy.RunOnceStrategy;
 import net.famzangl.minecraft.minebot.ai.utils.PrivateFieldUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.MouseHelper;
-import net.minecraft.client.entity.player.ClientPlayerEntity;
-
+import net.minecraft.client.renderer.debug.DebugRenderer;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.client.util.InputMappings;
-import net.minecraft.entity.Entity;
-import net.minecraft.item.Items;
-import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.vector.Matrix4f;
 import net.minecraftforge.client.event.ClientPlayerNetworkEvent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
@@ -109,14 +104,11 @@ public class AIController extends AIHelper implements IAIControllable {
 
 	private boolean nextPosIsPos2;
 
-	private PosMarkerRenderer markerRenderer;
-
 	private MouseHelper oldMouseHelper;
 
 	private BuildMarkerRenderer buildMarkerRenderer;
 	private NetworkHelper networkHelper;
 	private InterceptingProfiler profilerHelper;
-	private TickEvent.RenderTickEvent activeDrawEvent;
 	private boolean displayWasActiveSinceUngrab;
 
 	public AIController() {
@@ -126,14 +118,11 @@ public class AIController extends AIHelper implements IAIControllable {
 		AIChatController.getRegistry().setControlled(this);
 
 		networkHelper = MinebotNetHandler.inject(getMinecraft().getConnection());
-		//profilerHelper = InterceptingProfiler.inject(getMinecraft());
-		// Hook into
-		//profilerHelper.addListener("destroyProgress", new Runnable() {
-		//	@Override
-	//		public void run() {
-	//			drawMakers();
-	//		}
-	//	});
+
+		// We use a fake debug renderer to render our Minebot debug info.
+		// Field: Minecraft#debugRenderer is final
+		PrivateFieldUtils.setFieldValue(getMinecraft(), Minecraft.class, DebugRenderer.class,
+				new MinebotDebugRenderer(getMinecraft(), this, () -> this.currentStrategy));
 	}
 
 	/**
@@ -319,35 +308,12 @@ public class AIController extends AIHelper implements IAIControllable {
 		if (event.phase != TickEvent.Phase.START) {
 			return;
 		}
-		activeDrawEvent = event;
-	}
-
-	public void drawMakers() {
-		final Entity view = getMinecraft().getRenderViewEntity();
-		if (!(view instanceof ClientPlayerEntity)) {
-			return;
-		}
-		ClientPlayerEntity player = (ClientPlayerEntity) view;
-		if (player.getHeldItem(Hand.MAIN_HAND).getItem() != Items.AIR
-				&& player.getHeldItem(Hand.MAIN_HAND).getItem() == Items.WOODEN_AXE) {
-			if (markerRenderer == null) {
-				markerRenderer = new PosMarkerRenderer(1, 0, 0);
-			}
-			markerRenderer.render(activeDrawEvent, this, pos1, pos2);
-		} else if (player.getHeldItem(Hand.MAIN_HAND).getItem() != Items.AIR
-				&& player.getHeldItem(Hand.MAIN_HAND).getItem() == Items.STICK) {
-			if (buildMarkerRenderer == null) {
-				buildMarkerRenderer = new BuildMarkerRenderer();
-			}
-			buildMarkerRenderer.render(activeDrawEvent, this);
-		}
-		AIStrategy strategy = currentStrategy;
-		if (strategy != null) {
-			strategy.drawMarkers(activeDrawEvent, this);
-		}
+		// We could do profilerHelper = InterceptingProfiler.inject(getMinecraft());
+		// But it is much better to fake a debug renderer
 	}
 
 	public void positionMarkEvent(int x, int y, int z, int side) {
+		// TODO: Reactivate right mouse click with axe
 		final BlockPos pos = new BlockPos(x, y, z);
 		setPosition(pos, nextPosIsPos2);
 		nextPosIsPos2 ^= true;

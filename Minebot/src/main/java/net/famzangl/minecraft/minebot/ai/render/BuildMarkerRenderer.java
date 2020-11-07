@@ -16,100 +16,84 @@
  *******************************************************************************/
 package net.famzangl.minecraft.minebot.ai.render;
 
+import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.IVertexBuilder;
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.build.BuildManager;
 import net.famzangl.minecraft.minebot.build.blockbuild.BuildTask;
+import net.minecraft.client.renderer.IRenderTypeBuffer;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.WorldRenderer;
+import net.minecraft.client.renderer.debug.DebugRenderer;
+import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.shapes.VoxelShape;
+import net.minecraft.util.math.shapes.VoxelShapes;
 import net.minecraftforge.event.TickEvent;
 
+import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 
-public class BuildMarkerRenderer extends RenderHelper {
+@ParametersAreNonnullByDefault
+public class BuildMarkerRenderer implements DebugRenderer.IDebugRenderer {
 
-	private final class CornerComparator implements Comparator<BuildTask> {
-		private final int[] orders;
-		private final boolean[] inverts;
+    private AIHelper helper;
 
-		public CornerComparator(int[] orders, boolean[] inverts) {
-			super();
-			this.orders = orders;
-			this.inverts = inverts;
-		}
+    private final class CornerComparator implements Comparator<BuildTask> {
+        private final int[] orders;
+        private final boolean[] inverts;
 
-		@Override
-		public int compare(BuildTask o1, BuildTask o2) {
-			final BlockPos p1 = o1.getForPosition();
-			final BlockPos p2 = o2.getForPosition();
-			final int[] points = new int[] { p1.getX(), p1.getY(), p1.getZ() };
-			final int[] points2 = new int[] { p2.getX(), p2.getY(), p2.getZ() };
-			for (int i = 0; i < 3; i++) {
-				final int res = ((Integer) points[orders[i]])
-						.compareTo(points2[orders[i]]);
-				if (res != 0) {
-					return inverts[i] ? -res : res;
-				}
-			}
-			return 0;
-		}
-	}
+        public CornerComparator(int[] orders, boolean[] inverts) {
+            super();
+            this.orders = orders;
+            this.inverts = inverts;
+        }
 
-	public void render(TickEvent.RenderTickEvent event, AIHelper helper) {
-		renderStart(event, helper);
-		final BuildManager buildManager = helper.buildManager;
-		final List<BuildTask> scheduled = buildManager.getScheduled();
-		if (scheduled.size() > 0) {
-			final BuildTask nextTask = scheduled.get(0);
-			final HashSet<BlockPos> corners = new HashSet<BlockPos>();
+        @Override
+        public int compare(BuildTask o1, BuildTask o2) {
+            final BlockPos p1 = o1.getForPosition();
+            final BlockPos p2 = o2.getForPosition();
+            final int[] points = new int[]{p1.getX(), p1.getY(), p1.getZ()};
+            final int[] points2 = new int[]{p2.getX(), p2.getY(), p2.getZ()};
+            for (int i = 0; i < 3; i++) {
+                final int res = ((Integer) points[orders[i]]).compareTo(points2[orders[i]]);
+                if (res != 0) {
+                    return inverts[i] ? -res : res;
+                }
+            }
+            return 0;
+        }
+    }
 
-			renderMarker(nextTask.getForPosition(), 1, 1, 0, 0.7f);
-			findCorners(corners, scheduled);
-			corners.remove(nextTask.getForPosition());
-			for (final BlockPos pos : corners) {
-				renderMarker(pos, 0, 0, 1, 0.5f);
-			}
-		}
-		renderEnd();
-	}
+    public BuildMarkerRenderer(AIHelper helper) {
+        this.helper = helper;
+    }
 
-	private void findCorners(HashSet<BlockPos> corners, List<BuildTask> scheduled) {
-		for (int i = 0; i < 3; i++) {
-			addWith(corners, scheduled, i, true);
-			addWith(corners, scheduled, i, false);
-		}
-	}
+    @Override
+    public void render(MatrixStack matrixStackIn, IRenderTypeBuffer bufferIn, double camX, double camY, double camZ) {
+        final BuildManager buildManager = helper.buildManager;
+        final List<BuildTask> scheduled = buildManager.getScheduled();
+        if (scheduled.size() > 0) {
+            final BuildTask nextTask = scheduled.get(0);
+            IVertexBuilder ivertexbuilder = bufferIn.getBuffer(RenderType.getLines());
+            BlockPos pos = nextTask.getForPosition();
+            AxisAlignedBB box = new AxisAlignedBB(pos).grow(.02, .02, .02);
+            VoxelShape voxelshape = VoxelShapes.create(box);
+            WorldRenderer.drawVoxelShapeParts(matrixStackIn, ivertexbuilder, voxelshape,
+                        -camX, -camY, -camZ, 1, 0, 1, 1.0F);
 
-	private void addWith(HashSet<BlockPos> corners, List<BuildTask> scheduled,
-			int side1, boolean side1Inverted) {
-		for (int i = 0; i < 3; i++) {
-			if (i != side1) {
-				addWith(corners, scheduled, side1, side1Inverted, i, true);
-				addWith(corners, scheduled, side1, side1Inverted, i, false);
-			}
-		}
-	}
-
-	private void addWith(HashSet<BlockPos> corners, List<BuildTask> scheduled,
-			int side1, boolean side1Inverted, int side2, boolean side2Inverted) {
-		for (int i = 0; i < 3; i++) {
-			if (i != side1 && i != side2) {
-				addWith(corners, scheduled, side1, side1Inverted, side2,
-						side2Inverted, i, true);
-				addWith(corners, scheduled, side1, side1Inverted, side2,
-						side2Inverted, i, false);
-			}
-		}
-	}
-
-	private void addWith(HashSet<BlockPos> corners, List<BuildTask> scheduled,
-			int side1, boolean side1Inverted, int side2, boolean side2Inverted,
-			int side3, boolean side3Inverted) {
-		final BuildTask task = Collections.min(scheduled, new CornerComparator(
-				new int[] { side1, side2, side3 }, new boolean[] {
-						side1Inverted, side2Inverted, side3Inverted }));
-		corners.add(task.getForPosition());
-	}
+            // Places where we can stand
+            for (BlockPos p : nextTask.getStandablePlaces()) {
+                AxisAlignedBB standBox = new AxisAlignedBB(p).grow(-.3, -.1, -.3)
+                        .contract(0, .8, 0);
+                VoxelShape standVoxelshape = VoxelShapes.create(standBox);
+                RenderUtils.drawVoxelShapeParts(matrixStackIn, ivertexbuilder, standVoxelshape,
+                        -camX, -camY, -camZ, 1, 0, 1, 1.0F);
+            }
+        }
+    }
 
 }

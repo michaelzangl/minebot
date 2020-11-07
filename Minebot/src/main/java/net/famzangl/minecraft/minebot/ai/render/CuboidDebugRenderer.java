@@ -8,7 +8,6 @@ import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.client.renderer.debug.DebugRenderer;
 import net.minecraft.util.math.AxisAlignedBB;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraft.util.math.shapes.VoxelShapes;
 
@@ -16,28 +15,30 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.function.Supplier;
 
 @ParametersAreNonnullByDefault
-public class PosMarkerRenderer extends CuboidDebugRenderer {
+public class CuboidDebugRenderer implements DebugRenderer.IDebugRenderer {
 
-    private final Supplier<BlockPos> pos;
-    private final String name;
+    public static final double EXPAND = .02;
+    private final Supplier<BlockCuboid<?>> pos;
+    private final float r;
+    private final float g;
+    private final float b;
 
-    public PosMarkerRenderer(Supplier<BlockPos> pos, float r, float g, float b, String name) {
-        super(() -> {
-            BlockPos val = pos.get();
-            return val != null ? new BlockCuboid<>(val, val) : null;
-        }, r, g, b);
+    public CuboidDebugRenderer(Supplier<BlockCuboid<?>> pos, float r, float g, float b) {
         this.pos = pos;
-        this.name = name;
+        this.r = r;
+        this.g = g;
+        this.b = b;
     }
 
     @Override
     public void render(MatrixStack matrixStackIn, IRenderTypeBuffer bufferIn, double camX, double camY, double camZ) {
-        super.render(matrixStackIn, bufferIn, camX, camY, camZ);
-
-        BlockPos pos = this.pos.get();
+        IVertexBuilder ivertexbuilder = bufferIn.getBuffer(RenderType.getLines());
+        BlockCuboid<?> pos = this.pos.get();
         if (pos != null) {
-            DebugRenderer.renderText(name,
-                   pos.getX(), pos.getY(), pos.getZ(), -1);
+            AxisAlignedBB box = new AxisAlignedBB(pos.getMin().getX() - EXPAND, pos.getMin().getY() - EXPAND, pos.getMin().getZ() - EXPAND,
+                    pos.getMax().getX() + 1 + EXPAND, pos.getMax().getY() + 1 + EXPAND, pos.getMax().getZ() + 1 + EXPAND);
+
+            RenderUtils.drawShape(matrixStackIn, ivertexbuilder, box, -camX, -camY, -camZ, r, g, b, 1.0F);
         }
     }
 }

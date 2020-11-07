@@ -24,7 +24,6 @@ import net.famzangl.minecraft.minebot.ai.command.AICommandParameter;
 import net.famzangl.minecraft.minebot.ai.command.ParameterType;
 import net.famzangl.minecraft.minebot.ai.command.SafeStrategyRule;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSets;
-import net.famzangl.minecraft.minebot.ai.render.PosMarkerRenderer;
 import net.famzangl.minecraft.minebot.ai.strategy.AIStrategy;
 import net.famzangl.minecraft.minebot.ai.strategy.TaskStrategy;
 import net.famzangl.minecraft.minebot.ai.task.WaitTask;
@@ -34,7 +33,6 @@ import net.famzangl.minecraft.minebot.build.ForBuildPathFinder;
 import net.famzangl.minecraft.minebot.build.NextTaskTask;
 import net.famzangl.minecraft.minebot.build.blockbuild.BuildTask;
 import net.minecraft.util.math.BlockPos;
-import net.minecraftforge.event.TickEvent;
 
 import java.util.List;
 
@@ -46,8 +44,6 @@ public class CommandBuild {
 		private boolean terrainChecked = false;
 		private ForBuildPathFinder pathFinder;
 
-		private final PosMarkerRenderer renderer = new PosMarkerRenderer(1, 1,
-				0);
 		private final BlockPos[] positions = new BlockPos[5];
 
 		@Override
@@ -124,12 +120,6 @@ public class CommandBuild {
 		public String getDescription(AIHelper helper) {
 			return "Building.";
 		}
-
-		@Override
-		public void drawMarkers(TickEvent.RenderTickEvent event, AIHelper helper) {
-			renderer.render(event, helper, positions);
-		}
-
 	}
 
 	@AICommandInvocation(safeRule = SafeStrategyRule.DEFEND)

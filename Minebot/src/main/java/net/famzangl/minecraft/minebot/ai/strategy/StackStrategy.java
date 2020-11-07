@@ -17,7 +17,8 @@
 package net.famzangl.minecraft.minebot.ai.strategy;
 
 import net.famzangl.minecraft.minebot.ai.AIHelper;
-import net.minecraftforge.event.TickEvent;
+import net.famzangl.minecraft.minebot.ai.render.StrategyStackRenderer;
+import net.minecraft.client.renderer.debug.DebugRenderer;
 
 import java.util.HashSet;
 
@@ -94,15 +95,12 @@ public class StackStrategy extends AIStrategy {
 	}
 
 	@Override
-	public void drawMarkers(TickEvent.RenderTickEvent event, AIHelper helper) {
-		AIStrategy current = stack.getCurrentStrategy();
-		if (current != null) {
-			current.drawMarkers(event, helper);
-		}
+	public String toString() {
+		return "StackStrategy [stack=" + stack + ", aborted=" + aborted + "]";
 	}
 
 	@Override
-	public String toString() {
-		return "StackStrategy [stack=" + stack + ", aborted=" + aborted + "]";
+	public DebugRenderer.IDebugRenderer getDebugRenderer(AIHelper helper) {
+		return new StrategyStackRenderer(stack, helper);
 	}
 }

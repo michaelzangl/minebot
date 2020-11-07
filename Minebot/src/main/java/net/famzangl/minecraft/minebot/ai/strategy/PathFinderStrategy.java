@@ -20,12 +20,9 @@ import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.path.MovePathFinder;
 import net.famzangl.minecraft.minebot.ai.path.world.WorldData;
 import net.famzangl.minecraft.minebot.ai.path.world.WorldWithDelta;
-import net.famzangl.minecraft.minebot.ai.render.PosMarkerRenderer;
 import net.famzangl.minecraft.minebot.ai.task.AITask;
 import net.famzangl.minecraft.minebot.ai.task.WaitTask;
-import net.minecraft.client.Minecraft;
 import net.minecraft.util.math.BlockPos;
-import net.minecraftforge.event.TickEvent;
 
 /**
  * This is the base strategy for all strategies that do pathfinding. Most of the
@@ -43,8 +40,6 @@ public class PathFinderStrategy extends TaskStrategy {
 	private final String description;
 	private boolean inShouldTakeOver;
 	private boolean noPathFound;
-	private final PosMarkerRenderer renderer = new PosMarkerRenderer(255, 128,
-			0);
 	protected WorldData pathFindingWorld;;
 
 	// private final HealthWatcher watcher = new HealthWatcher();
@@ -173,15 +168,6 @@ public class PathFinderStrategy extends TaskStrategy {
 	public String toString() {
 		return "PathFinderStrategy [pathFinder=" + pathFinder
 				+ ", description=" + description + "]";
-	}
-
-	@Override
-	public void drawMarkers(TickEvent.RenderTickEvent event, AIHelper helper) {
-		BlockPos target = pathFinder.getCurrentTarget();
-		if (target != null) {
-			renderer.render(event, helper, target, target.add(0, 1, 0));
-		}
-		super.drawMarkers(event, helper);
 	}
 
 }

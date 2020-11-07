@@ -17,7 +17,9 @@
 package net.famzangl.minecraft.minebot.ai.task.move;
 
 import net.famzangl.minecraft.minebot.ai.AIHelper;
+import net.famzangl.minecraft.minebot.ai.path.world.BlockSets;
 import net.famzangl.minecraft.minebot.ai.path.world.RecordingWorld;
+import net.famzangl.minecraft.minebot.ai.path.world.WorldWithDelta;
 import net.famzangl.minecraft.minebot.ai.task.AITask;
 import net.famzangl.minecraft.minebot.ai.task.TaskOperations;
 import net.famzangl.minecraft.minebot.ai.task.error.PositionTaskError;
@@ -76,4 +78,13 @@ public class WalkTowardsTask extends AITask {
 				+ "]";
 	}
 
+	@Override
+	public boolean applyToDelta(WorldWithDelta world) {
+		int y = world.getPlayerPosition().getY();
+		while (BlockSets.FEET_CAN_WALK_THROUGH.isAt(world, x, y - 1, z)) {
+			y--;
+		}
+		world.setPlayerPosition(new BlockPos(x, y, z));
+		return true;
+	}
 }

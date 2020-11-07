@@ -131,7 +131,4 @@ public abstract class AITask {
 	public void onCanceled() {
 	}
 
-	public void drawMarkers(TickEvent.RenderTickEvent event, AIHelper helper) {
-	}
-
 }

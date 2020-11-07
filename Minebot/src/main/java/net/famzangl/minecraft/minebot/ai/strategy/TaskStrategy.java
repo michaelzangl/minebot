@@ -19,6 +19,7 @@ package net.famzangl.minecraft.minebot.ai.strategy;
 import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.command.AIChatController;
 import net.famzangl.minecraft.minebot.ai.path.TaskReceiver;
+import net.famzangl.minecraft.minebot.ai.render.TaskListRenderer;
 import net.famzangl.minecraft.minebot.ai.task.AITask;
 import net.famzangl.minecraft.minebot.ai.task.CanWorkWhileApproaching;
 import net.famzangl.minecraft.minebot.ai.task.SkipWhenSearchingPrefetch;
@@ -26,12 +27,13 @@ import net.famzangl.minecraft.minebot.ai.task.TaskOperations;
 import net.famzangl.minecraft.minebot.ai.task.error.StrategyDeactivatedError;
 import net.famzangl.minecraft.minebot.ai.task.error.StringTaskError;
 import net.famzangl.minecraft.minebot.ai.task.error.TaskError;
-import net.minecraftforge.event.TickEvent;
+import net.minecraft.client.renderer.debug.DebugRenderer;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.MarkerManager;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 
 /**
@@ -165,7 +167,8 @@ public abstract class TaskStrategy extends AIStrategy implements
 		} else {
 			int tickTimeout = task.getGameTickTimeout(helper);
 			if (taskTimeout > tickTimeout) {
-				LOGGER.error(MARKER_TASK, "Task timeout for: " + task);
+				LOGGER.error(MARKER_TASK, "Task timeout after {} ticks for: {}",
+						tickTimeout, task);
 				desync(new StringTaskError(
 						"Task timed out. It should have been completed in "
 								+ (tickTimeout / 20f) + "s"));
@@ -213,14 +216,10 @@ public abstract class TaskStrategy extends AIStrategy implements
 	public boolean isDesync() {
 		return desyncTimer > 0;
 	}
-	
-	@Override
-	public void drawMarkers(TickEvent.RenderTickEvent event, AIHelper helper) {
-		AITask activeTask2 = activeTask;
-		if (activeTask2 != null) {
-			activeTask2.drawMarkers(event, helper);
-		}
-		super.drawMarkers(event, helper);
-	}
 
+	@Override
+	public DebugRenderer.IDebugRenderer getDebugRenderer(AIHelper helper) {
+		// Tasks may be mutated on some game loop thread => do not access it on rendering directly
+		return new TaskListRenderer(new ArrayList<>(tasks), helper);
+	}
 }

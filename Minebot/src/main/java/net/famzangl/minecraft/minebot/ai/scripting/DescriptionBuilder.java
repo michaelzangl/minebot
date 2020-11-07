@@ -68,10 +68,4 @@ public class DescriptionBuilder {
 		}
 		return str;
 	}
-	
-	public synchronized void drawMarkers(TickEvent.RenderTickEvent event, AIHelper helper) {
-		if (activeStrategy != null) {
-			activeStrategy.drawMarkers(event, helper);
-		}
-	}
 }

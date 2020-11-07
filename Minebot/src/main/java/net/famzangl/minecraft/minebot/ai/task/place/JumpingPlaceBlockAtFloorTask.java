@@ -39,7 +39,7 @@ public class JumpingPlaceBlockAtFloorTask extends PlaceBlockAtFloorTask {
 
 	@Override
 	public boolean isFinished(AIHelper aiHelper) {
-		return hasPlacedBlock && isAtDesiredHeight(aiHelper) && super.isFinished(aiHelper);
+		return hasPlacedBlock && isAtDesiredHeight(aiHelper) && !aiHelper.isJumping() && super.isFinished(aiHelper);
 	}
 
 	@Override

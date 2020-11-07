@@ -20,7 +20,6 @@ import net.famzangl.minecraft.minebot.ai.AIHelper;
 import net.famzangl.minecraft.minebot.ai.path.world.BlockSets;
 import net.famzangl.minecraft.minebot.ai.path.world.WorldData;
 import net.famzangl.minecraft.minebot.ai.path.world.WorldWithDelta;
-import net.famzangl.minecraft.minebot.ai.render.PosMarkerRenderer;
 import net.famzangl.minecraft.minebot.ai.utils.BlockArea;
 import net.famzangl.minecraft.minebot.ai.utils.BlockArea.AreaVisitor;
 import net.famzangl.minecraft.minebot.ai.utils.BlockCuboid;
@@ -29,7 +28,6 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.vector.Vector3d;
-import net.minecraftforge.event.TickEvent;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.Marker;
@@ -82,12 +80,11 @@ public class DestroyInRangeTask extends AITask implements CanPrefaceAndDestroy {
 					world.setBlock(new BlockPos(x, y, z), Blocks.AIR);
 					y++;
 				}
-			} else {
+			} else if (!noDestructionRequired(world, x, y, z)) {
 				LOGGER.error(MARKER_DESTROY_IN_RANGE, "Cannot simulate the destroy for " + x + "," + y + ","
 						+ z + ", block state at that position is: " + world.getBlockStateId(x, y, z));
 			}
 		}
-
 	}
 
 	private int facingAttempts;
@@ -96,8 +93,6 @@ public class DestroyInRangeTask extends AITask implements CanPrefaceAndDestroy {
 	private BlockArea<WorldData> range;
 	private Vector3d facingPos;
 	private BlockPos lastFacingFor;
-
-	private final PosMarkerRenderer renderer = new PosMarkerRenderer(0, 0, 255);
 
 	/**
 	 * Create a new {@link DestroyInRangeTask}.
@@ -252,14 +247,5 @@ public class DestroyInRangeTask extends AITask implements CanPrefaceAndDestroy {
 		// FIXME Check which blocks are really destroyed / fail if they are not.
 		range.accept(new ApplyToDelta(), world);
 		return true;
-	}
-
-	@Override
-	public void drawMarkers(TickEvent.RenderTickEvent event, AIHelper helper) {
-		BlockPos currentAttemptingPos2 = currentAttemptingPos;
-		if (currentAttemptingPos2 != null) {
-			renderer.render(event, helper, currentAttemptingPos2);
-		}
-		super.drawMarkers(event, helper);
 	}
 }

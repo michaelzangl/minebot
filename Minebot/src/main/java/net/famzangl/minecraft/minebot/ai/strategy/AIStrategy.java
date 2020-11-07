@@ -16,8 +16,10 @@
  *******************************************************************************/
 package net.famzangl.minecraft.minebot.ai.strategy;
 
+import com.mojang.blaze3d.matrix.MatrixStack;
 import net.famzangl.minecraft.minebot.ai.AIHelper;
-import net.minecraftforge.event.TickEvent;
+import net.minecraft.client.renderer.IRenderTypeBuffer;
+import net.minecraft.client.renderer.debug.DebugRenderer;
 
 /**
  * An {@link AIStrategy} tells the bot what to do next. It should recover from
@@ -29,6 +31,14 @@ import net.minecraftforge.event.TickEvent;
  * 
  */
 public abstract class AIStrategy {
+
+	public static final DebugRenderer.IDebugRenderer NOP_DEBUG_RENDERER = new DebugRenderer.IDebugRenderer() {
+		@Override
+		public void render(MatrixStack matrixStackIn, IRenderTypeBuffer bufferIn, double camX, double camY, double camZ) {
+			// NOP
+		}
+	};
+
 	public enum TickResult {
 		/**
 		 * To do this tick again, either calling the same strategy again or
@@ -150,8 +160,7 @@ public abstract class AIStrategy {
 		return false;
 	}
 
-	public void drawMarkers(TickEvent.RenderTickEvent event, AIHelper helper) {
-		
+	public DebugRenderer.IDebugRenderer getDebugRenderer(AIHelper helper) {
+		return NOP_DEBUG_RENDERER;
 	}
-
 }
