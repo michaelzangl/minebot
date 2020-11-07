@@ -1,7 +1,8 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="runClient" type="Application" factoryName="Application" singleton="false">
+  <configuration default="false" name="runClient" type="Application" factoryName="Application" singleton="true">
     <envs>
-      <env name="MOD_CLASSES" value="$PROJECT_DIR$/build/resources/main:$PROJECT_DIR$/build/classes/java/main"/>      <env name="MCP_MAPPINGS" value="snapshot_20200514-1.16" />
+      <env name="MOD_CLASSES" value="$PROJECT_DIR$/build/resources/main:$PROJECT_DIR$/build/classes/java/main" />
+      <env name="MCP_MAPPINGS" value="snapshot_20200514-1.16" />
       <env name="MCP_VERSION" value="20200911.084530" />
       <env name="FORGE_VERSION" value="34.0.17" />
       <env name="assetIndex" value="1.16" />
